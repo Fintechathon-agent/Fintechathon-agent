@@ -68,3 +68,4 @@ button:focus-visible, input:focus-visible { outline: 3px solid rgba(44, 129, 107
 .scenario-footer { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin: 0 22px 21px; color: var(--muted); font-size: 10px; }
 .red-permission-dot { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: var(--red); }
 @media (max-width: 760px) { .scenario-footer { margin: 0 16px 17px; }.scenario-footer .primary-button { padding: 9px 10px; font-size: 10px; } }
+.panel { min-width: 0; }
