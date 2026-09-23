@@ -1,0 +1,10 @@
+{
+  "name": "portfolio-sentinel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portfolio Sentinel Agent MVP demo",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check app.js"
+  }
+}
