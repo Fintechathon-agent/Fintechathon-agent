@@ -156,7 +156,7 @@ $("#risk-confirm-checkbox").addEventListener("change", (event) => {
 $("#start-verification-button").addEventListener("click", () => {
   $("#verification-step-one").classList.add("is-hidden");
   $("#verification-step-two").classList.remove("is-hidden");
-  $(".code-inputs input").first().focus();
+  $(".code-inputs input").focus();
 });
 $(".code-inputs").addEventListener("input", (event) => {
   const input = event.target;
