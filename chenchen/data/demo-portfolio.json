@@ -1,0 +1,68 @@
+{
+  "dataset_version": "golden-demo-v1",
+  "as_of": "2026-09-23T08:00:00Z",
+  "transaction_cost_rate": 0.001,
+  "scenario_seed": 20260924,
+  "portfolio": {
+    "portfolio_id": "golden-demo-portfolio",
+    "as_of": "2026-09-23T08:00:00Z",
+    "cash": 10000,
+    "positions": [
+      {
+        "instrument_id": "EQUITY_ALPHA",
+        "name": "Alpha Holdings",
+        "type": "A_SHARE",
+        "sector": "Technology",
+        "quantity": 100,
+        "price": 47.2
+      },
+      {
+        "instrument_id": "ETF_GROWTH",
+        "name": "Growth ETF",
+        "type": "ETF",
+        "sector": "Technology",
+        "quantity": 100,
+        "price": 75.5
+      },
+      {
+        "instrument_id": "ETF_CONSUMER",
+        "name": "Consumer ETF",
+        "type": "ETF",
+        "sector": "Consumer",
+        "quantity": 100,
+        "price": 47.6
+      },
+      {
+        "instrument_id": "ETF_BOND",
+        "name": "Bond ETF",
+        "type": "ETF",
+        "sector": "Fixed Income",
+        "quantity": 100,
+        "price": 40.5
+      }
+    ]
+  },
+  "instrument_metadata": {
+    "EQUITY_ALPHA": { "type": "A_SHARE", "lot_size": 100 },
+    "ETF_GROWTH": { "type": "ETF", "lot_size": 100 },
+    "ETF_CONSUMER": { "type": "ETF", "lot_size": 100 },
+    "ETF_BOND": { "type": "ETF", "lot_size": 100 }
+  },
+  "price_history": {
+    "dates": [
+      "2026-09-15",
+      "2026-09-16",
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22",
+      "2026-09-23"
+    ],
+    "prices": {
+      "EQUITY_ALPHA": [50, 49.4, 48.8, 49.6, 48.1, 48.4, 47.2],
+      "ETF_GROWTH": [80, 78.6, 77.5, 79.1, 76.4, 77.3, 75.5],
+      "ETF_CONSUMER": [50, 49.1, 48.6, 49.2, 47.9, 48.2, 47.6],
+      "ETF_BOND": [40, 40.1, 40.2, 40.1, 40.3, 40.4, 40.5]
+    }
+  }
+}

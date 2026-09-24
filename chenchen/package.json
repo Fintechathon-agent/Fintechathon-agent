@@ -5,6 +5,7 @@
   "description": "Portfolio Sentinel Agent MVP demo",
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node --check app.js"
+    "check": "node --check server.js && node --check app.js && node --check core/harness.js && node --check core/memory.js && node --check tools/financial-tools.js",
+    "test": "node --test"
   }
 }

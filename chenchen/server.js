@@ -1,9 +1,14 @@
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
+"use strict";
+
+const http = require("node:http");
+const fs = require("node:fs");
+const path = require("node:path");
+const { Harness } = require("./core/harness");
+const tools = require("./tools/financial-tools");
 
 const root = __dirname;
 const port = Number(process.env.PORT || 4173);
+const harness = new Harness({ toolset: tools });
 const mime = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -12,32 +17,197 @@ const mime = {
   ".svg": "image/svg+xml"
 };
 
-const server = http.createServer((request, response) => {
-  const requested = decodeURIComponent(request.url.split("?")[0]);
-  const safePath = path.normalize(requested === "/" ? "/index.html" : requested);
-  const filePath = path.join(root, safePath);
+function sendJson(response, status, payload) {
+  response.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store"
+  });
+  response.end(JSON.stringify(payload));
+}
 
-  if (!filePath.startsWith(root)) {
-    response.writeHead(403);
-    response.end("Forbidden");
+function sendError(response, error, fallbackStatus = 400) {
+  const status = error.statusCode || (error.code === "INVALID_PORTFOLIO" ? 422 : fallbackStatus);
+  sendJson(response, status, {
+    error: {
+      code: error.code || "REQUEST_FAILED",
+      message: error.message,
+      details: error.details || null
+    }
+  });
+}
+
+function parseBody(request) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    request.on("data", (chunk) => {
+      body += chunk;
+      if (body.length > 1024 * 1024) {
+        const error = new Error("request body exceeds 1 MB");
+        error.statusCode = 413;
+        reject(error);
+        request.destroy();
+      }
+    });
+    request.on("end", () => {
+      if (!body) return resolve({});
+      try {
+        resolve(JSON.parse(body));
+      } catch (error) {
+        error.statusCode = 400;
+        error.code = "INVALID_JSON";
+        reject(error);
+      }
+    });
+    request.on("error", reject);
+  });
+}
+
+function resolvePortfolio(body) {
+  if (body && body.snapshot) return body.snapshot;
+  if (body && body.portfolio) return body.portfolio;
+  return body && Object.keys(body).length ? body : tools.getDemoPortfolio();
+}
+
+function resolveSnapshot(body) {
+  const input = resolvePortfolio(body);
+  if (input.snapshot_id) return input;
+  const result = tools.validatePortfolio(input);
+  if (!result.output.valid) {
+    const error = new Error("portfolio validation failed");
+    error.code = "INVALID_PORTFOLIO";
+    error.details = result.output;
+    throw error;
+  }
+  return result.output.snapshot;
+}
+
+async function handleApi(request, response, pathname, url) {
+  const method = request.method || "GET";
+  let body = {};
+  if (method === "POST") body = await parseBody(request);
+
+  if (method === "GET" && pathname === "/api/demo/portfolio") {
+    sendJson(response, 200, tools.validatePortfolio(tools.getDemoPortfolio()));
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/session/init") {
+    sendJson(response, 200, harness.createSession(body));
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/health-check/run") {
+    const result = harness.runHealthCheck({
+      task_id: body.task_id,
+      session_id: body.session_id,
+      risk_profile: body.risk_profile,
+      portfolio: body.portfolio || body.snapshot
+    });
+    sendJson(response, 200, result);
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/portfolio/import") {
+    sendJson(response, 200, tools.validatePortfolio(resolvePortfolio(body)));
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/portfolio/diagnose") {
+    sendJson(response, 200, tools.diagnosePortfolio(resolvePortfolio(body)));
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/strategy/generate") {
+    const snapshot = resolveSnapshot(body);
+    const report = body.health_report || body.report || tools.diagnosePortfolio(snapshot).output;
+    sendJson(response, 200, tools.generateCandidates(snapshot, report));
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/simulation/run") {
+    const snapshot = resolveSnapshot(body);
+    const candidates = body.candidates || body.proposals;
+    sendJson(response, 200, tools.runSimulation(snapshot, candidates));
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/paper-trade/execute") {
+    const result = tools.paperTrade({
+      snapshot: resolveSnapshot(body),
+      proposal: body.proposal,
+      approval: body.approval,
+      idempotency_key: body.idempotency_key
+    });
+    sendJson(response, result.output.status === "REQUIRES_APPROVAL" ? 403 : 200, result);
+    return true;
+  }
+  if (method === "GET" && pathname.startsWith("/api/audit/")) {
+    const taskId = decodeURIComponent(pathname.slice("/api/audit/".length));
+    const audit = harness.getAudit(taskId);
+    if (!audit) {
+      sendJson(response, 404, { error: { code: "TASK_NOT_FOUND", message: "task not found" } });
+    } else {
+      sendJson(response, 200, audit);
+    }
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/memory/save") {
+    sendJson(response, 200, harness.saveMemory(body.task_id, body.record));
+    return true;
+  }
+  if (method === "GET" && pathname === "/api/memory") {
+    sendJson(response, 200, { session_id: url.searchParams.get("session_id"), entries: harness.listMemory(url.searchParams.get("session_id")) });
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/memory/clear") {
+    sendJson(response, 200, harness.memory.clear(body.session_id));
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/demo/reset") {
+    harness.reset();
+    tools.resetPaperTrading();
+    sendJson(response, 200, { reset: true, data_as_of: tools.constants.DATA_AS_OF });
+    return true;
+  }
+  return false;
+}
+
+function serveStatic(response, pathname) {
+  let decodedPath;
+  try {
+    decodedPath = decodeURIComponent(pathname);
+  } catch {
+    sendJson(response, 400, { error: { code: "INVALID_PATH", message: "invalid URL path" } });
     return;
   }
-
+  const relativePath = decodedPath === "/" ? "index.html" : decodedPath.replace(/^\/+/, "");
+  const filePath = path.resolve(root, relativePath);
+  const relativeToRoot = path.relative(root, filePath);
+  if (relativeToRoot.startsWith("..") || path.isAbsolute(relativeToRoot)) {
+    sendJson(response, 403, { error: { code: "FORBIDDEN", message: "forbidden path" } });
+    return;
+  }
   fs.readFile(filePath, (error, file) => {
     if (error) {
-      response.writeHead(error.code === "ENOENT" ? 404 : 500);
-      response.end(error.code === "ENOENT" ? "Not found" : "Server error");
+      sendJson(response, error.code === "ENOENT" ? 404 : 500, { error: { code: error.code || "FILE_ERROR", message: error.code === "ENOENT" ? "not found" : "server error" } });
       return;
     }
-
-    response.writeHead(200, {
-      "Content-Type": mime[path.extname(filePath)] || "application/octet-stream",
-      "Cache-Control": "no-store"
-    });
+    response.writeHead(200, { "Content-Type": mime[path.extname(filePath)] || "application/octet-stream", "Cache-Control": "no-store" });
     response.end(file);
   });
+}
+
+const server = http.createServer(async (request, response) => {
+  try {
+    const url = new URL(request.url, `http://${request.headers.host || "127.0.0.1"}`);
+    if (url.pathname.startsWith("/api/")) {
+      const handled = await handleApi(request, response, url.pathname, url);
+      if (!handled) sendJson(response, 404, { error: { code: "API_NOT_FOUND", message: "API route not found" } });
+      return;
+    }
+    serveStatic(response, url.pathname);
+  } catch (error) {
+    if (!response.headersSent) sendError(response, error);
+  }
 });
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`Portfolio Sentinel running at http://127.0.0.1:${port}`);
-});
+if (require.main === module) {
+  server.listen(port, "127.0.0.1", () => {
+    console.log(`Portfolio Sentinel running at http://127.0.0.1:${port}`);
+  });
+}
+
+module.exports = { server, harness };
