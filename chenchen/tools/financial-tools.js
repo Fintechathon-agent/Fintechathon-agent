@@ -3,7 +3,7 @@
 const crypto = require("node:crypto");
 const dataset = require("../data/demo-portfolio.json");
 
-const TOOL_VERSION = "financial-tools@0.2.0";
+const TOOL_VERSION = "financial-tools@0.3.0";
 const PERIODS_PER_YEAR = 252;
 const DEFAULT_SCENARIO_PATHS = 2000;
 const DEFAULT_SCENARIO_SEED = dataset.scenario_seed;
@@ -308,9 +308,63 @@ function normalizeWeights(weights) {
   return normalized;
 }
 
+function capSecurityWeights(weights, maxSingleAssetWeight) {
+  const capped = { ...weights };
+  let released = 0;
+  for (const [instrumentId, weight] of Object.entries(capped)) {
+    if (instrumentId !== "CASH" && weight > maxSingleAssetWeight) {
+      released += weight - maxSingleAssetWeight;
+      capped[instrumentId] = maxSingleAssetWeight;
+    }
+  }
+  capped.CASH = (capped.CASH || 0) + released;
+  return normalizeWeights(capped);
+}
+
 function turnoverBetween(current, target) {
   const ids = new Set([...Object.keys(current), ...Object.keys(target)]);
   return round(sum([...ids].map((id) => Math.abs((target[id] || 0) - (current[id] || 0)))) / 2);
+}
+
+function validateProposal(proposal, { requireHash = false } = {}) {
+  const errors = [];
+  const targetWeights = proposal && proposal.target_weights;
+  const constraints = proposal && proposal.constraints;
+  if (!proposal || typeof proposal !== "object") errors.push("proposal must be an object");
+  if (!targetWeights || typeof targetWeights !== "object") errors.push("target_weights must be an object");
+  if (!constraints || typeof constraints !== "object") errors.push("constraints must be an object");
+
+  if (targetWeights && typeof targetWeights === "object") {
+    const values = Object.values(targetWeights);
+    if (!values.length) errors.push("target_weights must contain at least one asset");
+    if (values.some((value) => !Number.isFinite(Number(value)) || Number(value) < 0)) errors.push("target_weights must contain finite non-negative numbers");
+    const weightSum = sum(values.map(Number));
+    if (Math.abs(weightSum - 1) > 0.000001) errors.push(`target_weights must sum to 1, received ${round(weightSum)}`);
+    const securityWeights = Object.entries(targetWeights).filter(([instrumentId]) => instrumentId !== "CASH").map(([, value]) => Number(value));
+    if (constraints && Number.isFinite(Number(constraints.max_single_asset_weight)) && securityWeights.some((weight) => weight > Number(constraints.max_single_asset_weight) + 0.000001)) {
+      errors.push("target_weights exceed max_single_asset_weight");
+    }
+  }
+
+  if (!Number.isFinite(Number(proposal && proposal.turnover)) || Number(proposal.turnover) < 0) errors.push("turnover must be a non-negative number");
+  if (constraints && Number.isFinite(Number(constraints.max_turnover)) && Number(proposal.turnover) > Number(constraints.max_turnover) + 0.000001) {
+    errors.push("turnover exceeds max_turnover");
+  }
+
+  if (Array.isArray(proposal && proposal.actions) && targetWeights) {
+    for (const action of proposal.actions) {
+      const target = Number(targetWeights[action.instrument_id] || 0);
+      if (Math.abs(target - Number(action.to_weight)) > 0.000001) errors.push(`action target mismatch: ${action.instrument_id}`);
+    }
+  }
+
+  if (requireHash || proposal && proposal.proposal_hash) {
+    const unsigned = clone(proposal || {});
+    delete unsigned.proposal_hash;
+    delete unsigned.validation;
+    if (!proposal.proposal_hash || proposal.proposal_hash !== hash(unsigned)) errors.push("proposal_hash does not match proposal contents");
+  }
+  return { valid: errors.length === 0, errors };
 }
 
 function buildProposal(planId, label, objective, currentWeights, targetWeights, constraints, rationale) {
@@ -322,7 +376,7 @@ function buildProposal(planId, label, objective, currentWeights, targetWeights, 
     delta_weight: round((target[instrumentId] || 0) - (currentWeights[instrumentId] || 0)),
     side: target[instrumentId] > (currentWeights[instrumentId] || 0) ? "BUY_OR_HOLD_CASH" : target[instrumentId] < (currentWeights[instrumentId] || 0) ? "SELL_OR_REDUCE" : "HOLD"
   }));
-  const proposal = {
+  const unsignedProposal = {
     proposal_id: `proposal-${planId.toLowerCase()}-${hash(target).slice(0, 10)}`,
     plan_id: planId,
     label,
@@ -337,7 +391,14 @@ function buildProposal(planId, label, objective, currentWeights, targetWeights, 
       cash_weight: round(target.CASH || 0)
     }
   };
-  proposal.proposal_hash = hash(proposal);
+  const proposal = {
+    ...unsignedProposal,
+    proposal_hash: hash(unsignedProposal)
+  };
+  proposal.validation = validateProposal(proposal, { requireHash: true });
+  if (!proposal.validation.valid) {
+    throw new FinancialToolError("INVALID_GENERATED_PROPOSAL", "generated proposal violates its constraints", proposal.validation);
+  }
   return proposal;
 }
 
@@ -375,12 +436,12 @@ function generateCandidates(snapshotOrInput, reportInput) {
       max_turnover: 0.05,
       objective: "minimum_action"
     }, ["No hard constraint is currently violated; keep the baseline for comparison."]),
-    buildProposal("B", "Moderate rebalance", "reduce the largest position with bounded turnover", currentWeights, targetB, {
+    buildProposal("B", "Moderate rebalance", "reduce the largest position with bounded turnover", currentWeights, capSecurityWeights(targetB, 0.2), {
       max_single_asset_weight: 0.2,
       max_turnover: 0.1,
       objective: "concentration_control"
     }, ["Cap any security above 20% and move the difference to cash."]),
-    buildProposal("C", "Risk priority", "reduce correlated exposure and increase the defensive sleeve", currentWeights, targetC, {
+    buildProposal("C", "Risk priority", "reduce correlated exposure and increase the defensive sleeve", currentWeights, capSecurityWeights(targetC, 0.2), {
       max_single_asset_weight: 0.2,
       max_turnover: 0.25,
       objective: "risk_budget"
@@ -394,6 +455,10 @@ function generateCandidates(snapshotOrInput, reportInput) {
 }
 
 function evaluateCandidate(snapshot, proposal) {
+  const validation = validateProposal(proposal, { requireHash: true });
+  if (!validation.valid) {
+    throw new FinancialToolError("INVALID_PROPOSAL", "simulation received an invalid ActionProposal", validation);
+  }
   const currentWeights = weightsFor(snapshot);
   const transactionCost = turnoverBetween(currentWeights, proposal.target_weights) * dataset.transaction_cost_rate;
   const path = buildPath(snapshot, proposal.target_weights);
@@ -443,13 +508,16 @@ function runSimulation(snapshotOrInput, proposalsInput) {
     ? proposalsInput
     : generateCandidates(snapshot).output.candidates;
   const comparisons = candidates.map((proposal) => evaluateCandidate(snapshot, proposal));
-  const current = evaluateCandidate(snapshot, {
-    proposal_id: "proposal-current",
-    plan_id: "CURRENT",
-    label: "Current portfolio",
-    target_weights: weightsFor(snapshot),
-    turnover: 0
-  });
+  const currentProposal = buildProposal(
+    "CURRENT",
+    "Current portfolio",
+    "use the current allocation as the baseline for comparison",
+    weightsFor(snapshot),
+    weightsFor(snapshot),
+    { max_single_asset_weight: 1, max_turnover: 0, objective: "baseline" },
+    ["Baseline has zero turnover and is used only for comparison."]
+  );
+  const current = evaluateCandidate(snapshot, currentProposal);
   const allComparisons = [current, ...comparisons];
   const scenarios = allComparisons.map((comparison) => ({
     plan_id: comparison.plan_id,
@@ -487,6 +555,8 @@ function paperTrade({ snapshot: snapshotInput, proposal, approval, idempotency_k
   if (!proposal || !proposal.target_weights || !proposal.proposal_hash) {
     throw new FinancialToolError("INVALID_PROPOSAL", "paper trade requires a structured ActionProposal");
   }
+  const validation = validateProposal(proposal, { requireHash: true });
+  if (!validation.valid) throw new FinancialToolError("INVALID_PROPOSAL", "paper trade received an invalid ActionProposal", validation);
   const receipt = {
     receipt_id: `paper-${hash({ snapshot: snapshot.snapshot_id, proposal: proposal.proposal_hash, idempotencyKey }).slice(0, 16)}`,
     idempotency_key: idempotencyKey,
@@ -518,6 +588,7 @@ module.exports = {
   diagnosePortfolio,
   generateCandidates,
   runSimulation,
+  validateProposal,
   paperTrade,
   resetPaperTrading,
   constants: {

@@ -48,6 +48,7 @@ class Harness {
       checkpoint: {
         stage: missingFields.length ? "MINIMUM_CLARIFICATION" : "VALIDATE_INPUT",
         completed: [],
+        result_refs: {},
         resume_token: id("resume")
       }
     };
@@ -83,6 +84,24 @@ class Harness {
     if (!task.state.checkpoint.completed.includes(stage)) task.state.checkpoint.completed.push(stage);
     task.state.checkpoint.stage = stage;
     task.state.checkpoint.last_tool_result_ref = resultRef;
+    task.state.checkpoint.result_refs[stage] = resultRef;
+  }
+
+  runOrReuse(task, stage, artifactKey, outputFactory, operation) {
+    if (task.state.checkpoint.completed.includes(stage) && task.artifacts[artifactKey]) {
+      const result = {
+        tool_name: `checkpoint.${stage.toLowerCase()}`,
+        version: "checkpoint@1.0.0",
+        inputs_hash: task.state.checkpoint.result_refs[stage] || "checkpoint",
+        output: outputFactory(task),
+        data_as_of: this.toolset.constants ? this.toolset.constants.DATA_AS_OF : null,
+        warnings: ["result reused from checkpoint"],
+        trace_id: task.state.checkpoint.result_refs[stage]
+      };
+      this.addEvent(task, "stage.reused", { stage, result_ref: result.trace_id });
+      return result;
+    }
+    return this.runNode(task, stage, operation);
   }
 
   runNode(task, stage, operation) {
@@ -96,6 +115,7 @@ class Harness {
         const result = operation();
         const resultRef = result.trace_id || `tool-result-${crypto.randomUUID()}`;
         task.state.tool_result_refs.push(resultRef);
+        delete task.failures[stage];
         this.checkpoint(task, stage, resultRef);
         this.addEvent(task, "stage.completed", { stage, attempt, result_ref: resultRef });
         return result;
@@ -125,6 +145,7 @@ class Harness {
       task = this.tasks.get(created.task_state.task_id);
     }
     if (sessionId && task.state.session_id !== sessionId) throw new Error("session_id does not match task");
+    if (task.state.status === "HANDOFF_REQUIRED") return this.getTask(task.state.task_id);
     if (riskProfile) {
       task.state.risk_profile = riskProfile;
       task.state.missing_fields = missingRiskFields(riskProfile);
@@ -136,7 +157,13 @@ class Harness {
       return this.getTask(task.state.task_id);
     }
 
-    const validation = this.runNode(task, "VALIDATE_INPUT", () => this.toolset.validatePortfolio(portfolio || this.toolset.getDemoPortfolio()));
+    const validation = this.runOrReuse(
+      task,
+      "VALIDATE_INPUT",
+      "portfolio_snapshot",
+      (currentTask) => ({ valid: true, snapshot: currentTask.artifacts.portfolio_snapshot }),
+      () => this.toolset.validatePortfolio(portfolio || this.toolset.getDemoPortfolio())
+    );
     if (!validation.output.valid) {
       task.state.status = "BLOCKED";
       task.state.error_state = { code: "INVALID_PORTFOLIO", reasons: validation.output.errors, recovery: "Correct the portfolio snapshot and run validation again." };
@@ -147,14 +174,32 @@ class Harness {
     task.state.portfolio_snapshot_id = snapshot.snapshot_id;
     task.artifacts.portfolio_snapshot = snapshot;
 
-    const diagnosis = this.runNode(task, "DIAGNOSE", () => this.toolset.diagnosePortfolio(snapshot));
+    const diagnosis = this.runOrReuse(
+      task,
+      "DIAGNOSE",
+      "health_report",
+      (currentTask) => currentTask.artifacts.health_report,
+      () => this.toolset.diagnosePortfolio(snapshot)
+    );
     task.artifacts.health_report = diagnosis.output;
 
-    const candidates = this.runNode(task, "GENERATE_CANDIDATES", () => this.toolset.generateCandidates(snapshot, diagnosis.output));
+    const candidates = this.runOrReuse(
+      task,
+      "GENERATE_CANDIDATES",
+      "candidates",
+      (currentTask) => ({ snapshot_id: snapshot.snapshot_id, report_id: currentTask.artifacts.health_report.report_id, candidates: currentTask.artifacts.candidates }),
+      () => this.toolset.generateCandidates(snapshot, diagnosis.output)
+    );
     task.state.proposed_action_ids = candidates.output.candidates.map((candidate) => candidate.proposal_id);
     task.artifacts.candidates = candidates.output.candidates;
 
-    const simulation = this.runNode(task, "SIMULATE", () => this.toolset.runSimulation(snapshot, candidates.output.candidates));
+    const simulation = this.runOrReuse(
+      task,
+      "SIMULATE",
+      "simulation",
+      (currentTask) => currentTask.artifacts.simulation,
+      () => this.toolset.runSimulation(snapshot, candidates.output.candidates)
+    );
     task.artifacts.simulation = simulation.output;
     task.state.stage = "RISK_CHECK";
     task.state.status = "HANDOFF_REQUIRED";

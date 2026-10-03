@@ -51,11 +51,20 @@ test("candidate generation creates three structured plans", () => {
   assert.deepEqual(candidates.map((candidate) => candidate.plan_id), ["A", "B", "C"]);
   for (const candidate of candidates) {
     assert.ok(candidate.proposal_hash);
+    assert.equal(candidate.validation.valid, true);
     assert.ok(candidate.actions.length >= 4);
     const weightSum = Object.values(candidate.target_weights).reduce((total, weight) => total + weight, 0);
     assert.ok(Math.abs(weightSum - 1) < 0.000001);
     assert.ok(candidate.turnover <= candidate.constraints.max_turnover || candidate.plan_id === "A");
+    const maxSecurityWeight = Math.max(...Object.entries(candidate.target_weights).filter(([instrumentId]) => instrumentId !== "CASH").map(([, weight]) => weight));
+    assert.ok(maxSecurityWeight <= candidate.constraints.max_single_asset_weight + 0.000001);
   }
+});
+
+test("simulation rejects a tampered ActionProposal", () => {
+  const { snapshot, candidates } = demoHealthCheck();
+  const tampered = { ...candidates[1], target_weights: { ...candidates[1].target_weights, EQUITY_ALPHA: 0.5 } };
+  assert.throws(() => tools.runSimulation(snapshot, [tampered]), /invalid ActionProposal/);
 });
 
 test("simulation returns reproducible quantiles with fixed seed", () => {
@@ -86,6 +95,24 @@ test("harness stops at the ownership boundary and supports clarification", () =>
   assert.equal(completed.task_state.handoff.owner, "Safety/Risk/Eval");
   assert.equal(completed.task_state.checkpoint.stage, "RISK_CHECK");
   assert.equal(completed.artifacts.candidates.length, 3);
+});
+
+test("harness resumes from the last completed checkpoint after a tool failure", () => {
+  const flakyToolset = { ...tools, diagnosePortfolio: () => { throw new Error("temporary market data timeout"); } };
+  const harness = new Harness({ toolset: flakyToolset });
+  const session = harness.createSession({ risk_profile: riskProfile });
+  assert.throws(() => harness.runHealthCheck({ task_id: session.task_state.task_id }), /temporary market data timeout/);
+  const failed = harness.getTask(session.task_state.task_id);
+  assert.equal(failed.task_state.status, "FAILED");
+  assert.deepEqual(failed.task_state.checkpoint.completed, ["VALIDATE_INPUT"]);
+
+  harness.toolset.diagnosePortfolio = tools.diagnosePortfolio;
+  harness.resume(session.task_state.task_id);
+  const resumed = harness.runHealthCheck({ task_id: session.task_state.task_id });
+  assert.equal(resumed.task_state.stage, "RISK_CHECK");
+  assert.equal(resumed.task_state.status, "HANDOFF_REQUIRED");
+  const audit = harness.getAudit(session.task_state.task_id);
+  assert.ok(audit.events.some((event) => event.event_type === "stage.reused" && event.payload.stage === "VALIDATE_INPUT"));
 });
 
 test("memory requires explicit consent and is session-only", () => {

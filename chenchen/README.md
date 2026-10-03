@@ -49,3 +49,5 @@ Other endpoints:
 - Scenario engine: 2,000-path block bootstrap, seed `20260924`, identical data window and transaction cost for Current/A/B/C.
 - Raw portfolio data remains session-only unless a user explicitly consents to saving a preference or decision memory.
 - Paper trade is in-memory mock state and is idempotent by `idempotency_key`.
+- Generated ActionProposal objects are checked for weight sum, single-asset cap, turnover cap, action consistency, and proposal hash before simulation or Paper Trading.
+- If a Tool fails after an earlier stage completed, Harness resumes from the last checkpoint and records the reused stage in Audit.
