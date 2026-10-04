@@ -5,9 +5,22 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { Harness } = require("./core/harness");
 const tools = require("./tools/financial-tools");
+const { randomUUID } = require("node:crypto");
+const { MerchantSession, demo: merchantDemo } = require("./merchant/ledger");
+const merchantSessions = new Map();
+
+function merchantFor(request, response) {
+  let id = /(?:^|;\s*)merchant_session=([a-z0-9-]+)/.exec(request.headers.cookie || "")?.[1];
+  if (!merchantSessions.has(id)) {
+    if (merchantSessions.size >= 500) merchantSessions.delete(merchantSessions.keys().next().value);
+    id = randomUUID(); merchantSessions.set(id, new MerchantSession());
+    response.setHeader("Set-Cookie", "merchant_session=" + id + "; HttpOnly; SameSite=Strict; Path=/");
+  }
+  return merchantSessions.get(id);
+}
 
 const root = __dirname;
-const port = Number(process.env.PORT || 4173);
+const port = Number(process.env.PORT || 4175);
 const harness = new Harness({ toolset: tools });
 const mime = {
   ".html": "text/html; charset=utf-8",
@@ -34,6 +47,12 @@ function sendError(response, error, fallbackStatus = 400) {
       details: error.details || null
     }
   });
+}
+
+function sendDownload(response, filename, payload) {
+  response.writeHead(200, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store",
+    "Content-Disposition": "attachment; filename*=UTF-8''" + encodeURIComponent(filename) });
+  response.end(JSON.stringify(payload, null, 2));
 }
 
 function parseBody(request) {
@@ -85,6 +104,38 @@ async function handleApi(request, response, pathname, url) {
   const method = request.method || "GET";
   let body = {};
   if (method === "POST") body = await parseBody(request);
+  if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("JSON body must be an object");
+  if (pathname.startsWith("/api/merchant/")) {
+    const session = merchantFor(request, response);
+    let result;
+    const delay = Number(url.searchParams.get("delay") || 0);
+    if (method === "GET" && pathname === "/api/merchant/export") {
+      const type = url.searchParams.get("type") || "ledger";
+      if (!["ledger", "review", "demo"].includes(type)) throw new Error("unknown export type");
+      const s = session.summary(delay);
+      const payload = type === "demo" ? merchantDemo() : type === "ledger" ? s.ledger :
+        { ledger: s.ledger, revision: s.revision, forecast: s.forecast, costs: s.costs,
+          review: session.insights(delay), scope: "已知账单测算；预计日期待核实；未连接支付平台" };
+      sendDownload(response, "merchant-" + type + "-" + s.ledger.as_of + ".json", payload); return true;
+    }
+    if (method === "GET" && pathname === "/api/merchant/ledger") result = session.summary(delay);
+    else if (method === "GET" && pathname === "/api/merchant/demo") result = merchantDemo();
+    else if (method === "GET" && pathname === "/api/merchant/bill") result = session.detail(url.searchParams.get("id"));
+    else if (method === "GET" && pathname === "/api/merchant/insights") result = session.insights(delay);
+    else if (method === "POST" && pathname === "/api/merchant/review") result = session.review(body.revision, body.confirmed);
+    else if (method === "POST" && pathname === "/api/merchant/import") result = session.replace(body);
+    else if (method === "POST" && pathname === "/api/merchant/follow") result = session.follow(body.id, body.delay || 0);
+    else if (method === "POST" && pathname === "/api/merchant/reset") result = session.replace(merchantDemo());
+    else return false;
+    sendJson(response, 200, result); return true;
+  }
+  if (method === "GET" && pathname.startsWith("/api/task/")) {
+    const exporting = pathname.endsWith("/export");
+    const taskId = pathname.slice("/api/task/".length, exporting ? -"/export".length : undefined);
+    const task = harness.getTask(taskId);
+    if (task && exporting) { sendDownload(response, "portfolio-analysis.json", task); return true; }
+    sendJson(response, task ? 200 : 404, task || { error: { code: "TASK_NOT_FOUND", message: "task not found" } }); return true;
+  }
 
   if (method === "GET" && pathname === "/api/demo/portfolio") {
     sendJson(response, 200, tools.validatePortfolio(tools.getDemoPortfolio()));
@@ -125,13 +176,8 @@ async function handleApi(request, response, pathname, url) {
     return true;
   }
   if (method === "POST" && pathname === "/api/paper-trade/execute") {
-    const result = tools.paperTrade({
-      snapshot: resolveSnapshot(body),
-      proposal: body.proposal,
-      approval: body.approval,
-      idempotency_key: body.idempotency_key
-    });
-    sendJson(response, result.output.status === "REQUIRES_APPROVAL" ? 403 : 200, result);
+    sendJson(response, 503, { error: { code: "GATEWAY_NOT_CONNECTED",
+      message: "Safety Action Gateway 尚未接入；客户端提交的 approval 不能作为执行授权。" } });
     return true;
   }
   if (method === "GET" && pathname.startsWith("/api/audit/")) {
@@ -173,7 +219,12 @@ function serveStatic(response, pathname) {
     sendJson(response, 400, { error: { code: "INVALID_PATH", message: "invalid URL path" } });
     return;
   }
-  const relativePath = decodedPath === "/" ? "index.html" : decodedPath.replace(/^\/+/, "");
+  const routes = { "/": "versions/home.html", "/index.html": "versions/home.html", "/investment": "versions/investment.html", "/merchant": "versions/merchant.html" };
+  const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
+  const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html",
+    "versions/style.css", "versions/investment.js", "versions/merchant.js", "versions/common.js",
+    "index.html", "app.js", "styles.css"]);
+  if (!allowed.has(relativePath)) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "not found" } }); return; }
   const filePath = path.resolve(root, relativePath);
   const relativeToRoot = path.relative(root, filePath);
   if (relativeToRoot.startsWith("..") || path.isAbsolute(relativeToRoot)) {
@@ -193,6 +244,12 @@ function serveStatic(response, pathname) {
 const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, `http://${request.headers.host || "127.0.0.1"}`);
+    if (!["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)) {
+      sendJson(response, 403, { error: { code: "LOCAL_ONLY", message: "Local demo only" } }); return;
+    }
+    if (request.headers.origin && request.headers.origin !== url.origin) {
+      sendJson(response, 403, { error: { code: "ORIGIN_MISMATCH", message: "Cross-origin requests are disabled" } }); return;
+    }
     if (url.pathname.startsWith("/api/")) {
       const handled = await handleApi(request, response, url.pathname, url);
       if (!handled) sendJson(response, 404, { error: { code: "API_NOT_FOUND", message: "API route not found" } });

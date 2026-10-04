@@ -27,6 +27,7 @@ class Harness {
   }
 
   createSession({ intent = "PORTFOLIO_HEALTH_CHECK", risk_profile: riskProfile = null } = {}) {
+    this.validateProfile(riskProfile);
     const sessionId = id("session");
     const taskId = id("task");
     const missingFields = missingRiskFields(riskProfile);
@@ -36,7 +37,7 @@ class Harness {
       intent,
       stage: missingFields.length ? "MINIMUM_CLARIFICATION" : "VALIDATE_INPUT",
       status: missingFields.length ? "WAITING_INPUT" : "READY",
-      risk_profile: riskProfile,
+      risk_profile: clone(riskProfile),
       missing_fields: missingFields,
       portfolio_snapshot_id: null,
       risk_profile_id: riskProfile ? `risk-profile-${crypto.randomUUID()}` : null,
@@ -52,7 +53,7 @@ class Harness {
         resume_token: id("resume")
       }
     };
-    const task = { state, artifacts: {}, events: [], failures: {} };
+    const task = { state, artifacts: {}, events: [], failures: {}, results: {} };
     this.tasks.set(taskId, task);
     this.addEvent(task, "session.created", { missing_fields: missingFields });
     return this.getTask(taskId);
@@ -60,7 +61,18 @@ class Harness {
 
   getTask(taskId) {
     const task = this.tasks.get(taskId);
-    return task ? clone({ task_state: task.state, artifacts: task.artifacts }) : null;
+    return task ? clone({ task_state: task.state, artifacts: task.artifacts, tool_results: task.results }) : null;
+  }
+
+  validateProfile(profile) {
+    if (profile == null) return;
+    if (typeof profile !== "object" || Array.isArray(profile)) throw new Error("risk_profile must be an object");
+    if (profile.max_drawdown !== undefined && (!Number.isFinite(profile.max_drawdown) || profile.max_drawdown <= 0 || profile.max_drawdown > 1))
+      throw new Error("max_drawdown must be between 0 and 1");
+    if (profile.investment_horizon_days !== undefined && (!Number.isInteger(profile.investment_horizon_days) || profile.investment_horizon_days <= 0))
+      throw new Error("investment_horizon_days must be a positive integer");
+    if (profile.liquidity_need !== undefined && !["low", "medium", "high"].includes(profile.liquidity_need))
+      throw new Error("liquidity_need must be low, medium or high");
   }
 
   getAudit(taskId) {
@@ -114,6 +126,7 @@ class Harness {
       try {
         const result = operation();
         const resultRef = result.trace_id || `tool-result-${crypto.randomUUID()}`;
+        task.results[resultRef] = clone(result);
         task.state.tool_result_refs.push(resultRef);
         delete task.failures[stage];
         this.checkpoint(task, stage, resultRef);
@@ -139,15 +152,29 @@ class Harness {
   }
 
   runHealthCheck({ task_id: taskId, session_id: sessionId, risk_profile: riskProfile, portfolio } = {}) {
+    this.validateProfile(riskProfile);
     let task = taskId ? this.tasks.get(taskId) : null;
+    if (taskId && !task) throw Object.assign(new Error("task not found"), { statusCode: 404 });
     if (!task) {
       const created = this.createSession({ risk_profile: riskProfile });
       task = this.tasks.get(created.task_state.task_id);
     }
     if (sessionId && task.state.session_id !== sessionId) throw new Error("session_id does not match task");
+    if (task.state.status === "CIRCUIT_OPEN") throw new Error("circuit is open; create a new task after repairing the tool");
+    const changed = (portfolio !== undefined && JSON.stringify(portfolio) !== JSON.stringify(task.inputPortfolio)) ||
+      (riskProfile !== undefined && JSON.stringify(riskProfile) !== JSON.stringify(task.state.risk_profile));
+    if (changed) {
+      task.artifacts = {}; task.results = {}; task.state.tool_result_refs = []; task.state.proposed_action_ids = [];
+      task.state.portfolio_snapshot_id = null; task.state.handoff = null;
+      task.state.checkpoint.completed = []; task.state.checkpoint.result_refs = {};
+      task.state.status = "READY"; task.state.error_state = null; task.failures = {};
+      this.addEvent(task, "checkpoint.invalidated", { reason: "input changed" });
+    }
+    if (portfolio !== undefined) task.inputPortfolio = clone(portfolio);
     if (task.state.status === "HANDOFF_REQUIRED") return this.getTask(task.state.task_id);
-    if (riskProfile) {
-      task.state.risk_profile = riskProfile;
+    if (riskProfile !== undefined) {
+      task.state.risk_profile = clone(riskProfile);
+      task.state.risk_profile_id = riskProfile ? id("risk-profile") : null;
       task.state.missing_fields = missingRiskFields(riskProfile);
     }
     if (task.state.missing_fields.length) {
@@ -162,7 +189,7 @@ class Harness {
       "VALIDATE_INPUT",
       "portfolio_snapshot",
       (currentTask) => ({ valid: true, snapshot: currentTask.artifacts.portfolio_snapshot }),
-      () => this.toolset.validatePortfolio(portfolio || this.toolset.getDemoPortfolio())
+      () => this.toolset.validatePortfolio(task.inputPortfolio || this.toolset.getDemoPortfolio())
     );
     if (!validation.output.valid) {
       task.state.status = "BLOCKED";

@@ -3,7 +3,7 @@
 const crypto = require("node:crypto");
 const dataset = require("../data/demo-portfolio.json");
 
-const TOOL_VERSION = "financial-tools@0.3.0";
+const TOOL_VERSION = "financial-tools@0.4.0";
 const PERIODS_PER_YEAR = 252;
 const DEFAULT_SCENARIO_PATHS = 2000;
 const DEFAULT_SCENARIO_SEED = dataset.scenario_seed;
@@ -96,7 +96,7 @@ function makeToolResult(toolName, inputs, output, warnings = []) {
     inputs_hash: hash(inputs),
     output,
     data_as_of: dataset.as_of,
-    warnings,
+    warnings: [...warnings, "Synthetic replay data: seven observations only; not suitable for investment decisions."],
     trace_id: `trace-${hash({ toolName, inputs }).slice(0, 16)}`
   };
 }
@@ -119,15 +119,15 @@ function validatePortfolio(input = getDemoPortfolio()) {
   const normalizedPositions = [];
 
   if (!candidate || typeof candidate !== "object") errors.push("portfolio must be an object");
-  const cash = Number(candidate && candidate.cash);
+  const cash = candidate && candidate.cash;
   if (!Number.isFinite(cash) || cash < 0) errors.push("cash must be a non-negative number");
   if (!positions.length) errors.push("positions must contain at least one instrument");
 
   for (const position of positions) {
     const instrumentId = position && position.instrument_id;
     const metadata = dataset.instrument_metadata[instrumentId];
-    const quantity = Number(position && position.quantity);
-    const price = position && position.price === undefined ? latestPrice(instrumentId) : Number(position && position.price);
+    const quantity = position && position.quantity;
+    const price = position && position.price === undefined ? latestPrice(instrumentId) : position && position.price;
     if (!instrumentId || seen.has(instrumentId)) errors.push(`duplicate or missing instrument_id: ${instrumentId || "unknown"}`);
     if (instrumentId) seen.add(instrumentId);
     if (!metadata) errors.push(`unsupported instrument: ${instrumentId || "unknown"}`);
@@ -152,10 +152,13 @@ function validatePortfolio(input = getDemoPortfolio()) {
 
   const totalValue = cash + sum(normalizedPositions.map((position) => position.market_value));
   if (!Number.isFinite(totalValue) || totalValue <= 0) errors.push("total_value must be positive");
-  if (candidate && candidate.total_value !== undefined && Math.abs(Number(candidate.total_value) - totalValue) > 0.01) {
+  if (candidate && candidate.total_value !== undefined && (!Number.isFinite(candidate.total_value) || Math.abs(candidate.total_value - totalValue) > 0.01)) {
     errors.push("declared total_value does not equal cash plus market value");
   }
-  if (candidate && candidate.as_of && candidate.as_of > dataset.as_of) warnings.push("portfolio snapshot is newer than the fixed demo dataset");
+  if (!candidate || candidate.as_of !== dataset.as_of) errors.push("snapshot date must match the fixed replay data_as_of");
+  for (const position of normalizedPositions) {
+    if (Math.abs(position.price - latestPrice(position.instrument_id)) > 0.0001) errors.push("price does not match fixed replay data: " + position.instrument_id);
+  }
 
   const snapshot = {
     snapshot_id: `snapshot-${hash({ candidate, totalValue }).slice(0, 16)}`,
@@ -184,14 +187,19 @@ function validatePortfolio(input = getDemoPortfolio()) {
 }
 
 function requireSnapshot(snapshotOrInput) {
-  if (snapshotOrInput && snapshotOrInput.snapshot_id && snapshotOrInput.positions) {
-    if (snapshotOrInput.data_quality && snapshotOrInput.data_quality.status === "INVALID") {
-      throw new FinancialToolError("INVALID_PORTFOLIO", "portfolio snapshot is invalid", snapshotOrInput.data_quality);
-    }
-    return snapshotOrInput;
-  }
   const result = validatePortfolio(snapshotOrInput || getDemoPortfolio());
   if (!result.output.valid) throw new FinancialToolError("INVALID_PORTFOLIO", "portfolio validation failed", result.output);
+  if (snapshotOrInput && snapshotOrInput.snapshot_id) {
+    const normalized = result.output.snapshot;
+    for (const p of snapshotOrInput.positions) {
+      const n = normalized.positions.find(v => v.instrument_id === p.instrument_id);
+      if (!Number.isFinite(p.weight) || !Number.isFinite(p.market_value) || Math.abs(n.weight - p.weight) > 1e-6 || Math.abs(n.market_value - p.market_value) > 0.01)
+        throw new FinancialToolError("INVALID_PORTFOLIO", "snapshot amounts and weights are inconsistent");
+    }
+    if (!Number.isFinite(snapshotOrInput.cash_weight) || Math.abs(normalized.cash_weight - snapshotOrInput.cash_weight) > 1e-6)
+      throw new FinancialToolError("INVALID_PORTFOLIO", "cash weight is inconsistent");
+    return { ...normalized, snapshot_id: snapshotOrInput.snapshot_id };
+  }
   return result.output.snapshot;
 }
 
@@ -204,17 +212,19 @@ function getPriceSeries(instrumentId) {
 }
 
 function weightsFor(snapshot) {
-  return snapshot.positions.reduce((weights, position) => {
+  const weights = snapshot.positions.reduce((weights, position) => {
     weights[position.instrument_id] = position.weight;
     return weights;
   }, { CASH: snapshot.cash_weight });
+  weights.CASH = round(1 - sum(snapshot.positions.map(position => position.weight)));
+  return weights;
 }
 
 function buildPath(snapshot, weights) {
   return dataset.price_history.dates.map((date, index) => {
-    const securityValue = sum(snapshot.positions.map((position) => {
-      const prices = getPriceSeries(position.instrument_id);
-      return (weights[position.instrument_id] || 0) * prices[index] / prices[0];
+    const securityValue = sum(Object.keys(weights).filter(id => id !== "CASH").map((id) => {
+      const prices = getPriceSeries(id);
+      return (weights[id] || 0) * prices[index] / prices[0];
     }));
     return { date, value: round((weights.CASH || 0) + securityValue, 8) };
   });
@@ -262,7 +272,7 @@ function diagnosePortfolio(snapshotOrInput) {
       correlations[ids[leftIndex]][ids[rightIndex]] = leftIndex === rightIndex
         ? 1
         : correlation(assetReturns[ids[leftIndex]], assetReturns[ids[rightIndex]]);
-      if (rightIndex > leftIndex && Math.abs(correlations[ids[leftIndex]][ids[rightIndex]]) >= 0.8) {
+      if (rightIndex > leftIndex && correlations[ids[leftIndex]][ids[rightIndex]] >= 0.8) {
         hiddenClusters.push({
           instruments: [ids[leftIndex], ids[rightIndex]],
           correlation: correlations[ids[leftIndex]][ids[rightIndex]]
@@ -270,14 +280,16 @@ function diagnosePortfolio(snapshotOrInput) {
       }
     }
   }
-  const orderedWeights = Object.entries(weights).sort((left, right) => right[1] - left[1]);
+  const orderedWeights = Object.entries(weights).filter(([id]) => id !== "CASH").sort((left, right) => right[1] - left[1]);
   const hhi = sum(Object.values(weights).map((weight) => weight ** 2));
   const report = {
     report_id: `health-${hash({ snapshot: snapshot.snapshot_id, weights }).slice(0, 16)}`,
     snapshot_id: snapshot.snapshot_id,
     metrics,
+    cash_weight: snapshot.cash_weight,
     concentration: {
       hhi: round(hhi),
+      hhi_basis: "all assets including cash; top-N excludes cash",
       top_1: round(orderedWeights[0][1]),
       top_3: round(sum(orderedWeights.slice(0, 3).map((entry) => entry[1]))),
       largest_instrument: orderedWeights[0][0]
@@ -327,6 +339,7 @@ function turnoverBetween(current, target) {
 }
 
 function validateProposal(proposal, { requireHash = false } = {}) {
+  if (!proposal || typeof proposal !== "object" || Array.isArray(proposal)) return { valid: false, errors: ["proposal must be an object"] };
   const errors = [];
   const targetWeights = proposal && proposal.target_weights;
   const constraints = proposal && proposal.constraints;
@@ -337,7 +350,8 @@ function validateProposal(proposal, { requireHash = false } = {}) {
   if (targetWeights && typeof targetWeights === "object") {
     const values = Object.values(targetWeights);
     if (!values.length) errors.push("target_weights must contain at least one asset");
-    if (values.some((value) => !Number.isFinite(Number(value)) || Number(value) < 0)) errors.push("target_weights must contain finite non-negative numbers");
+    if (Array.isArray(targetWeights) || values.some((value) => !Number.isFinite(value) || value < 0)) errors.push("target_weights must contain finite non-negative numbers");
+    if (Object.keys(targetWeights).some(id => id !== "CASH" && !Object.hasOwn(dataset.instrument_metadata, id))) errors.push("unknown instrument in target_weights");
     const weightSum = sum(values.map(Number));
     if (Math.abs(weightSum - 1) > 0.000001) errors.push(`target_weights must sum to 1, received ${round(weightSum)}`);
     const securityWeights = Object.entries(targetWeights).filter(([instrumentId]) => instrumentId !== "CASH").map(([, value]) => Number(value));
@@ -345,17 +359,29 @@ function validateProposal(proposal, { requireHash = false } = {}) {
       errors.push("target_weights exceed max_single_asset_weight");
     }
   }
+  if (!constraints || !Number.isFinite(constraints.max_turnover) || constraints.max_turnover < 0 || constraints.max_turnover > 1 ||
+      !Number.isFinite(constraints.max_single_asset_weight) || constraints.max_single_asset_weight <= 0 || constraints.max_single_asset_weight > 1)
+    errors.push("invalid numeric constraints");
 
-  if (!Number.isFinite(Number(proposal && proposal.turnover)) || Number(proposal.turnover) < 0) errors.push("turnover must be a non-negative number");
+  if (!Number.isFinite(proposal.turnover) || proposal.turnover < 0) errors.push("turnover must be a non-negative number");
   if (constraints && Number.isFinite(Number(constraints.max_turnover)) && Number(proposal.turnover) > Number(constraints.max_turnover) + 0.000001) {
     errors.push("turnover exceeds max_turnover");
   }
 
-  if (Array.isArray(proposal && proposal.actions) && targetWeights) {
+  if (!Array.isArray(proposal.actions) || !proposal.actions.length) errors.push("actions must be a non-empty array");
+  if (Array.isArray(proposal.actions) && targetWeights) {
+    const seen = new Set();
     for (const action of proposal.actions) {
+      if (!action || typeof action.instrument_id !== "string" || seen.has(action.instrument_id) ||
+          !Number.isFinite(action.from_weight) || !Number.isFinite(action.to_weight) || !Number.isFinite(action.delta_weight)) {
+        errors.push("invalid or duplicate action"); continue;
+      }
+      seen.add(action.instrument_id);
       const target = Number(targetWeights[action.instrument_id] || 0);
       if (Math.abs(target - Number(action.to_weight)) > 0.000001) errors.push(`action target mismatch: ${action.instrument_id}`);
+      if (Math.abs(action.to_weight - action.from_weight - action.delta_weight) > 0.000001) errors.push("action delta mismatch");
     }
+    if (Object.keys(targetWeights).some(id => !seen.has(id))) errors.push("missing action for target asset");
   }
 
   if (requireHash || proposal && proposal.proposal_hash) {
@@ -397,14 +423,15 @@ function buildProposal(planId, label, objective, currentWeights, targetWeights, 
   };
   proposal.validation = validateProposal(proposal, { requireHash: true });
   if (!proposal.validation.valid) {
-    throw new FinancialToolError("INVALID_GENERATED_PROPOSAL", "generated proposal violates its constraints", proposal.validation);
+    throw new FinancialToolError("INVALID_GENERATED_PROPOSAL", "当前组合无法同时满足演示方案的仓位与换手限制；未生成可执行调整。", proposal.validation);
   }
   return proposal;
 }
 
 function generateCandidates(snapshotOrInput, reportInput) {
   const snapshot = requireSnapshot(snapshotOrInput);
-  const report = reportInput && reportInput.report_id ? reportInput : diagnosePortfolio(snapshot).output;
+  const report = diagnosePortfolio(snapshot).output;
+  if (reportInput && hash(reportInput) !== hash(report)) throw new FinancialToolError("INVALID_REPORT", "health report does not match this portfolio snapshot");
   const currentWeights = weightsFor(snapshot);
   const targetA = { ...currentWeights };
   const targetB = { ...currentWeights };
@@ -460,42 +487,55 @@ function evaluateCandidate(snapshot, proposal) {
     throw new FinancialToolError("INVALID_PROPOSAL", "simulation received an invalid ActionProposal", validation);
   }
   const currentWeights = weightsFor(snapshot);
-  const transactionCost = turnoverBetween(currentWeights, proposal.target_weights) * dataset.transaction_cost_rate;
-  const path = buildPath(snapshot, proposal.target_weights);
+  const actualTurnover = turnoverBetween(currentWeights, proposal.target_weights);
+  for (const action of proposal.actions) {
+    if (Math.abs(action.from_weight - (currentWeights[action.instrument_id] || 0)) > 1e-6)
+      throw new FinancialToolError("INVALID_PROPOSAL", "action source weight does not match current portfolio");
+  }
+  if (Math.abs(actualTurnover - proposal.turnover) > 1e-6 || actualTurnover > proposal.constraints.max_turnover + 1e-6)
+    throw new FinancialToolError("INVALID_PROPOSAL", "turnover does not match current portfolio");
+  const transactionCost = actualTurnover * dataset.transaction_cost_rate;
+  const grossPath = buildPath(snapshot, proposal.target_weights);
+  const path = grossPath.map((point, i) => ({ ...point, value: i === 0 ? 1 : round(point.value * (1 - transactionCost)) }));
   return {
     plan_id: proposal.plan_id,
     proposal_id: proposal.proposal_id,
     label: proposal.label,
     turnover: proposal.turnover,
     transaction_cost: round(transactionCost),
-    metrics: metricsFromPath(path, transactionCost),
+    metrics: metricsFromPath(path),
     curve: path
   };
 }
 
-function scenarioDistribution(path, transactionCost, seed, pathCount = DEFAULT_SCENARIO_PATHS) {
-  const returns = path.slice(1).map((point, index) => point.value / path[index].value - 1);
+function scenarioDistribution(weights, transactionCost, seed, pathCount = DEFAULT_SCENARIO_PATHS) {
+  const ids = Object.keys(weights).filter(id => id !== "CASH");
+  const jointReturns = dataset.price_history.dates.slice(1).map((_, i) =>
+    ids.map(id => getPriceSeries(id)[i + 1] / getPriceSeries(id)[i] - 1));
   const random = seededRandom(seed);
   const blockSize = 3;
-  const horizon = Math.max(20, returns.length * 3);
+  const horizon = 20;
   const outcomes = [];
   for (let pathIndex = 0; pathIndex < pathCount; pathIndex += 1) {
-    let value = 1;
+    const holdings = ids.map(id => weights[id]);
     let steps = 0;
     while (steps < horizon) {
-      const start = Math.floor(random() * Math.max(1, returns.length - blockSize + 1));
+      const start = Math.floor(random() * Math.max(1, jointReturns.length - blockSize + 1));
       for (let offset = 0; offset < blockSize && steps < horizon; offset += 1) {
-        value *= 1 + returns[Math.min(start + offset, returns.length - 1)];
+        const row = jointReturns[start + offset];
+        holdings.forEach((value, i) => { holdings[i] = value * (1 + row[i]); });
         steps += 1;
       }
     }
-    outcomes.push(value - 1 - transactionCost);
+    outcomes.push((sum(holdings) + (weights.CASH || 0)) * (1 - transactionCost) - 1);
   }
   return {
     method: "block_bootstrap",
     block_size: blockSize,
     paths: pathCount,
     seed,
+    horizon_days: horizon,
+    sampling: "joint asset daily returns; identical block indices across Current/A/B/C",
     p10: quantile(outcomes, 0.1),
     p50: quantile(outcomes, 0.5),
     p90: quantile(outcomes, 0.9)
@@ -519,9 +559,9 @@ function runSimulation(snapshotOrInput, proposalsInput) {
   );
   const current = evaluateCandidate(snapshot, currentProposal);
   const allComparisons = [current, ...comparisons];
-  const scenarios = allComparisons.map((comparison) => ({
+  const scenarios = allComparisons.map((comparison, index) => ({
     plan_id: comparison.plan_id,
-    distribution: scenarioDistribution(comparison.curve, comparison.transaction_cost, DEFAULT_SCENARIO_SEED)
+    distribution: scenarioDistribution([currentProposal, ...candidates][index].target_weights, comparison.transaction_cost, DEFAULT_SCENARIO_SEED)
   }));
   return makeToolResult("simulation.run", { snapshot, candidates, seed: DEFAULT_SCENARIO_SEED }, {
     simulation_id: `simulation-${hash({ snapshot: snapshot.snapshot_id, candidates }).slice(0, 16)}`,
@@ -531,6 +571,12 @@ function runSimulation(snapshotOrInput, proposalsInput) {
       end: dataset.price_history.dates[dataset.price_history.dates.length - 1]
     },
     transaction_cost_rate: dataset.transaction_cost_rate,
+    assumptions: {
+      data_mode: "SYNTHETIC_REPLAY", initial_capital: snapshot.total_value, annualization_factor: 252,
+      risk_free_rate: 0.02, portfolio_method: "buy-and-hold", cost_basis: "one-way turnover times rate charged once",
+      sample_observations: dataset.price_history.dates.length,
+      caveat: "Ex-post allocation comparison on a short synthetic window, not an out-of-sample strategy backtest."
+    },
     comparisons: allComparisons,
     scenarios,
     limitation: "Historical replay and fixed-seed scenario simulation are not a prediction of future returns."
