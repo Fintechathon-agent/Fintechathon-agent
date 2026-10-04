@@ -9,7 +9,7 @@ const planCopy = {
 function planRecommendation(comparisons) {
   return comparisons.reduce((best, item) => {
     if (!best) return item;
-    return item.metrics.max_drawdown < best.metrics.max_drawdown ? item : best;
+    return item.metrics.max_drawdown > best.metrics.max_drawdown ? item : best;
   }, null)?.plan_id;
 }
 async function init() {
