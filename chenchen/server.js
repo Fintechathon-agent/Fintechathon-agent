@@ -222,7 +222,7 @@ function serveStatic(response, pathname) {
   const routes = { "/": "versions/home.html", "/index.html": "versions/home.html", "/investment": "versions/investment.html", "/merchant": "versions/merchant.html" };
   const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
   const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html",
-    "versions/style.css", "versions/investment.js", "versions/merchant.js", "versions/common.js",
+    "versions/style.css", "versions/product-overrides.css", "versions/investment.js", "versions/merchant.js", "versions/common.js",
     "index.html", "app.js", "styles.css"]);
   if (!allowed.has(relativePath)) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "not found" } }); return; }
   const filePath = path.resolve(root, relativePath);

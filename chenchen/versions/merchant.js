@@ -3,6 +3,9 @@ let state, reminders, refreshSequence = 0;
 const key = b => b.channel + ':' + b.id;
 const delay = () => Number($('#delay').value);
 const sourceButtons = refs => refs.map(r => '<button class="subtle evidence" data-key="'+esc(r)+'">'+esc(r)+'</button>').join(' · ');
+function previewBill(b) {
+  return '<article class="bill-preview"><div class="bill-top"><span>'+esc(b.id)+'</span><span>'+esc(b.due_on)+'</span></div><div class="bill-amount '+(b.kind==='income'?'positive':'danger')+'">'+(b.kind==='income'?'+':'−')+money(b.amount_cents-b.fee_cents-b.refund_cents)+'</div><p class="bill-meta">'+esc(b.category)+' · '+(b.status==='settled'?'已结算':b.kind==='income'?'待到账':'待付款')+'</p><button class="secondary evidence" data-key="'+esc(key(b))+'">看账单'+(state.viewed.includes(key(b))?' ✓':'')+'</button></article>';
+}
 function showBills() {
   if (!state) return;
   const query = $('#search').value.trim().toLowerCase();
@@ -10,21 +13,29 @@ function showBills() {
     (!$('#bill-status').value || b.status === $('#bill-status').value) &&
     (!query || [b.id,b.category,b.description].join(' ').toLowerCase().includes(query)));
   $('#bill-count').textContent = '显示 '+bills.length+' / '+state.ledger.bills.length+' 笔 · 已查看来源 '+state.viewed.length+' 笔';
+  $('#quick-bills').innerHTML = bills.length ? bills.slice(0,3).map(previewBill).join('') : '<p class="empty">没有符合条件的账单。</p>';
   $('#bills').innerHTML = bills.length ? '<table><thead><tr><th>账单 / 渠道</th><th>类别</th><th class="num">账单原额</th><th class="num">扣费 / 退款</th><th class="num">净收 / 付款</th><th>预计日期 / 状态</th><th>来源</th></tr></thead><tbody>'+bills.map(b=>'<tr><td>'+esc(b.id)+'<small>'+esc(b.channel)+'</small></td><td>'+esc(b.category)+'<small>'+esc(b.booked_on)+' 记账</small></td><td class="num">'+money(b.amount_cents)+'</td><td class="num">'+money(b.fee_cents+b.refund_cents)+'</td><td class="num">'+(b.kind==='income'?'+':'−')+money(b.amount_cents-b.fee_cents-b.refund_cents)+'</td><td>'+esc(b.due_on)+'<small>'+ (b.status==='settled'?'已结算':b.kind==='income'?'待到账':'待付款')+'</small></td><td><button class="subtle evidence" data-key="'+esc(key(b))+'">看账单'+(state.viewed.includes(key(b))?' ✓':'')+'</button></td></tr>').join('')+'</tbody></table>' : '<p class="empty">没有符合条件的账单。尝试清空筛选条件。</p>';
 }
 function render() {
-  const l = state.ledger;
+  const l = state.ledger, f = state.forecast;
   $('#shop-date').textContent = l.shop + ' · 截至 ' + l.as_of;
   $('#totals').innerHTML = [['已核对余额',state.totals.balance_cents,'当前已经拿到的钱'],['还在路上的钱',state.totals.receivable_cents,'包含逾期未确认款，不是可用余额'],['已知待付款',state.totals.payable_cents,'全部未结算支出，按账单日期核对']].map(([t,v,d])=>'<article class="metric"><small>'+t+'</small><strong>'+money(v)+'</strong><small>'+d+'</small></article>').join('');
+  $('#merchant-status').innerHTML = '<span class="cash-label">已核对余额</span><div class="cash-value">'+money(state.totals.balance_cents)+'</div><p class="cash-sub">已到账且已核对；待到账收入不计入可用余额</p>';
+  const firstGap = f.days.find(d => d.expected_cents < 0), conservativeGap = f.days.find(d => d.conservative_cents < 0);
+  $('#gap-summary').textContent = firstGap ? '按预计到账，首个缺口出现在 '+firstGap.date+'，当天预计余额 '+money(firstGap.expected_cents)+'。'+(conservativeGap?'如果待到账款继续延迟，可能提前到 '+conservativeGap.date+'。':'') : '按目前已知账单，预计到账情景下未来 14 天未出现负余额。';
+  const rising = state.costs.filter(c => c.change_ratio !== null && c.change_ratio > 0).sort((a,b)=>b.change_ratio-a.change_ratio)[0];
+  $('#cost-summary').textContent = rising ? rising.category+' 本期 '+money(rising.current_cents)+'，较上期上升 '+pct(rising.change_ratio)+'。' : '目前没有可比的上涨采购。';
   const channel = $('#channel').value;
   $('#channel').innerHTML = '<option value="">全部渠道</option>'+[...new Set(l.bills.map(b=>b.channel))].map(c=>'<option>'+esc(c)+'</option>').join('');
   if ([...$('#channel').options].some(o=>o.value===channel)) $('#channel').value=channel;
   showBills(); renderReview();
-  const f = state.forecast;
   $('#cash-chart').innerHTML = chart([{name:'预计余额（元）',values:[l.balance_cents,...f.days.map(d=>d.expected_cents)].map(v=>v/100)},{name:'暂未到账时余额（元）',values:[l.balance_cents,...f.days.map(d=>d.conservative_cents)].map(v=>v/100)}],[l.as_of,...f.days.map(d=>d.date)]);
   $('#calendar').innerHTML = '<table><thead><tr><th>日期</th><th class="num">预计到账</th><th class="num">到期付款</th><th class="num">预计余额</th><th>相关账单</th></tr></thead><tbody>'+f.days.map(d=>'<tr><td>'+d.date+'</td><td class="num">'+money(d.incoming_cents)+'</td><td class="num">'+money(d.outgoing_cents)+'</td><td class="num '+(d.expected_cents<0?'danger':'')+'">'+money(d.expected_cents)+'</td><td>'+sourceButtons(d.evidence)+'</td></tr>').join('')+'</tbody></table>';
-  $('#cost-period').textContent = state.costs.length ? '本期 '+state.costs[0].current_window.join(' 至 ')+'；对比 '+state.costs[0].previous_window.join(' 至 ')+'（均为 7 天）。' : '没有可比较的采购记录。';
-  $('#costs').innerHTML = state.costs.map(c=>'<div class="cost-line"><div class="row"><strong>'+esc(c.category)+'</strong><span>'+money(c.current_cents)+' <small>'+ (c.change_ratio===null?'上期无记录':(c.change_ratio>=0?'+':'')+pct(c.change_ratio))+'</small></span></div><p class="small">上期 '+money(c.previous_cents)+' → 本期 '+money(c.current_cents)+(c.decomposition ? '<br>同品单价 '+money(c.decomposition.previous_unit_cents)+' → '+money(c.decomposition.current_unit_cents)+' / '+esc(c.decomposition.unit)+'<br>数量变化影响 '+money(c.decomposition.quantity_effect_cents)+'；单价变化影响 '+money(c.decomposition.price_effect_cents) : '<br>缺少可比数量或上期记录，暂不判断涨价原因。')+'</p><div class="small">'+sourceButtons(c.evidence)+'</div></div>').join('') || '<p class="empty">暂无采购支出。</p>';
+  $('#cost-period').textContent = state.costs.length ? '本期 '+state.costs[0].current_window.join(' 至 ')+'；对比 '+state.costs[0].previous_window.join(' 至 ')+'。' : '没有可比较的采购记录。';
+  $('#costs').innerHTML = state.costs.map(c=>{
+    const change = c.change_ratio === null ? '暂无对比' : (c.change_ratio>=0?'+':'')+pct(c.change_ratio);
+    return '<article class="cost-card"><div class="cost-top"><strong>'+esc(c.category)+'</strong><span class="cost-change '+(c.change_ratio>0?'up':c.change_ratio<0?'down':'')+'">'+change+'</span></div><p>本期 '+money(c.current_cents)+' · 上期 '+money(c.previous_cents)+'</p><details><summary>查看变化解释</summary><p>'+(c.decomposition ? '同品单价 '+money(c.decomposition.previous_unit_cents)+' → '+money(c.decomposition.current_unit_cents)+' / '+esc(c.decomposition.unit)+'；数量影响 '+money(c.decomposition.quantity_effect_cents)+'，单价影响 '+money(c.decomposition.price_effect_cents)+'。':'缺少可比数量或上期记录，暂不判断涨价原因。')+'</p><div class="small">'+sourceButtons(c.evidence)+'</div></details></article>';
+  }).join('') || '<p class="empty">暂无采购支出。</p>';
 }
 function renderReview() {
   $('#review-status').textContent = state.reviewed ? '本版账单已确认；导入新账单后需要重新核对。' : '已查看 '+state.viewed.length+' 笔来源。请核对当前余额与未结算款的区别。';
