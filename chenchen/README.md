@@ -1,4 +1,4 @@
-# 两版财务 Agent 演示 · v0.9.0
+# 两版财务 Agent 演示 · v0.10.0
 
 本次交付是两个相互独立的产品；本地服务只负责分别提供运行入口：
 
@@ -36,7 +36,7 @@ $env:PORT = '4180'
 npm start
 ```
 
-此时访问 http://127.0.0.1:4180/ 。本次不配置公网托管或成员登录。
+此时访问 http://127.0.0.1:4180/ 。本地运行不配置成员登录。
 
 ## 公开演示
 
@@ -47,6 +47,23 @@ cloudflared tunnel --url http://127.0.0.1:4175
 ```
 
 浏览器和手机直接打开命令输出的 `https://*.trycloudflare.com` 地址即可。不要把本机的 `127.0.0.1` 地址发给其他人。
+
+## 长期部署与自动更新
+
+当前代码适合部署为 Render Web Service。Render 连接 GitHub 的 `main` 分支后，每次推送成功会自动构建并更新同一个网址；设置 `Root Directory` 后，仓库中其他目录的变化不会触发这个服务。长期稳定运行需要在 Render 选择合适的实例；免费实例可能休眠，网址仍保留但首次访问会等待唤醒。
+
+在 Render 新建 Web Service 时填写：
+
+- Repository：`realchenchenluo/agent`
+- Branch：`main`
+- Root Directory：`chenchen`
+- Runtime：`Node`
+- Build Command：`npm install --omit=dev`
+- Start Command：`npm run start:public`
+- Health Check Path：`/api/demo/portfolio`
+- Auto-Deploy：`On Commit`
+
+部署完成后，Render 会提供固定的 `onrender.com` 地址。以后只要把更新推送到个人仓库 `main`，网页会继续使用同一个地址并自动更新。当前项目仍是虚构数据演示，不应放入真实账单或账户信息。
 
 代码更新后请先在旧服务终端按 Ctrl+C，再重新运行 `npm start`。仅刷新网页不会更新运行中的后端。服务启动后可在另一个终端执行 `npm run smoke`，核对实际页面、样式和脚本是否与本地文件一致；使用其他端口时两个终端需设置相同的 `PORT`。
 
