@@ -165,13 +165,18 @@ class MerchantSession {
           "同品同单位拆分数量和单价变化。先核对采购批次与单价，再考虑询价；采购支出不等于已消耗成本。" :
           "没有可比数量资料，暂时只能确认支出变化，不能判断单价上涨。", evidence: c.evidence });
     }
-    return { notices: notices.map(n => ({ ...n, following: this.followups.has(n.id), status: this.noticeStates.get(n.id) || "open" })), revision: this.revision,
+    return { notices: notices.map(n => {
+      const saved = this.noticeStates.get(n.id) || {};
+      return { ...n, following: this.followups.has(n.id), status: saved.status || "open", note: saved.note || "" };
+    }), revision: this.revision,
       digest: "本次已核对 " + this.viewed.size + " 笔来源，共 " + this.ledger.bills.length + " 笔账单。下次从未查看的账单开始。" };
   }
-  setNoticeStatus(id, status) {
+  setNoticeStatus(id, status, note) {
     if (!["open", "verified", "done"].includes(status)) fail("INVALID_NOTICE_STATUS", "提醒状态无效。");
     if (!this.insights().notices.some(n => n.id === id)) fail("NOTICE_NOT_FOUND", "提醒不存在。");
-    this.noticeStates.set(id, status);
+    if (note !== undefined && (typeof note !== "string" || note.length > 240)) fail("INVALID_NOTICE_NOTE", "处理备注请控制在 240 个字符以内。");
+    const previous = this.noticeStates.get(id) || {};
+    this.noticeStates.set(id, { status, note: note === undefined ? (previous.note || "") : note.trim() });
     return { id, status };
   }
   singleScenario(key, delayDays = 0) {

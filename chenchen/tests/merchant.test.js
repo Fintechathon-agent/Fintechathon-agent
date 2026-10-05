@@ -102,11 +102,14 @@ test('negative opening cash is the first gap even when next-day receipts cover i
 test('notice status moves through plain-language states and resets after replacement', () => {
   const s=new MerchantSession();s.detail('微信:WX-002');s.review(s.revision,true);
   assert.equal(s.insights().notices.find(n=>n.id==='overdue').status,'open');
-  assert.deepEqual(s.setNoticeStatus('overdue','verified'),{id:'overdue',status:'verified'});
+  assert.deepEqual(s.setNoticeStatus('overdue','verified','已联系平台，等回款'),{id:'overdue',status:'verified'});
   assert.equal(s.insights().notices.find(n=>n.id==='overdue').status,'verified');
+  assert.equal(s.insights().notices.find(n=>n.id==='overdue').note,'已联系平台，等回款');
   assert.deepEqual(s.setNoticeStatus('overdue','done'),{id:'overdue',status:'done'});
   assert.equal(s.insights().notices.find(n=>n.id==='overdue').status,'done');
+  assert.equal(s.insights().notices.find(n=>n.id==='overdue').note,'已联系平台，等回款');
   assert.throws(()=>s.setNoticeStatus('overdue','unknown'),{code:'INVALID_NOTICE_STATUS'});
+  assert.throws(()=>s.setNoticeStatus('overdue','done','x'.repeat(241)),{code:'INVALID_NOTICE_NOTE'});
   s.replace(demo());assert.equal(s.noticeStates.size,0);
 });
 

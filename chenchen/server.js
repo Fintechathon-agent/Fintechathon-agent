@@ -127,7 +127,7 @@ async function handleApi(request, response, pathname, url) {
     else if (method === "POST" && pathname === "/api/merchant/review") result = session.review(body.revision, body.confirmed);
     else if (method === "POST" && pathname === "/api/merchant/import") result = session.replace(body);
     else if (method === "POST" && pathname === "/api/merchant/follow") result = session.follow(body.id, body.delay || 0);
-    else if (method === "POST" && pathname === "/api/merchant/notice") result = session.setNoticeStatus(body.id, body.status);
+    else if (method === "POST" && pathname === "/api/merchant/notice") result = session.setNoticeStatus(body.id, body.status, body.note);
     else if (method === "POST" && pathname === "/api/merchant/reset") result = session.replace(merchantDemo());
     else return false;
     sendJson(response, 200, result); return true;

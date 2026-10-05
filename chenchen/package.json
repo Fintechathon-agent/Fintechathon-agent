@@ -1,6 +1,6 @@
 {
   "name": "portfolio-sentinel",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "description": "Portfolio Sentinel and evidence-first merchant finance demos",
   "scripts": {

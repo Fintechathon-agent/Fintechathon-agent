@@ -34,10 +34,11 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   assert.equal((await fetch(base+'/api/merchant/insights',{headers})).status,200);
   const scenario=await fetch(base+'/api/merchant/scenario?bill='+encodeURIComponent('微信:WX-002')+'&delay=3',{headers});
   assert.equal(scenario.status,200);assert.equal((await scenario.json()).moved_to,'2026-10-08');
-  const notice=await fetch(base+'/api/merchant/notice',{method:'POST',headers,body:JSON.stringify({id:'overdue',status:'verified'})});
+  const notice=await fetch(base+'/api/merchant/notice',{method:'POST',headers,body:JSON.stringify({id:'overdue',status:'verified',note:'已联系平台，等回款'})});
   assert.equal(notice.status,200);
   const notices=await fetch(base+'/api/merchant/insights',{headers}).then(r=>r.json());
   assert.equal(notices.notices.find(n=>n.id==='overdue').status,'verified');
+  assert.equal(notices.notices.find(n=>n.id==='overdue').note,'已联系平台，等回款');
   const exported=await fetch(base+'/api/merchant/export?type=review&delay=3',{headers});
   assert.match(exported.headers.get('content-disposition'),/attachment/);
   assert.equal((await exported.json()).forecast.first_gap.date,'2026-10-06');

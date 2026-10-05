@@ -72,7 +72,7 @@ async function loadInsights() {
   reminders = next;
   $('#insights').className='';
   const sorted = [...reminders.notices].sort((a,b)=>Number(a.status==='done')-Number(b.status==='done')||Number(a.status==='verified')-Number(b.status==='verified')||Number(b.following)-Number(a.following));
-  $('#insights').innerHTML = sorted.map(n=>'<article class="insight"><div class="row"><h3>'+esc(n.title)+'</h3><div class="notice-actions"><select class="notice-status" data-id="'+esc(n.id)+'" aria-label="'+esc(n.title)+'处理状态">'+Object.entries(noticeStatuses).map(([value,label])=>'<option value="'+value+'"'+(n.status===value?' selected':'')+'>'+label+'</option>').join('')+'</select><button class="secondary follow" data-id="'+esc(n.id)+'">'+(n.following?'已关注 ✓':'下次关注')+'</button></div></div><p><strong>'+money(n.amount_cents)+'</strong></p><details><summary>查看原因与相关账单</summary><p>'+esc(n.explanation)+'</p><div class="small">'+sourceButtons(n.evidence)+'</div></details></article>').join('') || '<p>已知账单未触发当前规则的提醒。未知支出和未来销售仍需你补充。</p>';
+  $('#insights').innerHTML = sorted.map(n=>'<article class="insight"><div class="row"><h3>'+esc(n.title)+'</h3><div class="notice-actions"><select class="notice-status" data-id="'+esc(n.id)+'" aria-label="'+esc(n.title)+'处理状态">'+Object.entries(noticeStatuses).map(([value,label])=>'<option value="'+value+'"'+(n.status===value?' selected':'')+'>'+label+'</option>').join('')+'</select><button class="secondary follow" data-id="'+esc(n.id)+'">'+(n.following?'已关注 ✓':'下次关注')+'</button></div></div><p><strong>'+money(n.amount_cents)+'</strong></p><details><summary>查看原因与相关账单</summary><p>'+esc(n.explanation)+'</p><div class="small">'+sourceButtons(n.evidence)+'</div><div class="notice-note"><label>处理备注<input class="notice-note-input" data-id="'+esc(n.id)+'" maxlength="240" value="'+esc(n.note)+'" placeholder="例如：已联系平台，等回款"></label><button type="button" class="secondary note-save" data-id="'+esc(n.id)+'">保存</button></div></details></article>').join('') || '<p>已知账单未触发当前规则的提醒。未知支出和未来销售仍需你补充。</p>';
   $('#digest').textContent=reminders.digest;
 }
 async function runSingleScenario() {
@@ -93,7 +93,7 @@ async function refresh() {
 }
 document.addEventListener('click', async event=>{
   try {
-    const evidence=event.target.closest('.evidence'), follow=event.target.closest('.follow');
+    const evidence=event.target.closest('.evidence'), follow=event.target.closest('.follow'), noteSave=event.target.closest('.note-save');
     if(evidence) {
       const id=evidence.dataset.key, b=await api('/api/merchant/bill?id='+encodeURIComponent(id));
       if(!state.viewed.includes(id)) state.viewed.push(id);
@@ -103,6 +103,11 @@ document.addEventListener('click', async event=>{
       if(!$('#bill-dialog').open)$('#bill-dialog').showModal(); showBills(); renderReview();
     }
     if(follow) { await api('/api/merchant/follow',{id:follow.dataset.id,delay:delay()}); await loadInsights(); }
+    if(noteSave) {
+      const box=noteSave.closest('.notice-note'), input=box?.querySelector('.notice-note-input'), select=noteSave.closest('.insight')?.querySelector('.notice-status');
+      await api('/api/merchant/notice',{id:noteSave.dataset.id,status:select?.value || 'open',note:input?.value || ''});
+      await loadInsights(); toast('处理备注已保存。');
+    }
   } catch(e) { toast(e.message); }
 });
 document.addEventListener('change', async event=>{
