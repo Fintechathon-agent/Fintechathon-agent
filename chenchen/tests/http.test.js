@@ -6,6 +6,23 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));
   const base='http://127.0.0.1:'+server.address().port;
   for(const page of ['/','/investment','/merchant','/versions/merchant.js']) assert.equal((await fetch(base+page)).status,200);
+  await t.test('all page assets load with the right type including the separate product stylesheet',async()=>{
+    const assets=new Set(['/versions/presentation.mjs']);
+    for(const route of ['/','/investment','/merchant']){
+      const html=await fetch(base+route).then(r=>r.text());
+      assert.match(html,/product-overrides\.css/);
+      for(const match of html.matchAll(/(?:src|href)="(\/versions\/[^"]+)"/g))assets.add(match[1]);
+    }
+    for(const asset of assets){
+      const response=await fetch(base+asset);
+      assert.equal(response.status,200,asset);
+      assert.match(response.headers.get('content-type'),asset.endsWith('.css')?/text\/css/:/javascript/);
+      const body=await response.text();
+      assert.ok(body.length>0,asset);
+      if(asset.endsWith('.css'))assert.doesNotMatch(body,/^\+/m);
+      if(asset.endsWith('product-overrides.css'))assert.match(body,/--product-shell:ready/);
+    }
+  });
   assert.equal((await fetch(base+'/data/demo-portfolio.json')).status,404);
   assert.equal((await fetch(base+'/server.js')).status,404);
   const a=await fetch(base+'/api/merchant/ledger'), cookie=a.headers.get('set-cookie').split(';')[0], data=await a.json();

@@ -112,7 +112,9 @@ function forecast(ledger, delayDays = 0) {
     days.push({ date, incoming_cents: incomingCents, outgoing_cents: outgoingCents,
       expected_cents: expected, conservative_cents: conservative, evidence: [...incoming, ...outgoing].map(ref) });
   }
-  return { delay_days: delayDays, days, first_gap: days.find(d => d.expected_cents < 0) || null,
+  const openingGap = ledger.balance_cents < 0 ? { date: ledger.as_of, expected_cents: ledger.balance_cents,
+    conservative_cents: ledger.balance_cents, incoming_cents: 0, outgoing_cents: 0, evidence: [], opening: true } : null;
+  return { delay_days: delayDays, days, first_gap: openingGap || days.find(d => d.expected_cents < 0) || null,
     min_expected_cents: Math.min(ledger.balance_cents, ...days.map(d => d.expected_cents)),
     excluded_overdue_receipts: pending.filter(b => b.kind === "income" && b.due_on <= ledger.as_of).map(ref) };
 }
@@ -148,12 +150,13 @@ class MerchantSession {
   insights(delay = 0) {
     if (!this.reviewed) fail("REVIEW_REQUIRED", "先看清账单，再查看提醒。");
     const s = this.summary(delay), notices = [];
-    if (s.forecast.first_gap) notices.push({ id: "cash-gap", title: s.forecast.first_gap.date + " 已知账单可能形成资金缺口",
+    if (s.forecast.first_gap) notices.push({ id: "cash-gap", title: s.forecast.first_gap.date + (s.forecast.first_gap.opening ? " 当前余额已为负数" : " 已知账单可能形成资金缺口"),
       amount_cents: -s.forecast.first_gap.expected_cents,
-      explanation: "按当前余额、预计到账和已知付款逐日计算。先核对到账，再与房东或供应商讨论付款时间。",
+      explanation: s.forecast.first_gap.opening ? "缺口来自输入的当前余额，不是未来账单造成的。请先核对银行余额、现金及透支记录。" :
+        "按当前余额、预计到账和已知付款逐日计算。先核对到账，再与房东或供应商讨论付款时间。",
       evidence: [...new Set(s.forecast.days.filter(d => d.date <= s.forecast.first_gap.date).flatMap(d => d.evidence))] });
     const overdue = s.ledger.bills.filter(b => b.kind === "income" && b.status === "pending" && b.due_on <= s.ledger.as_of);
-    if (overdue.length) notices.push({ id: "overdue", title: "有结算款已过预计到账日", amount_cents: sum(overdue.map(net)),
+    if (overdue.length) notices.push({ id: "overdue", title: "有结算款已到预计到账日但未确认", amount_cents: sum(overdue.map(net)),
       explanation: "这部分未计入预计余额。请先对照平台结算单和银行记录，确认状态。", evidence: overdue.map(ref) });
     for (const c of s.costs.filter(c => c.change_ratio !== null && c.change_ratio > 0.1)) {
       notices.push({ id: "cost-" + c.category, title: c.category + " 本期采购支出增加",

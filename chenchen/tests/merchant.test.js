@@ -86,3 +86,15 @@ test('empty ledger has a flat known-cash forecast without fabricated warnings', 
   assert.equal(s.totals.receivable_cents,0);assert.equal(s.costs.length,0);
   assert.ok(s.forecast.days.every(d=>d.expected_cents===620000));assert.equal(s.forecast.first_gap,null);
 });
+
+test('negative opening cash is the first gap even when next-day receipts cover it', () => {
+  const d=demo();d.balance_cents=-10000;
+  d.bills=d.bills.filter(b=>b.id==='WX-002');
+  const s=new MerchantSession(d), f=s.summary().forecast;
+  assert.equal(f.first_gap.date,d.as_of);assert.equal(f.first_gap.opening,true);
+  assert.equal(f.first_gap.expected_cents,-10000);assert.ok(f.days[0].expected_cents>0);
+  s.detail('微信:WX-002');s.review(s.revision,true);
+  const notice=s.insights().notices.find(n=>n.id==='cash-gap');
+  assert.equal(notice.amount_cents,10000);assert.deepEqual(notice.evidence,[]);
+  assert.match(notice.title,/当前余额已为负数/);
+});

@@ -2,6 +2,7 @@ export const $ = (s) => document.querySelector(s);
 export const esc = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 export const money = cents => new Intl.NumberFormat("zh-CN", { style:"currency", currency:"CNY" }).format(cents / 100);
 export const pct = value => (value * 100).toFixed(2) + "%";
+export const today = () => new Intl.DateTimeFormat("sv-SE", {timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 export async function api(path, body) {
   const response = await fetch(path, body === undefined ? {} : { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
   const data = await response.json();
@@ -13,6 +14,20 @@ export function downloadLink(url) {
   const anchor = document.createElement("a");
   anchor.href = url; anchor.download = ""; anchor.hidden = true;
   document.body.append(anchor); anchor.click(); anchor.remove();
+}
+document.addEventListener("click",event=>{
+  const button=event.target.closest("[data-reveal]");
+  if(!button)return;
+  const panel=document.getElementById(button.dataset.reveal);
+  if(panel){ panel.scrollIntoView({behavior:"smooth",block:"start"});panel.focus({preventScroll:true}); }
+});
+// The HTML can update while an old Node process still denies a new stylesheet.
+// Surface the deployment mismatch instead of silently showing a broken layout.
+if(getComputedStyle(document.body).getPropertyValue("--product-shell").trim()!=="ready"){
+  const warning=document.createElement("p");
+  warning.id="asset-warning";warning.className="notice";warning.setAttribute("role","alert");
+  warning.textContent="新版样式未加载。请停止旧启动窗口，重新运行 npm start，然后刷新页面。";
+  document.querySelector("main")?.prepend(warning);
 }
 export function chart(series, labels) {
   const colors = ["#245b49","#b67845","#798d70","#404f71"];

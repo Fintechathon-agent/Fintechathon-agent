@@ -1,52 +1,62 @@
-import { $, esc, money, pct, api, toast, downloadLink, chart } from "./common.js";
-let result;
+import { $, esc, money, pct, api, toast, downloadLink, chart, today } from "./common.js";
+import { dateStatus, planComparison } from "./presentation.mjs";
+let result, inputVersion = 0;
 const names = { CURRENT:"当前组合", A:"A 保持或最小动作", B:"B 温和调整", C:"C 风险优先" };
-const planCopy = {
-  A: "改动最少，适合先观察组合结构。",
-  B: "在风险和换手之间做温和取舍。",
-  C: "优先压低风险，通常需要更多调整。"
-};
-function planRecommendation(comparisons) {
-  return comparisons.reduce((best, item) => {
-    if (!best) return item;
-    return item.metrics.max_drawdown > best.metrics.max_drawdown ? item : best;
-  }, null)?.plan_id;
+const planCopy = { A:"保留当前配置", B:"适度降低集中度", C:"降低高波动资产权重" };
+function invalidate() {
+  inputVersion++;
+  if (result) { result=null; $("#results").hidden=true; $("#input-changed").hidden=false; }
 }
 async function init() {
-  const data = await api("/api/demo/portfolio"), p = data.output.snapshot;
-  const raw = { portfolio_id:p.portfolio_id, as_of:p.as_of, cash:p.cash, positions:p.positions.map(({instrument_id,type,quantity,price,name,sector})=>({instrument_id,type,quantity,price,name,sector})) };
-  $("#portfolio-json").value = JSON.stringify(raw, null, 2);
-  renderHoldings(p);
+  const data=await api("/api/demo/portfolio"), p=data.output.snapshot;
+  const raw={portfolio_id:p.portfolio_id,as_of:p.as_of,cash:p.cash,positions:p.positions.map(({instrument_id,type,quantity,price,name,sector})=>({instrument_id,type,quantity,price,name,sector}))};
+  $("#portfolio-json").value=JSON.stringify(raw,null,2);
+  renderHoldings(p); $("#run").disabled=false;
 }
 function renderHoldings(p) {
-  $("#holdings").innerHTML = '<div class="table-wrap clean-table"><table><thead><tr><th>本次证券</th><th>类型</th><th class="num">市值</th><th class="num">占比</th></tr></thead><tbody>'+
-    p.positions.map(p=>'<tr><td>'+esc(p.name)+'<small>'+esc(p.instrument_id)+'</small></td><td>'+esc(p.type)+'</td><td class="num">'+money(p.market_value*100)+'</td><td class="num">'+pct(p.weight)+'</td></tr>').join("")+
-    '<tr><td>现金</td><td>备用资金</td><td class="num">'+money(p.cash*100)+'</td><td class="num">'+pct(p.cash_weight)+'</td></tr></tbody></table></div><p class="small muted">合计 '+money(p.total_value*100)+' · 数据截至 '+esc(p.as_of.slice(0,10))+'</p>';
+  const dated=dateStatus(p.as_of,today());
+  $("#portfolio-stamp").textContent="演示组合 "+money(p.total_value*100);
+  $("#portfolio-health").innerHTML='<span>基准日 '+esc(p.as_of.slice(0,10))+'</span><span class="date-warning">'+esc(dated.label)+'</span><span>固定虚构价格 · 不自动更新</span>';
+  $("#holdings").innerHTML='<div class="table-wrap"><table><thead><tr><th>证券</th><th class="num">市值</th><th class="num">占比</th></tr></thead><tbody>'+
+    p.positions.map(p=>'<tr><td>'+esc(p.name)+'<small>'+esc(p.instrument_id)+'</small></td><td class="num">'+money(p.market_value*100)+'</td><td class="num">'+pct(p.weight)+'</td></tr>').join("")+
+    '<tr><td>现金</td><td class="num">'+money(p.cash*100)+'</td><td class="num">'+pct(p.cash_weight)+'</td></tr></tbody></table></div>';
 }
-$("#demo-profile").onclick = () => { $("#horizon").value=365; $("#drawdown").value=10; $("#liquidity").value="medium"; toast("已填入虚构用户偏好，可自行修改。"); };
-$("#check-form").onsubmit = async event => {
-  event.preventDefault(); $("#run").disabled=true; $("#results").hidden=true;
+$("#check-form").addEventListener("input",invalidate);
+$("#demo-profile").onclick=()=>{ invalidate(); $("#horizon").value=365;$("#drawdown").value=10;$("#liquidity").value="medium";toast("已填入虚构偏好，可修改。"); };
+$("#check-form").onsubmit=async event=>{
+  event.preventDefault();const version=inputVersion;$("#run").disabled=true;$("#results").hidden=true;$("#input-changed").hidden=true;$("#run").textContent="正在诊断…";
   try {
-    result=await api("/api/health-check/run", { risk_profile:{investment_horizon_days:Number($("#horizon").value),max_drawdown:Number($("#drawdown").value)/100,liquidity_need:$("#liquidity").value},portfolio:JSON.parse($("#portfolio-json").value) });
-    if (result.task_state.status !== "HANDOFF_REQUIRED") throw new Error(result.task_state.error_state?.reasons?.join("；") || "请补齐有效的持仓与风险信息。");
-    const a=result.artifacts, m=a.health_report.metrics, s=a.simulation;
+    const next=await api("/api/health-check/run",{risk_profile:{investment_horizon_days:Number($("#horizon").value),max_drawdown:Number($("#drawdown").value)/100,liquidity_need:$("#liquidity").value},portfolio:JSON.parse($("#portfolio-json").value)});
+    if(version!==inputVersion) { $("#input-changed").hidden=false; return toast("输入已改变，请重新检查。"); }
+    if(next.task_state.status!=="HANDOFF_REQUIRED")throw new Error(next.task_state.error_state?.reasons?.join("；")||"请补齐有效的持仓与风险信息。");
+    result=next; const a=result.artifacts,m=a.health_report.metrics,s=a.simulation,view=planComparison(s.comparisons);
+    if(!view.best||!view.baseline)throw new Error("模拟缺少有效结果，暂不展示结论。");
     renderHoldings(a.portfolio_snapshot);
-    $("#risk-metrics").innerHTML = [["历史窗口回撤",pct(m.max_drawdown),"7 个观测值"],["年化波动率",pct(m.annualized_volatility),"短样本年化，仅演示公式"],["现金占比",pct(a.portfolio_snapshot.cash_weight),"现金单独展示"]].map(v=>'<article class="metric"><small>'+v[0]+'</small><strong>'+v[1]+'</strong><small>'+v[2]+'</small></article>').join("");
-    $("#findings").innerHTML='<p>最大证券仓位 <b>'+esc(a.health_report.concentration.largest_instrument)+'</b>，占 <b>'+pct(a.health_report.concentration.top_1)+'</b>。</p>'+a.health_report.hidden_clusters.map(c=>'<p class="small">'+esc(c.instruments.join(" / "))+' · 相关系数 <b>'+c.correlation.toFixed(3)+'</b></p>').join("");
-    const plans = s.comparisons.filter(c=>c.plan_id!=="CURRENT");
-    const preferred = planRecommendation(plans);
-    $("#comparison").innerHTML='<div class="plan-grid">'+plans.map(c=>{
-      const scenarioIndex=s.comparisons.findIndex(item=>item.plan_id===c.plan_id), d=s.scenarios[scenarioIndex].distribution, recommended=c.plan_id===preferred;
-      return '<article class="plan-card'+(recommended?' recommended':'')+'"><p class="section-kicker">'+(recommended?'建议先看':'路径 '+c.plan_id)+'</p><h3>'+esc(names[c.plan_id])+'</h3><p class="plan-meta">'+esc(planCopy[c.plan_id] || "固定规则演示方案。")+'</p><div class="row"><span><small>历史收益</small><strong>'+pct(c.metrics.cumulative_return)+'</strong></span><span><small>最大回撤</small><strong>'+pct(c.metrics.max_drawdown)+'</strong></span></div><details><summary>查看换手与情景</summary><p class="small">换手率 '+pct(c.turnover)+'；情景 P10 / P50 / P90：'+[d.p10,d.p50,d.p90].map(pct).join(" / ")+'。</p></details></article>';
+    $("#risk-metrics").innerHTML=[["演示区间收益",pct(view.baseline.metrics.cumulative_return),"同一配置的历史模拟"],["历史最大回撤",pct(m.max_drawdown),"负数越接近 0，回撤越小"],["现金占比",pct(a.portfolio_snapshot.cash_weight),"不参与证券集中度"]].map(v=>'<article class="metric"><small>'+v[0]+'</small><strong>'+v[1]+'</strong><small>'+v[2]+'</small></article>').join("");
+    $("#findings").innerHTML='<p>最大证券仓位 <b>'+esc(a.health_report.concentration.largest_instrument)+'</b>，占 <b>'+pct(a.health_report.concentration.top_1)+'</b>。</p><p class="small">短样本年化波动率 '+pct(m.annualized_volatility)+'。</p>'+
+      a.health_report.hidden_clusters.map(c=>'<p class="small">'+esc(c.instruments.join(" / "))+' · 相关系数 '+c.correlation.toFixed(3)+'</p>').join("");
+    $("#verdict-title").textContent=names[view.best.plan_id]+" · 样本内回撤较小";
+    $("#verdict-copy").textContent="相较当前组合，回撤"+(view.improvementPoints>=0?"减少 ":"增加 ")+Math.abs(view.improvementPoints).toFixed(2)+" 个百分点；需换手 "+pct(view.best.turnover)+"。仅作历史比较。";
+    $("#verdict-tag").textContent="非个性化推荐";
+    $("#comparison").innerHTML='<div class="plan-grid">'+view.plans.map(c=>{
+      const index=s.comparisons.findIndex(item=>item.plan_id===c.plan_id),d=s.scenarios[index].distribution;
+      const proposal=a.candidates.find(item=>item.plan_id===c.plan_id);
+      return '<article class="plan-card'+(c.plan_id===view.best.plan_id?' highlighted':'')+'"><p class="section-kicker">'+(c.plan_id===view.best.plan_id?'样本内回撤较小':'固定规则示例')+'</p><h3>'+esc(names[c.plan_id])+'</h3><p class="plan-meta">'+planCopy[c.plan_id]+'</p><div class="row"><span><small>区间收益</small><strong>'+pct(c.metrics.cumulative_return)+'</strong></span><span><small>最大回撤</small><strong>'+pct(c.metrics.max_drawdown)+'</strong></span></div><p class="small">换手率 '+pct(c.turnover)+'</p><details><summary>查看路径 '+esc(c.plan_id)+' 的细节</summary><p class="small">20 日情景 P10 / P50 / P90：'+[d.p10,d.p50,d.p90].map(pct).join(" / ")+'。仅演示重采样机制，不是未来预测。</p><ul class="weight-list">'+Object.entries(proposal?.target_weights||{}).map(([id,value])=>'<li>'+esc(id)+' <b>'+pct(value)+'</b></li>').join("")+'</ul></details></article>';
     }).join("")+'</div>';
     $("#investment-chart").innerHTML=chart(s.comparisons.map(c=>({name:names[c.plan_id],values:c.curve.map(p=>Number(((p.value-1)*100).toFixed(4)))})),s.comparisons[0].curve.map(p=>p.date.slice(5)));
-    $("#weights").innerHTML='<details class="compact-detail"><summary>查看目标权重</summary><div class="table-wrap clean-table"><table><thead><tr><th>标的</th><th>A</th><th>B</th><th>C</th></tr></thead><tbody>'+[...new Set(a.candidates.flatMap(c=>Object.keys(c.target_weights)))].map(id=>'<tr><td>'+esc(id)+'</td>'+a.candidates.map(c=>'<td>'+pct(c.target_weights[id]||0)+'</td>').join("")+'</tr>').join("")+'</tbody></table></div></details>';
-    $("#assumptions").textContent="曲线单位为 %；统一起始资金 "+money(s.assumptions.initial_capital*100)+"。交易成本按单向换手 × "+pct(s.transaction_cost_rate)+" 一次扣除；固定种子，20 个交易日情景。无风险利率 2%，年化系数 252。风险偏好随任务交接；A/B/C 尚未完成个性化适配与风控审批。";
-    $("#task-status").textContent="当前阶段 "+result.task_state.stage+" · 等待团队风控接入";
-    const audit=await api("/api/audit/"+encodeURIComponent(result.task_state.task_id));
-    $("#evidence").textContent=JSON.stringify({task_state:result.task_state,tool_results:result.tool_results,audit:audit.events},null,2);
-    $("#results").hidden=false; $("#results").scrollIntoView({behavior:"smooth"}); toast("诊断与模拟完成，先看方案卡，再打开明细。");
-  } catch(error) { toast(error.message); } finally {$("#run").disabled=false;}
+    $("#weights").innerHTML='<div class="table-wrap"><table><thead><tr><th>标的</th>'+a.candidates.map(c=>'<th>'+esc(c.plan_id)+'</th>').join("")+'</tr></thead><tbody>'+[...new Set(a.candidates.flatMap(c=>Object.keys(c.target_weights)))].map(id=>'<tr><td>'+esc(id)+'</td>'+a.candidates.map(c=>'<td>'+pct(c.target_weights[id]||0)+'</td>').join("")+'</tr>').join("")+'</tbody></table></div>';
+    $("#assumptions").textContent=s.comparisons[0].curve.length+" 个价格观测。统一起始资金 "+money(s.assumptions.initial_capital*100)+"；单向换手 × "+pct(s.transaction_cost_rate)+" 扣费；2,000 条联合收益区块重采样路径、固定种子、20 个交易日情景。年化系数 252、无风险利率 2%。";
+    $("#task-status").textContent=result.task_state.stage+" · 等待团队风控接入";
+    $("#evidence").textContent=JSON.stringify({task_state:result.task_state,tool_results:result.tool_results},null,2);
+    // Audit loading must not hide a valid result or overwrite a newer run.
+    api("/api/audit/"+encodeURIComponent(next.task_state.task_id)).then(audit=>{
+      if(result===next&&version===inputVersion)$("#evidence").textContent=JSON.stringify({task_state:next.task_state,tool_results:next.tool_results,audit},null,2);
+    }).catch(()=>{
+      if(result===next&&version===inputVersion)$("#evidence").textContent+="\n完整运行记录暂未读取成功，可重新检查后再试。";
+    });
+    $("#results").hidden=false;$("#input-panel").open=false;$("#result-summary").scrollIntoView({behavior:"smooth",block:"start"});toast("分析完成。展开方案可查看细节。");
+  }catch(error){ result=null;toast(error.message); }
+  finally{$("#run").disabled=false;$("#run").textContent="开始健康检查 →";}
 };
-$("#export").onclick=()=>downloadLink("/api/task/"+encodeURIComponent(result.task_state.task_id)+"/export");
-init().catch(error=>toast(error.message));
+$("#export").onclick=()=>{if(result)downloadLink("/api/task/"+encodeURIComponent(result.task_state.task_id)+"/export");};
+init().catch(error=>{$("#load-error").hidden=false;$("#load-error").textContent="数据读取失败："+error.message+"。请确认服务已启动，再刷新页面。";});

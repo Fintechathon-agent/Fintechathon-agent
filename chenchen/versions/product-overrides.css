@@ -1,4 +1,19 @@
 /* Independent product shells: compact first screen, progressive detail */
+:root{--product-shell:ready}
+main>*{min-width:0}
+[id]{scroll-margin-top:105px}
+.input-panel>summary{font-size:18px;color:var(--ink)}
+.input-panel>summary .small{float:right;font-weight:400}
+.plan-card.highlighted{border:2px solid var(--green);padding:17px;background:linear-gradient(155deg,var(--pale),#fff 60%)}
+.weight-list{list-style:none;padding:0;font-size:12px;overflow-wrap:anywhere}
+.weight-list li{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:6px 0}
+.data-strip .date-warning{color:#8b5a23;background:#fff8eb}
+.merchant-product .compact-metrics .metric:first-child{background:#fff;color:var(--ink)}
+.merchant-product .compact-metrics .metric:first-child small{color:var(--muted)}
+.bill-preview .bill-top{flex-wrap:wrap}
+.bill-preview{overflow-wrap:anywhere}
+.product-choice,.focus-card,.plan-card,.cost-card{min-width:0}
+.cost-card .cost-top{flex-wrap:wrap}
 body.investment-product{--ink:#18283b;--muted:#66748a;--green:#2358a6;--pale:#edf4ff;--line:#dbe4f0;--red:#b44747;--amber:#a76720;background:#f5f8fc}
 body.merchant-product{--ink:#24352f;--muted:#6c7b74;--green:#26735a;--pale:#eaf6ef;--line:#dbe8df;--red:#b44b43;--amber:#a56623;background:#f7faf7}
 body.home-product{--green:#2358a6}
@@ -117,4 +132,62 @@ dialog dl{font-size:13px}
   .product-nav .product-label{display:none}
   .product-header .brand{font-size:17px}
   .summary-metric{padding:12px}
+}
+/* Product selector and decision-first iteration */
+.home-product{--ink:#19302c;--muted:#6b7b75;--line:#dce7df;--paper:#f7faf8;background:var(--paper)}
+.home-header{padding:16px max(4vw,20px);background:rgba(255,255,255,.92);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:20px}
+.home-header .brand{display:flex;align-items:center;gap:10px;color:var(--ink);letter-spacing:0}
+.home-header .brand-mark{background:#19302c}
+.home-header .tag{background:#eef6f0;color:#26735a}
+.home-main{max-width:1160px;padding:24px 24px 50px}
+.home-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;padding:0 0 16px}
+.home-hero h1{font-size:clamp(32px,3.6vw,44px);line-height:1.17;margin:8px 0 12px;letter-spacing:-1.5px}
+.home-lede{font-size:16px;max-width:570px;margin:0;color:var(--muted)}
+.home-principle{width:136px;height:136px;border:1px solid var(--line);border-radius:34px;background:#fff;display:grid;grid-template-columns:1fr 1fr;align-content:center;justify-items:center;position:relative;box-shadow:0 14px 34px rgba(30,68,50,.06)}
+.home-principle span{font:800 31px/1 system-ui;color:#26735a}
+.home-principle small{grid-column:1 / -1;color:var(--muted);font-size:11px;margin-top:14px}
+.product-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.product-choice{border:1px solid var(--line);border-radius:22px;padding:22px;min-height:346px;display:flex;flex-direction:column;box-shadow:0 15px 42px rgba(26,57,44,.07)}
+.investment-choice{--choice:#2358a6;--choice-pale:#edf4ff;background:linear-gradient(145deg,#f6f9ff 0%,#fff 68%);border-top:5px solid #2358a6}
+.merchant-choice{--choice:#26735a;--choice-pale:#eaf6ef;background:linear-gradient(145deg,#f4fbf6 0%,#fff 68%);border-top:5px solid #26735a}
+.choice-top{display:flex;align-items:center;gap:10px;color:var(--choice);font-size:12px;font-weight:800;letter-spacing:1px}
+.choice-mark{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;background:var(--choice);color:#fff;font:800 12px system-ui;letter-spacing:0}
+.choice-kicker{letter-spacing:1.4px}
+.product-choice h2{font-size:28px;line-height:1.25;margin:25px 0 10px;letter-spacing:-.8px}
+.choice-description{font-size:14px;color:var(--muted);max-width:460px;margin:0 0 22px}
+.choice-snapshot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:auto;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.choice-snapshot div{min-width:0}
+.choice-snapshot small{font-size:11px;display:block;white-space:nowrap}
+.choice-snapshot strong{display:block;font:750 20px/1.25 system-ui;color:var(--choice);margin-top:4px;white-space:nowrap}
+.choice-flow{font-size:12px;color:var(--muted);padding:14px 0 17px}
+.choice-flow span{color:var(--choice);padding:0 5px;font-weight:800}
+.choice-button{align-self:flex-start;background:var(--choice);border-color:var(--choice);border-radius:10px;padding:11px 16px}
+.choice-button span{font-size:17px;line-height:0}
+.home-note{display:flex;align-items:center;gap:10px;margin:19px 2px 0;color:var(--muted);font-size:12px}
+.home-note p{margin:0}
+.home-note strong{color:var(--ink)}
+.note-dot{width:8px;height:8px;border-radius:50%;background:#c28a3b;flex:0 0 auto}
+.data-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin:0 0 18px}
+.data-strip span{background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 10px}
+.data-strip .fresh{color:var(--green);background:var(--pale);font-weight:700}
+.result-verdict{display:flex;align-items:center;justify-content:space-between;gap:20px;background:linear-gradient(120deg,var(--pale),#fff 70%);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-bottom:18px}
+.result-verdict h2{margin:2px 0 4px;font-size:21px}
+.result-verdict p{margin:0;color:var(--muted);font-size:13px}
+.verdict-tag{display:inline-flex;align-items:center;white-space:nowrap;background:var(--green);color:#fff;border-radius:99px;padding:7px 12px;font-size:12px;font-weight:700}
+@media(max-width:800px){
+  .home-main{padding:30px 16px 54px}
+  .home-hero{align-items:flex-start}
+  .home-principle{width:104px;height:104px;border-radius:26px}
+  .home-principle span{font-size:24px}
+  .product-choice-grid{grid-template-columns:1fr}
+  .product-choice{min-height:0}
+  .choice-snapshot strong{font-size:18px}
+}
+@media(max-width:520px){
+  .home-header{align-items:flex-start;flex-direction:column;gap:10px}
+  .home-hero{display:block}
+  .home-principle{margin-top:24px}
+  .home-hero h1{font-size:39px}
+  .result-verdict{display:block}
+  .verdict-tag{margin-top:13px}
 }
