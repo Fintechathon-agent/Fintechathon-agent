@@ -18,7 +18,7 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
     for(const asset of assets){
       const response=await fetch(base+asset);
       assert.equal(response.status,200,asset);
-      assert.match(response.headers.get('content-type'),asset.endsWith('.css')?/text\/css/:/javascript/);
+      assert.match(response.headers.get('content-type'),asset.endsWith('.css')?/text\/css/:asset.endsWith('.svg')?/image\/svg\+xml/:/javascript/);
       const body=await response.text();
       assert.ok(body.length>0,asset);
       if(asset.endsWith('.css'))assert.doesNotMatch(body,/^\+/m);
