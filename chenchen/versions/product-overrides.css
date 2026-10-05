@@ -151,9 +151,12 @@ dialog dl{font-size:13px}
 .home-principle span{font:800 31px/1 system-ui;color:#26735a}
 .home-principle small{grid-column:1 / -1;color:var(--muted);font-size:11px;margin-top:14px}
 .product-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.catalog-grid{grid-template-columns:minmax(0,1.4fr) minmax(280px,.8fr);align-items:stretch}
 .product-choice{border:1px solid var(--line);border-radius:22px;padding:22px;min-height:346px;display:flex;flex-direction:column;box-shadow:0 15px 42px rgba(26,57,44,.07)}
 .investment-choice{--choice:#2358a6;--choice-pale:#edf4ff;background:linear-gradient(145deg,#f6f9ff 0%,#fff 68%);border-top:5px solid #2358a6}
 .merchant-choice{--choice:#26735a;--choice-pale:#eaf6ef;background:linear-gradient(145deg,#f4fbf6 0%,#fff 68%);border-top:5px solid #26735a}
+.catalog-grid .investment-choice{min-height:390px}
+.catalog-grid .merchant-choice{min-height:300px}
 .choice-top{display:flex;align-items:center;gap:10px;color:var(--choice);font-size:12px;font-weight:800;letter-spacing:1px}
 .choice-mark{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;background:var(--choice);color:#fff;font:800 12px system-ui;letter-spacing:0}
 .choice-kicker{letter-spacing:1.4px}
@@ -203,6 +206,7 @@ dialog dl{font-size:13px}
   .home-principle{width:104px;height:104px;border-radius:26px}
   .home-principle span{font-size:24px}
   .product-choice-grid{grid-template-columns:1fr}
+  .catalog-grid{grid-template-columns:1fr}
   .product-choice{min-height:0}
   .choice-snapshot strong{font-size:18px}
 }
