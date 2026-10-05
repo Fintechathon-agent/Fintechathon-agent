@@ -22,6 +22,7 @@ function merchantFor(request, response) {
 const root = __dirname;
 const port = Number(process.env.PORT || 4175);
 const harness = new Harness({ toolset: tools });
+const publicAccessEnabled = () => process.env.PUBLIC_ACCESS === "true";
 const mime = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -247,10 +248,11 @@ function serveStatic(response, pathname) {
 const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, `http://${request.headers.host || "127.0.0.1"}`);
-    if (!["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)) {
+    const localHost = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+    if (!localHost && !publicAccessEnabled()) {
       sendJson(response, 403, { error: { code: "LOCAL_ONLY", message: "Local demo only" } }); return;
     }
-    if (request.headers.origin && request.headers.origin !== url.origin) {
+    if (!publicAccessEnabled() && request.headers.origin && request.headers.origin !== url.origin) {
       sendJson(response, 403, { error: { code: "ORIGIN_MISMATCH", message: "Cross-origin requests are disabled" } }); return;
     }
     if (url.pathname.startsWith("/api/")) {

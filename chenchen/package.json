@@ -1,10 +1,11 @@
 {
   "name": "portfolio-sentinel",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "description": "Portfolio Sentinel and evidence-first merchant finance demos",
   "scripts": {
     "start": "node server.js",
+    "start:public": "node scripts/start-public.js",
     "check": "node scripts/check.js",
     "test": "node --test",
     "smoke": "node scripts/smoke.js"
