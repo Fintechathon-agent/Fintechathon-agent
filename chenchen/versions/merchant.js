@@ -1,8 +1,9 @@
-import { $, esc, money, pct, api, toast, downloadLink, chart, today } from './common.js';
+import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip } from './common.js';
 import { dateStatus, merchantOverview, priorityBills } from './presentation.mjs';
 let state, reminders, refreshSequence = 0;
 const key = b => b.channel + ':' + b.id;
 const delay = () => Number($('#delay').value);
+const noticeStatuses = { open:'待处理', verified:'已核实', done:'已处理' };
 const sourceButtons = refs => refs.map(r => '<button class="subtle evidence" data-key="'+esc(r)+'">'+esc(r)+'</button>').join(' · ');
 function previewBill(b) {
   return '<article class="bill-preview"><div class="bill-top"><span>'+esc(b.id)+'</span><span>'+esc(b.due_on)+'</span></div><div class="bill-amount '+(b.kind==='income'?'positive':'danger')+'">'+(b.kind==='income'?'+':'−')+money(b.amount_cents-b.fee_cents-b.refund_cents)+'</div><p class="bill-meta">'+esc(b.category)+' · '+(b.status==='settled'?'已结算':b.kind==='income'?'待到账':'待付款')+'</p><button class="secondary evidence" data-key="'+esc(key(b))+'">看账单'+(state.viewed.includes(key(b))?' ✓':'')+'</button></article>';
@@ -20,8 +21,8 @@ function showBills() {
 function render() {
   const l = state.ledger, f = state.forecast, overview = merchantOverview(state);
   $('#shop-date').textContent = l.shop + ' · 截至 ' + l.as_of;
-  $('#totals').innerHTML = [['还在路上的钱',money(state.totals.receivable_cents),'不是可用余额'],['已知待付款',money(state.totals.payable_cents),'全部未结算支出'],['最近待付款',overview.nextPayment ? overview.nextPayment.due_on.slice(5) : '暂无',overview.nextPayment ? overview.nextPayment.category+' · '+money(overview.nextPayment.amount_cents) : '未录入不代表无支出']].map(([t,v,d])=>'<article class="metric"><small>'+t+'</small><strong>'+esc(v)+'</strong><small>'+esc(d)+'</small></article>').join('');
-  $('#merchant-status').innerHTML = '<span class="cash-label">已核对余额</span><div class="cash-value">'+money(state.totals.balance_cents)+'</div><p class="cash-sub">已到账且已核对；待到账收入不计入可用余额</p>';
+  $('#totals').innerHTML = [[tip('还在路上的钱','tip-receivable','预计会到账，但现在还不能拿来付款。'),money(state.totals.receivable_cents),'不是可用余额'],[tip('已知待付款','tip-payable','已经记下、以后需要付出去的钱。'),money(state.totals.payable_cents),'全部未结算支出'],[tip('最近待付款','tip-next-payment','当前账单里日期最近的一笔待付款。'),overview.nextPayment ? overview.nextPayment.due_on.slice(5) : '暂无',overview.nextPayment ? overview.nextPayment.category+' · '+money(overview.nextPayment.amount_cents) : '未录入不代表无支出']].map(([t,v,d])=>'<article class="metric"><small>'+t+'</small><strong>'+esc(v)+'</strong><small>'+esc(d)+'</small></article>').join('');
+  $('#merchant-status').innerHTML = '<span class="cash-label">'+tip('已核对余额','tip-balance-live','已经到账，并且你已经对照过银行或现金记录的钱。')+'</span><div class="cash-value">'+money(state.totals.balance_cents)+'</div><p class="cash-sub">已到账且已核对；待到账收入不计入可用余额</p>';
   const firstGap = overview.gap, conservativeGap = overview.conservativeGap;
   $('#scenario-label').textContent = overview.scenario + ' · 测算';
   $('#cash-callout-title').textContent = firstGap ? (firstGap.opening ? '基准日余额已为负' : '首个缺口 · '+firstGap.date.slice(5)) : '14 天内未见已知缺口';
@@ -29,6 +30,10 @@ function render() {
   $('#gap-summary').textContent = conservativeGap ? '待收款全部暂未到账时，'+conservativeGap.date+' 余额为负。' : '保守情景下未见负余额；仍需核对新增账单。';
   const rising = state.costs.filter(c => c.change_ratio !== null && c.change_ratio > 0).sort((a,b)=>b.change_ratio-a.change_ratio)[0];
   $('#cost-summary').textContent = rising ? rising.category+' 本期 '+money(rising.current_cents)+'，较上期上升 '+pct(rising.change_ratio)+'；不等于单价上涨。' : '目前没有可比的上涨采购。';
+  const scenarioBill = $('#scenario-bill').value;
+  const scenarioBills = l.bills.filter(b => b.kind === 'income' && b.status === 'pending' && b.due_on > l.as_of);
+  $('#scenario-bill').innerHTML = scenarioBills.length ? scenarioBills.map(b=>'<option value="'+esc(key(b))+'">'+esc(b.channel+' · '+b.id+' · '+money(b.amount_cents-b.fee_cents-b.refund_cents))+'</option>').join('') : '<option value="">没有可试算的未到账收入</option>';
+  if (scenarioBills.some(b => key(b) === scenarioBill)) $('#scenario-bill').value = scenarioBill;
   const channel = $('#channel').value;
   $('#channel').innerHTML = '<option value="">全部渠道</option>'+[...new Set(l.bills.map(b=>b.channel))].map(c=>'<option>'+esc(c)+'</option>').join('');
   if ([...$('#channel').options].some(o=>o.value===channel)) $('#channel').value=channel;
@@ -66,9 +71,20 @@ async function loadInsights() {
   if (!state.reviewed || state.revision !== revision || next.revision !== revision || delay() !== requestedDelay) return;
   reminders = next;
   $('#insights').className='';
-  const sorted = [...reminders.notices].sort((a,b)=>Number(b.following)-Number(a.following));
-  $('#insights').innerHTML = sorted.map(n=>'<article class="insight"><div class="row"><h3>'+esc(n.title)+'</h3><button class="secondary follow" data-id="'+esc(n.id)+'">'+(n.following?'已关注 ✓':'下次关注')+'</button></div><p><strong>'+money(n.amount_cents)+'</strong></p><details><summary>查看原因与相关账单</summary><p>'+esc(n.explanation)+'</p><div class="small">'+sourceButtons(n.evidence)+'</div></details></article>').join('') || '<p>已知账单未触发当前规则的提醒。未知支出和未来销售仍需你补充。</p>';
+  const sorted = [...reminders.notices].sort((a,b)=>Number(a.status==='done')-Number(b.status==='done')||Number(a.status==='verified')-Number(b.status==='verified')||Number(b.following)-Number(a.following));
+  $('#insights').innerHTML = sorted.map(n=>'<article class="insight"><div class="row"><h3>'+esc(n.title)+'</h3><div class="notice-actions"><select class="notice-status" data-id="'+esc(n.id)+'" aria-label="'+esc(n.title)+'处理状态">'+Object.entries(noticeStatuses).map(([value,label])=>'<option value="'+value+'"'+(n.status===value?' selected':'')+'>'+label+'</option>').join('')+'</select><button class="secondary follow" data-id="'+esc(n.id)+'">'+(n.following?'已关注 ✓':'下次关注')+'</button></div></div><p><strong>'+money(n.amount_cents)+'</strong></p><details><summary>查看原因与相关账单</summary><p>'+esc(n.explanation)+'</p><div class="small">'+sourceButtons(n.evidence)+'</div></details></article>').join('') || '<p>已知账单未触发当前规则的提醒。未知支出和未来销售仍需你补充。</p>';
   $('#digest').textContent=reminders.digest;
+}
+async function runSingleScenario() {
+  const bill = $('#scenario-bill').value, days = Number($('#scenario-delay').value);
+  if (!bill) return toast('没有可试算的未到账收入。');
+  $('#scenario-run').disabled = true; $('#scenario-result').hidden = false; $('#scenario-result').textContent = '正在试算…';
+  try {
+    const result = await api('/api/merchant/scenario?bill='+encodeURIComponent(bill)+'&delay='+days);
+    const gap = value => value.first_gap ? value.first_gap.date+' · '+money(value.first_gap.expected_cents) : '未来 14 天未出现负余额';
+    $('#scenario-result').innerHTML = '<strong>'+esc(result.bill.channel+' · '+result.bill.id)+' 晚 '+result.delay_days+' 天到账</strong><p>预计到账日：'+esc(result.moved_from)+' → '+esc(result.moved_to)+'</p><p>原本情景：'+esc(gap(result.baseline))+'；单笔延迟后：'+esc(gap(result.scenario))+'</p><small>这只是单笔收入的假设，不会修改账单，也不会自动改变付款日期。</small>';
+  } catch (error) { $('#scenario-result').textContent = error.message; }
+  finally { $('#scenario-run').disabled = false; }
 }
 async function refresh() {
   const sequence=++refreshSequence, next=await api('/api/merchant/ledger?delay='+delay());
@@ -89,6 +105,12 @@ document.addEventListener('click', async event=>{
     if(follow) { await api('/api/merchant/follow',{id:follow.dataset.id,delay:delay()}); await loadInsights(); }
   } catch(e) { toast(e.message); }
 });
+document.addEventListener('change', async event=>{
+  const select = event.target.closest('.notice-status');
+  if (!select) return;
+  try { await api('/api/merchant/notice',{id:select.dataset.id,status:select.value}); await loadInsights(); toast('提醒状态已更新。'); }
+  catch (error) { toast(error.message); }
+});
 $('#close-dialog').onclick=()=>$('#bill-dialog').close();
 $('#confirm').onchange=renderReview;
 $('#review').onclick=async()=>{ try { await api('/api/merchant/review',{revision:state.revision,confirmed:$('#confirm').checked}); await refresh(); toast('账单口径已确认，提醒已生成。'); }catch(e){toast(e.message);} };
@@ -99,6 +121,7 @@ $('#delay').onchange=async()=>{
   try { await refresh(); } catch(e) { $('#delay').value=String(state?.forecast.delay_days ?? before); toast('测算或提醒读取失败，请刷新重试：'+e.message); }
   finally { $('#delay').disabled=false; }
 };
+$('#scenario-run').onclick=runSingleScenario;
 $('#export-ledger').onclick=()=>downloadLink('/api/merchant/export?type=ledger');
 $('#template').onclick=()=>downloadLink('/api/merchant/export?type=demo');
 $('#export-review').onclick=()=>downloadLink('/api/merchant/export?type=review&delay='+delay());

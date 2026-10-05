@@ -98,3 +98,25 @@ test('negative opening cash is the first gap even when next-day receipts cover i
   assert.equal(notice.amount_cents,10000);assert.deepEqual(notice.evidence,[]);
   assert.match(notice.title,/当前余额已为负数/);
 });
+
+test('notice status moves through plain-language states and resets after replacement', () => {
+  const s=new MerchantSession();s.detail('微信:WX-002');s.review(s.revision,true);
+  assert.equal(s.insights().notices.find(n=>n.id==='overdue').status,'open');
+  assert.deepEqual(s.setNoticeStatus('overdue','verified'),{id:'overdue',status:'verified'});
+  assert.equal(s.insights().notices.find(n=>n.id==='overdue').status,'verified');
+  assert.deepEqual(s.setNoticeStatus('overdue','done'),{id:'overdue',status:'done'});
+  assert.equal(s.insights().notices.find(n=>n.id==='overdue').status,'done');
+  assert.throws(()=>s.setNoticeStatus('overdue','unknown'),{code:'INVALID_NOTICE_STATUS'});
+  s.replace(demo());assert.equal(s.noticeStates.size,0);
+});
+
+test('single receipt delay scenario moves only the selected income bill', () => {
+  const s=new MerchantSession(), l=s.ledger;
+  const result=s.singleScenario('外卖平台:MT-001',3);
+  assert.equal(result.moved_from,'2026-10-06');assert.equal(result.moved_to,'2026-10-09');
+  assert.equal(result.baseline.first_gap.date,'2026-10-10');
+  assert.equal(result.scenario.first_gap.date,'2026-10-07');
+  const scenario=forecast(l,3,'外卖平台:MT-001');
+  assert.equal(scenario.days[0].incoming_cents,357780);
+  assert.equal(scenario.days[1].incoming_cents,0);
+});

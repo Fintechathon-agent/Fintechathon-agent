@@ -3,6 +3,7 @@ export const esc = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({ "&
 export const money = cents => new Intl.NumberFormat("zh-CN", { style:"currency", currency:"CNY" }).format(cents / 100);
 export const pct = value => (value * 100).toFixed(2) + "%";
 export const today = () => new Intl.DateTimeFormat("sv-SE", {timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+export const tip = (label, id, copy) => '<span class="term-label">'+esc(label)+' <button type="button" class="tip-toggle" data-tip-toggle="'+esc(id)+'" aria-controls="'+esc(id)+'" aria-expanded="false" aria-label="解释 '+esc(label)+'">?</button></span><span class="tip-copy" id="'+esc(id)+'" hidden>'+esc(copy)+'</span>';
 export async function api(path, body) {
   const response = await fetch(path, body === undefined ? {} : { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
   const data = await response.json();
@@ -20,6 +21,15 @@ document.addEventListener("click",event=>{
   if(!button)return;
   const panel=document.getElementById(button.dataset.reveal);
   if(panel){ panel.scrollIntoView({behavior:"smooth",block:"start"});panel.focus({preventScroll:true}); }
+});
+document.addEventListener("click",event=>{
+  const button=event.target.closest("[data-tip-toggle]");
+  if(!button)return;
+  const copy=document.getElementById(button.dataset.tipToggle);
+  if(!copy)return;
+  const open=copy.hidden;
+  copy.hidden=!open;
+  button.setAttribute("aria-expanded",String(open));
 });
 // The HTML can update while an old Node process still denies a new stylesheet.
 // Surface the deployment mismatch instead of silently showing a broken layout.

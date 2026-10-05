@@ -122,10 +122,12 @@ async function handleApi(request, response, pathname, url) {
     if (method === "GET" && pathname === "/api/merchant/ledger") result = session.summary(delay);
     else if (method === "GET" && pathname === "/api/merchant/demo") result = merchantDemo();
     else if (method === "GET" && pathname === "/api/merchant/bill") result = session.detail(url.searchParams.get("id"));
+    else if (method === "GET" && pathname === "/api/merchant/scenario") result = session.singleScenario(url.searchParams.get("bill"), delay);
     else if (method === "GET" && pathname === "/api/merchant/insights") result = session.insights(delay);
     else if (method === "POST" && pathname === "/api/merchant/review") result = session.review(body.revision, body.confirmed);
     else if (method === "POST" && pathname === "/api/merchant/import") result = session.replace(body);
     else if (method === "POST" && pathname === "/api/merchant/follow") result = session.follow(body.id, body.delay || 0);
+    else if (method === "POST" && pathname === "/api/merchant/notice") result = session.setNoticeStatus(body.id, body.status);
     else if (method === "POST" && pathname === "/api/merchant/reset") result = session.replace(merchantDemo());
     else return false;
     sendJson(response, 200, result); return true;

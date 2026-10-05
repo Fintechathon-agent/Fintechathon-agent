@@ -97,7 +97,7 @@ function costs(ledger) {
       current_window: [start, ledger.as_of], previous_window: [previousStart, previousEnd], evidence: all.map(ref) };
   }).sort((a, b) => b.delta_cents - a.delta_cents);
 }
-function forecast(ledger, delayDays = 0) {
+function forecast(ledger, delayDays = 0, singleRef = null) {
   if (![0, 3, 7].includes(delayDays)) fail("INVALID_DELAY", "到账延迟只支持 0、3、7 天。");
   const pending = ledger.bills.filter(b => b.status === "pending");
   let expected = ledger.balance_cents, conservative = ledger.balance_cents;
@@ -105,7 +105,8 @@ function forecast(ledger, delayDays = 0) {
   for (let i = 1; i <= 14; i++) {
     const date = day(ledger.as_of, i);
     // Overdue payments are reserved tomorrow; overdue receipts stay uncertain.
-    const incoming = pending.filter(b => b.kind === "income" && b.due_on > ledger.as_of && day(b.due_on, delayDays) === date);
+    const incoming = pending.filter(b => b.kind === "income" && b.due_on > ledger.as_of &&
+      (singleRef && ref(b) !== singleRef ? b.due_on === date : day(b.due_on, delayDays) === date));
     const outgoing = pending.filter(b => b.kind === "expense" && (b.due_on <= ledger.as_of ? i === 1 : b.due_on === date));
     const incomingCents = sum(incoming.map(net)), outgoingCents = sum(outgoing.map(net));
     expected += incomingCents - outgoingCents; conservative -= outgoingCents;
@@ -123,7 +124,7 @@ class MerchantSession {
   replace(input) {
     const checked = validate(input);
     this.ledger = checked.ledger; this.revision = checked.revision; this.duplicates = checked.duplicates;
-    this.reviewed = false; this.viewed = new Set(); this.followups = new Set();
+    this.reviewed = false; this.viewed = new Set(); this.followups = new Set(); this.noticeStates = new Map();
     return this.summary();
   }
   summary(delay = 0) {
@@ -164,8 +165,27 @@ class MerchantSession {
           "同品同单位拆分数量和单价变化。先核对采购批次与单价，再考虑询价；采购支出不等于已消耗成本。" :
           "没有可比数量资料，暂时只能确认支出变化，不能判断单价上涨。", evidence: c.evidence });
     }
-    return { notices: notices.map(n => ({ ...n, following: this.followups.has(n.id) })), revision: this.revision,
+    return { notices: notices.map(n => ({ ...n, following: this.followups.has(n.id), status: this.noticeStates.get(n.id) || "open" })), revision: this.revision,
       digest: "本次已核对 " + this.viewed.size + " 笔来源，共 " + this.ledger.bills.length + " 笔账单。下次从未查看的账单开始。" };
+  }
+  setNoticeStatus(id, status) {
+    if (!["open", "verified", "done"].includes(status)) fail("INVALID_NOTICE_STATUS", "提醒状态无效。");
+    if (!this.insights().notices.some(n => n.id === id)) fail("NOTICE_NOT_FOUND", "提醒不存在。");
+    this.noticeStates.set(id, status);
+    return { id, status };
+  }
+  singleScenario(key, delayDays = 0) {
+    if (![0, 3, 7].includes(delayDays)) fail("INVALID_DELAY", "单笔到账延迟只支持 0、3、7 天。");
+    const bill = this.ledger.bills.find(item => ref(item) === key);
+    if (!bill) fail("BILL_NOT_FOUND", "账单不存在。");
+    if (bill.kind !== "income" || bill.status !== "pending" || bill.due_on <= this.ledger.as_of) {
+      fail("INVALID_SCENARIO_BILL", "只能试算尚未到账且尚未过预计日期的收入账单。");
+    }
+    const baseline = forecast(this.ledger, 0), scenario = forecast(this.ledger, delayDays, key);
+    const compact = value => ({ first_gap: value.first_gap, min_expected_cents: value.min_expected_cents });
+    return { bill: { ...clone(bill), net_cents: net(bill) }, delay_days: delayDays,
+      moved_from: bill.due_on, moved_to: day(bill.due_on, delayDays),
+      baseline: compact(baseline), scenario: compact(scenario) };
   }
   follow(id, delay = 0) {
     if (!this.insights(delay).notices.some(n => n.id === id)) fail("NOTICE_NOT_FOUND", "提醒不存在。");

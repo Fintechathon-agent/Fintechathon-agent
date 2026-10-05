@@ -1,4 +1,4 @@
-import { $, esc, money, pct, api, toast, downloadLink, chart, today } from "./common.js";
+import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip } from "./common.js";
 import { dateStatus, planComparison } from "./presentation.mjs";
 let result, inputVersion = 0;
 const names = { CURRENT:"当前组合", A:"A 保持或最小动作", B:"B 温和调整", C:"C 风险优先" };
@@ -32,11 +32,17 @@ $("#check-form").onsubmit=async event=>{
     result=next; const a=result.artifacts,m=a.health_report.metrics,s=a.simulation,view=planComparison(s.comparisons);
     if(!view.best||!view.baseline)throw new Error("模拟缺少有效结果，暂不展示结论。");
     renderHoldings(a.portfolio_snapshot);
-    $("#risk-metrics").innerHTML=[["演示区间收益",pct(view.baseline.metrics.cumulative_return),"同一配置的历史模拟"],["历史最大回撤",pct(m.max_drawdown),"负数越接近 0，回撤越小"],["现金占比",pct(a.portfolio_snapshot.cash_weight),"不参与证券集中度"]].map(v=>'<article class="metric"><small>'+v[0]+'</small><strong>'+v[1]+'</strong><small>'+v[2]+'</small></article>').join("");
+    $("#risk-metrics").innerHTML=[[tip("演示区间收益","tip-demo-return","只是在这段虚构历史数据上算出的结果，不是你的真实账户收益。"),pct(view.baseline.metrics.cumulative_return),"同一配置的历史模拟"],[tip("历史最大回撤","tip-max-drawdown","从高点跌到低点，曾经出现过的最大跌幅。数值越接近 0，跌得越少。"),pct(m.max_drawdown),"负数越接近 0，回撤越小"],[tip("现金占比","tip-cash-weight","组合里暂时没有买入证券、留在现金里的比例。") ,pct(a.portfolio_snapshot.cash_weight),"不参与证券集中度"]].map(v=>'<article class="metric"><small>'+v[0]+'</small><strong>'+v[1]+'</strong><small>'+v[2]+'</small></article>').join("");
     $("#findings").innerHTML='<p>最大证券仓位 <b>'+esc(a.health_report.concentration.largest_instrument)+'</b>，占 <b>'+pct(a.health_report.concentration.top_1)+'</b>。</p><p class="small">短样本年化波动率 '+pct(m.annualized_volatility)+'。</p>'+
       a.health_report.hidden_clusters.map(c=>'<p class="small">'+esc(c.instruments.join(" / "))+' · 相关系数 '+c.correlation.toFixed(3)+'</p>').join("");
     $("#verdict-title").textContent=names[view.best.plan_id]+" · 样本内回撤较小";
     $("#verdict-copy").textContent="相较当前组合，回撤"+(view.improvementPoints>=0?"减少 ":"增加 ")+Math.abs(view.improvementPoints).toFixed(2)+" 个百分点；需换手 "+pct(view.best.turnover)+"。仅作历史比较。";
+    $("#verdict-evidence").innerHTML=[
+      "当前组合最大单项仓位为 "+a.health_report.concentration.largest_instrument+"，占 "+pct(a.health_report.concentration.top_1)+"。",
+      "三条路径使用同一段价格数据、同一起始资金和同一费用口径。",
+      names[view.best.plan_id]+"在这段样本中的最大回撤为 "+pct(view.best.metrics.max_drawdown)+"，换手率为 "+pct(view.best.turnover)+"。",
+      "这只是固定样例比较，没有使用真实交易记录，也没有自动执行交易。"
+    ].map(item=>"<li>"+esc(item)+"</li>").join("");
     $("#verdict-tag").textContent="非个性化推荐";
     $("#comparison").innerHTML='<div class="plan-grid">'+view.plans.map(c=>{
       const index=s.comparisons.findIndex(item=>item.plan_id===c.plan_id),d=s.scenarios[index].distribution;
