@@ -56,31 +56,62 @@ async function accessible() {
     await page.getByRole('link',{name:'探索经营工作台'}).click();
     await page.locator('#quick-bills .bill-preview').first().waitFor();
   });
-  await check('scroll moves and shrinks objects, reverses, and reveals core functions',async()=>{
+  await check('K rotates into a large coin before traveling right and shrinking; scrolling reverses it',async()=>{
     await page.emulateMedia({reducedMotion:'no-preference'}); await page.goto(base);
-    const original=await page.locator('#coin').boundingBox();
-    const pencilStart=await page.locator('#pencil').boundingBox();
-    const distance=await page.locator('.scroll-story').evaluate(el=>el.offsetHeight-innerHeight);
-    await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),distance*.75);
-    await page.waitForFunction(()=>Number(getComputedStyle(document.querySelector('.scroll-story')).getPropertyValue('--progress'))>.7);
+    const distance=await page.locator('.scroll-story').evaluate(el=>el.offsetHeight-el.firstElementChild.offsetHeight);
+    const at=async progress=>{
+      await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),distance*progress);
+      await page.waitForFunction(p=>Math.abs(Number(getComputedStyle(document.querySelector('.scroll-story')).getPropertyValue('--progress'))-p)<.005,progress);
+    };
+    const opacity=selector=>page.locator(selector).evaluate(el=>Number(getComputedStyle(el).opacity));
+    assert.equal(await page.locator('#pencil').count(),0);
+    assert.equal(await opacity('.coin-material'),0); assert.equal(await opacity('#k-spine'),1);
+    const initialPath=await page.locator('#k-upper').getAttribute('d');
+    const initialBounds=await page.locator('#coin').boundingBox();
+    await screenshot('landing-desktop');
+    await at(.25);
+    assert.notEqual(await page.locator('#k-upper').getAttribute('d'),initialPath);
+    const rotation=Number((await page.locator('#k-arms').getAttribute('transform')).match(/rotate\(([^ ]+)/)[1]);
+    assert.ok(rotation>0 && rotation<360);
+    await page.screenshot({path:path.join(output,'landing-k-morph.png')});
+    await at(.5);
+    assert.equal(await opacity('.coin-material'),1); assert.equal(await opacity('#k-spine'),0);
+    const large=await page.locator('#coin').boundingBox();
+    assert.ok(Math.abs(large.x-initialBounds.x)<1); assert.ok(Math.abs(large.width-initialBounds.width)<1);
+    await page.screenshot({path:path.join(output,'landing-large-coin.png')});
+    await at(.96);
     const moved=await page.locator('#coin').boundingBox();
-    const pencilEnd=await page.locator('#pencil').boundingBox();
-    assert.ok(moved.x>original.x+200); assert.ok(moved.width<original.width*.8);
-    assert.ok(pencilEnd.x>pencilStart.x); assert.ok(pencilEnd.width<pencilStart.width);
+    assert.ok(moved.x>large.x+300); assert.ok(moved.width<large.width*.65);
     await page.screenshot({path:path.join(output,'landing-scroll.png')});
     await page.locator('#explore').scrollIntoViewIfNeeded();
     assert.equal(await page.locator('#explore-title').isVisible(),true);
     await page.screenshot({path:path.join(output,'landing-features.png')});
-    await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
+    await at(.5); assert.equal(await opacity('.coin-material'),1);
+    await at(0); assert.equal(await opacity('.coin-material'),0);
+    assert.equal(await page.locator('#k-upper').getAttribute('d'),initialPath);
+    await page.mouse.wheel(0,350);
+    await page.waitForFunction(()=>Number(getComputedStyle(document.querySelector('.scroll-story')).getPropertyValue('--progress'))>.1);
+    await page.mouse.wheel(0,-2000);
     await page.waitForFunction(()=>Number(getComputedStyle(document.querySelector('.scroll-story')).getPropertyValue('--progress'))===0);
-    const reset=await page.locator('#coin').boundingBox(); assert.ok(Math.abs(reset.x-original.x)<2);
-    await screenshot('landing-desktop');
     await page.setViewportSize({width:390,height:844}); await page.reload();
     await page.screenshot({path:path.join(output,'landing-mobile-start.png')});
-    await page.evaluate(()=>scrollTo({top:700,behavior:'instant'}));
-    await page.waitForFunction(()=>Number(getComputedStyle(document.querySelector('.scroll-story')).getPropertyValue('--progress'))>.5);
-    await noOverflow(); await page.screenshot({path:path.join(output,'landing-mobile-scroll.png')});
+    const mobileDistance=await page.locator('.scroll-story').evaluate(el=>el.offsetHeight-el.firstElementChild.offsetHeight);
+    for(const progress of [.25,.5,.96]) {
+      await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),mobileDistance*progress);
+      await page.waitForFunction(p=>Math.abs(Number(getComputedStyle(document.querySelector('.scroll-story')).getPropertyValue('--progress'))-p)<.005,progress);
+      await noOverflow();
+      const artwork=await page.locator(progress<.44?'#k-arms':'.coin-material').boundingBox();
+      assert.ok(artwork.x>=0 && artwork.x+artwork.width<=390,JSON.stringify(artwork));
+      await page.screenshot({path:path.join(output,'landing-mobile-'+progress+'.png')});
+    }
     await page.emulateMedia({reducedMotion:'reduce'}); await page.setViewportSize({width:1440,height:1000});
+  });
+  await check('product pages contain no community promotion or design-conversation copy',async()=>{
+    for(const route of ['/','/investment','/merchant','/catalog']) {
+      await page.goto(base+route);
+      assert.doesNotMatch(await page.locator('body').innerText(),/KOSX|社群|视觉灵感|视觉风格探索/);
+      assert.equal(await page.locator('a[href*="kosx.ai"]').count(),0);
+    }
   });
   await check('reduced motion and JavaScript disabled keep all destinations available',async()=>{
     await page.goto(base);
@@ -282,12 +313,12 @@ async function accessible() {
     await noOverflow(); await page.click('#close-dialog'); await page.check('#confirm'); await page.click('#review');
     await page.locator('#insights .insight').first().waitFor(); await noOverflow();
   });
-  await check('keyboard skip link and explicit community destination',async()=>{
+  await check('keyboard skip link and return to the product showcase',async()=>{
     await page.goto(base+'/investment'); await page.keyboard.press('Tab');
     assert.equal(await page.locator('.skip-link').evaluate(element=>element===document.activeElement),true);
     await page.keyboard.press('Enter');
     assert.equal(await page.locator('#main-content').evaluate(element=>element===document.activeElement),true);
-    assert.equal(await page.locator('.community-card').getAttribute('href'),'https://kosx.ai/');
+    assert.equal(await page.locator('.lab-brand').getAttribute('href'),'/');
   });
   for(const route of ['/','/investment','/merchant','/catalog']) await check('automated WCAG A/AA checks on '+route,async()=>{
     await page.goto(base+route);

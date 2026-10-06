@@ -1,176 +1,181 @@
 {
-  "created_at": "2026-10-06T02:32:56.374Z",
+  "created_at": "2026-10-06T10:16:52.306Z",
   "browser": "154.0.8037.98",
   "results": [
     {
       "name": "showcase is the default entry with working product links",
       "status": "passed",
-      "duration_ms": 1319
+      "duration_ms": 1313
     },
     {
-      "name": "scroll moves and shrinks objects, reverses, and reveals core functions",
+      "name": "K rotates into a large coin before traveling right and shrinking; scrolling reverses it",
       "status": "passed",
-      "duration_ms": 976
+      "duration_ms": 1958
+    },
+    {
+      "name": "product pages contain no community promotion or design-conversation copy",
+      "status": "passed",
+      "duration_ms": 271
     },
     {
       "name": "reduced motion and JavaScript disabled keep all destinations available",
       "status": "passed",
-      "duration_ms": 381
+      "duration_ms": 372
     },
     {
       "name": "frosted workspace and dialog materials are applied",
       "status": "passed",
-      "duration_ms": 688
+      "duration_ms": 1017
     },
     {
       "name": "investment snapshot, allocation and desktop layout",
       "status": "passed",
-      "duration_ms": 357
+      "duration_ms": 4286
     },
     {
       "name": "investment diagnosis, candidate details, evidence and JSON export",
       "status": "passed",
-      "duration_ms": 1714
+      "duration_ms": 2587
     },
     {
       "name": "changing investment input invalidates previous conclusions",
       "status": "passed",
-      "duration_ms": 41
+      "duration_ms": 39
     },
     {
       "name": "invalid JSON keeps input and shows a persistent recovery message",
       "status": "passed",
-      "duration_ms": 179
+      "duration_ms": 248
     },
     {
       "name": "failed investment initialization retries without page reload",
       "status": "passed",
-      "duration_ms": 193
+      "duration_ms": 266
     },
     {
       "name": "in-flight investment result cannot overwrite changed input",
       "status": "passed",
-      "duration_ms": 304
+      "duration_ms": 360
     },
     {
       "name": "merchant overview, review gate and bill source dialog",
       "status": "passed",
-      "duration_ms": 680
+      "duration_ms": 918
     },
     {
       "name": "merchant note and processing status persist across reload",
       "status": "passed",
-      "duration_ms": 397
+      "duration_ms": 321
     },
     {
       "name": "merchant search empty state and clear filters",
       "status": "passed",
-      "duration_ms": 192
+      "duration_ms": 240
     },
     {
       "name": "cash delay changes the known gap with consistent scenario copy",
       "status": "passed",
-      "duration_ms": 125
+      "duration_ms": 170
     },
     {
       "name": "single receipt scenario clears stale results when inputs change",
       "status": "passed",
-      "duration_ms": 362
+      "duration_ms": 276
     },
     {
       "name": "review download contains actual reviewed ledger",
       "status": "passed",
-      "duration_ms": 281
+      "duration_ms": 209
     },
     {
       "name": "invalid import does not replace existing merchant data",
       "status": "passed",
-      "duration_ms": 151
+      "duration_ms": 80
     },
     {
       "name": "empty ledger import provides honest empty states and invalidates review",
       "status": "passed",
-      "duration_ms": 323
+      "duration_ms": 369
     },
     {
       "name": "merchant failed initialization has a working retry action",
       "status": "passed",
-      "duration_ms": 206
+      "duration_ms": 154
     },
     {
       "name": "successful import followed by read failure is reported truthfully and can recover",
       "status": "passed",
-      "duration_ms": 557
+      "duration_ms": 480
     },
     {
       "name": "missing page offers working recovery navigation",
       "status": "passed",
-      "duration_ms": 200
+      "duration_ms": 180
     },
     {
       "name": "responsive layouts without page overflow at 320px",
       "status": "passed",
-      "duration_ms": 212
+      "duration_ms": 176
     },
     {
       "name": "responsive layouts without page overflow at 390px",
       "status": "passed",
-      "duration_ms": 1097
+      "duration_ms": 841
     },
     {
       "name": "responsive layouts without page overflow at 768px",
       "status": "passed",
-      "duration_ms": 195
+      "duration_ms": 174
     },
     {
       "name": "responsive layouts without page overflow at 1024px",
       "status": "passed",
-      "duration_ms": 210
+      "duration_ms": 158
     },
     {
       "name": "responsive layouts without page overflow at 1440px",
       "status": "passed",
-      "duration_ms": 200
+      "duration_ms": 169
     },
     {
       "name": "mobile investment and merchant actions remain operable",
       "status": "passed",
-      "duration_ms": 711
+      "duration_ms": 785
     },
     {
-      "name": "keyboard skip link and explicit community destination",
+      "name": "keyboard skip link and return to the product showcase",
       "status": "passed",
-      "duration_ms": 72
+      "duration_ms": 76
     },
     {
       "name": "automated WCAG A/AA checks on /",
       "status": "passed",
-      "duration_ms": 340
+      "duration_ms": 309
     },
     {
       "name": "automated WCAG A/AA checks on /investment",
       "status": "passed",
-      "duration_ms": 423
+      "duration_ms": 404
     },
     {
       "name": "automated WCAG A/AA checks on /merchant",
       "status": "passed",
-      "duration_ms": 546
+      "duration_ms": 554
     },
     {
       "name": "automated WCAG A/AA checks on /catalog",
       "status": "passed",
-      "duration_ms": 308
+      "duration_ms": 340
     },
     {
       "name": "merchant dialog automated accessibility and Escape focus recovery",
       "status": "passed",
-      "duration_ms": 459
+      "duration_ms": 470
     },
     {
       "name": "no uncaught browser exceptions",
       "status": "passed",
-      "duration_ms": 1
+      "duration_ms": 0
     }
   ]
 }
