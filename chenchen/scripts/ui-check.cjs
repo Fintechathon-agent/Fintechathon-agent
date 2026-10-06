@@ -120,7 +120,7 @@ async function accessible() {
     const offlineContext=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});
     try {
       const staticPage=await offlineContext.newPage(); await staticPage.goto(base);
-      await staticPage.getByRole('link',{name:'探索功能',exact:true}).click();
+      await staticPage.getByRole('link',{name:'探索两大工作台'}).click();
       assert.equal(await staticPage.locator('#explore-title').isVisible(),true);
       assert.equal(await staticPage.getByRole('link',{name:'探索经营工作台'}).getAttribute('href'),'/merchant');
     } finally { await offlineContext.close(); }

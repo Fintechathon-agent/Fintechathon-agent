@@ -16,7 +16,7 @@ const properties = ['display','position','color','backgroundColor','backgroundIm
   const results = [];
   try {
     for (const width of [1440,1024,375]) {
-      for (const route of ['/', '/investment', '/merchant', '/catalog']) {
+      for (const route of (mode==='catalog'?['/catalog']:['/', '/investment', '/merchant', '/catalog'])) {
         const page = await browser.newPage({viewport:{width,height:1000},reducedMotion:'reduce'});
         const errors = [];
         page.on('pageerror', e => errors.push(e.message));
@@ -36,7 +36,7 @@ const properties = ['display','position','color','backgroundColor','backgroundIm
         assert.equal(snapshot.overflow,false,name+' horizontal overflow');
         assert.deepEqual(errors,[],name+' console errors');
         if (mode==='baseline') fs.writeFileSync(path.join(output,name+'.json'),JSON.stringify(snapshot));
-        if (mode==='consolidation') assert.deepEqual(snapshot,JSON.parse(fs.readFileSync(path.join(output,name+'.json'),'utf8')),name+' visual geometry and computed styles changed');
+        if (mode==='consolidation' || mode==='catalog') assert.deepEqual(snapshot,JSON.parse(fs.readFileSync(path.join(output,name+'.json'),'utf8')),name+' visual geometry and computed styles changed');
         await page.screenshot({path:path.join(output,mode+'-'+name+'.png'),fullPage:true,animations:'disabled'});
         results.push({name,status:'passed'});
         console.log('PASS '+mode+' '+name);

@@ -8,3 +8,28 @@ dialog{background:linear-gradient(130deg,#ffffff0e,#ffffff02),#1c191be8;box-shad
 .balance-card,.cash-status{background:radial-gradient(ellipse at 90% 0%,#b952252b,transparent 65%),#1c191bd9}.community-card,.review{background:linear-gradient(130deg,#65361736,#211d1ac9);border-color:#ffad6d35}.plan-card.highlighted{background:linear-gradient(135deg,#4e321ddd,#251d18eb);border-color:#ff9f5360}
 @supports not (backdrop-filter:blur(1px)){.glass,.sidebar,.product-header.lab-header,body .panel,.balance-card,.allocation-card,.cash-status,.cash-callout,.focus-card,.product-choice,.plan-card,.metric,.bill-preview,.analysis-empty,.insight,dialog{background-color:#1b191c}}
 @media(prefers-reduced-transparency:reduce){.glass,.sidebar,.product-header.lab-header,body .panel,.balance-card,.allocation-card,.cash-status,.cash-callout,.focus-card,.product-choice,.plan-card,.metric,.bill-preview,.analysis-empty,.insight,dialog{background:#1b191c!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}dialog::backdrop{backdrop-filter:none;-webkit-backdrop-filter:none}}
+/* Reusable archive scenery is decorative and never changes document geometry. */
+.archive-scene { position:absolute; inset:0; overflow:hidden; pointer-events:none; color:var(--decor-ink); transform:translateY(var(--archive-parallax,0px)); }
+.archive-grid { position:absolute; inset:0; background-image:linear-gradient(#b8ada00e 1px,transparent 1px),linear-gradient(90deg,#b8ada00e 1px,transparent 1px); background-size:32px 32px; }
+.archive-paper { position:absolute; width:580px; height:640px; padding:38px; border:1px solid #b8ada050; background-color:#b8ada00b; background-image:repeating-linear-gradient(0deg,transparent 0 39px,#b8ada026 39px 40px); box-shadow:20px 24px 0 #b8ada00b; animation:archive-drift var(--ambient-duration) ease-in-out infinite alternate; }
+.archive-paper-primary { left:45%; top:18%; transform:rotate(-12deg); }
+.archive-paper-secondary { left:74%; top:3%; transform:rotate(16deg); animation-delay:-24s; }
+.archive-paper svg { width:100%; height:75%; stroke:#b8ada04d; }
+.archive-coordinate,.archive-page-number,.archive-paper-secondary>span { display:block; font:14px Consolas,monospace; letter-spacing:4px; color:#b8ada090; }
+.archive-page-number { margin-top:12px; font-size:32px; }
+.archive-paper-secondary i { position:absolute; inset:25% 10%; border-top:1px solid #b8ada055; transform:rotate(-24deg); }
+.archive-paper-secondary i:nth-of-type(2) { transform:rotate(15deg); }
+.archive-paper-secondary i:nth-of-type(3) { top:60%; transform:rotate(30deg); }
+.archive-ruler { position:absolute; right:6%; top:14%; height:72%; width:24px; border-inline:1px solid #b8ada04d; background:repeating-linear-gradient(#b8ada066 0 1px,transparent 1px 14px); }
+.archive-stamp { position:absolute; right:16%; bottom:12%; width:140px; height:140px; border:4px double #b8ada060; border-radius:50%; display:grid; place-content:center; text-align:center; font:36px/1.4 Consolas,monospace; color:#b8ada080; transform:rotate(16deg); }
+.archive-stamp span { display:block; font-size:12px; letter-spacing:2px; }
+.archive-margin-note { position:absolute; right:11%; top:18%; font:14px Consolas,monospace; color:#b8ada070; writing-mode:vertical-rl; letter-spacing:3px; }
+.archive-scene[data-density=quiet] .archive-paper-secondary,.archive-scene[data-density=quiet] .archive-ruler,.archive-scene[data-density=quiet] .archive-margin-note { display:none; }
+.archive-scene[data-density=quiet] .archive-paper-primary { left:25%; top:7%; width:70%; height:85%; }
+.archive-scene[data-density=quiet] .archive-stamp { right:30%; bottom:17%; }
+.archive-scene[data-density=quiet] .archive-grid { opacity:.5; }
+.landing-product .feature-card.glass { background:linear-gradient(130deg,#fff4da09,transparent),var(--glass-tint); border:1px solid var(--glass-border); box-shadow:inset 0 1px 1px #ffe6bd25,0 10px 32px #0004,0 0 16px #ffe6bd08; backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur)); }
+@keyframes archive-drift { to { translate:0 -18px; } }
+@media(max-width:700px) { .archive-paper-primary { left:22%; top:40%; width:380px; height:450px; }.archive-paper-secondary { left:72%; width:320px; height:450px; }.archive-stamp { right:6%; bottom:12%; width:108px; height:108px; font-size:28px; }.archive-page-number { font-size:25px; } }
+@media(prefers-reduced-motion:reduce) { .archive-scene { transform:none; }.archive-paper { animation:none; } }
+@supports not (backdrop-filter:blur(1px)) { .landing-product .feature-card.glass { background:#191715; } }

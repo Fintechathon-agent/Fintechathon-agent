@@ -1,5 +1,12 @@
+import { createArchiveScene, initLiquidBalance } from './archive.js';
 'use strict';
 // Native scrolling remains available with or without JavaScript.
+for (const host of document.querySelectorAll('[data-archive-scene]')) host.append(createArchiveScene({density:host.dataset.archiveScene}));
+const copy = document.querySelector('.story-copy');
+const next = document.querySelector('.story-next');
+const flip = document.querySelector('.coin-flip');
+const glyph = document.querySelector('.coin-glyph');
+const ridges = document.querySelector('.coin-edge-ridges');
 const story = document.querySelector('.scroll-story');
 const coin = document.querySelector('#coin');
 const spine = document.querySelector('#k-spine');
@@ -24,6 +31,12 @@ function render() {
   const rect = story.getBoundingClientRect();
   const stageHeight = story.firstElementChild.offsetHeight;
   const progress = motion.matches ? 0 : clamp(-rect.top / Math.max(1, rect.height - stageHeight));
+  // Mutually exclusive title intervals remain deterministic in both directions.
+  for (const [element, opacity] of [[copy,1-smooth(progress/.18)],[next,smooth((progress-.31)/.17)]]) {
+    element.style.opacity=opacity;
+    element.style.visibility=opacity===0?'hidden':'visible';
+    element.setAttribute('aria-hidden',String(opacity===0));
+  }
   // Form the coin at the left before allowing any rightward travel.
   const forming = smooth((progress - .06) / .38);
   const rounding = smooth((progress - .16) / .28);
@@ -40,7 +53,18 @@ function render() {
   arms.setAttribute('stroke-width', 58 - rounding * 38);
   spine.style.opacity = 1 - smooth((progress - .20) / .19);
   material.style.opacity = smooth((progress - .30) / .14);
-  coin.style.transform = `translate3d(${travel * travelDistance}px,${-travel * 24}px,0) scale(${1 - travel * .66}) rotate(${travel * 400}deg)`;
+  const angle = travel * 360;
+  const side = (angle>=60 && angle<=120) || (angle>=240 && angle<=300);
+  const formed = smooth((progress-.30)/.14);
+  flip.style.transform = 'rotateY('+angle+'deg)';
+  glyph.style.opacity = side ? 0 : formed;
+  glyph.style.visibility = side || !formed ? 'hidden' : 'visible';
+  // The independent glyph remains upright and never gets horizontally squeezed.
+  glyph.style.transform = 'rotate('+(-travel*360)+'deg)';
+  ridges.style.opacity = formed * Math.abs(Math.sin(angle*Math.PI/180));
+  coin.dataset.flipAngle = angle.toFixed(3);
+  story.querySelector('.archive-scene')?.style.setProperty('--archive-parallax',motion.matches?'0px':(-progress*18)+'px');
+  coin.style.transform = `translate3d(${travel * travelDistance}px,${-travel * 90}px,0) scale(${1 - travel * .66}) rotate(${travel * 360}deg)`;
 }
 function schedule() { if (!pending) { pending = true; requestAnimationFrame(render); } }
 addEventListener('scroll', schedule, {passive:true});
@@ -48,3 +72,5 @@ addEventListener('resize', schedule);
 motion.addEventListener('change', schedule);
 document.documentElement.classList.add('motion-ready');
 render();
+
+initLiquidBalance(document.querySelector('.feature-grid'));
