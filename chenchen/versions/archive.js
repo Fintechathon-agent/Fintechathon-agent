@@ -22,6 +22,72 @@ export function createArchiveScene({density = 'full'} = {}) {
   return scene;
 }
 
+// Presentation enhancement only; business requests and result state remain in each page.
+export function initArchiveWorkbench() {
+  const body=document.body,main=document.querySelector('main');
+  if(!body.classList.contains('archive-workbench')||!main)return;
+  const investment=body.dataset.workbench==='investment';
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  const tokens=getComputedStyle(body);
+  const motion={duration:parseFloat(tokens.getPropertyValue('--motion-duration'))||320,easing:tokens.getPropertyValue('--motion-ease').trim()||'ease-out'};
+  const distance=tokens.getPropertyValue('--motion-distance').trim()||'12px';
+  const scene=createArchiveScene({density:'quiet'});scene.classList.add('workbench-scene');body.prepend(scene);
+  const glassSelectors=investment?['.balance-card','.allocation-card','#input-panel','.result-verdict','#plans-panel']:['.cash-status','.cash-callout','#ledger-panel','#cash-panel','#cost-panel'];
+  glassSelectors.forEach((selector,index)=>{
+    const panel=document.querySelector(selector);if(!panel)return;
+    panel.classList.add('archive-glass');
+    const mark=document.createElement('span');mark.className='archive-panel-mark';mark.setAttribute('aria-hidden','true');mark.textContent='LAB / '+String(index+1).padStart(2,'0');panel.append(mark);
+  });
+  document.querySelector('dialog')?.classList.add('archive-glass');
+  const nav=document.querySelector('.journey-strip'),links=[...nav.querySelectorAll('[data-step]')];
+  let scheduled=0;
+  const visible=e=>!!e&&e.getClientRects().length>0&&!e.closest('[hidden]');
+  const inView=e=>{if(!visible(e))return false;const r=e.getBoundingClientRect();return r.bottom>Number.parseFloat(getComputedStyle(body).getPropertyValue('--step-offset'))+70&&r.top<innerHeight-24;};
+  function update() {
+    scheduled=0;
+    const results=document.querySelector('#results'),ready=investment&&results&&!results.hidden;
+    if(investment){links[1].href=ready?'#result-summary':'#analysis-anchor';links[2].setAttribute('aria-disabled',String(!ready));links[2].title=ready?'查看本次分析依据':'完成健康检查后查看';}
+    const offset=Number.parseFloat(getComputedStyle(body).getPropertyValue('--step-offset'))||0;
+    const targets=links.map(a=>document.querySelector(a.getAttribute('href')));
+    let active=0;
+    targets.forEach((target,index)=>{if(visible(target)&&links[index].getAttribute('aria-disabled')!=='true'&&target.getBoundingClientRect().top<=offset+nav.offsetHeight+70)active=index;});
+    if(scrollY+innerHeight>=document.documentElement.scrollHeight-3&&visible(targets[2])&&links[2].getAttribute('aria-disabled')!=='true')active=2;
+    links.forEach((a,index)=>{a.classList.toggle('active',index===active);if(index===active)a.setAttribute('aria-current','step');else a.removeAttribute('aria-current');});
+    const dialog=document.querySelector('dialog[open]');
+    const error=[...document.querySelectorAll('[role=alert]')].find(inView);
+    const risk=document.querySelector(investment?'.result-verdict':'.cash-callout');
+    const riskValid=investment?ready:document.querySelector('#cash-callout-title')?.textContent.includes('缺口')||document.querySelector('#cash-callout-title')?.textContent.includes('负');
+    const primary=investment?document.querySelector('#run'):document.querySelector('#review');
+    const focus=dialog?(dialog.querySelector('button:not(:disabled)')):error||(riskValid&&inView(risk)?risk:null)||((investment&&!ready||inView(primary))&&primary&&!primary.disabled?primary:null)||links[active];
+    body.querySelectorAll('.signal-focus').forEach(e=>{if(e!==focus)e.classList.remove('signal-focus');});focus?.classList.add('signal-focus');
+    body.dataset.pageHidden=String(document.hidden);
+  }
+  const schedule=()=>{if(!scheduled)scheduled=requestAnimationFrame(update);};
+  const resize=new ResizeObserver(()=>{
+    const sidebar=document.querySelector('.sidebar');
+    body.style.setProperty('--step-offset',getComputedStyle(sidebar).position==='sticky'?sidebar.getBoundingClientRect().height+'px':'0px');schedule();
+  });resize.observe(document.querySelector('.sidebar'));resize.observe(main);
+  nav.addEventListener('click',event=>{
+    const link=event.target.closest('[data-step]');if(!link)return;event.preventDefault();
+    if(link.getAttribute('aria-disabled')==='true'){const status=document.querySelector('#status');status.textContent='完成健康检查后查看';return;}
+    const target=document.querySelector(link.getAttribute('href'));if(!target)return;
+    if(target.tagName==='DETAILS')target.open=true;
+    target.scrollIntoView({behavior:reduced.matches?'instant':'smooth',block:'start'});
+    if(!target.hasAttribute('tabindex'))target.setAttribute('tabindex','-1');target.focus({preventScroll:true});schedule();
+  });
+  const animated=new WeakSet();
+  const entry=new IntersectionObserver(entries=>entries.forEach(({target,isIntersecting,intersectionRatio})=>{
+    if(!isIntersecting||intersectionRatio<.1)return;entry.unobserve(target);
+    if(!reduced.matches&&!document.hidden)target.animate([{opacity:.55,transform:`translateY(${distance})`},{opacity:1,transform:'translateY(0)'}],motion);
+  }),{threshold:.1});
+  function discover(){main.querySelectorAll('.hero-number,.cash-value,.metric strong,.plan-card,.insight').forEach(e=>{if(!animated.has(e)){animated.add(e);entry.observe(e);}});schedule();}
+  new MutationObserver(discover).observe(main,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','open','disabled']});
+  const dialog=document.querySelector('dialog');if(dialog)new MutationObserver(schedule).observe(dialog,{attributes:true,attributeFilter:['open']});
+  main.addEventListener('toggle',event=>{if(event.target.open&&!reduced.matches){[...event.target.children].filter(e=>e.tagName!=='SUMMARY').forEach(e=>e.animate([{opacity:.5,transform:`translateY(${distance})`},{opacity:1,transform:'translateY(0)'}],motion));}schedule();},true);
+  addEventListener('scroll',schedule,{passive:true});addEventListener('resize',schedule);document.addEventListener('visibilitychange',()=>{if(document.hidden)document.getAnimations().forEach(a=>{if(a.effect?.target?.closest('main'))a.finish();});schedule();});
+  reduced.addEventListener('change',()=>{if(reduced.matches)document.getAnimations().forEach(a=>{if(a.effect?.target?.closest('main'))a.finish();});schedule();});discover();update();
+}
+
 // A decorative two-pan balance. Values are local animation state, never finance data.
 export function initLiquidBalance(grid) {
   if (!grid) return;

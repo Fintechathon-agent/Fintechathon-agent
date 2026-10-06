@@ -214,3 +214,20 @@
 - 阶段 0：pull --ff-only 成功，2298826 为远程一致起点，包含手机两行标题修复。上轮草稿先备份到 chenchen/artifacts/overnight/preflight.patch，再恢复正式代码基线。
 - 基线：check / 46项 test / smoke / ui-check / landing-archive-check 三尺寸 / catalog 三尺寸对比全通过；日志 chenchen/artifacts/overnight/stage0.json。晨间报告骨架已建立。
 - 不修改 prototypes、learning、output、tmp、根 .gitignore；不新增生产依赖；原业务模块保持不变。报告仅陈述实际结果。
+
+### Deviations · 夜间阶段 1
+- 点击事件立即同步活动态并缩短淡入至 160ms 后，新验收仍在 250ms 读取 opacity 0.85005，未达到 1。未降低门槛。
+- check / 46项 test / smoke 通过；explore-check 首组失败，因此本阶段正式文件及测试变更已撤回。草稿与证据备份至 artifacts/overnight/stage1-failed.patch、stage1.json、explore-check.failed.cjs。
+- 标题安静区、液体降权与常驻提示本次未交付。阶段 2 的硬币独立于这些样式，基于已通过的原液体天平继续。
+
+### Deviations · 夜间阶段 2
+- 独立硬币试作共用 rAF、9 次落入计 4 个来回；验收中“点击中断”期望 paused、实际 rest。可能涉及自动化点击等待运动控件稳定的时机，但未完成证明，不视为通过。
+- check / 46项 test / smoke 通过；coin-toss-check 失败。按阶段失败规则撤回正式脚本、样式及验收脚本；保留 artifacts/overnight/stage2-failed.patch 和 stage2.json。
+- 后续工作台及静态构建不依赖新首页动画，继续；本轮首页维持 2298826 已通过版本。
+
+### 夜间阶段 3a · 投资工作台
+- 暖黑手稿背景、五块固定玻璃、边缘 LAB 编号；投资分布图和普通按钮中性化。未产生结果时橙色给健康检查，方案差异入屏时交给它；依据步骤在结果生成前不可用。
+- 步骤点击定位、手动滚动跟随、结果失效恢复禁用；数字以准确最终文本做 320ms / 12px 入场，辅助技术无中间金额；加载格线骨架取代碎片文字。
+- 验收通过：check、46/46 test、smoke；workbench-archive-check investment 1440/1024/375；既有 ui-check 35组；catalog 三尺寸与旧基线一致。日志 artifacts/overnight/stage3a.json；截图 screenshots/investment-{data,result}-{desktop,mobile}.png。
+- 保守实施偏差：保留 catalog 使用的旧样式源与工作台旧引用，新组件集中于已有 glass.css 的 archive-workbench 作用域，未新建 override 文件。可选阶段 7 再确认是否可安全取消引用，不做自动 CSSOM 去重。
+- 没有修改后端、ui-model、presentation、接口参数或金额算法；common.js 仅为新版工作台选择中性色图表。

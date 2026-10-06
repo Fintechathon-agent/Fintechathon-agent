@@ -63,7 +63,7 @@ if(getComputedStyle(document.body).getPropertyValue("--product-shell").trim()!==
   document.querySelector("main")?.prepend(warning);
 }
 export function chart(series, labels) {
-  const colors = ["#ff8b38","#d6c1a8","#91c7ad","#b0a2dc"];
+  const colors = document.body.classList.contains("archive-workbench") ? ["#f3eee8","#b8ada0","#8b8278","#d0c7be"] : ["#ff8b38","#d6c1a8","#91c7ad","#b0a2dc"];
   const { low, high } = chartDomain(series.flatMap(s => s.values));
   const y = value => 185 - (value-low)/(high-low)*145;
   const x = i => 60 + i / Math.max(1,labels.length-1)*660;
