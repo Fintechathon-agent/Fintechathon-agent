@@ -1,6 +1,6 @@
 # 方向 A 正式页面实施计划
 
-状态：**阶段 ① 已验证并推送；阶段 ② 手机边界验收失败，已停止。阶段 ③ / ④ 未开始。**
+状态：**2026-10-07 提交 1（标题安静区 / 天平降权）验收失败，已停止；提交 2 硬币循环未开始。**
 
 ## 1. 范围与已核对基线
 
@@ -144,6 +144,15 @@
 
 ## Deviations
 
+### 2026-10-07 · 功能区优化提交 1 停止记录
+
+- 开工已 pull --ff-only，基线为 2298826，工作区原有未跟踪文件完整保留。补跑 check、46/46 test、smoke 均通过，记录见本文件后文和 artifacts/archive/2026-10-07-baseline.json。
+- 本地草稿包含：标题暖黑磨砂面板及背后半透明安静区；液体空闲 opacity .6、活动 200ms 恢复 / 1.2s 降权；0.6px / 3.6s 水面呼吸；hover:none 双语常驻提示。手机首屏标题和 CTA 规则未修改。
+- **失败门槛：**scripts/explore-check.cjs 首个 1440px 场景中，点击后等待 250ms，断言 interaction restores brightness 失败；期望 opacity = 1，实际为 0.966596。首次激活依赖下一帧才写入 data-liquid-active，活动态同步与 CSS 过渡起点需后续恢复时核查；当前尚未确认唯一根因。
+- 已立即停止实现，不以放宽断言作为通过，不推进硬币循环，不提交 / 推送此次草稿。新功能三尺寸、截图与完整验收未完成。
+- 失败测试脚本保留在 chenchen/scripts/explore-check.cjs；结构化记录在 chenchen/artifacts/archive/2026-10-07-quiet-failure.json。
+
+
 ### 2026-10-06 · 阶段 ① 停止记录
 
 - 用户的五项修订已更新：主操作优先、三次独立提交、静态玻璃预算、13px 等宽元信息、12 张最终截图。
@@ -179,3 +188,29 @@
 - 阶段 ① 提交：efb7e52c748eb18204952cca4044170990796959；已推送 codex/kosx-landing-glass，并用 git ls-remote 核对一致。
 - 阶段 ②：本地未提交草稿，停止点如上；阶段 ③ / 可选 ④ 均未启动。
 - 12 张最终截图尚未齐全；不能将草稿截图称为验收通过。当前不合入 main，未更改接口或计算逻辑。
+
+## 2026-10-07 · 开工基线与本轮范围
+
+- 已执行 git pull --ff-only origin codex/kosx-landing-glass，返回 Already up to date；起点 2298826，前一提交 a023dfc。旧的阶段 ② 停止记录保留为历史，不代表当前已同步版本的状态。
+- 补跑记录：node scripts/check.js 退出 0；node --test 46/46 通过、退出 0；在独立本机服务器上运行 node scripts/smoke.js 退出 0。原始日志保存在 chenchen/artifacts/archive/2026-10-07-baseline.json。
+- 本轮仅改首页四个表现文件及测试脚本、本文和验收截图；工作台、glass.css、接口与计算逻辑不修改。
+- 提交 1：标题安静区、液体静止 60% / 活动恢复、0.6px / 3.6s 呼吸、hover:none 常驻提示。呼吸是此次新授权，因此可见时静止水面继续共享 rAF，离屏 / 隐藏 / reduced-motion 停止。
+- 提交 2：独立硬币在开场后交替落入，01→02→01 为一轮，共 4 轮；手动交互优先，停手 4 秒且回正后续播。不影响首页大硬币。
+
+### 2026-10-07 当前变更摘要与已知问题
+- 本轮新内容仅本地：首页 landing.html / landing.css / archive.js、测试及记录。未改工作台、接口、计算逻辑，未切换或合入 main。
+- 已知阻断：液体活动亮度未在验收等待窗口内精确到全亮；标题安静区等也尚未完成全部新验收，因此不能称为完成。
+- 硬币投掷循环及其三张截图尚未实现；新两次提交均未创建。
+
+### 本次停止时的最终检查记录
+- 修改后 check、46/46 test、smoke 均通过（完整日志 chenchen/artifacts/archive/2026-10-07-quiet-validation.json）。
+- landing-archive-check 三尺寸通过，手机首屏标题两行 / CTA 位置保持；archive-check catalog 三尺寸与基线一致；liquid-balance-check 三尺寸通过原有注满拒绝、回落平衡、键盘及 reduced-motion 回归。
+- 新增 explore-check 未通过：首次 1440 场景的活动亮度恢复断言失败，后续新验收未放行。原有检查通过不替代本次新增门槛。
+- 测试重新生成的既有截图也仅保留本地；新要求的五张最终截图尚未齐备。
+- HEAD 与 origin/codex/kosx-landing-glass 均仍为 229882613644ae7e27966fdfd7472f426f135c60，本轮无提交和推送。
+
+## 2026-10-07 夜间任务（最新规则）
+- 已读取用户粘贴的完整夜间任务；以下覆盖此前失败即整轮停止的安排：每阶段失败撤回该阶段正式改动，记录 Deviations，继续独立阶段；单问题不超过 30 分钟。
+- 阶段 0：pull --ff-only 成功，2298826 为远程一致起点，包含手机两行标题修复。上轮草稿先备份到 chenchen/artifacts/overnight/preflight.patch，再恢复正式代码基线。
+- 基线：check / 46项 test / smoke / ui-check / landing-archive-check 三尺寸 / catalog 三尺寸对比全通过；日志 chenchen/artifacts/overnight/stage0.json。晨间报告骨架已建立。
+- 不修改 prototypes、learning、output、tmp、根 .gitignore；不新增生产依赖；原业务模块保持不变。报告仅陈述实际结果。
