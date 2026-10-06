@@ -226,7 +226,7 @@ function serveStatic(response, pathname) {
   const routes = { "/": "versions/landing.html", "/index.html": "versions/landing.html", "/catalog": "versions/home.html", "/investment": "versions/investment.html", "/merchant": "versions/merchant.html" };
   const pagePath = decodedPath.length > 1 ? decodedPath.replace(/\/$/, '') : decodedPath;
   let relativePath = routes[pagePath] || decodedPath.replace(/^\/+/, "");
-  const allowed = new Set(["versions/landing.html", "versions/landing.css", "versions/landing.js", "versions/glass.css", "versions/home.html", "versions/investment.html", "versions/merchant.html",
+  const allowed = new Set(["versions/tokens.css", "versions/archive.js", "versions/landing.html", "versions/landing.css", "versions/landing.js", "versions/glass.css", "versions/home.html", "versions/investment.html", "versions/merchant.html",
     "versions/style.css", "versions/product-overrides.css", "versions/kosx.css", "versions/favicon.svg", "versions/ui-model.mjs", "versions/presentation.mjs", "versions/investment.js", "versions/merchant.js", "versions/common.js",
     "index.html", "app.js", "styles.css"]);
   let status = 200;
