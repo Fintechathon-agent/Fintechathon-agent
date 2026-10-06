@@ -1,6 +1,7 @@
-import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip } from './common.js';
+import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip, feedback, busy } from './common.js';
+import { userError } from './ui-model.mjs';
 import { dateStatus, merchantOverview, priorityBills } from './presentation.mjs';
-let state, reminders, refreshSequence = 0;
+let state, reminders, refreshSequence = 0, scenarioSequence = 0, lastEvidenceKey;
 const key = b => b.channel + ':' + b.id;
 const delay = () => Number($('#delay').value);
 const noticeStatuses = { open:'待处理', verified:'已核实', done:'已处理' };
@@ -78,47 +79,78 @@ async function loadInsights() {
 async function runSingleScenario() {
   const bill = $('#scenario-bill').value, days = Number($('#scenario-delay').value);
   if (!bill) return toast('没有可试算的未到账收入。');
+  const sequence = ++scenarioSequence, revision = state.revision;
   $('#scenario-run').disabled = true; $('#scenario-result').hidden = false; $('#scenario-result').textContent = '正在试算…';
   try {
     const result = await api('/api/merchant/scenario?bill='+encodeURIComponent(bill)+'&delay='+days);
+    if(sequence !== scenarioSequence || state.revision !== revision) return;
     const gap = value => value.first_gap ? value.first_gap.date+' · '+money(value.first_gap.expected_cents) : '未来 14 天未出现负余额';
     $('#scenario-result').innerHTML = '<strong>'+esc(result.bill.channel+' · '+result.bill.id)+' 晚 '+result.delay_days+' 天到账</strong><p>预计到账日：'+esc(result.moved_from)+' → '+esc(result.moved_to)+'</p><p>原本情景：'+esc(gap(result.baseline))+'；单笔延迟后：'+esc(gap(result.scenario))+'</p><small>这只是单笔收入的假设，不会修改账单，也不会自动改变付款日期。</small>';
-  } catch (error) { $('#scenario-result').textContent = error.message; }
-  finally { $('#scenario-run').disabled = false; }
+  } catch (error) { if(sequence === scenarioSequence) $('#scenario-result').textContent = error.message; }
+  finally { if(sequence === scenarioSequence) $('#scenario-run').disabled = false; }
+}
+function invalidateScenario() {
+  scenarioSequence++;
+  $('#scenario-result').hidden = true;
+  $('#scenario-result').textContent = '';
+  $('#scenario-run').disabled = false;
 }
 async function refresh() {
   const sequence=++refreshSequence, next=await api('/api/merchant/ledger?delay='+delay());
   if(sequence!==refreshSequence)return;
+  if(state && state.revision !== next.revision) invalidateScenario();
   state=next; render(); await loadInsights();
 }
 document.addEventListener('click', async event=>{
   try {
     const evidence=event.target.closest('.evidence'), follow=event.target.closest('.follow'), noteSave=event.target.closest('.note-save');
     if(evidence) {
+      if(evidence.disabled) return;
+      evidence.disabled = true;
+      feedback('#page-feedback','正在读取账单来源…');
+      try {
       const id=evidence.dataset.key, b=await api('/api/merchant/bill?id='+encodeURIComponent(id));
+      lastEvidenceKey=id;
       if(!state.viewed.includes(id)) state.viewed.push(id);
       $('#bill-title').textContent=b.id+' · '+b.category;
       const rows=[['原始来源',b.source],['渠道',b.channel],['说明',b.description],['记账日期',b.booked_on],['预计到账 / 到期日',b.due_on],['账单原额',money(b.amount_cents)],['平台扣费',money(b.fee_cents)],['退款',money(b.refund_cents)],[b.kind==='income'?'预计净收':'应付款',money(b.net_cents)],['余额口径',b.balance_effect]];
       $('#bill-detail').innerHTML='<dl>'+rows.map(([k,v])=>'<dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd>').join('')+'</dl><p class="notice small">来源为导入账单的引用信息。请另行对照实际凭证；演示数据不代表真实平台费率或结算周期。</p>';
       if(!$('#bill-dialog').open)$('#bill-dialog').showModal(); showBills(); renderReview();
+      feedback('#page-feedback','');
+      } finally { evidence.disabled = false; }
     }
-    if(follow) { await api('/api/merchant/follow',{id:follow.dataset.id,delay:delay()}); await loadInsights(); }
+    if(follow) await busy(follow,'更新中…',async()=>{ await api('/api/merchant/follow',{id:follow.dataset.id,delay:delay()}); await loadInsights(); });
     if(noteSave) {
+      await busy(noteSave,'保存中…',async()=>{
       const box=noteSave.closest('.notice-note'), input=box?.querySelector('.notice-note-input'), select=noteSave.closest('.insight')?.querySelector('.notice-status');
       await api('/api/merchant/notice',{id:noteSave.dataset.id,status:select?.value || 'open',note:input?.value || ''});
       await loadInsights(); toast('处理备注已保存。');
+      });
     }
-  } catch(e) { toast(e.message); }
+  } catch(e) { feedback('#page-feedback',e.message,'error');toast(e.message); }
 });
 document.addEventListener('change', async event=>{
   const select = event.target.closest('.notice-status');
   if (!select) return;
+  const previous=reminders?.notices.find(notice=>notice.id===select.dataset.id)?.status || 'open';
+  select.disabled=true;
   try { await api('/api/merchant/notice',{id:select.dataset.id,status:select.value}); await loadInsights(); toast('提醒状态已更新。'); }
-  catch (error) { toast(error.message); }
+  catch (error) { select.value=previous; feedback('#page-feedback',error.message,'error'); toast(error.message); }
+  finally { select.disabled=false; }
 });
 $('#close-dialog').onclick=()=>$('#bill-dialog').close();
+$('#bill-dialog').addEventListener('close',()=>{
+  const trigger=[...document.querySelectorAll('.evidence')].find(button=>button.dataset.key===lastEvidenceKey && button.getClientRects().length);
+  trigger?.focus({preventScroll:true});
+});
 $('#confirm').onchange=renderReview;
-$('#review').onclick=async()=>{ try { await api('/api/merchant/review',{revision:state.revision,confirmed:$('#confirm').checked}); await refresh(); toast('账单口径已确认，提醒已生成。'); }catch(e){toast(e.message);} };
+$('#review').onclick=async()=>{
+  await busy($('#review'),'正在核对…',async()=>{
+    try { await api('/api/merchant/review',{revision:state.revision,confirmed:$('#confirm').checked}); await refresh(); feedback('#page-feedback','账单口径已确认，提醒已生成。','success'); $('#insights-panel').scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}); toast('账单口径已确认，提醒已生成。'); }
+    catch(e){feedback('#page-feedback',e.message,'error');toast(e.message);}
+  });
+  renderReview();
+};
 $('#channel').onchange=showBills; $('#bill-status').onchange=showBills; $('#search').oninput=showBills;
 $('#delay').onchange=async()=>{
   const before = state?.forecast.delay_days ?? 0;
@@ -127,9 +159,62 @@ $('#delay').onchange=async()=>{
   finally { $('#delay').disabled=false; }
 };
 $('#scenario-run').onclick=runSingleScenario;
+$('#scenario-bill').onchange=invalidateScenario;
+$('#scenario-delay').onchange=invalidateScenario;
+$('#clear-filters').onclick=()=>{ $('#channel').value=''; $('#bill-status').value=''; $('#search').value=''; showBills(); toast('已清空筛选，显示全部账单。'); };
 $('#export-ledger').onclick=()=>downloadLink('/api/merchant/export?type=ledger');
 $('#template').onclick=()=>downloadLink('/api/merchant/export?type=demo');
 $('#export-review').onclick=()=>downloadLink('/api/merchant/export?type=review&delay='+delay());
-$('#import').onclick=async()=>{ const file=$('#import-file').files[0]; if(!file)return toast('请先选择一份 JSON 账单。'); if(file.size>950000)return toast('演示导入文件请小于 950 KB。'); try { const result=await api('/api/merchant/import',JSON.parse(await file.text())); $('#confirm').checked=false; await refresh(); toast('导入成功，去重 '+result.duplicates+' 笔。请重新核对账单。'); }catch(e){toast('导入未完成：'+e.message);} };
-$('#reset').onclick=async()=>{try{await api('/api/merchant/reset',{});$('#confirm').checked=false;await refresh();toast('已恢复虚构演示账单。');}catch(e){toast(e.message);}};
-refresh().catch(e=>toast(e.message));
+$('#import').onclick=async()=>{
+  const file=$('#import-file').files[0];
+  if(!file) return feedback('#page-feedback','请先选择一份 JSON 账单。','error');
+  if(file.size>950000) return feedback('#page-feedback','演示导入文件请小于 950 KB。','error');
+  await busy($('#import'),'正在校验…',async()=>{
+    let replaced = false;
+    try { const result=await api('/api/merchant/import',JSON.parse(await file.text())); replaced=true; invalidateScenario(); $('#confirm').checked=false; await refresh(); feedback('#page-feedback','导入成功，去重 '+result.duplicates+' 笔。请重新核对账单。','success'); toast('账单已更新，请重新核对。'); }
+    catch(e){
+      if(replaced) {
+        markUnavailable();
+        feedback('#page-feedback','账单已导入，但页面读取失败。请重新读取账单后继续。','error');
+        toast('账单已导入，请重新读取。');
+      } else { feedback('#page-feedback','导入未完成：'+userError(e),'error');toast('导入未完成，请查看错误说明。'); }
+    }
+  });
+};
+$('#reset').onclick=async()=>{
+  if(!window.confirm('恢复演示会替换当前会话账单、核对状态和备注。请先导出需要保留的内容。确定恢复吗？')) return;
+  await busy($('#reset'),'正在恢复…',async()=>{
+    let replaced=false;
+    try{await api('/api/merchant/reset',{});replaced=true;invalidateScenario();$('#confirm').checked=false;await refresh();feedback('#page-feedback','已恢复虚构演示账单。','success');toast('已恢复虚构演示账单。');}
+    catch(e){if(replaced)markUnavailable();feedback('#page-feedback',replaced?'账单已恢复，但页面读取失败，请重新读取账单。':e.message,'error');}
+  });
+};
+function markUnavailable() {
+  state=null; reminders=null;
+  $('#retry-load').hidden=false;
+  $('#shop-date').textContent='等待重新读取';
+  $('#merchant-status .cash-value').textContent='暂不可用';
+  $('#ledger-health').textContent='数据未加载，请重试。';
+  $('#quick-bills').innerHTML='<p class="empty">账单尚未加载。</p>';
+  for(const id of ['totals','bills','cash-chart','calendar','costs']) $('#'+id).textContent='';
+  $('#insights').textContent='账单未读取，暂时无法生成提醒。';
+  $('#digest').textContent=''; $('#cost-period').textContent='';
+  $('#scenario-bill').innerHTML='<option value="">账单尚未加载</option>';
+  $('#gap-summary').textContent='数据未加载，暂时无法计算。';
+  $('#cost-summary').textContent='数据未加载，暂时无法比较。';
+  $('#cash-callout-title').textContent='等待重新读取';
+  $('#cash-callout-copy').textContent='请重试后查看最新账单。';
+  $('#confirm').checked=false; $('#confirm').disabled=true;
+  $('#review').disabled=true; $('#export-review').disabled=true;
+}
+async function loadLedger() {
+  $('#retry-load').hidden = true;
+  feedback('#page-feedback','正在读取演示账单…');
+  try { await refresh(); feedback('#page-feedback',''); }
+  catch(e) {
+    feedback('#page-feedback','账单读取失败：'+e.message,'error'); $('#retry-load').hidden=false;
+    if(!state) markUnavailable();
+  }
+}
+$('#retry-load').onclick=loadLedger;
+loadLedger();

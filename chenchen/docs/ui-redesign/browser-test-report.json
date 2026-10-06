@@ -1,0 +1,151 @@
+{
+  "created_at": "2026-10-05T16:52:47.269Z",
+  "browser": "154.0.8037.95",
+  "results": [
+    {
+      "name": "investment snapshot, allocation and desktop layout",
+      "status": "passed",
+      "duration_ms": 340
+    },
+    {
+      "name": "investment diagnosis, candidate details, evidence and JSON export",
+      "status": "passed",
+      "duration_ms": 1237
+    },
+    {
+      "name": "changing investment input invalidates previous conclusions",
+      "status": "passed",
+      "duration_ms": 23
+    },
+    {
+      "name": "invalid JSON keeps input and shows a persistent recovery message",
+      "status": "passed",
+      "duration_ms": 67
+    },
+    {
+      "name": "failed investment initialization retries without page reload",
+      "status": "passed",
+      "duration_ms": 136
+    },
+    {
+      "name": "in-flight investment result cannot overwrite changed input",
+      "status": "passed",
+      "duration_ms": 161
+    },
+    {
+      "name": "merchant overview, review gate and bill source dialog",
+      "status": "passed",
+      "duration_ms": 439
+    },
+    {
+      "name": "merchant note and processing status persist across reload",
+      "status": "passed",
+      "duration_ms": 231
+    },
+    {
+      "name": "merchant search empty state and clear filters",
+      "status": "passed",
+      "duration_ms": 82
+    },
+    {
+      "name": "cash delay changes the known gap with consistent scenario copy",
+      "status": "passed",
+      "duration_ms": 57
+    },
+    {
+      "name": "single receipt scenario clears stale results when inputs change",
+      "status": "passed",
+      "duration_ms": 123
+    },
+    {
+      "name": "review download contains actual reviewed ledger",
+      "status": "passed",
+      "duration_ms": 349
+    },
+    {
+      "name": "invalid import does not replace existing merchant data",
+      "status": "passed",
+      "duration_ms": 122
+    },
+    {
+      "name": "empty ledger import provides honest empty states and invalidates review",
+      "status": "passed",
+      "duration_ms": 145
+    },
+    {
+      "name": "merchant failed initialization has a working retry action",
+      "status": "passed",
+      "duration_ms": 212
+    },
+    {
+      "name": "successful import followed by read failure is reported truthfully and can recover",
+      "status": "passed",
+      "duration_ms": 399
+    },
+    {
+      "name": "missing page offers working recovery navigation",
+      "status": "passed",
+      "duration_ms": 204
+    },
+    {
+      "name": "responsive layouts without page overflow at 320px",
+      "status": "passed",
+      "duration_ms": 279
+    },
+    {
+      "name": "responsive layouts without page overflow at 390px",
+      "status": "passed",
+      "duration_ms": 688
+    },
+    {
+      "name": "responsive layouts without page overflow at 768px",
+      "status": "passed",
+      "duration_ms": 260
+    },
+    {
+      "name": "responsive layouts without page overflow at 1024px",
+      "status": "passed",
+      "duration_ms": 265
+    },
+    {
+      "name": "responsive layouts without page overflow at 1440px",
+      "status": "passed",
+      "duration_ms": 224
+    },
+    {
+      "name": "mobile investment and merchant actions remain operable",
+      "status": "passed",
+      "duration_ms": 1024
+    },
+    {
+      "name": "keyboard skip link and explicit community destination",
+      "status": "passed",
+      "duration_ms": 130
+    },
+    {
+      "name": "automated WCAG A/AA checks on /investment",
+      "status": "passed",
+      "duration_ms": 663
+    },
+    {
+      "name": "automated WCAG A/AA checks on /merchant",
+      "status": "passed",
+      "duration_ms": 746
+    },
+    {
+      "name": "automated WCAG A/AA checks on /catalog",
+      "status": "passed",
+      "duration_ms": 371
+    },
+    {
+      "name": "merchant dialog automated accessibility and Escape focus recovery",
+      "status": "passed",
+      "duration_ms": 641
+    },
+    {
+      "name": "no uncaught browser exceptions",
+      "status": "passed",
+      "duration_ms": 0
+    }
+  ]
+}

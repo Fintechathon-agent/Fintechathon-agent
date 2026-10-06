@@ -1,13 +1,21 @@
-import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip } from "./common.js";
+import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip, feedback } from "./common.js";
+import { allocationView, userError } from './ui-model.mjs';
 import { dateStatus, planComparison } from "./presentation.mjs";
 let result, inputVersion = 0;
 const names = { CURRENT:"当前组合", A:"A 保持或最小动作", B:"B 温和调整", C:"C 风险优先" };
 const planCopy = { A:"保留当前配置", B:"适度降低集中度", C:"降低高波动资产权重" };
 function invalidate() {
   inputVersion++;
+  $('#analysis-anchor').hidden = false;
+  document.querySelector('.section-nav a[href="#result-summary"]')?.setAttribute('href','#input-panel');
+  $('#journey-evidence').classList.remove('active');
+  $('#journey-analysis').classList.remove('active');
+  feedback('#run-feedback', '');
   if (result) { result=null; $("#results").hidden=true; $("#input-changed").hidden=false; }
 }
 async function init() {
+  $('#retry-load').hidden = true; $('#load-error').hidden = true;
+  $('#portfolio-total').textContent = '读取中';
   const data=await api("/api/demo/portfolio"), p=data.output.snapshot;
   const raw={portfolio_id:p.portfolio_id,as_of:p.as_of,cash:p.cash,positions:p.positions.map(({instrument_id,type,quantity,price,name,sector})=>({instrument_id,type,quantity,price,name,sector}))};
   $("#portfolio-json").value=JSON.stringify(raw,null,2);
@@ -15,6 +23,13 @@ async function init() {
 }
 function renderHoldings(p) {
   const dated=dateStatus(p.as_of,today());
+  const allocation = allocationView(p);
+  $('#portfolio-total').textContent = money(p.total_value * 100);
+  $('#overview-numbers').innerHTML = [['现金储备',money(p.cash*100)],['持仓标的',p.positions.length+' 个'],['现金占比',pct(p.cash_weight)]].map(([label,value])=>'<div><small>'+esc(label)+'</small><strong>'+esc(value)+'</strong></div>').join('');
+  $('#allocation-count').textContent = allocation.filter(item=>item.weight>0).length;
+  $('#allocation-donut').style.background = 'conic-gradient('+allocation.map(item=>item.color+' '+item.start+'% '+item.end+'%').join(',')+')';
+  $('#allocation-donut').setAttribute('aria-label', allocation.map(item=>item.label+' '+pct(item.weight)).join('，'));
+  $('#allocation-legend').innerHTML = allocation.map(item=>'<li><i class="dot" style="background:'+item.color+'"></i><span>'+esc(item.label)+'</span><b>'+pct(item.weight)+'</b></li>').join('');
   $("#portfolio-stamp").textContent="演示组合 "+money(p.total_value*100);
   $("#portfolio-health").innerHTML='<span>基准日 '+esc(p.as_of.slice(0,10))+'</span><span class="date-warning">'+esc(dated.label)+'</span><span>固定虚构价格 · 不自动更新</span>';
   $("#holdings").innerHTML='<div class="table-wrap"><table><thead><tr><th>证券</th><th class="num">市值</th><th class="num">占比</th></tr></thead><tbody>'+
@@ -25,6 +40,9 @@ $("#check-form").addEventListener("input",invalidate);
 $("#demo-profile").onclick=()=>{ invalidate(); $("#horizon").value=365;$("#drawdown").value=10;$("#liquidity").value="medium";toast("已填入虚构偏好，可修改。"); };
 $("#check-form").onsubmit=async event=>{
   event.preventDefault();const version=inputVersion;$("#run").disabled=true;$("#results").hidden=true;$("#input-changed").hidden=true;$("#run").textContent="正在诊断…";
+  $('#run').setAttribute('aria-busy','true');
+  $('#journey-analysis').classList.add('active');
+  feedback('#run-feedback','正在校验持仓、计算风险并比较三条路径…');
   try {
     const next=await api("/api/health-check/run",{risk_profile:{investment_horizon_days:Number($("#horizon").value),max_drawdown:Number($("#drawdown").value)/100,liquidity_need:$("#liquidity").value},portfolio:JSON.parse($("#portfolio-json").value)});
     if(version!==inputVersion) { $("#input-changed").hidden=false; return toast("输入已改变，请重新检查。"); }
@@ -60,9 +78,23 @@ $("#check-form").onsubmit=async event=>{
     }).catch(()=>{
       if(result===next&&version===inputVersion)$("#evidence").textContent+="\n完整运行记录暂未读取成功，可重新检查后再试。";
     });
-    $("#results").hidden=false;$("#input-panel").open=false;$("#result-summary").scrollIntoView({behavior:"smooth",block:"start"});toast("分析完成。展开方案可查看细节。");
-  }catch(error){ result=null;toast(error.message); }
-  finally{$("#run").disabled=false;$("#run").textContent="开始健康检查 →";}
+    $('#analysis-anchor').hidden=true; $('#journey-evidence').classList.add('active');
+    document.querySelector('.section-nav a[data-health-link]')?.setAttribute('href','#result-summary');
+    feedback('#run-feedback','分析完成，已保留本次偏好和持仓。','success');
+    $("#results").hidden=false;$("#input-panel").open=false;$("#result-summary").scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:"start"});toast("分析完成。展开方案可查看细节。");
+  }catch(error){ result=null; $('#journey-analysis').classList.remove('active'); feedback('#run-feedback',userError(error),'error');toast(userError(error)); }
+  finally{$("#run").disabled=false;$("#run").textContent="开始健康检查 →";$('#run').removeAttribute('aria-busy');}
 };
 $("#export").onclick=()=>{if(result)downloadLink("/api/task/"+encodeURIComponent(result.task_state.task_id)+"/export");};
-init().catch(error=>{$("#load-error").hidden=false;$("#load-error").textContent="数据读取失败："+error.message+"。请确认服务已启动，再刷新页面。";});
+async function loadPortfolio() {
+  try { await init(); }
+  catch(error) {
+    $('#portfolio-total').textContent = '暂不可用'; $('#portfolio-stamp').textContent = '数据读取失败';
+    $('#portfolio-health').textContent = '暂未取得数据，点击下方按钮重试。';
+    $('#overview-numbers').textContent = '组合数据未加载。'; $('#allocation-legend').textContent = '暂无可展示数据。';
+    $('#load-error').hidden=false; $('#load-error').textContent='数据读取失败：'+error.message;
+    $('#retry-load').hidden=false; $('#run').disabled=true;
+  }
+}
+$('#retry-load').onclick = loadPortfolio;
+loadPortfolio();

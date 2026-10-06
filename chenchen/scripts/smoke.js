@@ -4,12 +4,12 @@ const fs = require("node:fs"), path = require("node:path");
 const base = "http://127.0.0.1:" + (process.env.PORT || 4175);
 (async()=>{
   for (const [route,file] of [
-    ["/","versions/home.html"],["/investment","versions/investment.html"],["/merchant","versions/merchant.html"],
-    ...["style.css","product-overrides.css","common.js","presentation.mjs","investment.js","merchant.js"].map(file=>["/versions/"+file,"versions/"+file])
+    ["/","versions/investment.html"],["/catalog","versions/home.html"],["/investment","versions/investment.html"],["/merchant","versions/merchant.html"],
+    ...["style.css","product-overrides.css","kosx.css","favicon.svg","common.js","ui-model.mjs","presentation.mjs","investment.js","merchant.js"].map(file=>["/versions/"+file,"versions/"+file])
   ]) {
     const response=await fetch(base+route,{signal:AbortSignal.timeout(5000)});
     if(!response.ok)throw new Error(route+" HTTP "+response.status+"; stop the old server and restart npm start.");
-    const expectedType=file.endsWith(".html")?"text/html":file.endsWith(".css")?"text/css":"javascript";
+    const expectedType=file.endsWith(".html")?"text/html":file.endsWith(".css")?"text/css":file.endsWith('.svg')?'image/svg+xml':"javascript";
     if(!response.headers.get("content-type")?.includes(expectedType))throw new Error(route+" has the wrong content type");
     const actual=await response.text(), expected=fs.readFileSync(path.join(__dirname,"..",file),"utf8");
     if(actual.replace(/\r\n/g,"\n")!==expected.replace(/\r\n/g,"\n"))throw new Error(route+" does not match this checkout");

@@ -224,11 +224,16 @@ function serveStatic(response, pathname) {
     return;
   }
   const routes = { "/": "versions/investment.html", "/index.html": "versions/investment.html", "/catalog": "versions/home.html", "/investment": "versions/investment.html", "/merchant": "versions/merchant.html" };
-  const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
+  const pagePath = decodedPath.length > 1 ? decodedPath.replace(/\/$/, '') : decodedPath;
+  let relativePath = routes[pagePath] || decodedPath.replace(/^\/+/, "");
   const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html",
-    "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/merchant.js", "versions/common.js",
+    "versions/style.css", "versions/product-overrides.css", "versions/kosx.css", "versions/favicon.svg", "versions/ui-model.mjs", "versions/presentation.mjs", "versions/investment.js", "versions/merchant.js", "versions/common.js",
     "index.html", "app.js", "styles.css"]);
-  if (!allowed.has(relativePath)) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "not found" } }); return; }
+  let status = 200;
+  if (!allowed.has(relativePath)) {
+    if (!path.extname(decodedPath)) { relativePath = 'versions/not-found.html'; status = 404; }
+    else { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "not found" } }); return; }
+  }
   const filePath = path.resolve(root, relativePath);
   const relativeToRoot = path.relative(root, filePath);
   if (relativeToRoot.startsWith("..") || path.isAbsolute(relativeToRoot)) {
@@ -240,20 +245,29 @@ function serveStatic(response, pathname) {
       sendJson(response, error.code === "ENOENT" ? 404 : 500, { error: { code: error.code || "FILE_ERROR", message: error.code === "ENOENT" ? "not found" : "server error" } });
       return;
     }
-    response.writeHead(200, { "Content-Type": mime[path.extname(filePath)] || "application/octet-stream", "Cache-Control": "no-store" });
+    response.writeHead(status, { "Content-Type": mime[path.extname(filePath)] || "application/octet-stream", "Cache-Control": "no-store" });
     response.end(file);
   });
 }
 
 const server = http.createServer(async (request, response) => {
+  response.setHeader('X-Content-Type-Options', 'nosniff');
+  response.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.setHeader('X-Frame-Options', 'DENY');
+  response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
   try {
     const url = new URL(request.url, `http://${request.headers.host || "127.0.0.1"}`);
     const localHost = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
     if (!localHost && !publicAccessEnabled()) {
       sendJson(response, 403, { error: { code: "LOCAL_ONLY", message: "Local demo only" } }); return;
     }
-    if (!publicAccessEnabled() && request.headers.origin && request.headers.origin !== url.origin) {
-      sendJson(response, 403, { error: { code: "ORIGIN_MISMATCH", message: "Cross-origin requests are disabled" } }); return;
+    if (request.headers.origin) {
+      let origin;
+      try { origin = new URL(request.headers.origin); } catch {}
+      // HTTPS reverse proxies retain the browser Host while the local hop is HTTP.
+      if (!origin || !['http:', 'https:'].includes(origin.protocol) || origin.host !== url.host) {
+        sendJson(response, 403, { error: { code: "ORIGIN_MISMATCH", message: "Cross-origin requests are disabled" } }); return;
+      }
     }
     if (url.pathname.startsWith("/api/")) {
       const handled = await handleApi(request, response, url.pathname, url);
