@@ -180,6 +180,16 @@ dialog dl{font-size:13px}
 .result-verdict{display:flex;align-items:center;justify-content:space-between;gap:20px;background:linear-gradient(120deg,var(--pale),#fff 70%);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-bottom:18px}
 .result-verdict h2{margin:2px 0 4px;font-size:21px}
 .result-verdict p{margin:0;color:var(--muted);font-size:13px}
+.next-steps-panel{margin-top:14px;background:linear-gradient(125deg,var(--pale),#fff 72%)}
+.next-step-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.next-step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.next-step-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.next-step-number{font:800 17px/1 system-ui;color:var(--green)}
+.next-step-tone{border:1px solid var(--line);border-radius:99px;padding:4px 7px;color:var(--muted);font-size:11px}
+.next-step-tone.priority{border-color:var(--amber);color:var(--amber);background:#fff8eb}
+.next-step h3{font-size:15px;margin:14px 0 7px}
+.next-step p{font-size:12px;line-height:1.65;color:var(--muted);margin:0 0 9px}
+.next-step small{display:block;padding-top:8px;border-top:1px solid var(--line);font-size:11px;color:var(--green);overflow-wrap:anywhere}
 .term-label{display:inline-flex;align-items:center;gap:4px}
 .tip-toggle{width:18px;height:18px;padding:0;border:1px solid currentColor;border-radius:50%;background:transparent;color:var(--green);font:700 11px/1 system-ui;vertical-align:middle}
 .tip-toggle:hover{background:var(--pale)}
@@ -216,5 +226,6 @@ dialog dl{font-size:13px}
   .home-principle{margin-top:24px}
   .home-hero h1{font-size:39px}
   .result-verdict{display:block}
+  .next-step-grid{grid-template-columns:1fr}
   .verdict-tag{margin-top:13px}
 }

@@ -223,10 +223,10 @@ function serveStatic(response, pathname) {
     sendJson(response, 400, { error: { code: "INVALID_PATH", message: "invalid URL path" } });
     return;
   }
-  const routes = { "/": "versions/investment.html", "/index.html": "versions/investment.html", "/catalog": "versions/home.html", "/investment": "versions/investment.html", "/merchant": "versions/merchant.html" };
+  const routes = { "/": "versions/investment.html", "/index.html": "versions/investment.html", "/catalog": "versions/home.html", "/investment": "versions/investment.html", "/investment-v0.10": "versions/investment-legacy.html", "/merchant": "versions/merchant.html" };
   const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
   const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html",
-    "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/merchant.js", "versions/common.js",
+    "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/common.js",
     "index.html", "app.js", "styles.css"]);
   if (!allowed.has(relativePath)) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "not found" } }); return; }
   const filePath = path.resolve(root, relativePath);

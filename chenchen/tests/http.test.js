@@ -5,12 +5,14 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));
   const base='http://127.0.0.1:'+server.address().port;
-  for(const page of ['/','/catalog','/investment','/merchant','/versions/merchant.js']) assert.equal((await fetch(base+page)).status,200);
+  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/versions/merchant.js','/versions/investment-legacy.js']) assert.equal((await fetch(base+page)).status,200);
   assert.match(await fetch(base+'/').then(r=>r.text()),/个人投资顾问/);
   assert.match(await fetch(base+'/catalog').then(r=>r.text()),/店主财务助手/);
+  assert.match(await fetch(base+'/investment').then(r=>r.text()),/现在先检查什么/);
+  assert.match(await fetch(base+'/investment-v0.10').then(r=>r.text()),/旧版/);
   await t.test('all page assets load with the right type including the separate product stylesheet',async()=>{
     const assets=new Set(['/versions/presentation.mjs']);
-    for(const route of ['/','/catalog','/investment','/merchant']){
+    for(const route of ['/','/catalog','/investment','/investment-v0.10','/merchant']){
       const html=await fetch(base+route).then(r=>r.text());
       assert.match(html,/product-overrides\.css/);
       for(const match of html.matchAll(/(?:src|href)="(\/versions\/[^"]+)"/g))assets.add(match[1]);

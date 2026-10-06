@@ -21,6 +21,33 @@ function renderHoldings(p) {
     p.positions.map(p=>'<tr><td>'+esc(p.name)+'<small>'+esc(p.instrument_id)+'</small></td><td class="num">'+money(p.market_value*100)+'</td><td class="num">'+pct(p.weight)+'</td></tr>').join("")+
     '<tr><td>现金</td><td class="num">'+money(p.cash*100)+'</td><td class="num">'+pct(p.cash_weight)+'</td></tr></tbody></table></div>';
 }
+function renderNextSteps(profile, snapshot, report, metrics) {
+  const steps = [];
+  const shortHorizon = profile.investment_horizon_days <= 90;
+  const needsLiquidity = profile.liquidity_need === "high" || shortHorizon;
+  const topWeight = report.concentration.top_1;
+  const drawdown = Math.abs(metrics.max_drawdown);
+  steps.push({
+    tone: needsLiquidity ? "重点" : "先做",
+    title: needsLiquidity ? "先核对近期要用的钱" : "先把备用金和投资钱分开",
+    body: needsLiquidity ? "你的输入显示这笔钱近期可能要用，先确认日常支出和备用金没有依赖这段投资结果。" : "先确认 3 到 6 个月内要用的钱没有放进需要承受波动的部分。",
+    evidence: shortHorizon ? "投资期限不超过 90 天" : profile.liquidity_need === "high" ? "流动性需求较高" : "这是每次看组合都应先确认的基础条件。"
+  });
+  steps.push({
+    tone: topWeight >= 0.25 ? "重点" : "再看",
+    title: "再看最大仓位",
+    body: "打开“组合集中在哪里？”，确认单一证券占比是否仍然符合你的心理预期；这里先看事实，不直接给交易指令。",
+    evidence: "当前最大单项仓位 " + report.concentration.largest_instrument + "，占 " + pct(topWeight)
+  });
+  steps.push({
+    tone: drawdown >= 0.03 ? "重点" : "记录",
+    title: "记录你能接受的下跌幅度",
+    body: "把本次输入的最大可接受回撤和样本内最大回撤放在一起看；如果看到这个数字会改变决定，就先停在核对，不急着调整。",
+    evidence: "本次输入上限 " + pct(profile.max_drawdown) + "；样本内最大回撤 " + pct(metrics.max_drawdown)
+  });
+  $("#next-steps-list").innerHTML = steps.map((step, index) => '<article class="next-step"><div class="next-step-top"><span class="next-step-number">0' + (index + 1) + '</span><span class="next-step-tone ' + (step.tone === "重点" ? "priority" : "") + '">' + step.tone + '</span></div><h3>' + esc(step.title) + '</h3><p>' + esc(step.body) + '</p><small>' + esc(step.evidence) + '</small></article>').join("");
+  $("#next-steps-intro").textContent = "这不是买卖建议，而是根据这次输入整理出的核对顺序；先看懂，再决定是否需要交给团队风控。";
+}
 $("#check-form").addEventListener("input",invalidate);
 $("#demo-profile").onclick=()=>{ invalidate(); $("#horizon").value=365;$("#drawdown").value=10;$("#liquidity").value="medium";toast("已填入虚构偏好，可修改。"); };
 $("#check-form").onsubmit=async event=>{
@@ -32,6 +59,7 @@ $("#check-form").onsubmit=async event=>{
     result=next; const a=result.artifacts,m=a.health_report.metrics,s=a.simulation,view=planComparison(s.comparisons);
     if(!view.best||!view.baseline)throw new Error("模拟缺少有效结果，暂不展示结论。");
     renderHoldings(a.portfolio_snapshot);
+    renderNextSteps({investment_horizon_days:Number($("#horizon").value),max_drawdown:Number($("#drawdown").value)/100,liquidity_need:$("#liquidity").value},a.portfolio_snapshot,a.health_report,m);
     $("#risk-metrics").innerHTML=[[tip("演示区间收益","tip-demo-return","只是在这段虚构历史数据上算出的结果，不是你的真实账户收益。"),pct(view.baseline.metrics.cumulative_return),"同一配置的历史模拟"],[tip("历史最大回撤","tip-max-drawdown","从高点跌到低点，曾经出现过的最大跌幅。数值越接近 0，跌得越少。"),pct(m.max_drawdown),"负数越接近 0，回撤越小"],[tip("现金占比","tip-cash-weight","组合里暂时没有买入证券、留在现金里的比例。") ,pct(a.portfolio_snapshot.cash_weight),"不参与证券集中度"]].map(v=>'<article class="metric"><small>'+v[0]+'</small><strong>'+v[1]+'</strong><small>'+v[2]+'</small></article>').join("");
     $("#findings").innerHTML='<p>最大证券仓位 <b>'+esc(a.health_report.concentration.largest_instrument)+'</b>，占 <b>'+pct(a.health_report.concentration.top_1)+'</b>。</p><p class="small">短样本年化波动率 '+pct(m.annualized_volatility)+'。</p>'+
       a.health_report.hidden_clusters.map(c=>'<p class="small">'+esc(c.instruments.join(" / "))+' · 相关系数 '+c.correlation.toFixed(3)+'</p>').join("");
