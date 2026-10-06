@@ -1,0 +1,176 @@
+{
+  "created_at": "2026-10-06T02:32:56.374Z",
+  "browser": "154.0.8037.98",
+  "results": [
+    {
+      "name": "showcase is the default entry with working product links",
+      "status": "passed",
+      "duration_ms": 1319
+    },
+    {
+      "name": "scroll moves and shrinks objects, reverses, and reveals core functions",
+      "status": "passed",
+      "duration_ms": 976
+    },
+    {
+      "name": "reduced motion and JavaScript disabled keep all destinations available",
+      "status": "passed",
+      "duration_ms": 381
+    },
+    {
+      "name": "frosted workspace and dialog materials are applied",
+      "status": "passed",
+      "duration_ms": 688
+    },
+    {
+      "name": "investment snapshot, allocation and desktop layout",
+      "status": "passed",
+      "duration_ms": 357
+    },
+    {
+      "name": "investment diagnosis, candidate details, evidence and JSON export",
+      "status": "passed",
+      "duration_ms": 1714
+    },
+    {
+      "name": "changing investment input invalidates previous conclusions",
+      "status": "passed",
+      "duration_ms": 41
+    },
+    {
+      "name": "invalid JSON keeps input and shows a persistent recovery message",
+      "status": "passed",
+      "duration_ms": 179
+    },
+    {
+      "name": "failed investment initialization retries without page reload",
+      "status": "passed",
+      "duration_ms": 193
+    },
+    {
+      "name": "in-flight investment result cannot overwrite changed input",
+      "status": "passed",
+      "duration_ms": 304
+    },
+    {
+      "name": "merchant overview, review gate and bill source dialog",
+      "status": "passed",
+      "duration_ms": 680
+    },
+    {
+      "name": "merchant note and processing status persist across reload",
+      "status": "passed",
+      "duration_ms": 397
+    },
+    {
+      "name": "merchant search empty state and clear filters",
+      "status": "passed",
+      "duration_ms": 192
+    },
+    {
+      "name": "cash delay changes the known gap with consistent scenario copy",
+      "status": "passed",
+      "duration_ms": 125
+    },
+    {
+      "name": "single receipt scenario clears stale results when inputs change",
+      "status": "passed",
+      "duration_ms": 362
+    },
+    {
+      "name": "review download contains actual reviewed ledger",
+      "status": "passed",
+      "duration_ms": 281
+    },
+    {
+      "name": "invalid import does not replace existing merchant data",
+      "status": "passed",
+      "duration_ms": 151
+    },
+    {
+      "name": "empty ledger import provides honest empty states and invalidates review",
+      "status": "passed",
+      "duration_ms": 323
+    },
+    {
+      "name": "merchant failed initialization has a working retry action",
+      "status": "passed",
+      "duration_ms": 206
+    },
+    {
+      "name": "successful import followed by read failure is reported truthfully and can recover",
+      "status": "passed",
+      "duration_ms": 557
+    },
+    {
+      "name": "missing page offers working recovery navigation",
+      "status": "passed",
+      "duration_ms": 200
+    },
+    {
+      "name": "responsive layouts without page overflow at 320px",
+      "status": "passed",
+      "duration_ms": 212
+    },
+    {
+      "name": "responsive layouts without page overflow at 390px",
+      "status": "passed",
+      "duration_ms": 1097
+    },
+    {
+      "name": "responsive layouts without page overflow at 768px",
+      "status": "passed",
+      "duration_ms": 195
+    },
+    {
+      "name": "responsive layouts without page overflow at 1024px",
+      "status": "passed",
+      "duration_ms": 210
+    },
+    {
+      "name": "responsive layouts without page overflow at 1440px",
+      "status": "passed",
+      "duration_ms": 200
+    },
+    {
+      "name": "mobile investment and merchant actions remain operable",
+      "status": "passed",
+      "duration_ms": 711
+    },
+    {
+      "name": "keyboard skip link and explicit community destination",
+      "status": "passed",
+      "duration_ms": 72
+    },
+    {
+      "name": "automated WCAG A/AA checks on /",
+      "status": "passed",
+      "duration_ms": 340
+    },
+    {
+      "name": "automated WCAG A/AA checks on /investment",
+      "status": "passed",
+      "duration_ms": 423
+    },
+    {
+      "name": "automated WCAG A/AA checks on /merchant",
+      "status": "passed",
+      "duration_ms": 546
+    },
+    {
+      "name": "automated WCAG A/AA checks on /catalog",
+      "status": "passed",
+      "duration_ms": 308
+    },
+    {
+      "name": "merchant dialog automated accessibility and Escape focus recovery",
+      "status": "passed",
+      "duration_ms": 459
+    },
+    {
+      "name": "no uncaught browser exceptions",
+      "status": "passed",
+      "duration_ms": 1
+    }
+  ]
+}

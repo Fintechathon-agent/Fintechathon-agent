@@ -46,8 +46,64 @@ async function accessible() {
   page=await context.newPage();
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
+  await check('showcase is the default entry with working product links',async()=>{
+    await page.goto(base); assert.equal(await page.locator('#story-title').count(),1);
+    assert.equal(await page.locator('#check-form').count(),0);
+    await screenshot('landing-desktop'); await accessible();
+    await page.getByRole('link',{name:'探索投资工作台'}).click();
+    await page.locator('#run:not([disabled])').waitFor();
+    await page.getByRole('link',{name:'Finance Lab 展示首页'}).click();
+    await page.getByRole('link',{name:'探索经营工作台'}).click();
+    await page.locator('#quick-bills .bill-preview').first().waitFor();
+  });
+  await check('scroll moves and shrinks objects, reverses, and reveals core functions',async()=>{
+    await page.emulateMedia({reducedMotion:'no-preference'}); await page.goto(base);
+    const original=await page.locator('#coin').boundingBox();
+    const pencilStart=await page.locator('#pencil').boundingBox();
+    const distance=await page.locator('.scroll-story').evaluate(el=>el.offsetHeight-innerHeight);
+    await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),distance*.75);
+    await page.waitForFunction(()=>Number(getComputedStyle(document.querySelector('.scroll-story')).getPropertyValue('--progress'))>.7);
+    const moved=await page.locator('#coin').boundingBox();
+    const pencilEnd=await page.locator('#pencil').boundingBox();
+    assert.ok(moved.x>original.x+200); assert.ok(moved.width<original.width*.8);
+    assert.ok(pencilEnd.x>pencilStart.x); assert.ok(pencilEnd.width<pencilStart.width);
+    await page.screenshot({path:path.join(output,'landing-scroll.png')});
+    await page.locator('#explore').scrollIntoViewIfNeeded();
+    assert.equal(await page.locator('#explore-title').isVisible(),true);
+    await page.screenshot({path:path.join(output,'landing-features.png')});
+    await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
+    await page.waitForFunction(()=>Number(getComputedStyle(document.querySelector('.scroll-story')).getPropertyValue('--progress'))===0);
+    const reset=await page.locator('#coin').boundingBox(); assert.ok(Math.abs(reset.x-original.x)<2);
+    await screenshot('landing-desktop');
+    await page.setViewportSize({width:390,height:844}); await page.reload();
+    await page.screenshot({path:path.join(output,'landing-mobile-start.png')});
+    await page.evaluate(()=>scrollTo({top:700,behavior:'instant'}));
+    await page.waitForFunction(()=>Number(getComputedStyle(document.querySelector('.scroll-story')).getPropertyValue('--progress'))>.5);
+    await noOverflow(); await page.screenshot({path:path.join(output,'landing-mobile-scroll.png')});
+    await page.emulateMedia({reducedMotion:'reduce'}); await page.setViewportSize({width:1440,height:1000});
+  });
+  await check('reduced motion and JavaScript disabled keep all destinations available',async()=>{
+    await page.goto(base);
+    const heights=await page.locator('.scroll-story').evaluate(el=>({story:el.offsetHeight,stage:el.firstElementChild.offsetHeight}));
+    assert.equal(heights.story,heights.stage);
+    const offlineContext=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});
+    try {
+      const staticPage=await offlineContext.newPage(); await staticPage.goto(base);
+      await staticPage.getByRole('link',{name:'探索功能',exact:true}).click();
+      assert.equal(await staticPage.locator('#explore-title').isVisible(),true);
+      assert.equal(await staticPage.getByRole('link',{name:'探索经营工作台'}).getAttribute('href'),'/merchant');
+    } finally { await offlineContext.close(); }
+  });
+  await check('frosted workspace and dialog materials are applied',async()=>{
+    await page.goto(base+'/merchant'); await page.locator('#quick-bills .evidence').first().click();
+    await page.locator('#bill-dialog[open]').waitFor();
+    const material=await page.locator('#bill-dialog').evaluate(el=>({blur:getComputedStyle(el).backdropFilter,radius:getComputedStyle(el).borderRadius}));
+    assert.match(material.blur,/blur/); assert.equal(material.radius,'18px');
+    await page.screenshot({path:path.join(output,'merchant-glass-dialog.png')});
+    await page.keyboard.press('Escape');
+  });
   await check('investment snapshot, allocation and desktop layout',async()=>{
-    await page.goto(base); await page.locator('#run:not([disabled])').waitFor();
+    await page.goto(base+'/investment'); await page.locator('#run:not([disabled])').waitFor();
     assert.match(await page.locator('#portfolio-total').innerText(),/31,080/);
     assert.equal(await page.locator('#allocation-legend li').count(),5);
     assert.equal(await page.locator('.workspace-switch [aria-current]').innerText(),'个人投资顾问\n01');
@@ -83,7 +139,7 @@ async function accessible() {
   });
   await check('failed investment initialization retries without page reload',async()=>{
     await page.route('**/api/demo/portfolio',route=>route.abort());
-    await page.goto(base); await page.locator('#retry-load:not([hidden])').waitFor();
+    await page.goto(base+'/investment'); await page.locator('#retry-load:not([hidden])').waitFor();
     assert.equal(await page.locator('#run').isDisabled(),true);
     await page.unroute('**/api/demo/portfolio'); await page.click('#retry-load');
     await page.locator('#run:not([disabled])').waitFor();
@@ -207,17 +263,17 @@ async function accessible() {
   for(const width of [320,390,768,1024,1440]) {
     await check('responsive layouts without page overflow at '+width+'px',async()=>{
       await page.setViewportSize({width,height:844});
-      for(const route of ['/investment','/merchant','/catalog']) {
+      for(const route of ['/','/investment','/merchant','/catalog']) {
         await page.goto(base+route);
         if(route==='/investment') await page.locator('#run:not([disabled])').waitFor();
         if(route==='/merchant') await page.locator('#quick-bills .bill-preview').first().waitFor();
         await noOverflow();
-        if(width===390) await screenshot(route.slice(1)+'-mobile',true);
+        if(width===390) await screenshot((route.slice(1)||'landing')+'-mobile',true);
       }
     });
   }
   await check('mobile investment and merchant actions remain operable',async()=>{
-    await page.setViewportSize({width:390,height:844}); await page.goto(base);
+    await page.setViewportSize({width:390,height:844}); await page.goto(base+'/investment');
     await page.locator('#run:not([disabled])').waitFor(); await page.click('#demo-profile'); await page.click('#run');
     await page.locator('#results:not([hidden])').waitFor(); await noOverflow();
     await screenshot('investment-results-mobile',true);
@@ -227,13 +283,13 @@ async function accessible() {
     await page.locator('#insights .insight').first().waitFor(); await noOverflow();
   });
   await check('keyboard skip link and explicit community destination',async()=>{
-    await page.goto(base); await page.keyboard.press('Tab');
+    await page.goto(base+'/investment'); await page.keyboard.press('Tab');
     assert.equal(await page.locator('.skip-link').evaluate(element=>element===document.activeElement),true);
     await page.keyboard.press('Enter');
     assert.equal(await page.locator('#main-content').evaluate(element=>element===document.activeElement),true);
     assert.equal(await page.locator('.community-card').getAttribute('href'),'https://kosx.ai/');
   });
-  for(const route of ['/investment','/merchant','/catalog']) await check('automated WCAG A/AA checks on '+route,async()=>{
+  for(const route of ['/','/investment','/merchant','/catalog']) await check('automated WCAG A/AA checks on '+route,async()=>{
     await page.goto(base+route);
     if(route==='/investment') await page.locator('#run:not([disabled])').waitFor();
     if(route==='/merchant') await page.locator('#quick-bills .bill-preview').first().waitFor();
