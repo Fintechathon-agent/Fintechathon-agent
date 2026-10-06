@@ -2,6 +2,10 @@
 :root { color-scheme: dark; --kosx-shell:ready; --accent: #ff6a00; --surface: #141414; --surface-raised: #1c1c1c; --sidebar-width: 226px; }
 body.investment-product, body.merchant-product, body.home-product { --paper:#0a0a0a; --ink:#f7f7f5; --muted:#a1a1a6; --green:#ff8b38; --pale:#25180f; --line:#2a2a2e; --red:#ff8d8d; --amber:#ffb347; background:var(--paper); color:var(--ink); font-family:Inter,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif; font-size:14px; }
 body { padding-left:var(--sidebar-width); }
+.error-product { padding-left:0; }
+.error-content { max-width:900px; padding:20vh 28px; }
+.hero-actions,.compact-hero>div,.allocation-legend span { min-width:0; }
+.product-stamp,.allocation-legend span,.cash-status,.cash-callout,.focus-card p,.insight h3 { overflow-wrap:anywhere; }
 button,a,input,select,textarea,summary { -webkit-tap-highlight-color:transparent; }
 a,button,summary { transition:background-color .18s,color .18s,border-color .18s; }
 a { text-underline-offset:4px; }

@@ -1,7 +1,7 @@
 import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip, feedback, busy } from './common.js';
 import { userError } from './ui-model.mjs';
 import { dateStatus, merchantOverview, priorityBills } from './presentation.mjs';
-let state, reminders, refreshSequence = 0, scenarioSequence = 0;
+let state, reminders, refreshSequence = 0, scenarioSequence = 0, lastEvidenceKey;
 const key = b => b.channel + ':' + b.id;
 const delay = () => Number($('#delay').value);
 const noticeStatuses = { open:'待处理', verified:'已核实', done:'已处理' };
@@ -110,6 +110,7 @@ document.addEventListener('click', async event=>{
       feedback('#page-feedback','正在读取账单来源…');
       try {
       const id=evidence.dataset.key, b=await api('/api/merchant/bill?id='+encodeURIComponent(id));
+      lastEvidenceKey=id;
       if(!state.viewed.includes(id)) state.viewed.push(id);
       $('#bill-title').textContent=b.id+' · '+b.category;
       const rows=[['原始来源',b.source],['渠道',b.channel],['说明',b.description],['记账日期',b.booked_on],['预计到账 / 到期日',b.due_on],['账单原额',money(b.amount_cents)],['平台扣费',money(b.fee_cents)],['退款',money(b.refund_cents)],[b.kind==='income'?'预计净收':'应付款',money(b.net_cents)],['余额口径',b.balance_effect]];
@@ -118,21 +119,30 @@ document.addEventListener('click', async event=>{
       feedback('#page-feedback','');
       } finally { evidence.disabled = false; }
     }
-    if(follow) { await api('/api/merchant/follow',{id:follow.dataset.id,delay:delay()}); await loadInsights(); }
+    if(follow) await busy(follow,'更新中…',async()=>{ await api('/api/merchant/follow',{id:follow.dataset.id,delay:delay()}); await loadInsights(); });
     if(noteSave) {
+      await busy(noteSave,'保存中…',async()=>{
       const box=noteSave.closest('.notice-note'), input=box?.querySelector('.notice-note-input'), select=noteSave.closest('.insight')?.querySelector('.notice-status');
       await api('/api/merchant/notice',{id:noteSave.dataset.id,status:select?.value || 'open',note:input?.value || ''});
       await loadInsights(); toast('处理备注已保存。');
+      });
     }
   } catch(e) { feedback('#page-feedback',e.message,'error');toast(e.message); }
 });
 document.addEventListener('change', async event=>{
   const select = event.target.closest('.notice-status');
   if (!select) return;
+  const previous=reminders?.notices.find(notice=>notice.id===select.dataset.id)?.status || 'open';
+  select.disabled=true;
   try { await api('/api/merchant/notice',{id:select.dataset.id,status:select.value}); await loadInsights(); toast('提醒状态已更新。'); }
-  catch (error) { toast(error.message); }
+  catch (error) { select.value=previous; feedback('#page-feedback',error.message,'error'); toast(error.message); }
+  finally { select.disabled=false; }
 });
 $('#close-dialog').onclick=()=>$('#bill-dialog').close();
+$('#bill-dialog').addEventListener('close',()=>{
+  const trigger=[...document.querySelectorAll('.evidence')].find(button=>button.dataset.key===lastEvidenceKey && button.getClientRects().length);
+  trigger?.focus({preventScroll:true});
+});
 $('#confirm').onchange=renderReview;
 $('#review').onclick=async()=>{
   await busy($('#review'),'正在核对…',async()=>{

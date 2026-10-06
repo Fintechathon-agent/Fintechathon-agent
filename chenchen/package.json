@@ -11,6 +11,11 @@
     "smoke": "node scripts/smoke.js",
     "test:ui": "node scripts/ui-check.cjs"
   },
-  "engines": { "node": ">=22" },
-  "devDependencies": { "playwright": "1.63.0" }
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "playwright": "1.63.0"
+  }
 }

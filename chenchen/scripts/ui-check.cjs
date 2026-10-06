@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
+const AxeBuilder = require('@axe-core/playwright').default;
 const { server } = require('../server');
 const output = path.resolve(process.env.UI_REPORT_DIR || path.join(__dirname, '../artifacts/ui'));
 const results = [];
@@ -31,6 +32,11 @@ async function noOverflow() {
   assert.ok(sizes.document<=sizes.viewport+1, JSON.stringify(sizes));
 }
 
+async function accessible() {
+  const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  assert.deepEqual(audit.violations.map(item=>({id:item.id,nodes:item.nodes.map(node=>node.target)})),[]);
+}
+
 (async()=>{
   fs.mkdirSync(output,{recursive:true});
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
@@ -51,6 +57,7 @@ async function noOverflow() {
     await page.click('#demo-profile'); await page.click('#run');
     await page.locator('#results:not([hidden])').waitFor();
     assert.equal(await page.locator('.plan-card').count(),3);
+    await accessible();
     await page.locator('.plan-card summary').first().click();
     assert.ok(await page.locator('.plan-card .weight-list').first().isVisible());
     await page.getByText('任务状态与工具证据',{exact:true}).click();
@@ -82,6 +89,20 @@ async function noOverflow() {
     await page.locator('#run:not([disabled])').waitFor();
     assert.match(await page.locator('#portfolio-total').innerText(),/31,080/);
   });
+  await check('in-flight investment result cannot overwrite changed input',async()=>{
+    let release;
+    const gate=new Promise(resolve=>{release=resolve;});
+    await page.route('**/api/health-check/run',async route=>{
+      const response=await route.fetch(); await gate; await route.fulfill({response});
+    });
+    try {
+      await page.click('#demo-profile'); await page.click('#run');
+      await page.fill('#horizon','900'); release();
+      await page.locator('#run:not([disabled])').waitFor();
+      assert.equal(await page.locator('#results').isVisible(),false);
+      assert.equal(await page.locator('#input-changed').isVisible(),true);
+    } finally { release(); await page.unroute('**/api/health-check/run'); }
+  });
   await check('merchant overview, review gate and bill source dialog',async()=>{
     await page.goto(base+'/merchant'); await page.locator('#quick-bills .bill-preview').first().waitFor();
     assert.match(await page.locator('#merchant-status').innerText(),/6,200/);
@@ -92,6 +113,7 @@ async function noOverflow() {
     assert.match(await page.locator('#bill-detail').innerText(),/原始来源/);
     await page.keyboard.press('Escape');
     assert.equal(await page.locator('#bill-dialog').isVisible(),false);
+    await page.waitForFunction(()=>document.querySelector('#quick-bills .evidence')===document.activeElement);
     await page.check('#confirm'); assert.equal(await page.locator('#review').isEnabled(),true);
     await page.click('#review'); await page.locator('#insights .insight').first().waitFor();
     assert.equal(await page.locator('#export-review').isEnabled(),true);
@@ -158,6 +180,30 @@ async function noOverflow() {
     await page.unroute('**/api/merchant/ledger*'); await page.click('#retry-load');
     await page.locator('#quick-bills .bill-preview').first().waitFor();
   });
+  await check('successful import followed by read failure is reported truthfully and can recover',async()=>{
+    const demo=await page.request.get(base+'/api/merchant/demo').then(response=>response.json());
+    demo.balance_cents=1234500;
+    demo.shop='测试店铺与很长的经营主体名称'.repeat(6);
+    await page.getByText('导入或恢复账单',{exact:true}).click();
+    await page.setInputFiles('#import-file',{name:'replacement.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(demo))});
+    await page.route('**/api/merchant/ledger*',route=>route.abort());
+    await page.click('#import'); await page.locator('#retry-load:not([hidden])').waitFor();
+    assert.match(await page.locator('#page-feedback').innerText(),/账单已导入/);
+    assert.match(await page.locator('#merchant-status').innerText(),/暂不可用/);
+    assert.equal(await page.locator('#export-review').isDisabled(),true);
+    await page.unroute('**/api/merchant/ledger*'); await page.click('#retry-load');
+    await page.locator('#quick-bills .bill-preview').first().waitFor();
+    assert.match(await page.locator('#merchant-status').innerText(),/12,345/);
+    await page.setViewportSize({width:320,height:844}); await noOverflow();
+    await page.setViewportSize({width:1440,height:1000});
+    page.once('dialog',dialog=>dialog.accept()); await page.click('#reset');
+    await page.waitForFunction(()=>document.querySelector('#merchant-status').textContent.includes('6,200'));
+  });
+  await check('missing page offers working recovery navigation',async()=>{
+    const response=await page.goto(base+'/missing-page'); assert.equal(response.status(),404);
+    await page.getByRole('link',{name:'进入店主工作台 →'}).click();
+    await page.locator('#quick-bills .bill-preview').first().waitFor();
+  });
   for(const width of [320,390,768,1024,1440]) {
     await check('responsive layouts without page overflow at '+width+'px',async()=>{
       await page.setViewportSize({width,height:844});
@@ -186,6 +232,18 @@ async function noOverflow() {
     await page.keyboard.press('Enter');
     assert.equal(await page.locator('#main-content').evaluate(element=>element===document.activeElement),true);
     assert.equal(await page.locator('.community-card').getAttribute('href'),'https://kosx.ai/');
+  });
+  for(const route of ['/investment','/merchant','/catalog']) await check('automated WCAG A/AA checks on '+route,async()=>{
+    await page.goto(base+route);
+    if(route==='/investment') await page.locator('#run:not([disabled])').waitFor();
+    if(route==='/merchant') await page.locator('#quick-bills .bill-preview').first().waitFor();
+    await accessible();
+  });
+  await check('merchant dialog automated accessibility and Escape focus recovery',async()=>{
+    await page.goto(base+'/merchant'); await page.locator('#quick-bills .evidence').first().click();
+    await page.locator('#bill-dialog[open]').waitFor(); await accessible();
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(()=>document.querySelector('#quick-bills .evidence')===document.activeElement);
   });
   await check('no uncaught browser exceptions',async()=>assert.deepEqual(errors,[]));
 })().catch(error=>{ console.error(error); process.exitCode=1; }).finally(async()=>{
