@@ -137,11 +137,18 @@ async function accessible() {
     await page.goto(base+'/investment'); await page.locator('#run:not([disabled])').waitFor();
     assert.match(await page.locator('#portfolio-total').innerText(),/31,080/);
     assert.equal(await page.locator('#allocation-legend li').count(),5);
+    assert.equal(await page.locator('#portfolio-editor').isVisible(),false);
+    assert.equal(await page.locator('#portfolio-json').isVisible(),false);
     assert.equal(await page.locator('.workspace-switch [aria-current]').innerText(),'个人投资顾问\n01');
     await noOverflow(); await screenshot('investment-desktop');
   });
   await check('investment diagnosis, candidate details, evidence and JSON export',async()=>{
-    await page.click('#demo-profile'); await page.click('#run');
+    await page.click('#demo-profile');
+    const expected=(await page.request.get(base+'/api/demo/portfolio').then(r=>r.json())).output.snapshot;
+    const sent=page.waitForRequest(request=>request.url().endsWith('/api/health-check/run'));
+    await page.click('#run');
+    const payload=(await sent).postDataJSON();
+    assert.deepEqual(payload.portfolio,{portfolio_id:expected.portfolio_id,as_of:expected.as_of,cash:expected.cash,positions:expected.positions.map(({instrument_id,type,quantity,price,name,sector})=>({instrument_id,type,quantity,price,name,sector}))});
     await page.locator('#results:not([hidden])').waitFor();
     assert.equal(await page.locator('.plan-card').count(),3);
     await accessible();
@@ -160,13 +167,20 @@ async function accessible() {
     assert.equal(await page.locator('#results').isVisible(),false);
     assert.equal(await page.locator('#input-changed').isVisible(),true);
   });
-  await check('invalid JSON keeps input and shows a persistent recovery message',async()=>{
-    await page.getByText('替换组合 JSON',{exact:true}).click();
-    await page.fill('#portfolio-json','{broken'); await page.click('#run');
-    await page.locator('#run-feedback[data-state="error"]').waitFor();
-    assert.match(await page.locator('#run-feedback').innerText(),/JSON 格式/);
-    assert.equal(await page.locator('#portfolio-json').inputValue(),'{broken');
-    assert.equal(await page.locator('#run').isEnabled(),true);
+  await check('failed diagnosis preserves inputs and can retry with the hidden portfolio',async()=>{
+    const originalPortfolio=await page.locator('#portfolio-json').inputValue();
+    await page.route('**/api/health-check/run',route=>route.abort());
+    try {
+      await page.click('#run');
+      await page.locator('#run-feedback[data-state="error"]').waitFor();
+      assert.match(await page.locator('#run-feedback').innerText(),/连接/);
+      assert.equal(await page.locator('#portfolio-json').inputValue(),originalPortfolio);
+      assert.equal(await page.locator('#horizon').inputValue(),'730');
+      assert.equal(await page.locator('#run').isEnabled(),true);
+    } finally { await page.unroute('**/api/health-check/run'); }
+    await page.click('#run'); await page.locator('#results:not([hidden])').waitFor();
+    assert.equal(await page.locator('.plan-card').count(),3);
+    assert.equal(await page.locator('#portfolio-editor').isVisible(),false);
   });
   await check('failed investment initialization retries without page reload',async()=>{
     await page.route('**/api/demo/portfolio',route=>route.abort());
