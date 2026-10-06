@@ -30,6 +30,23 @@ test('C includes the price path of a new bond holding even when the original por
   const curve=tools.runSimulation(p,candidates).output.comparisons[3].curve;
   assert.equal(curve[0].value,1);assert.ok(curve.every(p=>Number.isFinite(p.value)));
 });
+test('extreme concentration and zero cash still produce auditable plans',()=>{
+  for(const change of [
+    p=>{p.cash=0},
+    p=>{p.cash=0;p.positions.find(position=>position.instrument_id==='ETF_GROWTH').quantity=300}
+  ]){
+    const p=tools.getDemoPortfolio();change(p);delete p.total_value;
+    const run=new Harness().runHealthCheck({risk_profile:profile,portfolio:p});
+    assert.equal(run.task_state.status,'HANDOFF_REQUIRED');
+    assert.deepEqual(run.artifacts.candidates.map(candidate=>candidate.plan_id),['A','B','C']);
+    for(const candidate of run.artifacts.candidates){
+      assert.equal(candidate.validation.valid,true);
+      assert.ok(candidate.turnover<=candidate.constraints.max_turnover+1e-6);
+      const maxSecurityWeight=Math.max(...Object.entries(candidate.target_weights).filter(([id])=>id!=='CASH').map(([,weight])=>weight));
+      assert.ok(maxSecurityWeight<=candidate.constraints.max_single_asset_weight+1e-6);
+    }
+  }
+});
 test('stale or fabricated health reports do not influence strategy generation',()=>{
   const p=tools.validatePortfolio().output.snapshot,r=tools.diagnosePortfolio(p).output;
   r.hidden_clusters=[];assert.throws(()=>tools.generateCandidates(p,r),{code:'INVALID_REPORT'});
