@@ -6,9 +6,9 @@
 
 | 场景 | 本机运行入口 | 临时在线演示 |
 |---|---|---|
-| 投资 | http://127.0.0.1:4176/ | https://paint-commit-cinema-else.trycloudflare.com/ |
-| 店主 | http://127.0.0.1:4176/merchant | https://paint-commit-cinema-else.trycloudflare.com/merchant |
-| 产品导航 | http://127.0.0.1:4176/catalog | https://paint-commit-cinema-else.trycloudflare.com/catalog |
+| 投资 | http://127.0.0.1:4176/ | https://newbie-decade-entire-collectibles.trycloudflare.com/ |
+| 店主 | http://127.0.0.1:4176/merchant | https://newbie-decade-entire-collectibles.trycloudflare.com/merchant |
+| 产品导航 | http://127.0.0.1:4176/catalog | https://newbie-decade-entire-collectibles.trycloudflare.com/catalog |
 
 本机 `4176` 为本次独立演示进程；普通启动默认 `4175`。临时链接依赖这台电脑、服务和 Cloudflare 隧道持续运行，关机或停止隧道后失效，不等于固定域名或长期部署。网页查询工具无法读取该临时域名，本轮通过 HTTPS 实际请求与浏览器流程验证成功。
 
@@ -63,3 +63,5 @@
 账户、交易、金融计算边界与原系统一致：虚构固定价格、短样本、规则候选、交易接口关闭、会话内存状态。重启会清空账本和备注，先导出保存。没有绑定固定域名、建立真实登录、支付、银行接口或持久化数据库。
 
 KOSX 样式可在 `versions/kosx.css` 调整；业务脚本继续使用原页面元素和接口。`core/`、`tools/financial-tools.js`、`merchant/ledger.js` 均未修改。
+
+2026-10-06 恢复验收：首次临时链接因进程停止失效，已换成上表的新地址。公开预览固定运行于 v0.11.0 发布快照；后续展示首页开发不会修改这一版界面。
