@@ -13,6 +13,8 @@ const output=path.resolve(__dirname,'../../screenshots');
       const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
       await page.goto(base);
       const cards=page.locator('.feature-card'),buttons=page.locator('.liquid-vessel');
+      // Physical clicks must not wait for a moving pan to become stable.
+      const pour=async count=>{for(let i=0;i<count;i++){const r=await buttons.first().boundingBox();await page.mouse.click(r.x+r.width/2,r.y+r.height/2);await page.waitForTimeout(70);}};
       const show=async i=>page.evaluate(i=>{const r=document.querySelectorAll('.feature-card')[i].getBoundingClientRect();scrollTo({top:scrollY+r.top-120,behavior:'instant'});},i);
       await show(0);
       await page.waitForFunction(()=>document.querySelector('.feature-card').dataset.phase==='intro');
@@ -28,15 +30,16 @@ const output=path.resolve(__dirname,'../../screenshots');
         await show(1);
       }
       await page.waitForFunction(()=>[...document.querySelectorAll('.feature-card')].every(e=>e.dataset.ready==='true'),{},{timeout:15000});
+      await page.waitForFunction(()=>!document.querySelector('.balance-coin')||document.querySelector('.feature-grid').dataset.tossPhase==='rest',null,{timeout:65000});
       await page.waitForFunction(()=>Math.abs(Number(document.querySelector('.feature-grid').dataset.theta))<.03);
       await show(0);
-      for(let i=0;i<3;i++)await buttons.first().click();
+      await pour(3);
       await page.waitForFunction(()=>Number(document.querySelector('.feature-card').dataset.level)>.57);
       await page.waitForFunction(()=>Number(document.querySelector('.feature-grid').dataset.theta)>3);
       await show(0);await page.waitForTimeout(100);
       if(width===1440)await page.screenshot({path:path.join(output,'feature-balance-tilt-desktop.png')});
       if(width===375)await page.screenshot({path:path.join(output,'feature-balance-mobile.png')});
-      for(let i=0;i<6;i++)await buttons.first().click();
+      await pour(6);
       await page.waitForFunction(()=>Number(document.querySelector('.feature-card').dataset.level)>=.999);
       assert.equal(await buttons.first().getAttribute('aria-disabled'),'true');
       assert.match(await buttons.first().getAttribute('aria-label'),/已满/);
@@ -44,7 +47,8 @@ const output=path.resolve(__dirname,'../../screenshots');
       assert.equal(Number(await cards.first().getAttribute('data-pending')),0,'full rejects new drops');
       assert.equal(Number(await cards.first().getAttribute('data-level')),1);
       const url=page.url();assert.equal(new URL(url).pathname,'/','pour does not navigate');
-      await page.waitForFunction(()=>Number(document.querySelector('.feature-card').dataset.level)<=.34001,{},{timeout:25000});
+      try { await page.waitForFunction(()=>Number(document.querySelector('.feature-card').dataset.level)<=.34001,{},{timeout:25000}); }
+      catch(error) { console.error('Drain state',width,await cards.evaluateAll(es=>es.map(e=>({...e.dataset}))));throw error; }
       await page.waitForFunction(()=>Math.abs(Number(document.querySelector('.feature-grid').dataset.theta))<.02);
       assert.equal(await buttons.first().getAttribute('aria-disabled'),'false');
       await page.waitForFunction(()=>document.querySelector('.feature-grid').dataset.motion==='breathing',{},{timeout:12000});

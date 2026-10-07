@@ -18,6 +18,7 @@ const output=path.resolve(__dirname,'../../screenshots');
       await show(0);
       await page.waitForFunction(()=>document.querySelector('.feature-card').dataset.ready==='true',{},{timeout:18000});
       if(width===375){await show(1);await page.waitForFunction(()=>[...document.querySelectorAll('.feature-card')].every(e=>e.dataset.ready==='true'),{},{timeout:15000});await show(0);}
+      await page.waitForFunction(()=>!document.querySelector('.balance-coin')||document.querySelector('.feature-grid').dataset.tossPhase==='rest',null,{timeout:65000});
       await page.waitForFunction(()=>document.querySelector('.feature-grid').dataset.motion==='breathing');
       await page.waitForTimeout(1600);
       assert.equal(await page.locator('.liquid-water').first().evaluate(e=>getComputedStyle(e).opacity),'0.6');
