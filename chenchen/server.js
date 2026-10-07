@@ -48,7 +48,7 @@ function sendError(response, error, fallbackStatus = 400) {
     message: error.message,
     details: error.details || null
   }};
-  if (error.code === "INVALID_CONTRACT") {
+  if (error.requestId) {
     payload.contract_version = contract.CONTRACT_VERSION;
     payload.operation = contract.OPERATION;
     payload.request_id = error.requestId || null;

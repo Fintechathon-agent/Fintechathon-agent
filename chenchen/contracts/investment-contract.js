@@ -171,6 +171,10 @@ function assertHealthCheckResponse(response) {
   return assertAgainst("HealthCheckResponse", response);
 }
 
+function assertHealthCheckError(response) {
+  return assertAgainst("HealthCheckErrorResponse", response);
+}
+
 module.exports = {
   CONTRACT_VERSION,
   OPERATION,
@@ -179,5 +183,6 @@ module.exports = {
   createRequest,
   assertHealthCheckRequest,
   buildResponse,
-  assertHealthCheckResponse
+  assertHealthCheckResponse,
+  assertHealthCheckError
 };

@@ -96,6 +96,26 @@
         }
       }
     },
+    "HealthCheckErrorResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_version", "request_id", "operation", "error"],
+      "properties": {
+        "contract_version": { "const": "investment-agent.v1" },
+        "request_id": { "type": ["string", "null"] },
+        "operation": { "const": "PORTFOLIO_HEALTH_CHECK" },
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message"],
+          "properties": {
+            "code": { "type": "string" },
+            "message": { "type": "string" },
+            "details": {}
+          }
+        }
+      }
+    },
     "TaskState": {
       "type": "object",
       "additionalProperties": true,

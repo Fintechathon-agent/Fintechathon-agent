@@ -38,3 +38,13 @@ test("contract rejects the old unversioned bare request", () => {
     portfolio: tools.getDemoPortfolio()
   }), error => error.code === "INVALID_CONTRACT" && error.details.issues.some(issue => issue.path.endsWith(".contract_version")));
 });
+
+test("contract keeps investment errors traceable", () => {
+  const error = contract.assertHealthCheckError({
+    contract_version: contract.CONTRACT_VERSION,
+    request_id: "req-contract-error-001",
+    operation: contract.OPERATION,
+    error: { code: "INVALID_CONTRACT", message: "request shape is invalid", details: { field: "contract_version" } }
+  });
+  assert.equal(error.request_id, "req-contract-error-001");
+});
