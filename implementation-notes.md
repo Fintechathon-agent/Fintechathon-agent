@@ -264,3 +264,9 @@
 - 首页第二次尝试的 explore / liquid / landing 三尺寸检查全部通过，附加 static-check 出现一次 404。按规则暂存补丁并撤回首页未提交代码，先独立修复静态入口。
 - 隔离实验将入口跳转延迟 2 秒，稳定复现浏览器请求 /favicon.ico 返回 404；原因是生成的 index.html 没有 icon 声明，与首页液体逻辑无关。
 - build-static 为跳转入口显式引用已有 versions/favicon.svg；static-check 延迟入口跳转 1 秒并记录报错 URL，防止偶发漏测。check / 46项 test / smoke / 静态三尺寸流程全部通过（artifacts/overnight/static-icon-final.json）。没有忽略 404 或放宽错误检查。
+
+### 夜间阶段 1 · 恢复后完成
+- 外接 F: 盘重新连接后核对原工作区；未建立替代仓库，也未覆盖未提交文件。远程起点仍为 0349012ca2abc48096c1ac2e7e8019750fa55623。
+- 上次中断前的 stage1-final.json 已完整落盘：check、46 项 test、smoke、explore / liquid / landing / static 三尺寸及 catalog 旧基线全部通过。本次核对八项退出码均为 0。
+- 标题安静区、立即全亮响应、1.2 秒降权、0.6px / 3.6 秒呼吸、手机常驻提示已完成；没有改变容器尺寸、首屏标题和业务逻辑。活动响应采用立即切换，满足 200ms 内恢复，避免采样时序的不稳定。
+- 截图：screenshots/explore-quiet-{desktop,mobile}.png；其余首屏 / 侧币 / 液体截图随验收刷新。此前失败历史保留，当前以这次通过结果为准。

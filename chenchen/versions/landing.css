@@ -43,9 +43,10 @@ h1>span,.story-next>p:nth-child(2)>span { white-space:nowrap; }
 .scene-count { margin-left:auto; }
 .scene-count b { padding:0 14px; font-weight:400; }
 .explore-section { position:relative; isolation:isolate; overflow:hidden; padding:95px 8% 50px; background:var(--canvas); border-top:1px solid #b8ada036; scroll-margin-top:0; outline-offset:-5px; }
-.section-heading { display:flex; justify-content:space-between; align-items:end; margin-bottom:40px; gap:24px; }
+.section-heading { position:relative; isolation:isolate; display:flex; justify-content:space-between; align-items:center; margin-bottom:54px; gap:32px; padding:28px 32px; border:1px solid #b8ada040; border-radius:var(--radius-panel); background:rgb(20 18 16 / 88%); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur)); box-shadow:inset 0 1px 0 #f3dfbf12,0 0 20px #0003; }
+.section-heading::before { content:""; position:absolute; inset:-12px; z-index:-1; background:rgb(11 10 9 / 50%); border-radius:24px; pointer-events:none; }
 h2 { font-size:var(--text-title); font-weight:600; line-height:1.4; margin:15px 0 0; }
-.section-heading>p { color:var(--text-secondary); margin:0; }
+.section-heading>p { color:var(--text-secondary); margin:0; max-width:360px; flex:1; }
 .feature-grid { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:28px; }
 .feature-card { position:relative; border-radius:var(--radius-panel); padding:32px; min-width:0; overflow:hidden; transition:border-color var(--motion-duration) var(--motion-ease),transform var(--motion-duration) var(--motion-ease); }
 .feature-card:hover,.feature-card:focus-within { border-color:#ddd0b8; }
@@ -85,7 +86,7 @@ footer p { text-align:center; }
  .scene-bottom { bottom:25px; left:7%; right:7%; gap:12px; font-size:12px; }
  .scene-count { display:none; }
  .explore-section { padding:85px 20px 25px; }
- .section-heading { display:block; }
+ .section-heading { display:block; padding:24px 20px; }
  .section-heading>p { margin-top:20px; }
  .feature-grid { grid-template-columns:1fr; gap:22px; }
  .feature-card { padding:24px; }
@@ -106,7 +107,8 @@ footer p { text-align:center; }
 .liquid-vessel { position:absolute; left:38%; right:0; top:25%; bottom:25%; width:62%; padding:0; border:1px solid #b8ada070; border-radius:0; background:transparent; color:inherit; cursor:pointer; transform-origin:center; touch-action:manipulation; }
 .liquid-vessel:focus-visible { outline:2px solid var(--text-primary); outline-offset:5px; }
 .liquid-vessel[aria-disabled=true] { cursor:not-allowed; }
-.liquid-water { display:block; width:100%; height:100%; }
+.liquid-water { display:block; width:100%; height:100%; opacity:.6; transition:opacity 1.2s linear; }
+.feature-card[data-liquid-active=true] .liquid-water { opacity:1; transition-duration:0s; }
 .liquid-drops { position:absolute; left:0; top:-20px; width:100%; height:calc(100% + 20px); pointer-events:none; }
 .balance-caption { align-self:flex-end; display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; padding-bottom:7px; color:var(--text-secondary); font:12px/1.4 Consolas,monospace; }
 .archive-diagram>span { position:absolute; left:0; top:28px; pointer-events:none; }
@@ -116,5 +118,7 @@ footer p { text-align:center; }
 .balance-beam { position:absolute; left:10%; right:10%; top:-23px; height:1px; pointer-events:none; }
 .balance-beam i { position:absolute; inset:0; background:#b8ada070; transform:rotate(var(--beam-angle,0deg)); }
 .balance-beam span { position:absolute; left:calc(50% - 4px); top:5px; width:8px; height:8px; border:1px solid #b8ada080; transform:rotate(45deg); }
-@media(max-width:700px) { .balance-beam { display:none; }.feature-card:not([data-full=true]) .pour-hint { display:none; } }
-@media(prefers-reduced-motion:reduce) { .pour-hint { transition:none; } }
+@media(max-width:700px) { .balance-beam { display:none; } }
+.pour-hint .hint-cn { display:none; }
+@media(hover:none) { .feature-card[data-ready=true] .pour-hint { opacity:1; }.pour-hint .hint-cn { display:block; }.pour-hint .hint-en { display:block; } }
+@media(prefers-reduced-motion:reduce) { .pour-hint,.liquid-water { transition:none; } }

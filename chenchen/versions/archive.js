@@ -100,9 +100,9 @@ export function initLiquidBalance(grid) {
   const dark = colors.getPropertyValue('--brand-shadow').trim();
   const pans = [...grid.querySelectorAll('.feature-card')].map((card,index) => {
     const button=card.querySelector('.liquid-vessel'), diagram=card.querySelector('.archive-diagram');
-    return {card,button,diagram,index,label:button.getAttribute('aria-label'),water:button.querySelector('canvas'),dropsCanvas:diagram.querySelector('.liquid-drops'),hint:card.querySelector('.pour-hint'),level:reduced.matches?options.baseLevel:0,drops:[],wave:new Float64Array(40),velocity:new Float64Array(40),visible:false,started:reduced.matches,done:reduced.matches,age:0,emitted:0,delay:0,w:1,h:1,dw:1,dh:1,shake:0,lastInput:-Infinity,hintUntil:0};
+    return {card,button,diagram,index,label:button.getAttribute('aria-label'),water:button.querySelector('canvas'),dropsCanvas:diagram.querySelector('.liquid-drops'),hint:card.querySelector('.pour-hint'),level:reduced.matches?options.baseLevel:0,drops:[],wave:new Float64Array(40),velocity:new Float64Array(40),visible:false,started:reduced.matches,done:reduced.matches,age:0,emitted:0,delay:0,w:1,h:1,dw:1,dh:1,shake:0,lastInput:-Infinity,hintUntil:0,activeUntil:0,full:null};
   });
-  let frame=0, timer=0, previous=0, theta=0, angularVelocity=0, recovery=1, clock=0;
+  let frame=0, timer=0, previous=0, theta=0, angularVelocity=0, recovery=1, clock=0, breathing=false;
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const pending=p=>p.drops.reduce((n,d)=>n+d.volume,0);
   const hasView=()=>!document.hidden && pans.some(p=>p.visible);
@@ -123,7 +123,7 @@ export function initLiquidBalance(grid) {
     const attenuation=p.level>.82?clamp((1-p.level)/.18,0,1):1;
     const column=clamp(Math.round(x/p.w*39),0,39);
     const rotation=-theta*Math.PI/180;
-    return p.h*(1-p.level) + attenuation*(-(x-p.w/2)*Math.tan(rotation)+p.wave[column]);
+    return p.h*(1-p.level) + attenuation*(-(x-p.w/2)*Math.tan(rotation)+p.wave[column]+(breathing&&!reduced.matches?.6*Math.sin(clock*Math.PI*2/3.6+x/p.w*Math.PI*2):0));
   }
   function sync(p) {
     const full=p.level+pending(p)>=.999;
@@ -133,7 +133,8 @@ export function initLiquidBalance(grid) {
     p.card.dataset.phase=!p.started?'waiting':p.done?'ready':'intro';
     p.button.setAttribute('aria-disabled',String(full));
     p.button.setAttribute('aria-label',p.label+(full?'（已满）':''));
-    p.hint.textContent=full?'FULL':'TAP TO POUR';
+    if(p.full!==full){p.hint.innerHTML=full?'FULL':'<span class="hint-cn">点一下注入</span><span class="hint-en">TAP TO POUR</span>';p.full=full;}
+    p.card.dataset.liquidActive=String(p.started&&!p.done || p.drops.length>0 || p.shake>0 || clock<p.activeUntil);
   }
   function draw() {
     grid.style.setProperty('--beam-angle',(-theta)+'deg');grid.dataset.theta=theta.toFixed(4);
@@ -199,7 +200,7 @@ export function initLiquidBalance(grid) {
         const dx=d.x*p.dw-cx,dy=d.y-cy;
         const x=cos*dx+sin*dy+p.w/2,y=-sin*dx+cos*dy+p.h/2;
         if(y>=surface(p,clamp(x,0,p.w)) && x>=0&&x<=p.w || d.y>p.dh){
-          p.level=Math.min(options.maxLevel,p.level+d.volume);
+          p.level=Math.min(options.maxLevel,p.level+d.volume);p.activeUntil=clock+.3;
           const column=clamp(Math.round(x/p.w*39),1,38);p.velocity[column]+=Math.min(80,d.v*.12);p.velocity[column-1]+=15;p.velocity[column+1]+=15;
           return false;
         }return true;
@@ -226,8 +227,10 @@ export function initLiquidBalance(grid) {
     }
     const moving=pans.some(p=>p.visible&&(p.drops.length||p.started&&!p.done||p.shake>0||p.level>options.baseLevel+.00001&&clock-p.lastInput>=options.settleDelay||p.wave.some((v,i)=>Math.abs(v)>.015||Math.abs(p.velocity[i])>.03)))||Math.abs(theta-target)>.002||Math.abs(angularVelocity)>.004||!intro&&recovery<1;
     if(!moving){theta=target;angularVelocity=0;for(const p of pans){p.wave.fill(0);p.velocity.fill(0);}}
+    breathing=!moving&&!reduced.matches&&pans.some(p=>p.visible&&p.done);
+    grid.dataset.motion=moving?'active':breathing?'breathing':'still';
     draw();
-    if(moving){frame=requestAnimationFrame(tick);}
+    if(moving||breathing){frame=requestAnimationFrame(tick);}
     else {
       grid.dataset.running='false';
       const waits=pans.filter(p=>p.visible).flatMap(p=>[p.level>options.baseLevel+.00001?Math.max(.01,options.settleDelay-(clock-p.lastInput)):Infinity,p.hintUntil>clock?p.hintUntil-clock:Infinity]);
@@ -238,7 +241,9 @@ export function initLiquidBalance(grid) {
   for(const p of pans) p.button.addEventListener('click',event=>{
     event.preventDefault();
     if(!p.done||!narrow.matches&&inIntro())return;
-    p.lastInput=clock;
+    p.lastInput=clock;p.activeUntil=clock+.5;
+    // Respond during the input event, before the next physics frame.
+    sync(p);
     const available=options.maxLevel-p.level-pending(p);
     if(available<=.001){p.shake=.25;draw();wake();return;}
     const volume=Math.min(options.pour,available);

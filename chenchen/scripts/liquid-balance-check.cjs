@@ -47,7 +47,7 @@ const output=path.resolve(__dirname,'../../screenshots');
       await page.waitForFunction(()=>Number(document.querySelector('.feature-card').dataset.level)<=.34001,{},{timeout:25000});
       await page.waitForFunction(()=>Math.abs(Number(document.querySelector('.feature-grid').dataset.theta))<.02);
       assert.equal(await buttons.first().getAttribute('aria-disabled'),'false');
-      await page.waitForFunction(()=>document.querySelector('.feature-grid').dataset.running==='false',{},{timeout:12000});
+      await page.waitForFunction(()=>document.querySelector('.feature-grid').dataset.motion==='breathing',{},{timeout:12000});
       const geometry=await page.evaluate(()=>{
         const cards=[...document.querySelectorAll('.feature-card')],vessels=cards.map(c=>c.querySelector('.liquid-vessel').getBoundingClientRect());
         return {overflow:document.documentElement.scrollWidth>innerWidth+1,aligned:Math.abs(vessels[0].top-vessels[1].top)<1,overlap:cards.some(c=>{const h=c.querySelector('.pour-hint'),b=c.querySelector('.balance-caption b'),hr=h.getBoundingClientRect(),br=b.getBoundingClientRect();return getComputedStyle(h).display!=='none'&&hr.right>br.left;}),dpr:[...document.querySelectorAll('.liquid-water')].every(c=>c.width<=c.clientWidth*2+1)};
