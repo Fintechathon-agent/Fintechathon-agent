@@ -9,7 +9,9 @@
     "check": "node scripts/check.js",
     "test": "node --test",
     "smoke": "node scripts/smoke.js",
-    "test:ui": "node scripts/ui-check.cjs"
+    "test:ui": "node scripts/ui-check.cjs",
+    "build:static": "node scripts/build-static.cjs",
+    "test:static": "node scripts/static-check.cjs"
   },
   "engines": {
     "node": ">=22"

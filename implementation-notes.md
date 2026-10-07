@@ -238,3 +238,10 @@
 - 第一步账单、第二步现金、第三步成本可点击定位并滚动跟随；现金与成本改为纵向；去除重复页头状态横栏。骨架、元信息和中性控件与投资页一致。
 - 金额、接口、账单核对门槛未改；确认来源后才生成提醒。check / 46项 test / smoke、两工作台三尺寸完整检查、35组既有UI、catalog旧基线全部通过。日志 artifacts/overnight/stage3b-final.json。
 - 截图 screenshots/merchant-data-{desktop,mobile}.png 已检查，工作台无品牌橙，风险 / 弹窗 / 操作按优先级唯一高亮。
+
+### 夜间阶段 4 · 静态演示构建
+- 店主页 d96adfd15a9e7cb2fe45f522ebb88ff3fab09b02 已推送并核对远程一致。
+- 新增 scripts/build-static.cjs、scripts/static-check.cjs；package.json 增加 build:static / test:static；chenchen/.gitignore 忽略 dist-static；README 说明构建、托管与会话边界。
+- 构建包装原 Harness / MemoryStore / financial-tools / MerchantSession / 演示 JSON，直接提取 server.js 的 API 路由与错误响应，不改后端源码。同步 SHA-256 覆盖中文、emoji、块边界与长文本，结果与 node:crypto 一致。
+- 验证：check / 46项 test / smoke 全通过；静态站点 1440/1024/375 两流程、¥31,080.00 / ¥6,200.00、模拟输出逐字段一致、账单预测一致、子目录相对路径、导出 JSON、400/404/413/503、无控制台错误和无API网络请求均通过；catalog旧基线不变。日志 artifacts/overnight/stage4.json、artifacts/static/report.json。
+- 静态页面不依赖 Node 后端；构建时需要 Node，托管仍需 HTTP(S) 服务，不能直接 file:// 双击模块页面。数据仅当前页面内存，刷新重置；不提供真实账户、跨设备持久化或自动部署。
