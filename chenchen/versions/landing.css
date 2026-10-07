@@ -52,8 +52,10 @@ h2 { font-size:var(--text-title); font-weight:600; line-height:1.4; margin:15px 
 .feature-card:hover,.feature-card:focus-within { border-color:#ddd0b8; }
 .card-top { height:40px; border-bottom:1px solid #b8ada036; padding-bottom:12px; display:flex; align-items:center; justify-content:space-between; color:var(--text-secondary); font:var(--text-meta) Consolas,monospace; letter-spacing:1px; }
 .feature-icon { width:28px; height:28px; display:grid; place-content:center; flex:none; font:24px 'Segoe UI',sans-serif; }
-.archive-diagram { position:relative; height:160px; display:flex; align-items:center; margin:20px 0; color:#d0c2ad70; border-bottom:1px solid #b8ada036; }
-.archive-diagram>span { font:100px/1 Consolas,monospace; letter-spacing:-10px; }
+.archive-diagram { position:relative; container-type:inline-size; height:160px; display:flex; align-items:center; margin:20px 0; color:#d0c2ad70; border-bottom:1px solid #b8ada036; }
+.archive-diagram>span { font:100px/1 Consolas,monospace; letter-spacing:-.1em; }
+/* The number scales with its card so wide fallback fonts never run under the pan. */
+.archive-diagram>span { font-size:min(100px,27cqi); }
 
 
 .feature-card h3 { font-size:var(--text-title); font-weight:600; margin:18px 0; }
@@ -88,8 +90,8 @@ footer p { text-align:center; }
  .explore-section { padding:85px 20px 25px; }
  .section-heading { display:block; padding:24px 20px; }
  .section-heading>p { margin-top:20px; }
- .feature-grid { grid-template-columns:1fr; gap:22px; }
- .feature-card { padding:24px; }
+ .feature-grid { gap:10px; }
+ .feature-card { padding:20px 12px 14px; } /* clears the coin channel above the card label */
  .card-top { font-size:12px; letter-spacing:0; }
  .method-strip { gap:10px; font-size:13px; flex-wrap:wrap; }
  .method-strip b { margin-right:4px; }
@@ -121,7 +123,22 @@ footer p { text-align:center; }
 .balance-coin { position:absolute; top:0; left:0; width:54px; height:54px; pointer-events:none; opacity:0; z-index:3; will-change:transform; transition:opacity 160ms linear; }
 .balance-coin svg { display:block; width:100%; height:100%; }
 @media(max-width:700px) { .balance-coin { width:38px; height:38px; } }
-@media(max-width:700px) { .balance-beam { display:none; } }
+/* Phones keep the desktop balance: two pans side by side under one beam. */
+@media(max-width:700px) {
+ .feature-card .card-top { font-size:10px; align-items:flex-start; }
+ .feature-card .card-top>span:first-child { max-width:54%; line-height:1.35; }
+ .feature-card .feature-icon { display:none; }
+ .feature-card .archive-diagram { height:120px; margin:12px 0; }
+ .feature-card .archive-diagram>span { top:14px; }
+ .feature-card .liquid-vessel { left:46%; width:54%; top:14px; bottom:auto; height:52px; }
+ .feature-card .balance-caption { font-size:10px; padding-bottom:5px; }
+ .feature-card .balance-caption b { display:none; }
+ .feature-card h3 { font-size:17px; margin:12px 0 8px; }
+ .feature-card>p { font-size:12.5px; line-height:1.65; margin:0; }
+ .feature-card ul { gap:6px; margin:14px 0; }
+ .feature-card li { font-size:11px; padding:4px 7px; }
+ .feature-card .feature-link { font-size:13.5px; padding-top:12px; }
+}
 .pour-hint .hint-cn { display:none; }
 @media(hover:none) { .feature-card[data-ready=true] .pour-hint { opacity:1; }.pour-hint .hint-cn { display:block; }.pour-hint .hint-en { display:block; } }
 @media(prefers-reduced-motion:reduce) { .pour-hint,.liquid-water,.balance-coin { transition:none; } }

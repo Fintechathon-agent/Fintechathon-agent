@@ -24,11 +24,6 @@ const output=path.resolve(__dirname,'../../screenshots');
       assert(Number(await cards.first().getAttribute('data-level'))>0,'left stream');
       assert.equal(Number(await cards.nth(1).getAttribute('data-level')),0,'left before right');
       if(width===1440)await page.screenshot({path:path.join(output,'feature-balance-intro-desktop.png')});
-      if(width===375){
-        assert.equal(await cards.nth(1).getAttribute('data-phase'),'waiting','stacked independent intro');
-        await page.waitForFunction(()=>document.querySelector('.feature-card').dataset.ready==='true');
-        await show(1);
-      }
       await page.waitForFunction(()=>[...document.querySelectorAll('.feature-card')].every(e=>e.dataset.ready==='true'),{},{timeout:15000});
       await page.waitForFunction(()=>!document.querySelector('.balance-coin')||document.querySelector('.feature-grid').dataset.tossPhase==='rest',null,{timeout:65000});
       await page.waitForFunction(()=>Math.abs(Number(document.querySelector('.feature-grid').dataset.theta))<.03);
@@ -37,6 +32,14 @@ const output=path.resolve(__dirname,'../../screenshots');
       await page.waitForFunction(()=>Number(document.querySelector('.feature-card').dataset.level)>.57);
       await page.waitForFunction(()=>Number(document.querySelector('.feature-grid').dataset.theta)>3);
       await show(0);await page.waitForTimeout(100);
+      // Tilted pans must stay clear of the big number and the caption on every width.
+      // Phones without Consolas fall back to wide fonts (seen on a real Android WebView), so test a wide face too.
+      const clash=await page.evaluate(()=>['',"Verdana,'DejaVu Sans',sans-serif"].flatMap(face=>{for(const n of document.querySelectorAll('.archive-diagram>span')){n.style.fontFamily=face;n.style.fontWeight=face?'700':'';}
+        const found=[...document.querySelectorAll('.feature-card')].flatMap((c,i)=>{const hit=(a,b)=>a.width>0&&b.width>0&&a.left<b.right-1&&a.right>b.left+1&&a.top<b.bottom-1&&a.bottom>b.top+1;
+        const v=c.querySelector('.liquid-vessel').getBoundingClientRect(),others=[c.querySelector('.archive-diagram>span'),...c.querySelectorAll('.balance-caption>*')];
+        return others.filter(e=>hit(v,e.getBoundingClientRect())).map(e=>(face?'wide ':'')+i+':'+e.textContent.trim().slice(0,12));});
+        for(const n of document.querySelectorAll('.archive-diagram>span')){n.style.fontFamily='';n.style.fontWeight='';}return found;}));
+      assert.deepEqual(clash,[],'vessel overlaps number or caption');
       if(width===1440)await page.screenshot({path:path.join(output,'feature-balance-tilt-desktop.png')});
       if(width===375)await page.screenshot({path:path.join(output,'feature-balance-mobile.png')});
       await pour(6);
@@ -54,9 +57,9 @@ const output=path.resolve(__dirname,'../../screenshots');
       await page.waitForFunction(()=>document.querySelector('.feature-grid').dataset.motion==='breathing',{},{timeout:12000});
       const geometry=await page.evaluate(()=>{
         const cards=[...document.querySelectorAll('.feature-card')],vessels=cards.map(c=>c.querySelector('.liquid-vessel').getBoundingClientRect());
-        return {overflow:document.documentElement.scrollWidth>innerWidth+1,aligned:Math.abs(vessels[0].top-vessels[1].top)<1,overlap:cards.some(c=>{const h=c.querySelector('.pour-hint'),b=c.querySelector('.balance-caption b'),hr=h.getBoundingClientRect(),br=b.getBoundingClientRect();return getComputedStyle(h).display!=='none'&&hr.right>br.left;}),dpr:[...document.querySelectorAll('.liquid-water')].every(c=>c.width<=c.clientWidth*2+1)};
+        return {overflow:document.documentElement.scrollWidth>innerWidth+1,aligned:Math.abs(vessels[0].top-vessels[1].top)<1,overlap:cards.some(c=>{const h=c.querySelector('.pour-hint'),b=c.querySelector('.balance-caption b'),hr=h.getBoundingClientRect(),br=b.getBoundingClientRect();return getComputedStyle(h).display!=='none'&&getComputedStyle(b).display!=='none'&&hr.right>br.left;}),dpr:[...document.querySelectorAll('.liquid-water')].every(c=>c.width<=c.clientWidth*2+1)};
       });
-      assert(!geometry.overflow);assert(!geometry.overlap);assert(geometry.dpr);if(width>700)assert(geometry.aligned);
+      assert(!geometry.overflow);assert(!geometry.overlap);assert(geometry.dpr);assert(geometry.aligned,'pans share one beam height at every width');
       await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));await page.waitForTimeout(100);
       assert.equal(await page.locator('.feature-grid').getAttribute('data-running'),'false','offscreen stopped');
       await show(0);assert.equal(await cards.first().getAttribute('data-phase'),'ready','intro does not replay');

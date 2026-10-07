@@ -93,7 +93,6 @@ export function initLiquidBalance(grid) {
   if (!grid) return;
   const options = {pour:.08, maxTilt:7, damping:.45, settleDelay:4, maxLevel:1, baseLevel:.34, introPour:2, introGap:.65, slowMo:.4};
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const narrow = matchMedia('(max-width:700px)');
   const colors = getComputedStyle(document.querySelector('.landing-product'));
   const orange = colors.getPropertyValue('--brand-orange').trim();
   const light = colors.getPropertyValue('--brand-highlight').trim();
@@ -128,7 +127,7 @@ export function initLiquidBalance(grid) {
       y:card.offsetTop+diagram.offsetTop+p.button.offsetTop+p.h*(1-p.level)-lift(p)};
   }
   function restPoint() {
-    return narrow.matches?{x:grid.clientWidth/2,y:(pans[0].card.offsetHeight+pans[1].card.offsetTop)/2}:{x:grid.clientWidth/2,y:-23};
+    return {x:grid.clientWidth/2,y:-23};
   }
   function paintCoin(point,opacity=1,spin=0) {
     toss.x=point.x;toss.y=point.y;coin.style.transform=`translate(${point.x}px,${point.y}px) translate(-50%,-50%) rotate(${spin}deg)`;
@@ -137,13 +136,6 @@ export function initLiquidBalance(grid) {
   }
   function transfer(start,end,t) {
     const smooth=q=>q*q*(3-2*q);
-    if(narrow.matches) {
-      const lane=4;
-      if(t<.22){const q=smooth(t/.22);return {x:start.x+(lane-start.x)*q,y:start.y-20*4*q*(1-q)};}
-      if(t<.78){const q=smooth((t-.22)/.56);return {x:lane,y:start.y+(end.y-start.y)*q};}
-      const q=smooth((t-.78)/.22),arc=toss.phase==='settling'?0:20;
-      return {x:lane+(end.x-lane)*q,y:end.y-arc*4*q*(1-q)};
-    }
     // Lift into the empty channel before crossing either card's heading.
     const ceiling=-14;
     if(t<.24){const q=t/.24;return {x:start.x,y:start.y+(ceiling-start.y)*(2*q-q*q)};}
@@ -176,7 +168,7 @@ export function initLiquidBalance(grid) {
     let point;
     if(toss.from===null)point={x:start.x,y:start.y+(end.y-start.y)*t*t};
     else point=transfer(start,end,t);
-    const spin=narrow.matches?(t<.18||t>.82?Math.sin(t*Math.PI)*8:0):Math.sin(t*Math.PI)*22;
+    const spin=Math.sin(t*Math.PI)*22;
     paintCoin(point,1,spin);
     if(t===1) {
       const p=pans[toss.to];p.level=Math.min(.82,p.level+.04);p.activeUntil=clock+.35;p.velocity[19]+=65;p.velocity[20]+=45;
@@ -205,8 +197,8 @@ export function initLiquidBalance(grid) {
   }
   function sync(p) {
     const full=p.level+pending(p)>=.999;
-    p.card.dataset.full=String(full);p.card.dataset.ready=String(p.done && (narrow.matches || !inIntro()));
-    p.card.dataset.hint=String(clock<p.hintUntil && (narrow.matches || !inIntro()));
+    p.card.dataset.full=String(full);p.card.dataset.ready=String(p.done && !inIntro());
+    p.card.dataset.hint=String(clock<p.hintUntil && !inIntro());
     p.card.dataset.level=p.level.toFixed(5);p.card.dataset.pending=pending(p).toFixed(5);
     p.card.dataset.phase=!p.started?'waiting':p.done?'ready':'intro';
     p.button.setAttribute('aria-disabled',String(full));
@@ -283,7 +275,7 @@ export function initLiquidBalance(grid) {
           return false;
         }return true;
       });
-      if(p.started&&!p.done&&p.emitted===40&&!p.drops.length){p.done=true;p.level=options.baseLevel;p.hintUntil=clock+3;p.lastInput=clock;if(!narrow.matches&&pans.every(p=>p.done))for(const pan of pans)pan.hintUntil=clock+3;}
+      if(p.started&&!p.done&&p.emitted===40&&!p.drops.length){p.done=true;p.level=options.baseLevel;p.hintUntil=clock+3;p.lastInput=clock;if(pans.every(p=>p.done))for(const pan of pans)pan.hintUntil=clock+3;}
       // Drain by elapsed time; the wave solver's 40ms stability cap must not slow it.
       if(p.done&&!p.drops.length&&clock-p.lastInput>=options.settleDelay)p.level=Math.max(options.baseLevel,p.level-.05*realDt*scale);
       p.shake=Math.max(0,p.shake-realDt);
@@ -320,7 +312,7 @@ export function initLiquidBalance(grid) {
   }
   for(const p of pans) p.button.addEventListener('click',event=>{
     event.preventDefault();
-    if(!p.done||!narrow.matches&&inIntro())return;
+    if(!p.done||inIntro())return;
     if(toss.phase!=='rest'&&!reduced.matches){
       if(toss.phase!=='paused')toss.resumePhase=toss.phase;
       toss.phase='paused';toss.lastUser=clock;paintCoin({x:toss.x,y:toss.y},0);
@@ -340,7 +332,7 @@ export function initLiquidBalance(grid) {
     if(hasView())wake();else {cancelAnimationFrame(frame);frame=0;clearTimeout(timer);grid.dataset.running='false';}
   },{threshold:0});
   const introduction=new IntersectionObserver(entries=>{
-    for(const e of entries)if(e.isIntersecting&&e.intersectionRatio>=.35){const p=pans.find(p=>p.card===e.target);if(!reduced.matches){if(narrow.matches)start(p);else {start(pans[0]);start(pans[1],options.introPour+options.introGap);}}}
+    for(const e of entries)if(e.isIntersecting&&e.intersectionRatio>=.35){const p=pans.find(p=>p.card===e.target);if(!reduced.matches){start(pans[0]);start(pans[1],options.introPour+options.introGap);}}
   },{threshold:.35});
   for(const p of pans){visibility.observe(p.card);introduction.observe(p.card);}
   new ResizeObserver(resize).observe(grid);

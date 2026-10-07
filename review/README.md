@@ -18,6 +18,5 @@
 ## 公网演示（不用安装）
 
 - 完整演示：<https://lixjanus526-art.github.io/finance-lab-demo/>
-- 手机滑轮方案预览（待确认）：<https://lixjanus526-art.github.io/finance-lab-demo/preview/>
 
 这是同一套静态构建发布到 GitHub Pages 的副本，源码以本仓库 `codex/kosx-landing-glass` 为准。
