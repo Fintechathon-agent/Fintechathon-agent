@@ -245,3 +245,9 @@
 - 构建包装原 Harness / MemoryStore / financial-tools / MerchantSession / 演示 JSON，直接提取 server.js 的 API 路由与错误响应，不改后端源码。同步 SHA-256 覆盖中文、emoji、块边界与长文本，结果与 node:crypto 一致。
 - 验证：check / 46项 test / smoke 全通过；静态站点 1440/1024/375 两流程、¥31,080.00 / ¥6,200.00、模拟输出逐字段一致、账单预测一致、子目录相对路径、导出 JSON、400/404/413/503、无控制台错误和无API网络请求均通过；catalog旧基线不变。日志 artifacts/overnight/stage4.json、artifacts/static/report.json。
 - 静态页面不依赖 Node 后端；构建时需要 Node，托管仍需 HTTP(S) 服务，不能直接 file:// 双击模块页面。数据仅当前页面内存，刷新重置；不提供真实账户、跨设备持久化或自动部署。
+
+### 夜间阶段 5 · 收益与回撤调查
+- 静态版 c77807e883a689c3e4322d697ce43ee39693a6b4 已推送，远程与本地一致。
+- docs/investigation-return-vs-drawdown.md 已完成。不是同字段或同公式错误，也不是严格单边下跌；起点最高、终点最低，令两指标精确相同。实测原函数反例 [1,1.1,0.99,1.05] 得到 +5% / -10%。
+- 原始证据 artifacts/overnight/investigation-evidence.json、investigation-counterexample.json；未修改计算逻辑与数据。换窗口 / 泛化公式的影响面与不宜为制造差异改公式的原因已写明。
+- 文档阶段仍复跑 check / 46项 test / smoke、投资页三尺寸核心流程检查通过（stage5.json）。
