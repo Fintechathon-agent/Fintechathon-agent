@@ -1,0 +1,41 @@
+{
+  "contract_version": "investment-agent.v1",
+  "request_id": "req-demo-20261007-001",
+  "operation": "PORTFOLIO_HEALTH_CHECK",
+  "task_state": {
+    "task_id": "task-demo-001",
+    "session_id": "session-demo-001",
+    "stage": "RISK_CHECK",
+    "status": "HANDOFF_REQUIRED",
+    "missing_fields": [],
+    "checkpoint": {
+      "stage": "RISK_CHECK",
+      "completed": ["VALIDATE_INPUT", "DIAGNOSE", "GENERATE_CANDIDATES", "SIMULATE"],
+      "result_refs": {},
+      "resume_token": "resume-demo-001"
+    },
+    "handoff": {
+      "owner": "Safety/Risk/Eval",
+      "reason": "Risk decision is outside Agent Core and Tools ownership."
+    }
+  },
+  "artifacts": {},
+  "tool_results": {},
+  "risk_handoff": {
+    "contract_version": "investment-agent.v1",
+    "handoff_id": "handoff-task-demo-001",
+    "task_id": "task-demo-001",
+    "session_id": "session-demo-001",
+    "status": "PENDING_REVIEW",
+    "decision": "REQUIRED",
+    "owner": "Safety/Risk/Eval",
+    "reason": "Risk decision is outside Agent Core and Tools ownership.",
+    "evidence": {
+      "portfolio_snapshot_id": "snapshot-demo-001",
+      "health_report_id": "health-demo-001",
+      "proposal_ids": ["proposal-a-demo", "proposal-b-demo", "proposal-c-demo"],
+      "simulation_id": "simulation-demo-001"
+    },
+    "execution_allowed": false
+  }
+}

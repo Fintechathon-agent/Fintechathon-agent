@@ -10,6 +10,15 @@ export async function api(path, body) {
   if (!response.ok) throw new Error(data.error?.message || "请求失败");
   return data;
 }
+export function healthCheckRequest({ riskProfile, portfolio, taskId = null, sessionId = null }) {
+  return {
+    contract_version: "investment-agent.v1",
+    request_id: "req-" + (globalThis.crypto?.randomUUID?.() || Date.now() + "-" + Math.random().toString(16).slice(2)),
+    operation: "PORTFOLIO_HEALTH_CHECK",
+    context: { actor: "agent", environment: "demo", data_mode: "SYNTHETIC_REPLAY", task_id: taskId, session_id: sessionId },
+    input: { risk_profile: riskProfile, portfolio }
+  };
+}
 export function toast(message) { $("#status").textContent = message; clearTimeout(toast.timer); toast.timer = setTimeout(() => $("#status").textContent = "", 5500); }
 export function downloadLink(url) {
   const anchor = document.createElement("a");

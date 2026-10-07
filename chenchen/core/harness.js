@@ -3,6 +3,7 @@
 const crypto = require("node:crypto");
 const { MemoryStore } = require("./memory");
 const financialTools = require("../tools/financial-tools");
+const contract = require("../contracts/investment-contract");
 
 const REQUIRED_RISK_FIELDS = ["investment_horizon_days", "max_drawdown", "liquidity_need"];
 const OWNED_STAGES = ["VALIDATE_INPUT", "DIAGNOSE", "GENERATE_CANDIDATES", "SIMULATE"];
@@ -234,6 +235,17 @@ class Harness {
     task.state.handoff = { owner: "Safety/Risk/Eval", reason: "Risk decision is outside Agent Core and Tools ownership." };
     this.addEvent(task, "stage.handoff", task.state.handoff);
     return this.getTask(task.state.task_id);
+  }
+
+  runHealthCheckContract(request) {
+    const canonicalRequest = contract.assertHealthCheckRequest(request);
+    const result = this.runHealthCheck({
+      task_id: canonicalRequest.context.task_id || undefined,
+      session_id: canonicalRequest.context.session_id || undefined,
+      risk_profile: canonicalRequest.input.risk_profile,
+      portfolio: canonicalRequest.input.portfolio || undefined
+    });
+    return contract.buildResponse(canonicalRequest, result);
   }
 
   resume(taskId) {

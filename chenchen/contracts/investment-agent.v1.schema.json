@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/investment-agent.v1.schema.json",
+  "title": "Investment Agent / Backend / Risk Contract",
+  "description": "Versioned contract for the evidence-first investment health-check flow.",
+  "type": "object",
+  "$ref": "#/$defs/HealthCheckRequest",
+  "$defs": {
+    "HealthCheckRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_version", "request_id", "operation", "context", "input"],
+      "properties": {
+        "contract_version": { "const": "investment-agent.v1" },
+        "request_id": { "type": "string", "minLength": 4, "maxLength": 128 },
+        "operation": { "const": "PORTFOLIO_HEALTH_CHECK" },
+        "context": { "$ref": "#/$defs/RequestContext" },
+        "input": { "$ref": "#/$defs/HealthCheckInput" }
+      }
+    },
+    "RequestContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor", "environment", "data_mode"],
+      "properties": {
+        "actor": { "const": "agent" },
+        "environment": { "enum": ["demo"] },
+        "data_mode": { "enum": ["SYNTHETIC_REPLAY"] },
+        "task_id": { "type": ["string", "null"] },
+        "session_id": { "type": ["string", "null"] }
+      }
+    },
+    "HealthCheckInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["risk_profile", "portfolio"],
+      "properties": {
+        "risk_profile": { "$ref": "#/$defs/RiskProfile" },
+        "portfolio": { "anyOf": [{ "$ref": "#/$defs/PortfolioInput" }, { "type": "null" }] }
+      }
+    },
+    "RiskProfile": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "investment_horizon_days": { "type": "integer", "minimum": 1 },
+        "max_drawdown": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "liquidity_need": { "enum": ["low", "medium", "high"] }
+      }
+    },
+    "PortfolioInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["portfolio_id", "as_of", "cash", "positions"],
+      "properties": {
+        "portfolio_id": { "type": "string", "minLength": 1 },
+        "as_of": { "type": "string", "minLength": 10 },
+        "cash": { "type": "number", "minimum": 0 },
+        "total_value": { "type": "number", "exclusiveMinimum": 0 },
+        "positions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/PositionInput" }
+        }
+      }
+    },
+    "PositionInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["instrument_id", "quantity", "price"],
+      "properties": {
+        "instrument_id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "sector": { "type": "string" },
+        "quantity": { "type": "number", "exclusiveMinimum": 0 },
+        "price": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "HealthCheckResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_version", "request_id", "operation", "task_state", "artifacts", "tool_results", "risk_handoff"],
+      "properties": {
+        "contract_version": { "const": "investment-agent.v1" },
+        "request_id": { "type": "string", "minLength": 4, "maxLength": 128 },
+        "operation": { "const": "PORTFOLIO_HEALTH_CHECK" },
+        "task_state": { "$ref": "#/$defs/TaskState" },
+        "artifacts": { "$ref": "#/$defs/Artifacts" },
+        "tool_results": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/ToolResult" }
+        },
+        "risk_handoff": {
+          "anyOf": [{ "$ref": "#/$defs/RiskHandoff" }, { "type": "null" }]
+        }
+      }
+    },
+    "TaskState": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["task_id", "session_id", "stage", "status", "missing_fields", "checkpoint"],
+      "properties": {
+        "task_id": { "type": "string", "minLength": 1 },
+        "session_id": { "type": "string", "minLength": 1 },
+        "stage": { "type": "string", "minLength": 1 },
+        "status": {
+          "enum": ["READY", "RUNNING", "WAITING_INPUT", "HANDOFF_REQUIRED", "BLOCKED", "FAILED", "CIRCUIT_OPEN"]
+        },
+        "missing_fields": { "type": "array", "items": { "type": "string" } },
+        "checkpoint": { "$ref": "#/$defs/Checkpoint" }
+      }
+    },
+    "Checkpoint": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["stage", "completed", "result_refs", "resume_token"],
+      "properties": {
+        "stage": { "type": "string" },
+        "completed": { "type": "array", "items": { "type": "string" } },
+        "result_refs": { "type": "object" },
+        "resume_token": { "type": "string" }
+      }
+    },
+    "Artifacts": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "portfolio_snapshot": { "$ref": "#/$defs/PortfolioSnapshot" },
+        "health_report": { "$ref": "#/$defs/HealthReport" },
+        "candidates": { "type": "array", "items": { "$ref": "#/$defs/ActionProposal" } },
+        "simulation": { "$ref": "#/$defs/Simulation" }
+      }
+    },
+    "PortfolioSnapshot": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["snapshot_id", "portfolio_id", "as_of", "positions", "cash", "cash_weight", "total_value", "data_quality"],
+      "properties": {
+        "snapshot_id": { "type": "string" },
+        "portfolio_id": { "type": "string" },
+        "as_of": { "type": "string" },
+        "positions": { "type": "array", "items": { "$ref": "#/$defs/PositionSnapshot" } },
+        "cash": { "type": "number" },
+        "cash_weight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "total_value": { "type": "number", "exclusiveMinimum": 0 },
+        "data_quality": { "type": "object" }
+      }
+    },
+    "PositionSnapshot": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["instrument_id", "quantity", "price", "market_value", "weight"],
+      "properties": {
+        "instrument_id": { "type": "string" },
+        "quantity": { "type": "number" },
+        "price": { "type": "number" },
+        "market_value": { "type": "number" },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "HealthReport": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["report_id", "snapshot_id", "metrics", "cash_weight", "concentration", "hidden_clusters", "attention_points", "data_window"],
+      "properties": {
+        "report_id": { "type": "string" },
+        "snapshot_id": { "type": "string" },
+        "metrics": { "$ref": "#/$defs/Metrics" },
+        "cash_weight": { "type": "number" },
+        "concentration": { "$ref": "#/$defs/Concentration" },
+        "hidden_clusters": { "type": "array" },
+        "attention_points": { "type": "array", "items": { "type": "string" } },
+        "data_window": { "type": "object" }
+      }
+    },
+    "Metrics": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["cumulative_return", "max_drawdown"],
+      "properties": {
+        "cumulative_return": { "type": "number" },
+        "annualized_return": { "type": "number" },
+        "annualized_volatility": { "type": "number" },
+        "max_drawdown": { "type": "number" },
+        "sharpe_ratio": { "type": "number" }
+      }
+    },
+    "Concentration": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["top_1", "top_3", "largest_instrument"],
+      "properties": {
+        "top_1": { "type": "number", "minimum": 0, "maximum": 1 },
+        "top_3": { "type": "number", "minimum": 0, "maximum": 1 },
+        "largest_instrument": { "type": "string" }
+      }
+    },
+    "ActionProposal": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["proposal_id", "plan_id", "target_weights", "actions", "constraints", "turnover", "proposal_hash", "validation"],
+      "properties": {
+        "proposal_id": { "type": "string" },
+        "plan_id": { "type": "string" },
+        "label": { "type": "string" },
+        "target_weights": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } },
+        "actions": { "type": "array" },
+        "constraints": { "type": "object" },
+        "turnover": { "type": "number", "minimum": 0 },
+        "proposal_hash": { "type": "string" },
+        "validation": { "type": "object" }
+      }
+    },
+    "Simulation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["simulation_id", "snapshot_id", "comparisons", "scenarios", "assumptions", "limitation"],
+      "properties": {
+        "simulation_id": { "type": "string" },
+        "snapshot_id": { "type": "string" },
+        "comparisons": { "type": "array" },
+        "scenarios": { "type": "array" },
+        "assumptions": { "type": "object" },
+        "limitation": { "type": "string" }
+      }
+    },
+    "ToolResult": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["tool_name", "version", "inputs_hash", "output", "data_as_of", "warnings", "trace_id"],
+      "properties": {
+        "tool_name": { "type": "string" },
+        "version": { "type": "string" },
+        "inputs_hash": { "type": "string" },
+        "output": {},
+        "data_as_of": { "type": "string" },
+        "warnings": { "type": "array", "items": { "type": "string" } },
+        "trace_id": { "type": "string" }
+      }
+    },
+    "RiskHandoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_version", "handoff_id", "task_id", "session_id", "status", "decision", "owner", "reason", "evidence", "execution_allowed"],
+      "properties": {
+        "contract_version": { "const": "investment-agent.v1" },
+        "handoff_id": { "type": "string" },
+        "task_id": { "type": "string" },
+        "session_id": { "type": "string" },
+        "status": { "const": "PENDING_REVIEW" },
+        "decision": { "const": "REQUIRED" },
+        "owner": { "const": "Safety/Risk/Eval" },
+        "reason": { "type": "string" },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["portfolio_snapshot_id", "health_report_id", "proposal_ids", "simulation_id"],
+          "properties": {
+            "portfolio_snapshot_id": { "type": "string" },
+            "health_report_id": { "type": "string" },
+            "proposal_ids": { "type": "array", "items": { "type": "string" } },
+            "simulation_id": { "type": "string" }
+          }
+        },
+        "execution_allowed": { "const": false }
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip } from "./common.js";
+import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip, healthCheckRequest } from "./common.js";
 import { dateStatus, planComparison } from "./presentation.mjs";
 let result, inputVersion = 0;
 const names = { CURRENT:"当前组合", A:"A 保持或最小动作", B:"B 温和调整", C:"C 风险优先" };
@@ -53,7 +53,10 @@ $("#demo-profile").onclick=()=>{ invalidate(); $("#horizon").value=365;$("#drawd
 $("#check-form").onsubmit=async event=>{
   event.preventDefault();const version=inputVersion;$("#run").disabled=true;$("#results").hidden=true;$("#input-changed").hidden=true;$("#run").textContent="正在诊断…";
   try {
-    const next=await api("/api/health-check/run",{risk_profile:{investment_horizon_days:Number($("#horizon").value),max_drawdown:Number($("#drawdown").value)/100,liquidity_need:$("#liquidity").value},portfolio:JSON.parse($("#portfolio-json").value)});
+    const next=await api("/api/health-check/run",healthCheckRequest({
+      riskProfile:{investment_horizon_days:Number($("#horizon").value),max_drawdown:Number($("#drawdown").value)/100,liquidity_need:$("#liquidity").value},
+      portfolio:JSON.parse($("#portfolio-json").value)
+    }));
     if(version!==inputVersion) { $("#input-changed").hidden=false; return toast("输入已改变，请重新检查。"); }
     if(next.task_state.status!=="HANDOFF_REQUIRED")throw new Error(next.task_state.error_state?.reasons?.join("；")||"请补齐有效的持仓与风险信息。");
     result=next; const a=result.artifacts,m=a.health_report.metrics,s=a.simulation,view=planComparison(s.comparisons);

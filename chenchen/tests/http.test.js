@@ -1,15 +1,17 @@
 "use strict";
 const test=require('node:test'), assert=require('node:assert/strict');
 const {server}=require('../server');
+const {createRequest, CONTRACT_VERSION}=require('../contracts/investment-contract');
 test('HTTP flows: pages, independent cookies, review gating, import failure and disabled execution',async t=>{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));
   const base='http://127.0.0.1:'+server.address().port;
-  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/versions/merchant.js','/versions/investment-legacy.js']) assert.equal((await fetch(base+page)).status,200);
+  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/versions/merchant.js','/versions/investment-legacy.js','/contracts/investment-agent.v1.schema.json','/contracts/examples/health-check.request.json','/contracts/examples/health-check.response.json']) assert.equal((await fetch(base+page)).status,200);
   assert.match(await fetch(base+'/').then(r=>r.text()),/个人投资顾问/);
   assert.match(await fetch(base+'/catalog').then(r=>r.text()),/店主财务助手/);
   assert.match(await fetch(base+'/investment').then(r=>r.text()),/现在先检查什么/);
   assert.match(await fetch(base+'/investment-v0.10').then(r=>r.text()),/旧版/);
+  assert.equal((await fetch(base+'/contracts/investment-agent.v1.schema.json').then(r=>r.json())).$id,'https://fintechathon-agent.github.io/contracts/investment-agent.v1.schema.json');
   await t.test('all page assets load with the right type including the separate product stylesheet',async()=>{
     const assets=new Set(['/versions/presentation.mjs']);
     for(const route of ['/','/catalog','/investment','/investment-v0.10','/merchant']){
@@ -51,10 +53,25 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   assert.equal((await fetch(base+'/api/merchant/ledger',{headers}).then(r=>r.json())).reviewed,true);
   assert.equal((await fetch(base+'/api/paper-trade/execute',{method:'POST',headers,body:'{"approval":{"status":"APPROVED","token":"client-forged"}}'})).status,503);
   assert.equal((await fetch(base+'/api/merchant/reset',{method:'POST',headers:{...headers,Origin:'https://example.com'},body:'{}'})).status,403);
-  const task=await fetch(base+'/api/health-check/run',{method:'POST',headers,body:JSON.stringify({risk_profile:{investment_horizon_days:365,max_drawdown:.1,liquidity_need:'medium'}})}).then(r=>r.json());
+  const request=createRequest({requestId:'req-http-test-001',riskProfile:{investment_horizon_days:365,max_drawdown:.1,liquidity_need:'medium'}});
+  const taskResponse=await fetch(base+'/api/health-check/run',{method:'POST',headers,body:JSON.stringify(request)});
+  assert.equal(taskResponse.status,200);
+  const task=await taskResponse.json();
+  assert.equal(task.contract_version,CONTRACT_VERSION);
+  assert.equal(task.request_id,request.request_id);
+  assert.equal(task.risk_handoff.execution_allowed,false);
   assert.equal(task.task_state.status,'HANDOFF_REQUIRED');assert.equal(Object.keys(task.tool_results).length,4);
   assert.equal((await fetch(base+'/api/audit/'+task.task_state.task_id)).status,200);
   const investmentFile=await fetch(base+'/api/task/'+task.task_state.task_id+'/export');
   assert.match(investmentFile.headers.get('content-disposition'),/attachment/);
   assert.equal((await investmentFile.json()).task_state.task_id,task.task_state.task_id);
+  const legacyResponse=await fetch(base+'/api/health-check/run',{method:'POST',headers,body:JSON.stringify({risk_profile:request.input.risk_profile,portfolio:request.input.portfolio})});
+  assert.equal(legacyResponse.status,422);
+  assert.equal((await legacyResponse.json()).error.code,'INVALID_CONTRACT');
+  const invalidContract={...request};delete invalidContract.contract_version;
+  const invalidResponse=await fetch(base+'/api/health-check/run',{method:'POST',headers,body:JSON.stringify(invalidContract)});
+  assert.equal(invalidResponse.status,422);
+  const invalidBody=await invalidResponse.json();
+  assert.equal(invalidBody.contract_version,CONTRACT_VERSION);
+  assert.equal(invalidBody.request_id,request.request_id);
 });

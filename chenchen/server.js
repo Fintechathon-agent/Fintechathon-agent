@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { Harness } = require("./core/harness");
 const tools = require("./tools/financial-tools");
+const contract = require("./contracts/investment-contract");
 const { randomUUID } = require("node:crypto");
 const { MerchantSession, demo: merchantDemo } = require("./merchant/ledger");
 const merchantSessions = new Map();
@@ -42,13 +43,17 @@ function sendJson(response, status, payload) {
 
 function sendError(response, error, fallbackStatus = 400) {
   const status = error.statusCode || (error.code === "INVALID_PORTFOLIO" ? 422 : fallbackStatus);
-  sendJson(response, status, {
-    error: {
-      code: error.code || "REQUEST_FAILED",
-      message: error.message,
-      details: error.details || null
-    }
-  });
+  const payload = { error: {
+    code: error.code || "REQUEST_FAILED",
+    message: error.message,
+    details: error.details || null
+  }};
+  if (error.code === "INVALID_CONTRACT") {
+    payload.contract_version = contract.CONTRACT_VERSION;
+    payload.operation = contract.OPERATION;
+    payload.request_id = error.requestId || null;
+  }
+  sendJson(response, status, payload);
 }
 
 function sendDownload(response, filename, payload) {
@@ -150,12 +155,13 @@ async function handleApi(request, response, pathname, url) {
     return true;
   }
   if (method === "POST" && pathname === "/api/health-check/run") {
-    const result = harness.runHealthCheck({
-      task_id: body.task_id,
-      session_id: body.session_id,
-      risk_profile: body.risk_profile,
-      portfolio: body.portfolio || body.snapshot
-    });
+    let result;
+    try {
+      result = harness.runHealthCheckContract(body);
+    } catch (error) {
+      error.requestId = body.request_id || null;
+      throw error;
+    }
     sendJson(response, 200, result);
     return true;
   }
@@ -227,6 +233,7 @@ function serveStatic(response, pathname) {
   const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
   const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html",
     "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/common.js",
+    "contracts/investment-agent.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json",
     "index.html", "app.js", "styles.css"]);
   if (!allowed.has(relativePath)) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "not found" } }); return; }
   const filePath = path.resolve(root, relativePath);
