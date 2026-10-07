@@ -75,7 +75,7 @@ ${routes}\n(${browserAdapter.toString()})();\n})();\n`;
     html=html.replace(/href=(["'])(\/(?:investment|merchant|catalog|index\.html)?)([?#][^"']*)?\1/g,(_,quote,link,suffix='')=>'href='+quote+linkMap[link]+suffix+quote);
     fs.writeFileSync(path.join(dist,target+'.html'),html);
   }
-  fs.writeFileSync(path.join(dist,'index.html'),'<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=landing.html"><title>Finance Lab</title></head><body><a href="landing.html">进入 Finance Lab</a></body></html>');
+  fs.writeFileSync(path.join(dist,'index.html'),'<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=landing.html"><title>Finance Lab</title><link rel="icon" href="versions/favicon.svg" type="image/svg+xml"></head><body><a href="landing.html">进入 Finance Lab</a></body></html>');
   console.log('Static demo built: '+dist);return dist;
 }
 if(require.main===module)build();

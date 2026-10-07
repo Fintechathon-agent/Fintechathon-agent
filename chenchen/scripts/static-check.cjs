@@ -17,8 +17,10 @@ async function main(){
   const base='http://127.0.0.1:'+server.address().port+'/demo/';
   try{for(const width of [1440,1024,375]){
     const context=await browser.newContext({viewport:{width,height:width===375?844:1000},reducedMotion:'reduce'}),page=await context.newPage(),errors=[];
-    page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
-    await page.goto(base);await page.waitForURL('**/landing.html');assert(await page.locator('#story-title').isVisible());
+    page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text()+' @ '+m.location().url);});
+    // Expose the redirect shell long enough to detect missing favicon requests.
+    await page.route(base,async route=>{const response=await route.fetch();await route.fulfill({response,body:(await response.text()).replace('0;url=','1;url=')});});
+    await page.goto(base);await page.waitForURL('**/landing.html');await page.unroute(base);assert(await page.locator('#story-title').isVisible());
     const call=async(url,body)=>page.evaluate(async({url,body})=>{const r=await fetch(url,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return {status:r.status,data:await r.json()};},{url,body});
     assert.deepEqual((await call('/api/demo/portfolio')).data,tools.validatePortfolio(tools.getDemoPortfolio()),'browser SHA-256 and portfolio envelope match Node');
     assert.deepEqual((await call('/api/simulation/run',{})).data.output,tools.runSimulation().output,'simulation is identical to Node');

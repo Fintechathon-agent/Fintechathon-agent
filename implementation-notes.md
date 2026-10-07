@@ -251,3 +251,16 @@
 - docs/investigation-return-vs-drawdown.md 已完成。不是同字段或同公式错误，也不是严格单边下跌；起点最高、终点最低，令两指标精确相同。实测原函数反例 [1,1.1,0.99,1.05] 得到 +5% / -10%。
 - 原始证据 artifacts/overnight/investigation-evidence.json、investigation-counterexample.json；未修改计算逻辑与数据。换窗口 / 泛化公式的影响面与不宜为制造差异改公式的原因已写明。
 - 文档阶段仍复跑 check / 46项 test / smoke、投资页三尺寸核心流程检查通过（stage5.json）。
+
+### 夜间阶段 6 / 可选 7
+- Firefox 与 WebKit 的 Playwright 可执行文件均不存在；按要求不下载，跨浏览器覆盖记为未覆盖。本机 Chrome 已完成所有已交付阶段检查。
+- 只读实验在三尺寸临时禁用 kosx.css / product-overrides.css，投资页 13 个、店主页 63 个受测节点改变。可选阶段 7 的无变化门槛不满足，未改正式引用。证据 artifacts/overnight/browser-availability.json、legacy-dependency.json。
+
+### 首页阶段再次尝试的顺序记录
+- 独立阶段 3a / 3b / 4 / 5 已通过并推送后，利用剩余时间恢复首页问题。此前失败记录与撤回动作不变；新的尝试须重新完整验收，失败继续撤回。
+- 阶段 1 选择更保守的视觉响应：活动态立即恢复全亮（满足 200ms 内），空闲态仍 1.2s 回落。避免依赖浏览器过渡采样时机；不放宽亮度断言。
+
+### Deviations · 静态入口图标回归修复
+- 首页第二次尝试的 explore / liquid / landing 三尺寸检查全部通过，附加 static-check 出现一次 404。按规则暂存补丁并撤回首页未提交代码，先独立修复静态入口。
+- 隔离实验将入口跳转延迟 2 秒，稳定复现浏览器请求 /favicon.ico 返回 404；原因是生成的 index.html 没有 icon 声明，与首页液体逻辑无关。
+- build-static 为跳转入口显式引用已有 versions/favicon.svg；static-check 延迟入口跳转 1 秒并记录报错 URL，防止偶发漏测。check / 46项 test / smoke / 静态三尺寸流程全部通过（artifacts/overnight/static-icon-final.json）。没有忽略 404 或放宽错误检查。
