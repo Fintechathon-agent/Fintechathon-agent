@@ -231,3 +231,10 @@
 - 验收通过：check、46/46 test、smoke；workbench-archive-check investment 1440/1024/375；既有 ui-check 35组；catalog 三尺寸与旧基线一致。日志 artifacts/overnight/stage3a.json；截图 screenshots/investment-{data,result}-{desktop,mobile}.png。
 - 保守实施偏差：保留 catalog 使用的旧样式源与工作台旧引用，新组件集中于已有 glass.css 的 archive-workbench 作用域，未新建 override 文件。可选阶段 7 再确认是否可安全取消引用，不做自动 CSSOM 去重。
 - 没有修改后端、ui-model、presentation、接口参数或金额算法；common.js 仅为新版工作台选择中性色图表。
+
+### 夜间阶段 3b · 店主工作台
+- 投资页提交 171842c1ae032f2cefe5d9addc216a60d3954b08 已推送，git ls-remote 与本地一致。
+- 店主复用低密度档案背景，余额 / 缺口 / 账单 / 现金 / 成本固定五块玻璃，弹窗为第六块。缺口大卡取得主要视觉权重；无缺口时不标风险。
+- 第一步账单、第二步现金、第三步成本可点击定位并滚动跟随；现金与成本改为纵向；去除重复页头状态横栏。骨架、元信息和中性控件与投资页一致。
+- 金额、接口、账单核对门槛未改；确认来源后才生成提醒。check / 46项 test / smoke、两工作台三尺寸完整检查、35组既有UI、catalog旧基线全部通过。日志 artifacts/overnight/stage3b-final.json。
+- 截图 screenshots/merchant-data-{desktop,mobile}.png 已检查，工作台无品牌橙，风险 / 弹窗 / 操作按优先级唯一高亮。

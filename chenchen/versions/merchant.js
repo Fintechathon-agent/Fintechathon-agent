@@ -1,3 +1,4 @@
+import { initArchiveWorkbench } from './archive.js';
 import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip, feedback, busy } from './common.js';
 import { userError } from './ui-model.mjs';
 import { dateStatus, merchantOverview, priorityBills } from './presentation.mjs';
@@ -22,8 +23,10 @@ function showBills() {
 function render() {
   const l = state.ledger, f = state.forecast, overview = merchantOverview(state);
   $('#shop-date').textContent = l.shop + ' · 截至 ' + l.as_of;
+  $('#shop-date').removeAttribute('aria-label');
   $('#totals').innerHTML = [[tip('还在路上的钱','tip-receivable','预计会到账，但现在还不能拿来付款。'),money(state.totals.receivable_cents),'不是可用余额'],[tip('已知待付款','tip-payable','已经记下、以后需要付出去的钱。'),money(state.totals.payable_cents),'全部未结算支出'],[tip('最近待付款','tip-next-payment','当前账单里日期最近的一笔待付款。'),overview.nextPayment ? overview.nextPayment.due_on.slice(5) : '暂无',overview.nextPayment ? overview.nextPayment.category+' · '+money(overview.nextPayment.amount_cents) : '未录入不代表无支出']].map(([t,v,d])=>'<article class="metric"><small>'+t+'</small><strong>'+esc(v)+'</strong><small>'+esc(d)+'</small></article>').join('');
   $('#merchant-status').innerHTML = '<span class="cash-label">'+tip('已核对余额','tip-balance-live','已经到账，并且你已经对照过银行或现金记录的钱。')+'</span><div class="cash-value">'+money(state.totals.balance_cents)+'</div><p class="cash-sub">已到账且已核对；待到账收入不计入可用余额</p>';
+  $('#merchant-status').insertAdjacentHTML('beforeend','<span class="archive-panel-mark" aria-hidden="true">LAB / 01</span>');
   const firstGap = overview.gap, conservativeGap = overview.conservativeGap;
   $('#scenario-label').textContent = overview.scenario + ' · 测算';
   $('#cash-callout-title').textContent = firstGap ? (firstGap.opening ? '基准日余额已为负' : '首个缺口 · '+firstGap.date.slice(5)) : '14 天内未见已知缺口';
@@ -193,7 +196,7 @@ function markUnavailable() {
   state=null; reminders=null;
   $('#retry-load').hidden=false;
   $('#shop-date').textContent='等待重新读取';
-  $('#merchant-status .cash-value').textContent='暂不可用';
+  $('#merchant-status .cash-value').classList.remove('archive-skeleton'); $('#merchant-status .cash-value').textContent='暂不可用';
   $('#ledger-health').textContent='数据未加载，请重试。';
   $('#quick-bills').innerHTML='<p class="empty">账单尚未加载。</p>';
   for(const id of ['totals','bills','cash-chart','calendar','costs']) $('#'+id).textContent='';
@@ -209,7 +212,7 @@ function markUnavailable() {
 }
 async function loadLedger() {
   $('#retry-load').hidden = true;
-  feedback('#page-feedback','正在读取演示账单…');
+  feedback('#page-feedback','');
   try { await refresh(); feedback('#page-feedback',''); }
   catch(e) {
     feedback('#page-feedback','账单读取失败：'+e.message,'error'); $('#retry-load').hidden=false;
@@ -218,3 +221,5 @@ async function loadLedger() {
 }
 $('#retry-load').onclick=loadLedger;
 loadLedger();
+
+initArchiveWorkbench();

@@ -56,7 +56,7 @@ export function initArchiveWorkbench() {
     const dialog=document.querySelector('dialog[open]');
     const error=[...document.querySelectorAll('[role=alert]')].find(inView);
     const risk=document.querySelector(investment?'.result-verdict':'.cash-callout');
-    const riskValid=investment?ready:document.querySelector('#cash-callout-title')?.textContent.includes('缺口')||document.querySelector('#cash-callout-title')?.textContent.includes('负');
+    const riskValid=investment?ready:/^(首个缺口|基准日余额已为负)/.test(document.querySelector('#cash-callout-title')?.textContent||'');
     const primary=investment?document.querySelector('#run'):document.querySelector('#review');
     const focus=dialog?(dialog.querySelector('button:not(:disabled)')):error||(riskValid&&inView(risk)?risk:null)||((investment&&!ready||inView(primary))&&primary&&!primary.disabled?primary:null)||links[active];
     body.querySelectorAll('.signal-focus').forEach(e=>{if(e!==focus)e.classList.remove('signal-focus');});focus?.classList.add('signal-focus');
