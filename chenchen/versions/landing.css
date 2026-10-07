@@ -117,9 +117,13 @@ footer p { text-align:center; }
 .balance-caption b { font:inherit; text-align:right; margin-left:auto; }
 .pour-hint { opacity:0; white-space:nowrap; transition:opacity var(--motion-duration); }
 .feature-card[data-ready=true]:hover .pour-hint,.feature-card[data-ready=true]:focus-within .pour-hint,.feature-card[data-hint=true] .pour-hint,.feature-card[data-full=true] .pour-hint { opacity:1; }
-.balance-beam { position:absolute; left:10%; right:10%; top:-23px; height:1px; pointer-events:none; }
-.balance-beam i { position:absolute; inset:0; background:#b8ada070; transform:rotate(var(--beam-angle,0deg)); }
-.balance-beam span { position:absolute; left:calc(50% - 4px); top:5px; width:8px; height:8px; border:1px solid #b8ada080; transform:rotate(45deg); }
+/* The beam is the one orange line in this section, so the balance reads apart from the grid behind it. */
+.balance-beam { position:absolute; left:10%; right:10%; top:-23px; height:2px; pointer-events:none; }
+.balance-beam i { position:absolute; inset:0; border-radius:1px; background:linear-gradient(90deg,var(--brand-orange),var(--signal-orange) 50%,var(--brand-orange)); box-shadow:0 0 10px #ff914a55; transform:rotate(var(--beam-angle,0deg)); }
+.balance-beam i::before,.balance-beam i::after { content:""; position:absolute; top:0; width:2px; height:9px; border-radius:1px; background:var(--brand-orange); }
+.balance-beam i::before { left:0; }
+.balance-beam i::after { right:0; }
+.balance-beam span { position:absolute; left:calc(50% - 5px); top:6px; width:10px; height:10px; border:1.5px solid var(--signal-orange); background:#ff914a2e; box-shadow:0 0 8px #ff914a55; transform:rotate(45deg); }
 .balance-coin { position:absolute; top:0; left:0; width:54px; height:54px; pointer-events:none; opacity:0; z-index:3; will-change:transform; transition:opacity 160ms linear; }
 .balance-coin svg { display:block; width:100%; height:100%; }
 @media(max-width:700px) { .balance-coin { width:38px; height:38px; } }

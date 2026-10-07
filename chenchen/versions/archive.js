@@ -108,6 +108,7 @@ export function initLiquidBalance(grid) {
   const pending=p=>p.drops.reduce((n,d)=>n+d.volume,0);
   const hasView=()=>!document.hidden && pans.some(p=>p.visible);
   const inIntro=()=>pans.some(p=>p.started&&!p.done);
+  const beam=grid.querySelector('.balance-beam');
   // This coin owns only visual state and shares the liquid animation clock.
   const coin=document.createElement('div');
   coin.className='balance-coin';coin.setAttribute('aria-hidden','true');
@@ -207,7 +208,9 @@ export function initLiquidBalance(grid) {
     p.card.dataset.liquidActive=String(p.started&&!p.done || p.drops.length>0 || p.shake>0 || clock<p.activeUntil);
   }
   function draw() {
-    grid.style.setProperty('--beam-angle',(-theta)+'deg');grid.dataset.theta=theta.toFixed(4);
+    // A long desktop beam would swing its ends into the heading and cards; scale its angle so the ends move at most 12px.
+    const half=(beam?.offsetWidth||0)/2,beamLimit=half>12?Math.asin(12/half)*180/Math.PI:options.maxTilt;
+    grid.style.setProperty('--beam-angle',(-theta*Math.min(1,beamLimit/options.maxTilt))+'deg');grid.dataset.theta=theta.toFixed(4);
     for(const p of pans) {
       const dy=-lift(p);
       const shake=p.shake>0&&!reduced.matches?Math.sin(p.shake*65)*3:0;
