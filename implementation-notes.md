@@ -304,3 +304,16 @@
 - 用户反馈横梁与背景格线颜色太接近。横梁改为品牌橙渐变 + 轻微光晕，两端加下垂挂点，支点菱形改为信号橙描边。这是功能区唯一的橙色线条。
 - 变橙后发现旧问题：桌面横梁长约 1150px，倾斜 6–7° 时两端上下摆动约 70px，会穿进标题面板、压到卡片顶边（原灰色时不明显）。改为按横梁长度缩放其角度，两端最多移动 12px；容器自身倾斜角度不变。手机横梁较短，仍接近完整角度。
 - 完整回归通过：check、46/46 test、smoke、liquid、coin-toss、explore、landing、workbench、static 三尺寸、catalog 基线。
+
+### 2026-10-08 · 周四第五板块交付
+
+- 按用户要求先检查工作区并 `git pull --ff-only`，结果 Already up to date，起点 `b6090b4`；当前分支 `codex/kosx-landing-glass`。既有未跟踪的 `.gitignore`、learning/、output/、prototypes/、工作指令/ 均未修改或加入提交。
+- 阅读 AGENTS、仓库 v4 清单、附件 v3、风控规划表及旧聊天接续记录；以用户指定的仓库 v4 为准，跳过已经入库的第 6 节第 2 步。
+- 只读检查远程：`codex/fixed-risk-demo-v0.1` = `8cd0a8a104edcf59655d344e78532c18cd09f505`，Vesper 已交付 R01–R10 固定规则、案例原型及架构，仍是跨模块待确认提案；`codex/risk-policy-v0.2-only` = `51a8763c425eb5de30ce0e1d1d1def83197f7463`，仅较早 v0.2 规划。不切分支、不合并、不改第四板块代码，没有宣称其原型测试已在本轮通过。
+- 架构文档 `docs/finance-ops/ui-architecture.md` 已提交为 `7817db8eb045cd5441d809cb44063c9124181099`，推送成功，并以 `git ls-remote` 核对远程一致。文档含六步 / 三类界面、模块流向、字段 Owner、五项机制及现有与待接入的区分。
+- 需求提案 `docs/contract-proposals/2026-10-08-ui-needs.md` 已提交为 `2270c686a0226300626f1564805287427d590c09`，推送后核对远程一致。提案中的三份 JSON 语法检查通过；提案本身不是 Contract。重点待确认：新固定规则相对旧规划的变化、当前裸请求与远程版本化健康检查信封的差异、独立 RiskDecision / 可信确认 / 模拟回执 / 持久审计。
+- 新增 `review/home-directions/`，A 资产分类双卡，B 风险报告 / 计划确认双卡，C 卡内收益 / 风险单入口。只用于用户选型，不执行交易、不请求 API、不算风险、不伪造指标。保留黑橙柔边玻璃、同一根橙色横梁和手机左右容器，正式硬币循环迁移留待用户选定后验证。
+- 原型验证：`node chenchen/scripts/ui-directions-check.cjs`，1440 / 1024 / 375 / 320 × A / B / C 共 12 组通过，axe 每组 0 项违规；无横向溢出，容器并排、装饰液位上限、回正、全部入口弹窗、Esc / 焦点返回、键盘、返回 / 刷新、未知 URL 输入、低动态及无 API / 外部请求均通过。初次发现选择器同时命中 body，已限定为方向链接后重新完整验证；截图生成前回到页顶，避免全页截图捕获屏外跳转链接。
+- 本轮另运行现有语法检查和原有 46 项业务测试，全部通过。9 张截图入库，桌面与手机逐张视觉检查；1024 由自动检查覆盖。Firefox / WebKit / 安卓微信真机未覆盖，Owner 的风险程序与正式后端集成未测。
+- `git diff b6090b4 --` 核对正式 versions、core、tools、merchant、data、server.js、safety-risk-eval、AGENTS 和 v4 清单均无改动。未提前下线正式店主入口，也未发布公网或发起集成合并。
+- 本机独立预览：`http://127.0.0.1:4188/?direction=B`，HTTP 200；不是公网分享地址。操作说明、截图、变更说明、小测验与 21:00 三行同步稿见 `review/home-directions/README.md`。原型随本段提交，最终 SHA 在交付回复中报告并对照远程，用户选择前不改正式首页。
