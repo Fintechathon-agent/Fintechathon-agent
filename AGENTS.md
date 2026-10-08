@@ -26,4 +26,5 @@
 - 需要后端新字段或接口：在 docs/contract-proposals/ 写提案并提交，停下等用户确认。不在后端自行添加，不在前端伪造。
 - 红线：不接真实资金；不无依据荐股；不绕过审批；核心指标不由 LLM 编造；没有回执只能显示“模拟 / 待确认”；“审批”指用户本人确认完整计划，首版没有人工审核后台。
 - 店主财务助手不保留在比赛演示中（入口下线见清单 P0-C），不再扩展；本轮截止：2026-10-11 20:00 前。
+- 界面文字不得使用会被 iOS / 安卓画成彩色 emoji 的符号（如 ↗ U+2197、➡、✔ 等）；箭头一律用 inline SVG：`<svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg>`（样式 `.arrow-ne` 已定义在 landing.css 与 style.css，首页和各工作台页面都已加载）。`npm run check` 会扫描 chenchen/versions/ 并在发现这类符号时失败。
 - 进度与待办见 review/CODEX-NEXT-2026-10-08.md。
