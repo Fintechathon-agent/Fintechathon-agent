@@ -69,3 +69,11 @@ snapshot_date,cash,instrument_id,name,asset_type,quantity,current_price,cost_bas
 npm run check
 ```
 
+## 演示网站
+
+网站文件在 `site/`，打开 `site/index.html` 即可查看静态演示；部署后会通过 GitHub Pages 提供独立地址：
+
+`https://realchenchenluo.github.io/agent/holdings-intake/`
+
+网页中的 CSV 会在浏览器内解析，当前不上传文件。网站只展示导入、预览、校验和确认流程，不会把数据送进主产品。
+

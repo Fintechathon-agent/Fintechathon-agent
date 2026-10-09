@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="持仓导入与确认演示：先把输入数据看清楚，再进入后续分析。">
+  <title>持仓导入台 | Personal AI Fund Manager</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html" aria-label="持仓导入台首页">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span>持仓导入台</span>
+      </a>
+      <div class="topbar-meta">
+        <span class="eyebrow">独立实验项目</span>
+        <span class="privacy-chip"><span class="dot"></span>仅在本机预览</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">HOLDINGS INTAKE · V0.1</p>
+          <h1 id="page-title">先把持仓看清楚。</h1>
+          <p class="hero-lede">上传一份 CSV，先检查数据是否完整、重复或需要确认。通过确认后，才有资格进入后续的组合分析。</p>
+        </div>
+        <div class="hero-actions">
+          <button class="button button-primary" id="loadSample" type="button"><span aria-hidden="true">✦</span>填入演示数据</button>
+          <label class="button button-secondary" for="fileInput"><span aria-hidden="true">↑</span>选择 CSV 文件</label>
+          <input id="fileInput" type="file" accept=".csv,text/csv" hidden>
+        </div>
+      </section>
+
+      <div class="workspace-grid">
+        <aside class="side-rail" aria-label="导入进度">
+          <div class="rail-label">导入流程</div>
+          <ol class="step-list">
+            <li class="step active"><span class="step-number">1</span><span><strong>导入文件</strong><small>CSV 或演示数据</small></span></li>
+            <li class="step"><span class="step-number">2</span><span><strong>检查数据</strong><small>逐行显示问题</small></span></li>
+            <li class="step"><span class="step-number">3</span><span><strong>确认持仓</strong><small>确认后才可继续</small></span></li>
+          </ol>
+          <details class="tip-box">
+            <summary><span class="tip-icon">?</span>什么是“数据质量”</summary>
+            <p>它只说明这份文件能不能被准确读取，不代表这份投资本身好或不好。</p>
+          </details>
+          <div class="boundary-note">
+            <span class="boundary-icon" aria-hidden="true">↗</span>
+            <p><strong>当前边界</strong>这里只做输入检查，不连接券商，也不计算收益或买卖方案。</p>
+          </div>
+        </aside>
+
+        <section class="main-column">
+          <section class="panel upload-panel" aria-labelledby="upload-title">
+            <div class="panel-heading">
+              <div>
+                <p class="section-kicker">01 / 输入</p>
+                <h2 id="upload-title">把持仓文件放进来</h2>
+              </div>
+              <span class="format-badge">CSV</span>
+            </div>
+            <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="选择持仓 CSV 文件">
+              <div class="drop-icon" aria-hidden="true">↑</div>
+              <div>
+                <strong>拖入文件，或点击选择</strong>
+                <p>需要包含日期、现金、证券代码、数量和价格等字段</p>
+              </div>
+              <span class="drop-link">选择文件</span>
+            </div>
+            <div class="file-meta" id="fileMeta" hidden>
+              <span class="file-icon" aria-hidden="true">▤</span>
+              <span><strong id="fileName">尚未选择文件</strong><small id="fileSource">等待导入</small></span>
+              <button class="icon-button" id="clearData" type="button" aria-label="清空当前文件" title="清空当前文件">×</button>
+            </div>
+            <p class="microcopy"><span aria-hidden="true">⌁</span> 文件只在当前浏览器页面内解析，不会上传到服务器。请勿使用真实账户导出文件测试。</p>
+          </section>
+
+          <section class="summary-grid" aria-label="数据概览">
+            <div class="summary-item"><span>有效记录</span><strong id="validCount">0</strong><small>可继续检查</small></div>
+            <div class="summary-item"><span>需要处理</span><strong id="issueCount">0</strong><small>错误或提示</small></div>
+            <div class="summary-item"><span>现金</span><strong id="cashValue">—</strong><small>文件快照</small></div>
+            <div class="summary-item quality"><span>数据质量</span><strong id="qualityValue">未导入</strong><small id="qualityHint">等待一份文件</small></div>
+          </section>
+
+          <section class="panel preview-panel" aria-labelledby="preview-title">
+            <div class="panel-heading preview-heading">
+              <div>
+                <p class="section-kicker">02 / 检查</p>
+                <h2 id="preview-title">导入预览</h2>
+              </div>
+              <span class="revision" id="revision">Revision 0</span>
+            </div>
+            <div class="empty-state" id="emptyState">
+              <span class="empty-mark" aria-hidden="true">+</span>
+              <strong>还没有持仓数据</strong>
+              <p>先选择 CSV，或点上方“填入演示数据”看一遍完整流程。</p>
+            </div>
+            <div class="table-wrap" id="tableWrap" hidden>
+              <table>
+                <thead><tr><th>证券</th><th>类型</th><th>数量</th><th>当前价</th><th>成本价</th><th>检查</th></tr></thead>
+                <tbody id="previewBody"></tbody>
+              </table>
+            </div>
+            <div class="table-footer" id="tableFooter" hidden><span id="rowSummary">—</span><span>只展示导入预览，不代表投资判断</span></div>
+          </section>
+
+          <section class="confirm-panel" id="confirmPanel" aria-live="polite">
+            <div>
+              <span class="status-label" id="statusLabel">等待导入</span>
+              <h2 id="statusTitle">确认之前，先把每一行看明白</h2>
+              <p id="statusText">导入数据后，这里会告诉你哪些地方可以继续，哪些地方需要补充。</p>
+            </div>
+            <button class="button button-dark" id="confirmButton" type="button" disabled>确认这份持仓</button>
+          </section>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer"><span>Personal AI Fund Manager / Holdings Intake</span><span>holdings-intake.v0</span></footer>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

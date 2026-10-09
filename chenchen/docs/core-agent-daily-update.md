@@ -24,6 +24,8 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 - 新建独立项目 `fund-market-analysis/`，用于后续研究基金市场状态、类别比较、异常波动、证据链和信息冲突；本日不接入当前主产品。
 - 参考 GitHub 上的 RiskEngine、Portfolio-Analysis、Dashboard、mf-analytics 等公开项目，提取“导入校验、来源记录、类别/风格分析、冲突提示”等产品结构思路；未复制代码或 UI。
 - 两个独立项目都增加了版本化草案 Contract、固定测试夹具和本地检查脚本，作为未来融合前的边界验证。
+- 将两个独立项目升级为可直接打开的静态演示网站：持仓导入站支持演示 CSV、浏览器内解析、逐行状态和确认；市场分析站支持市场状态、观察项筛选、信号原因和证据限制展开。
+- 增加 GitHub Pages 自动部署配置，两个站点分别发布到 `holdings-intake/` 和 `fund-market-analysis/` 路径；代码推送后由工作流重新构建静态站点。
 
 ### 今日新增独立项目
 
@@ -33,6 +35,15 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 | `chenchen/fund-market-analysis/` | 固定市场上下文、市场状态、4 个观察项、2 个信号、证据来源和限制条件、`fund-market-analysis.v0` Schema | 独立 MVP 骨架，检查通过 | Core Agent、Quant、Memory、Risk、主 UI |
 
 这两个项目只放在各自的新文件夹中，不与现有投资产品或店主财务助手目录混合。未来如果要融合，只能通过双方确认后的版本化 Contract 和适配层接入，不能直接把实验逻辑塞回主链路。
+
+### 今日网站交付
+
+| 网站 | 入口 | 当前能力 |
+| --- | --- | --- |
+| 持仓导入台 | `holdings-intake/site/` | 选择或拖入 CSV、导入预览、逐行错误/提示、确认状态 |
+| 基金市场雷达 | `fund-market-analysis/site/` | 市场状态卡、4 项观察、全部/待确认筛选、信号解释、证据与限制 |
+
+两个网站都是前端演示，不接收真实账户、不调用实时行情，也不改变 Core Agent 主链路。个人仓库 GitHub Pages 预期地址为 `https://realchenchenluo.github.io/agent/holdings-intake/` 和 `https://realchenchenluo.github.io/agent/fund-market-analysis/`，需要等待 GitHub Actions 完成首次部署后访问。
 
 ### 当前主链路状态
 
@@ -79,6 +90,7 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 4. 市场简报目前是固定参考夹具，不是实时行情或新闻服务；原油价格和地缘消息冲突只进入 Review。
 5. 持仓导入项目目前只验证合成 CSV，尚未覆盖券商、银行、基金平台等真实文件格式，也没有处理真实用户敏感数据。
 6. 市场分析项目目前只验证固定样例，尚未接入实时数据、基金公告和新闻服务，不能把市场状态当作收益预测或直接推荐。
+7. 网站目前是静态演示，GitHub Pages 只负责发布前端文件；后续若接入真实数据，仍需单独设计认证、隐私、数据来源和服务端权限。
 
 ### 下一步
 

@@ -60,3 +60,11 @@ Core Agent 只消费已经带有数据日期、来源和限制的结果；是否
 npm run check
 ```
 
+## 演示网站
+
+网站文件在 `site/`，打开 `site/index.html` 即可查看静态演示；部署后会通过 GitHub Pages 提供独立地址：
+
+`https://realchenchenluo.github.io/agent/fund-market-analysis/`
+
+网页里的市场状态、观察项和信号来自固定参考数据，不是实时行情，不会生成直接买卖指令。
+

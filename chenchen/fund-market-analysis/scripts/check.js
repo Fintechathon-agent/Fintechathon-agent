@@ -14,4 +14,9 @@ if (!sample.observations.length || !sample.evidence.length) throw new Error("sam
 for (const signal of sample.signals) {
   if (!signal.signal_id || !["OBSERVED", "REVIEW_REQUIRED", "CONFIRMED"].includes(signal.status) || !signal.reason) throw new Error("invalid signal: " + signal.signal_id);
 }
+for (const file of ["index.html", "styles.css", "app.js"]) {
+  const siteFile = path.join(root, "site", file);
+  if (!fs.existsSync(siteFile) || fs.statSync(siteFile).size === 0) throw new Error("missing website file: " + file);
+}
+if (!fs.readFileSync(path.join(root, "site", "index.html"), "utf8").includes("observationList")) throw new Error("market website is missing observation view");
 console.log("Fund Market Analysis check passed: " + sample.observations.length + " observations and " + sample.signals.length + " signals validated.");

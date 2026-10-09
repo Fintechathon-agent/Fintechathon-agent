@@ -18,4 +18,9 @@ for (const [index, row] of rows.slice(1).entries()) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(row[0])) throw new Error("row " + (index + 2) + " has an invalid snapshot date");
 }
 if (schema.properties.contract_version.const !== "holdings-intake.v0") throw new Error("unexpected holdings Contract version");
+for (const file of ["index.html", "styles.css", "app.js"]) {
+  const siteFile = path.join(root, "site", file);
+  if (!fs.existsSync(siteFile) || fs.statSync(siteFile).size === 0) throw new Error("missing website file: " + file);
+}
+if (!fs.readFileSync(path.join(root, "site", "index.html"), "utf8").includes("confirmButton")) throw new Error("holdings website is missing confirmation flow");
 console.log("Holdings Intake check passed: " + (rows.length - 1) + " sample rows validated.");

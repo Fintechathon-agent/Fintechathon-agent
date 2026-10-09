@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="基金市场局势分析演示：把市场信号、证据和待确认项放在一起。">
+  <title>基金市场雷达 | Personal AI Fund Manager</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html" aria-label="基金市场雷达首页">
+        <span class="brand-mark" aria-hidden="true">R</span>
+        <span>基金市场雷达</span>
+      </a>
+      <div class="topbar-meta">
+        <span class="eyebrow">MARKET ANALYSIS · V0.1</span>
+        <span class="data-chip"><span class="data-dot"></span>固定参考数据</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">FUND MARKET ANALYSIS</p>
+          <h1 id="page-title">先看市场天气，再看自己的组合。</h1>
+          <p class="hero-lede">把价格、利率、商品和来源放在同一张桌面上。先说清楚发生了什么，再标出哪些地方还不能下结论。</p>
+        </div>
+        <div class="hero-actions">
+          <button class="button button-primary" id="showAll" type="button">全部观察</button>
+          <button class="button button-secondary" id="showReview" type="button">只看待确认</button>
+        </div>
+      </section>
+
+      <section class="status-band" aria-label="市场状态总览">
+        <div class="status-main">
+          <span class="status-overline">MARKET REGIME · 2026-10-08</span>
+          <div class="status-title-row"><h2>混合信号，先复核</h2><span class="status-pill">MIXED REVIEW</span></div>
+          <p>权益偏弱、商品走强、利率小幅上行。方向不一致，适合留在观察清单，不适合直接翻译成买卖动作。</p>
+        </div>
+        <div class="status-rule"><span class="rule-mark">!</span><span><strong>当前判断</strong><small>有信号，但还缺少足够证据</small></span></div>
+      </section>
+
+      <section class="metric-grid" aria-label="关键数字">
+        <div class="metric"><span>观察项</span><strong>04</strong><small>股票、利率、商品</small></div>
+        <div class="metric"><span>待确认信号</span><strong class="warn-number">01</strong><small>价格与消息方向冲突</small></div>
+        <div class="metric"><span>数据日期</span><strong>10.08</strong><small>不是实时行情</small></div>
+        <div class="metric"><span>数据模式</span><strong class="mode-number">参考</strong><small>REFERENCE FIXTURE</small></div>
+      </section>
+
+      <div class="content-grid">
+        <section class="main-column">
+          <div class="section-heading"><div><p class="section-kicker">01 / 观察</p><h2>市场在告诉我们什么</h2></div><span class="result-count" id="resultCount">4 项观察</span></div>
+          <div class="observation-list" id="observationList"></div>
+
+          <section class="insight-panel" aria-labelledby="insight-title">
+            <div class="insight-mark" aria-hidden="true">↗</div>
+            <div><p class="section-kicker">一眼结论</p><h2 id="insight-title">先把“方向不一致”说清楚</h2><p>今天最重要的不是找一个确定答案，而是把冲突保留下来：权益弱不自动等于债券一定安全，原油上涨也不能直接证明某条地缘消息是原因。</p></div>
+          </section>
+        </section>
+
+        <aside class="side-column">
+          <section class="panel signal-panel" aria-labelledby="signal-title">
+            <div class="panel-heading"><div><p class="section-kicker">02 / 信号</p><h2 id="signal-title">需要继续盯什么</h2></div><span class="signal-count">2 条</span></div>
+            <div id="signalList" class="signal-list"></div>
+          </section>
+          <details class="panel evidence-panel">
+            <summary><span><span class="summary-icon">⌁</span>证据与限制</span><span class="chevron">⌄</span></summary>
+            <div class="evidence-content">
+              <div class="evidence-row"><span>来源</span><strong>每日市场简报_2026-10-08.pdf</strong></div>
+              <div class="evidence-row"><span>口径</span><strong>固定参考夹具，不是实时行情</strong></div>
+              <div class="evidence-row"><span>限制</span><strong>不生成收益预测，不替代 Risk 审核</strong></div>
+            </div>
+          </details>
+          <details class="panel tip-panel">
+            <summary><span><span class="summary-icon">?</span>小 Tips</span><span class="chevron">⌄</span></summary>
+            <p>“待确认”不是坏消息，而是告诉你：这条信号还不能被写成确定事实。点击每条信号可以查看它为什么被保留。</p>
+          </details>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer"><span>Personal AI Fund Manager / Fund Market Analysis</span><span>fund-market-analysis.v0</span></footer>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>

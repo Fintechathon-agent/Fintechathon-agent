@@ -1,0 +1,53 @@
+name: Deploy standalone demo sites
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "chenchen/holdings-intake/site/**"
+      - "chenchen/fund-market-analysis/site/**"
+      - ".github/workflows/deploy-standalone-sites.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Assemble two independent sites
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site/holdings-intake _site/fund-market-analysis
+          cp -R chenchen/holdings-intake/site/. _site/holdings-intake/
+          cp -R chenchen/fund-market-analysis/site/. _site/fund-market-analysis/
+          cat > _site/index.html <<'EOF'
+          <!doctype html>
+          <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personal AI Fund Manager · 独立演示</title><style>body{margin:0;background:#f4f6f7;color:#18232b;font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif}main{width:min(760px,calc(100% - 36px));margin:12vh auto}h1{font-size:clamp(30px,5vw,54px);letter-spacing:-.05em}p{color:#71808a;line-height:1.7}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:30px}a{display:block;padding:22px;border:1px solid #dce4e8;border-radius:14px;background:#fff;color:#18232b;text-decoration:none}a:hover{border-color:#233d52}strong,small{display:block}small{margin-top:8px;color:#71808a}@media(max-width:560px){.grid{grid-template-columns:1fr}}</style></head><body><main><p>PERSONAL AI FUND MANAGER · STANDALONE DEMOS</p><h1>两个独立实验网站</h1><p>它们暂时不接入主产品：一个负责看清楚持仓输入，一个负责整理市场信号。</p><div class="grid"><a href="./holdings-intake/"><strong>持仓导入台</strong><small>上传、预览、校验和确认</small></a><a href="./fund-market-analysis/"><strong>基金市场雷达</strong><small>市场状态、观察项和证据</small></a></div></main></body></html>
+          EOF
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "_site"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
