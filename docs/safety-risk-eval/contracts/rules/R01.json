@@ -1,0 +1,43 @@
+{
+  "rule_id": "R01",
+  "title_zh": "权限、工具范围与真实交易禁止",
+  "version": "risk-rules.v0.1-draft",
+  "status": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW",
+  "stages": [
+    "PLAN_REVIEW",
+    "EXECUTION_PREFLIGHT"
+  ],
+  "check_key": "permissions",
+  "input_refs": [
+    "/context"
+  ],
+  "conditions": [
+    {
+      "condition_id": "R01-policy",
+      "metric": "permissions",
+      "operator": "POLICY_CHECK",
+      "threshold": null,
+      "threshold_ref": null,
+      "unit": "POLICY",
+      "basis": "POLICY",
+      "group": "ANY"
+    }
+  ],
+  "reason_codes": [
+    "PERMISSION_DENIED",
+    "REAL_TRADE_FORBIDDEN",
+    "TOOL_NOT_ALLOWED",
+    "EXTERNAL_PERMISSION_OVERRIDE"
+  ],
+  "failure_decisions": [
+    "BLOCK"
+  ],
+  "acceptance_policy_zh": "不可接受越权。",
+  "enforcement_owner": [
+    "ORCHESTRATOR",
+    "TOOLS"
+  ],
+  "recovery_zh": "使用有权限的模拟操作，禁止真实交易。",
+  "source": "SOP_CONFIRMED",
+  "notes_zh": "配置仅供队内虚构演示；规则定义不是可执行规则引擎。"
+}
