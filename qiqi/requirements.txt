@@ -1,0 +1,26 @@
+# Personal AI Fund Manager —— Python 依赖清单
+#
+# 版本为 2026-10-09 在本机实测通过的版本（Python 3.10，Windows）。
+# 审计前仓库无依赖文件（见 docs/审计报告_数据标准化与Memory治理_2026-10-09.md §7），
+# 此文件用于团队环境复现。安装：pip install -r requirements.txt
+
+# ---- 核心：行情与网络 ----
+akshare==1.18.88          # A 股行情/历史数据（agent/tools/market.py；缺失时降级 mock）
+requests==2.32.5          # HTTP（brief/collect_market_data.py 采集；agent/tools/news.py）
+
+# ---- 配置与模板 ----
+PyYAML==6.0.3             # config.*.yaml 解析（agent/config.py / config_fund.py）
+Jinja2==3.1.6             # 报告渲染（agent/render.py / pdf.py）
+
+# ---- 文档产出 ----
+python-docx==1.2.0        # DOCX 生成（brief/ 交付文档）
+pymupdf==1.28.2           # PDF 元数据/渲染（brief/make_brief_page.py、md_to_pdf.py）
+                          # 注意：import 用 `pymupdf`，`fitz` 别名已废弃
+
+# ---- 可选 ----
+boto3==1.43.109           # brief/deploy_aws.py（AWS 静态托管；未部署时可不装）
+jsonschema==4.26.0        # 契约校验（brief/verify_contract.py）
+
+# ---- 说明 ----
+# pandas / numpy 为 akshare 的传递依赖，无需显式声明（实测 pandas 2.3.3 / numpy 2.2.6）。
+# tushare / pydantic 未使用（审计确认无 import）。

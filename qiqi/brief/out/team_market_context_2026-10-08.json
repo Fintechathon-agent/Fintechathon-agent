@@ -1,0 +1,170 @@
+{
+  "brief_id": "market-brief-2026-10-08",
+  "as_of": "2026-10-08",
+  "published_at": "2026-10-08T18:05:00+08:00",
+  "data_mode": "AUTO_BRIEF",
+  "source_reference": "brief/out/market_2026-10-08.json（自动导出）",
+  "market": [
+    {
+      "asset_id": "CSI300",
+      "name": "沪深300",
+      "latest": 4310.28,
+      "change_pct": -1.09,
+      "data_time": "2026-10-08T15:00:00+08:00",
+      "source_status": "CROSS_CHECKED"
+    },
+    {
+      "asset_id": "SSE_COMPOSITE",
+      "name": "上证指数",
+      "latest": 3811.9,
+      "change_pct": -0.79,
+      "data_time": "2026-10-08T15:00:00+08:00",
+      "source_status": "CROSS_CHECKED"
+    },
+    {
+      "asset_id": "CHINEXT",
+      "name": "创业板指",
+      "latest": 3036.66,
+      "change_pct": -3.15,
+      "data_time": "2026-10-08T15:00:00+08:00",
+      "source_status": "CROSS_CHECKED"
+    },
+    {
+      "asset_id": "HSI",
+      "name": "恒生指数",
+      "latest": 23785.79,
+      "change_pct": -1.43,
+      "data_time": "2026-10-08T16:08:00+08:00",
+      "source_status": "CROSS_CHECKED"
+    },
+    {
+      "asset_id": "DOW",
+      "name": "道琼斯",
+      "latest": 51179.87,
+      "change_pct": -0.66,
+      "data_time": "2026-10-08T04:55:00+08:00",
+      "source_status": "REFERENCE_ONLY"
+    },
+    {
+      "asset_id": "NASDAQ",
+      "name": "纳斯达克",
+      "latest": 27538.69,
+      "change_pct": -0.22,
+      "data_time": "2026-10-08T04:55:00+08:00",
+      "source_status": "REFERENCE_ONLY"
+    },
+    {
+      "asset_id": "SP500",
+      "name": "标普500",
+      "latest": 7801.77,
+      "change_pct": -0.22,
+      "data_time": "2026-10-08T04:55:00+08:00",
+      "source_status": "REFERENCE_ONLY"
+    },
+    {
+      "asset_id": "COMEX_GOLD",
+      "name": "COMEX黄金",
+      "latest": 4145.76,
+      "change_pct": 0.12,
+      "data_time": "2026-10-08T18:00:00+08:00",
+      "source_status": "CROSS_CHECKED"
+    },
+    {
+      "asset_id": "NYMEX_CRUDE",
+      "name": "NYMEX原油",
+      "latest": 91.95,
+      "change_pct": 4.15,
+      "data_time": "2026-10-08T18:00:00+08:00",
+      "source_status": "CROSS_CHECKED"
+    },
+    {
+      "asset_id": "COMEX_SILVER",
+      "name": "COMEX白银",
+      "latest": 59.15,
+      "change_pct": -1.9,
+      "data_time": "2026-10-08T18:00:00+08:00",
+      "source_status": "CROSS_CHECKED"
+    },
+    {
+      "asset_id": "NYMEX_GAS",
+      "name": "NYMEX天然气",
+      "latest": 3.244,
+      "change_pct": 1.28,
+      "data_time": "2026-10-08T18:00:00+08:00",
+      "source_status": "REFERENCE_ONLY"
+    },
+    {
+      "asset_id": "CNH",
+      "name": "离岸人民币",
+      "latest": 6.7046,
+      "change_pct": 0.03,
+      "data_time": "2026-10-08T18:00:00+08:00",
+      "source_status": "REFERENCE_ONLY"
+    },
+    {
+      "asset_id": "UST10Y",
+      "name": "美债10Y",
+      "latest": 5.28,
+      "change_pct": null,
+      "data_time": "2026-10-07T18:00:00+08:00",
+      "source_status": "OFFICIAL_SOURCE",
+      "previous_value": 5.27
+    },
+    {
+      "asset_id": "UST30Y",
+      "name": "美债30Y",
+      "latest": 5.67,
+      "change_pct": null,
+      "data_time": "2026-10-07T18:00:00+08:00",
+      "source_status": "OFFICIAL_SOURCE",
+      "previous_value": 5.64
+    }
+  ],
+  "signals": [
+    {
+      "signal_id": "chinext-abnormal-move",
+      "type": "ABNORMAL_MOVE",
+      "status": "OBSERVED",
+      "asset_ids": [
+        "CHINEXT"
+      ],
+      "reason": "创业板指单日变动 -3.15%，达到异常检测阈值 3%",
+      "observed_change_pct": -3.15,
+      "threshold_pct": 3.0
+    },
+    {
+      "signal_id": "nymex-crude-abnormal-move",
+      "type": "ABNORMAL_MOVE",
+      "status": "OBSERVED",
+      "asset_ids": [
+        "NYMEX_CRUDE"
+      ],
+      "reason": "NYMEX原油单日变动 +4.15%，达到异常检测阈值 3%",
+      "observed_change_pct": 4.15,
+      "threshold_pct": 3.0
+    }
+  ],
+  "source_checks": [
+    {
+      "source": "新浪 / 东财 push2",
+      "scope": "A股与商品价格",
+      "status": "CROSS_CHECKED"
+    },
+    {
+      "source": "美国财政部官网",
+      "scope": "美债10Y与30Y",
+      "status": "OFFICIAL_SOURCE"
+    },
+    {
+      "source": "东财数据中心官方分类",
+      "scope": "业绩预告",
+      "status": "REFERENCE_ONLY"
+    }
+  ],
+  "limitations": [
+    "本文件由 brief/export_team_market_context.py 从每日市场简报自动导出，不是实时行情接口。",
+    "Core Agent 只传递市场上下文和异常证据，不把本文件重新计算为组合收益、回撤或预测。",
+    "价格与新闻冲突只进入 Review，不自动转换为买卖动作。",
+    "signals 仅含机械判定的异常波动；冲突类、利率敏感度、披露节奏等信号需 Research 层人工补充。"
+  ]
+}

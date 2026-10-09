@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+
+# 运行时产物（每次 demo 会重新生成）
+data/memory/
+data/audit/
+data/approvals/
+data/paper_trades/
+data/history/
+
+# 本地凭证（含密钥，勿提交）
+brief/feishu.local.json
+config.fund.local.yaml
+.env
+.env.*
