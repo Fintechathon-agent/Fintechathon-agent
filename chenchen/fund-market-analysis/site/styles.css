@@ -48,6 +48,9 @@ h1 { margin-top: 10px; font-size: clamp(32px, 4.5vw, 58px); line-height: 1.05; l
 .status-title-row h2 { font-size: 27px; letter-spacing: -.035em; }
 .status-pill { padding: 6px 8px; border-radius: 999px; color: var(--gold); background: var(--gold-soft); font-size: 10px; font-weight: 850; letter-spacing: .06em; }
 .status-main p { max-width: 670px; margin-top: 9px; color: #5d727f; font-size: 13px; line-height: 1.6; }
+.confidence-note { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+.confidence-note strong { color: var(--navy-dark); font-size: 12px; }
+.confidence-note span { color: #71808a; font-size: 11px; }
 .status-rule { display: flex; align-items: center; align-self: center; gap: 10px; min-width: 205px; padding-left: 23px; border-left: 1px solid #c8d5dc; }
 .rule-mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: #fff; background: var(--coral); font-weight: 800; }
 .status-rule strong, .status-rule small { display: block; }
@@ -75,6 +78,10 @@ h2 { margin-top: 7px; font-size: 20px; letter-spacing: -.025em; }
 .observation-label small { margin-top: 4px; color: var(--muted); font-size: 10px; }
 .observation-title { font-size: 13px; font-weight: 760; }
 .observation-source { margin-top: 5px; color: var(--muted); font-size: 11px; }
+.source-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 9px; color: var(--muted); font-size: 10px; line-height: 1.4; }
+.source-meta a, .source-row a { color: var(--navy); font-weight: 750; text-decoration: none; }
+.source-meta a:hover, .source-row a:hover { text-decoration: underline; }
+.credibility-tag { padding: 3px 6px; border-radius: 999px; color: #8a611d; background: var(--gold-soft); font-weight: 800; }
 .observation-value { text-align: right; }
 .observation-value strong { display: block; font-size: 20px; letter-spacing: -.04em; }
 .observation-value small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
@@ -98,6 +105,7 @@ h2 { margin-top: 7px; font-size: 20px; letter-spacing: -.025em; }
 .signal-status.observed { color: var(--navy); background: var(--blue-soft); }
 .signal-status.review { color: #8d5b1a; background: var(--gold-soft); }
 .signal-item p { margin-top: 8px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.signal-confidence { margin-top: 7px; color: #8a611d; font-size: 10px; font-weight: 800; }
 .signal-item details { margin-top: 9px; }
 .signal-item summary { color: var(--navy); cursor: pointer; font-size: 11px; font-weight: 750; }
 .signal-item details p { padding-top: 7px; margin-top: 0; color: #536875; }
@@ -111,6 +119,12 @@ h2 { margin-top: 7px; font-size: 20px; letter-spacing: -.025em; }
 .evidence-row:last-child { border: 0; }
 .evidence-row span { color: var(--muted); }
 .evidence-row strong { max-width: 190px; text-align: right; font-size: 11px; line-height: 1.45; }
+.source-list { margin-top: 10px; padding-top: 8px; border-top: 1px solid #edf1f3; }
+.source-row { display: flex; align-items: start; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #edf1f3; color: var(--ink); font-size: 10px; line-height: 1.45; }
+.source-row:last-child { border-bottom: 0; }
+.source-row span { min-width: 0; }
+.source-row small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
+.source-row em { flex: 0 0 auto; color: var(--muted); font-size: 10px; font-style: normal; }
 .tip-panel p { margin: 12px 0 0 29px; color: var(--muted); font-size: 11px; line-height: 1.65; }
 .site-footer { display: flex; justify-content: space-between; gap: 15px; padding: 30px 0 36px; color: #8b9791; font-size: 11px; }
 
@@ -142,6 +156,7 @@ h2 { margin-top: 7px; font-size: 20px; letter-spacing: -.025em; }
   .observation-value { grid-column: 2; grid-row: 2; }
   .observation-title { grid-column: 1; grid-row: 2; align-self: center; }
   .observation-source { display: none; }
+  .source-meta { display: flex; font-size: 9px; }
   .section-heading { align-items: start; }
   .site-footer { display: block; line-height: 2; }
 }

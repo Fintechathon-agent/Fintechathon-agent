@@ -6,6 +6,7 @@ const path = require("node:path");
 const root = path.join(__dirname, "..");
 const sample = JSON.parse(fs.readFileSync(path.join(root, "data", "sample-market-context.json"), "utf8"));
 const schema = JSON.parse(fs.readFileSync(path.join(root, "contracts", "market-analysis.v0.schema.json"), "utf8"));
+const sources = JSON.parse(fs.readFileSync(path.join(root, "data", "source-registry.json"), "utf8"));
 if (sample.contract_version !== schema.properties.contract_version.const) throw new Error("market analysis Contract version mismatch");
 if (!/^\d{4}-\d{2}-\d{2}$/.test(sample.as_of)) throw new Error("invalid sample date");
 if (sample.data_mode !== "REFERENCE_FIXTURE") throw new Error("sample must be marked as a reference fixture");
@@ -14,6 +15,17 @@ if (!sample.observations.length || !sample.evidence.length) throw new Error("sam
 for (const signal of sample.signals) {
   if (!signal.signal_id || !["OBSERVED", "REVIEW_REQUIRED", "CONFIRMED"].includes(signal.status) || !signal.reason) throw new Error("invalid signal: " + signal.signal_id);
 }
+if (sources.data_mode !== "REFERENCE_FIXTURE" || !sources.overall_credibility || sources.overall_credibility.score_out_of_5 > 5) throw new Error("invalid source registry credibility");
+for (const source of sources.sources) {
+  if (!source.source_id || !source.label || !source.status || (source.url !== null && !/^https:\/\//.test(source.url))) throw new Error("invalid source registry entry");
+}
+for (const observation of sources.observations) {
+  if (!observation.asset_id || !observation.credibility || observation.score_out_of_5 < 0 || observation.score_out_of_5 > 5) throw new Error("invalid observation credibility");
+}
+for (const signal of sources.signals) {
+  if (!signal.signal_id || !signal.credibility || !signal.basis) throw new Error("invalid signal credibility");
+}
+if (!fs.existsSync(path.join(root, "docs", "source-and-credibility.md"))) throw new Error("missing source and credibility documentation");
 for (const file of ["index.html", "styles.css", "app.js"]) {
   const siteFile = path.join(root, "site", file);
   if (!fs.existsSync(siteFile) || fs.statSync(siteFile).size === 0) throw new Error("missing website file: " + file);

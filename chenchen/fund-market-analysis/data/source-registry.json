@@ -1,0 +1,62 @@
+{
+  "as_of": "2026-10-08",
+  "data_mode": "REFERENCE_FIXTURE",
+  "overall_credibility": {
+    "label": "中低",
+    "score_out_of_5": 2.5,
+    "meaning": "工作评级，不是统计概率；只适合研究和演示，不适合作为直接投资依据。",
+    "basis": ["来源可追溯但原始简报没有公开网页链接", "页面数值不是实时拉取", "样本数量少，不能支持收益或因果判断"]
+  },
+  "sources": [
+    {
+      "source_id": "user-market-brief",
+      "label": "用户提供的每日市场简报",
+      "type": "USER_PROVIDED_DOCUMENT",
+      "status": "REFERENCE_ONLY",
+      "url": null,
+      "note": "原始 PDF 只作为本地参考，没有上传到 GitHub；页面不把它当作公开可验证的实时接口。"
+    },
+    {
+      "source_id": "csindex",
+      "label": "中证指数有限公司",
+      "type": "OFFICIAL_INDEX_SOURCE",
+      "status": "OFFICIAL_SOURCE",
+      "url": "https://www.csindex.com.cn/",
+      "note": "用于查看沪深300的官方指数定义和指数资料；页面中的历史涨跌数值仍来自固定市场简报。"
+    },
+    {
+      "source_id": "szse",
+      "label": "深圳证券交易所创业板指数说明",
+      "type": "OFFICIAL_EXCHANGE_SOURCE",
+      "status": "OFFICIAL_SOURCE",
+      "url": "https://www.szse.cn/disclosure/notice/general/t20100531_500454.html",
+      "note": "用于查看创业板指的官方代码和指数定义；页面中的历史涨跌数值仍来自固定市场简报。"
+    },
+    {
+      "source_id": "cme",
+      "label": "CME Group / NYMEX WTI",
+      "type": "OFFICIAL_MARKET_SOURCE",
+      "status": "OFFICIAL_SOURCE",
+      "url": "https://www.cmegroup.com/markets/energy/crude-oil/light-sweet-crude.quotes.html",
+      "note": "用于查看 NYMEX WTI 合约的行情入口和合约信息；页面中的历史涨跌数值仍来自固定市场简报。"
+    },
+    {
+      "source_id": "treasury",
+      "label": "U.S. Department of the Treasury",
+      "type": "OFFICIAL_GOVERNMENT_SOURCE",
+      "status": "OFFICIAL_SOURCE",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?field_tdr_date_value_month=202610&type=daily_treasury_yield_curve",
+      "note": "用于查看美国国债日度收益率曲线；页面中的历史数值仍来自固定市场简报。"
+    }
+  ],
+  "observations": [
+    { "asset_id": "CSI300", "source_ids": ["user-market-brief", "csindex"], "source_status": "REFERENCE_FIXTURE", "credibility": "中低", "score_out_of_5": 2.5 },
+    { "asset_id": "CHINEXT", "source_ids": ["user-market-brief", "szse"], "source_status": "REFERENCE_FIXTURE", "credibility": "中低", "score_out_of_5": 2.5 },
+    { "asset_id": "NYMEX_CRUDE", "source_ids": ["user-market-brief", "cme"], "source_status": "REFERENCE_FIXTURE", "credibility": "中低", "score_out_of_5": 2.5 },
+    { "asset_id": "UST30Y", "source_ids": ["user-market-brief", "treasury"], "source_status": "REFERENCE_FIXTURE", "credibility": "中", "score_out_of_5": 3 }
+  ],
+  "signals": [
+    { "signal_id": "growth-rate-sensitivity", "credibility": "低", "score_out_of_5": 2, "basis": "只有少量横截面观察，不能证明因果或预测收益。" },
+    { "signal_id": "oil-message-conflict", "credibility": "低", "score_out_of_5": 1.5, "basis": "价格和消息的独立来源尚未在页面内完成逐条核对。" }
+  ]
+}
