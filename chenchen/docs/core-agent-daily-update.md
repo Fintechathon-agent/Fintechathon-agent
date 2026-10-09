@@ -16,6 +16,18 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 - 当前整体可信度为“中低（2.5 / 5）”；成长资产利率敏感度信号为“低（2 / 5）”，原油与消息冲突信号为“低（1.5 / 5）”。这些是工程工作评级，不是收益概率。
 - 已核对个人仓库线上页面包含可信度、来源和限制区域；线上页面返回 HTTP 200。团队仓库只同步源码，因当前 GitHub 计划不支持 Pages，不单独发布。
 
+
+
+
+
+### 今日 22:00 收尾检查
+
+- 今日无新增业务代码变更；真实产出为对团队仓库与个人仓库当前 `main`、工作区和远程 `origin/main` 的核对，以及主链路 Contract / 追踪字段 / 边界测试复核。
+- 两个仓库均执行 `npm run check` 和 `npm test`：JavaScript 检查通过，50/50 测试通过；`git diff --check` 通过，工作区仅保留本日报更新。
+- 对齐结论：Core Agent 继续调用现有 Quant 健康指标、候选方案和模拟结果；`investment-agent.v1`、`request_id`、`task_id`、`session_id` 可在请求、任务、响应和审计导出中关联；旧裸字段仍拒绝为 `INVALID_CONTRACT`。
+- 边界结论：未修改 Memory 的 consent、范围、生命周期或清理规则；市场上下文只作为 Artifact / ToolResult 进入 Risk Handoff；`execution_allowed=false`；价格与新闻冲突保持 `REVIEW_REQUIRED`，不生成交易动作。
+- 市场数据仍为 2026-10-08 用户简报固定夹具，来源状态和限制已记录；本次没有新增金融数据，不上传原始 PDF、真实账户或真实财务数据。
+
 ### 今日完成
 
 - 明确 Core Agent 主链路 DRI 范围和非职责边界。
