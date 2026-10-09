@@ -62,9 +62,11 @@ npm run check
 
 ## 演示网站
 
-网站文件在 `site/`，打开 `site/index.html` 即可查看静态演示；部署后会通过 GitHub Pages 提供独立地址：
+网站文件在 `site/`，打开 `site/index.html` 即可查看静态演示；个人仓库已通过 GitHub Pages 发布为独立地址：
 
 `https://realchenchenluo.github.io/agent/fund-market-analysis/`
 
 网页里的市场状态、观察项和信号来自固定参考数据，不是实时行情，不会生成直接买卖指令。
+
+团队仓库只保存源码和文档；由于仓库所在 GitHub 计划不支持 Pages，不从团队仓库单独发布网页。
 

@@ -71,9 +71,11 @@ npm run check
 
 ## 演示网站
 
-网站文件在 `site/`，打开 `site/index.html` 即可查看静态演示；部署后会通过 GitHub Pages 提供独立地址：
+网站文件在 `site/`，打开 `site/index.html` 即可查看静态演示；个人仓库已通过 GitHub Pages 发布为独立地址：
 
 `https://realchenchenluo.github.io/agent/holdings-intake/`
 
 网页中的 CSV 会在浏览器内解析，当前不上传文件。网站只展示导入、预览、校验和确认流程，不会把数据送进主产品。
+
+团队仓库只保存源码和文档；由于仓库所在 GitHub 计划不支持 Pages，不从团队仓库单独发布网页。
 

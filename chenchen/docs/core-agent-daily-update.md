@@ -25,7 +25,7 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 - 参考 GitHub 上的 RiskEngine、Portfolio-Analysis、Dashboard、mf-analytics 等公开项目，提取“导入校验、来源记录、类别/风格分析、冲突提示”等产品结构思路；未复制代码或 UI。
 - 两个独立项目都增加了版本化草案 Contract、固定测试夹具和本地检查脚本，作为未来融合前的边界验证。
 - 将两个独立项目升级为可直接打开的静态演示网站：持仓导入站支持演示 CSV、浏览器内解析、逐行状态和确认；市场分析站支持市场状态、观察项筛选、信号原因和证据限制展开。
-- 增加 GitHub Pages 自动部署配置，两个站点分别发布到 `holdings-intake/` 和 `fund-market-analysis/` 路径；代码推送后由工作流重新构建静态站点。
+- 个人仓库开启 GitHub Pages 自动部署，两个站点分别发布到 `holdings-intake/` 和 `fund-market-analysis/` 路径；代码推送后由工作流重新构建静态站点。团队仓库当前计划不支持 Pages，因此只同步源码，不保留失败的部署工作流。
 
 ### 今日新增独立项目
 
@@ -43,7 +43,7 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 | 持仓导入台 | `holdings-intake/site/` | 选择或拖入 CSV、导入预览、逐行错误/提示、确认状态 |
 | 基金市场雷达 | `fund-market-analysis/site/` | 市场状态卡、4 项观察、全部/待确认筛选、信号解释、证据与限制 |
 
-两个网站都是前端演示，不接收真实账户、不调用实时行情，也不改变 Core Agent 主链路。个人仓库 GitHub Pages 预期地址为 `https://realchenchenluo.github.io/agent/holdings-intake/` 和 `https://realchenchenluo.github.io/agent/fund-market-analysis/`，需要等待 GitHub Actions 完成首次部署后访问。
+两个网站都是前端演示，不接收真实账户、不调用实时行情，也不改变 Core Agent 主链路。个人仓库 GitHub Pages 地址为 `https://realchenchenluo.github.io/agent/holdings-intake/` 和 `https://realchenchenluo.github.io/agent/fund-market-analysis/`；团队仓库只保留源码。
 
 ### 当前主链路状态
 
