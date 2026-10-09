@@ -1,0 +1,68 @@
+{
+  "brief_id": "market-brief-2026-10-08",
+  "as_of": "2026-10-08",
+  "published_at": "2026-10-08T18:05:00+08:00",
+  "data_mode": "REFERENCE_FIXTURE",
+  "source_reference": "用户提供的每日市场简报_2026-10-08.pdf",
+  "market": [
+    { "asset_id": "CSI300", "name": "沪深300", "latest": 4310.28, "change_pct": -1.09, "data_time": "2026-10-08T15:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "SSE_COMPOSITE", "name": "上证指数", "latest": 3811.90, "change_pct": -0.79, "data_time": "2026-10-08T15:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "CHINEXT", "name": "创业板指", "latest": 3036.66, "change_pct": -3.15, "data_time": "2026-10-08T15:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "HSI", "name": "恒生指数", "latest": 23785.79, "change_pct": -1.43, "data_time": "2026-10-08T16:08:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "DOW", "name": "道琼斯", "latest": 51179.87, "change_pct": -0.66, "data_time": "2026-10-08T04:55:00+08:00", "source_status": "REFERENCE_ONLY" },
+    { "asset_id": "NASDAQ", "name": "纳斯达克", "latest": 27538.69, "change_pct": -0.22, "data_time": "2026-10-08T04:55:00+08:00", "source_status": "REFERENCE_ONLY" },
+    { "asset_id": "SP500", "name": "标普500", "latest": 7801.77, "change_pct": -0.22, "data_time": "2026-10-08T04:55:00+08:00", "source_status": "REFERENCE_ONLY" },
+    { "asset_id": "COMEX_GOLD", "name": "COMEX黄金", "latest": 4145.76, "change_pct": 0.12, "data_time": "2026-10-08T18:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "NYMEX_CRUDE", "name": "NYMEX原油", "latest": 91.95, "change_pct": 4.15, "data_time": "2026-10-08T18:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "COMEX_SILVER", "name": "COMEX白银", "latest": 59.15, "change_pct": -1.90, "data_time": "2026-10-08T18:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "NYMEX_GAS", "name": "NYMEX天然气", "latest": 3.244, "change_pct": 1.28, "data_time": "2026-10-08T18:00:00+08:00", "source_status": "REFERENCE_ONLY" },
+    { "asset_id": "CNH", "name": "离岸人民币", "latest": 6.7046, "change_pct": 0.03, "data_time": "2026-10-08T18:00:00+08:00", "source_status": "REFERENCE_ONLY" },
+    { "asset_id": "UST10Y", "name": "美债10Y", "latest": 5.28, "change_pct": null, "data_time": "2026-10-07T18:00:00+08:00", "source_status": "OFFICIAL_SOURCE" },
+    { "asset_id": "UST30Y", "name": "美债30Y", "latest": 5.67, "change_pct": null, "previous_value": 5.64, "data_time": "2026-10-07T18:00:00+08:00", "source_status": "OFFICIAL_SOURCE" }
+  ],
+  "signals": [
+    {
+      "signal_id": "oil-abnormal-move",
+      "type": "ABNORMAL_MOVE",
+      "status": "OBSERVED",
+      "asset_ids": ["NYMEX_CRUDE"],
+      "reason": "原油单日上涨超过简报中的异常检测阈值",
+      "observed_change_pct": 4.15,
+      "threshold_pct": 3
+    },
+    {
+      "signal_id": "oil-message-conflict",
+      "type": "PRICE_NEWS_CONFLICT",
+      "status": "REVIEW_REQUIRED",
+      "asset_ids": ["NYMEX_CRUDE"],
+      "reason": "油价上涨 4.15%，同时出现地缘缓和消息，价格与消息方向不一致，不能强行单一归因",
+      "source_refs": ["market.NYMEX_CRUDE", "news.hormuz-brief"]
+    },
+    {
+      "signal_id": "growth-rate-sensitivity",
+      "type": "RATE_SENSITIVITY",
+      "status": "OBSERVED",
+      "asset_ids": ["CHINEXT", "UST30Y"],
+      "reason": "创业板跌幅明显高于沪深300，同时30年期美债收益率较前一日上升，适合作为利率敏感度复核样本",
+      "source_refs": ["market.CHINEXT", "market.UST30Y"]
+    },
+    {
+      "signal_id": "earnings-preview-pace",
+      "type": "DISCLOSURE_PACE",
+      "status": "OBSERVED",
+      "asset_ids": [],
+      "reason": "简报记录截至报告期已披露137家三季报预告，其中预喜102家；该信息只作为研究上下文，不直接进入组合计算",
+      "source_refs": ["earnings.2026Q3"]
+    }
+  ],
+  "source_checks": [
+    { "source": "新浪 / 东财 push2", "scope": "A股与商品价格", "status": "CROSS_CHECKED" },
+    { "source": "美国财政部官网", "scope": "美债10Y与30Y", "status": "OFFICIAL_SOURCE" },
+    { "source": "东财数据中心官方分类", "scope": "业绩预告", "status": "REFERENCE_ONLY" }
+  ],
+  "limitations": [
+    "本文件是由用户提供的市场简报整理出的测试夹具，不是实时行情接口。",
+    "Core Agent 只传递市场上下文和异常证据，不把本夹具重新计算为组合收益、回撤或预测。",
+    "价格与新闻冲突只进入 Review，不自动转换为买卖动作。"
+  ]
+}

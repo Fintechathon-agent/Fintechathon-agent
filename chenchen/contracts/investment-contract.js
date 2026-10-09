@@ -111,7 +111,7 @@ function assertAgainst(name, value) {
   return value;
 }
 
-function createRequest({ requestId = "req-" + crypto.randomUUID(), taskId = null, sessionId = null, riskProfile = null, portfolio = null } = {}) {
+function createRequest({ requestId = "req-" + crypto.randomUUID(), taskId = null, sessionId = null, riskProfile = null, portfolio = null, marketContext = null } = {}) {
   const request = {
     contract_version: CONTRACT_VERSION,
     request_id: requestId,
@@ -123,7 +123,7 @@ function createRequest({ requestId = "req-" + crypto.randomUUID(), taskId = null
       task_id: taskId,
       session_id: sessionId
     },
-    input: { risk_profile: riskProfile, portfolio }
+    input: { risk_profile: riskProfile, portfolio, market_context: marketContext }
   };
   return assertAgainst("HealthCheckRequest", request);
 }
@@ -144,7 +144,8 @@ function buildRiskHandoff(result) {
       portfolio_snapshot_id: result.task_state.portfolio_snapshot_id,
       health_report_id: artifacts.health_report?.report_id || "",
       proposal_ids: (artifacts.candidates || []).map((candidate) => candidate.proposal_id),
-      simulation_id: artifacts.simulation?.simulation_id || ""
+      simulation_id: artifacts.simulation?.simulation_id || "",
+      ...(artifacts.market_context ? { market_context_id: artifacts.market_context.context_id } : {})
     },
     execution_allowed: false
   };

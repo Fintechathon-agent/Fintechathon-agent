@@ -16,6 +16,10 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 - 保留 `request_id`、`task_id`、`session_id` 和证据 ID 的关联要求。
 - 保留 `risk_handoff.execution_allowed = false` 的安全边界。
 - 建立本 Daily Update 文档，后续按日期追加，不覆盖历史记录。
+- 使用用户提供的 2026-10-08 市场简报整理出固定测试夹具，不上传原始 PDF。
+- 新增 `market_context` Contract 和 `market-brief.context` ToolResult，只做来源、数据日期、异常和冲突标记。
+- 验证市场上下文不会改变已有 Quant 健康指标、候选方案和模拟结果。
+- 验证价格与消息冲突会进入 `REVIEW_REQUIRED`，不会自动转成交易动作。
 
 ### 当前主链路状态
 
@@ -48,8 +52,10 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 ### 验证结果
 
 - JavaScript 语法检查：通过。
-- 自动化测试：47 项通过。
-- 页面与静态资源 Smoke Test：通过。
+- 自动化测试：50 项通过。
+- HTTP Contract 测试：市场上下文请求返回 200，Risk Handoff 证据完整。
+- 页面与静态资源 Smoke Test：启动当前版本服务后通过；首次执行因服务未启动无法连接，已复跑通过。
+- 市场简报测试记录：见 `docs/market-brief-test-report-2026-10-08.md`。
 - 团队仓库和个人仓库：代码状态已同步。
 
 ### 当前风险与阻塞
@@ -57,6 +63,7 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 1. Contract 目前主要覆盖投资健康检查主流程，组合导入、诊断、策略生成和模拟等接口还需要继续版本化。
 2. 独立 Risk Consumer 尚未接入，当前是生成并验证 Handoff，还没有外部 Risk 服务的真实消费链路。
 3. 当前仍使用虚构演示数据，不能作为真实投资决策或交易系统。
+4. 市场简报目前是固定参考夹具，不是实时行情或新闻服务；原油价格和地缘消息冲突只进入 Review。
 
 ### 下一步
 
@@ -65,6 +72,7 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 - 与 Memory 确认 Core Agent 只调用既有 Memory 接口，不修改授权和生命周期规则。
 - 为剩余投资接口补充版本化 Contract 和错误信封。
 - 与 UI 对齐主流程字段，确保页面不依赖未声明的内部字段。
+- 与 Research / Data 确认真实市场数据接入时的来源、时间窗口、可信度和刷新协议。
 
 ## 后续日期模板
 

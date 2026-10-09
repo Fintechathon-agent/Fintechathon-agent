@@ -3,6 +3,7 @@
 const crypto = require("node:crypto");
 const { MemoryStore } = require("./memory");
 const financialTools = require("../tools/financial-tools");
+const marketBrief = require("../tools/market-brief");
 const contract = require("../contracts/investment-contract");
 
 const REQUIRED_RISK_FIELDS = ["investment_horizon_days", "max_drawdown", "liquidity_need"];
@@ -239,12 +240,33 @@ class Harness {
 
   runHealthCheckContract(request) {
     const canonicalRequest = contract.assertHealthCheckRequest(request);
+    let marketContextResult = null;
+    if (canonicalRequest.input.market_context) {
+      marketContextResult = marketBrief.validateMarketBrief(canonicalRequest.input.market_context);
+      if (!marketContextResult.valid) {
+        const error = new Error("market context validation failed");
+        error.code = "INVALID_MARKET_CONTEXT";
+        error.statusCode = 422;
+        error.details = marketContextResult;
+        throw error;
+      }
+    }
     const result = this.runHealthCheck({
       task_id: canonicalRequest.context.task_id || undefined,
       session_id: canonicalRequest.context.session_id || undefined,
       risk_profile: canonicalRequest.input.risk_profile,
       portfolio: canonicalRequest.input.portfolio || undefined
     });
+    if (marketContextResult) {
+      result.artifacts.market_context = marketContextResult.output;
+      result.tool_results[marketContextResult.tool_result.trace_id] = marketContextResult.tool_result;
+      const task = this.tasks.get(result.task_state.task_id);
+      if (task) {
+        task.artifacts.market_context = clone(marketContextResult.output);
+        task.results[marketContextResult.tool_result.trace_id] = clone(marketContextResult.tool_result);
+        if (!task.state.tool_result_refs.includes(marketContextResult.tool_result.trace_id)) task.state.tool_result_refs.push(marketContextResult.tool_result.trace_id);
+      }
+    }
     return contract.buildResponse(canonicalRequest, result);
   }
 

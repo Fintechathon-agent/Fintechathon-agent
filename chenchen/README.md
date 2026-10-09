@@ -1,4 +1,4 @@
-# 两版财务 Agent 演示 · v0.12.0
+# 两版财务 Agent 演示 · v0.13.0
 
 本次交付是两个相互独立的产品；本地服务只负责分别提供运行入口：
 
@@ -124,7 +124,7 @@ npm test
 npm run smoke
 ```
 
-47 项测试覆盖基础工具、成本口径、相关性、输入失效与恢复、边界组合、账单去重、确认门槛、现金情景、提醒状态与处理备注、单笔到账试算、会话隔离、公共 Contract、页面资源及展示口径。浏览器实测记录见 Word 文档。测试通过不代表不存在其他缺陷。
+50 项测试覆盖基础工具、成本口径、相关性、输入失效与恢复、边界组合、账单去重、确认门槛、现金情景、提醒状态与处理备注、单笔到账试算、会话隔离、公共 Contract、市场简报上下文、页面资源及展示口径。浏览器实测记录见 Word 文档。测试通过不代表不存在其他缺陷。
 
 | API | 用途 |
 | --- | --- |
@@ -140,7 +140,7 @@ npm run smoke
 | GET /api/merchant/scenario?bill=渠道:账单号&delay=3 | 只试算一笔收入延迟，不修改原账单 |
 | POST /api/merchant/import 与 /api/merchant/reset | 替换账本 / 恢复演示，并清除旧确认 |
 
-投资健康检查使用 contracts/investment-agent.v1.schema.json 定义的统一信封；请求示例和响应示例分别在 contracts/examples/health-check.request.json、contracts/examples/health-check.response.json。Agent 只发送 contract_version、request_id、operation、context、input；Backend 校验后返回 task_state、artifacts、tool_results 和 risk_handoff。Risk 只消费 risk_handoff.evidence，且 execution_allowed 固定为 false。缺少版本或使用旧的裸字段请求会返回 422 INVALID_CONTRACT。完整字段说明见 contracts/README.md。
+投资健康检查使用 contracts/investment-agent.v1.schema.json 定义的统一信封；请求示例和响应示例分别在 contracts/examples/health-check.request.json、contracts/examples/health-check.response.json。Agent 只发送 contract_version、request_id、operation、context、input；Backend 校验后返回 task_state、artifacts、tool_results 和 risk_handoff。请求可以附带 data/market-brief-2026-10-08.json 这类市场上下文，Core Agent 只传递和标记异常，不重新计算 Quant。Risk 只消费 risk_handoff.evidence，且 execution_allowed 固定为 false。缺少版本或使用旧的裸字段请求会返回 422 INVALID_CONTRACT。完整字段说明见 contracts/README.md。
 
 所有新文件与变更均限定在 chenchen/。
 

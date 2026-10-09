@@ -36,7 +36,63 @@
       "required": ["risk_profile", "portfolio"],
       "properties": {
         "risk_profile": { "$ref": "#/$defs/RiskProfile" },
-        "portfolio": { "anyOf": [{ "$ref": "#/$defs/PortfolioInput" }, { "type": "null" }] }
+        "portfolio": { "anyOf": [{ "$ref": "#/$defs/PortfolioInput" }, { "type": "null" }] },
+        "market_context": { "anyOf": [{ "$ref": "#/$defs/MarketBriefInput" }, { "type": "null" }] }
+      }
+    },
+    "MarketBriefInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["brief_id", "as_of", "published_at", "data_mode", "market", "signals", "source_checks"],
+      "properties": {
+        "brief_id": { "type": "string", "minLength": 1 },
+        "as_of": { "type": "string", "minLength": 10 },
+        "published_at": { "type": "string", "minLength": 10 },
+        "data_mode": { "const": "REFERENCE_FIXTURE" },
+        "source_reference": { "type": "string" },
+        "market": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/MarketObservation" } },
+        "signals": { "type": "array", "items": { "$ref": "#/$defs/MarketSignal" } },
+        "source_checks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/SourceCheck" } },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "MarketObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id", "name", "latest", "change_pct", "data_time", "source_status"],
+      "properties": {
+        "asset_id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "latest": { "type": "number", "exclusiveMinimum": 0 },
+        "change_pct": { "type": ["number", "null"] },
+        "previous_value": { "type": "number", "exclusiveMinimum": 0 },
+        "data_time": { "type": "string", "minLength": 10 },
+        "source_status": { "enum": ["CROSS_CHECKED", "OFFICIAL_SOURCE", "REFERENCE_ONLY"] }
+      }
+    },
+    "MarketSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["signal_id", "type", "status", "asset_ids", "reason"],
+      "properties": {
+        "signal_id": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["OBSERVED", "REVIEW_REQUIRED", "CONFIRMED"] },
+        "asset_ids": { "type": "array", "items": { "type": "string" } },
+        "reason": { "type": "string", "minLength": 1 },
+        "observed_change_pct": { "type": "number" },
+        "threshold_pct": { "type": "number" },
+        "source_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "SourceCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "scope", "status"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["CROSS_CHECKED", "OFFICIAL_SOURCE", "REFERENCE_ONLY"] }
       }
     },
     "RiskProfile": {
@@ -149,7 +205,25 @@
         "portfolio_snapshot": { "$ref": "#/$defs/PortfolioSnapshot" },
         "health_report": { "$ref": "#/$defs/HealthReport" },
         "candidates": { "type": "array", "items": { "$ref": "#/$defs/ActionProposal" } },
-        "simulation": { "$ref": "#/$defs/Simulation" }
+        "simulation": { "$ref": "#/$defs/Simulation" },
+        "market_context": { "$ref": "#/$defs/MarketContextArtifact" }
+      }
+    },
+    "MarketContextArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context_id", "brief_id", "as_of", "data_mode", "market", "abnormal_moves", "unresolved_conflicts", "source_checks", "limitations"],
+      "properties": {
+        "context_id": { "type": "string" },
+        "brief_id": { "type": "string" },
+        "as_of": { "type": "string" },
+        "data_mode": { "const": "REFERENCE_FIXTURE" },
+        "source_reference": { "type": "string" },
+        "market": { "type": "array", "items": { "$ref": "#/$defs/MarketObservation" } },
+        "abnormal_moves": { "type": "array", "items": { "type": "object" } },
+        "unresolved_conflicts": { "type": "array", "items": { "type": "object" } },
+        "source_checks": { "type": "array", "items": { "$ref": "#/$defs/SourceCheck" } },
+        "limitations": { "type": "array", "items": { "type": "string" } }
       }
     },
     "PortfolioSnapshot": {
@@ -280,7 +354,8 @@
             "portfolio_snapshot_id": { "type": "string" },
             "health_report_id": { "type": "string" },
             "proposal_ids": { "type": "array", "items": { "type": "string" } },
-            "simulation_id": { "type": "string" }
+            "simulation_id": { "type": "string" },
+            "market_context_id": { "type": "string" }
           }
         },
         "execution_allowed": { "const": false }

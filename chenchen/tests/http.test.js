@@ -2,11 +2,12 @@
 const test=require('node:test'), assert=require('node:assert/strict');
 const {server}=require('../server');
 const {createRequest, CONTRACT_VERSION}=require('../contracts/investment-contract');
+const marketBrief=require('../data/market-brief-2026-10-08.json');
 test('HTTP flows: pages, independent cookies, review gating, import failure and disabled execution',async t=>{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));
   const base='http://127.0.0.1:'+server.address().port;
-  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/versions/merchant.js','/versions/investment-legacy.js','/contracts/investment-agent.v1.schema.json','/contracts/examples/health-check.request.json','/contracts/examples/health-check.response.json']) assert.equal((await fetch(base+page)).status,200);
+  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/versions/merchant.js','/versions/investment-legacy.js','/contracts/investment-agent.v1.schema.json','/contracts/examples/health-check.request.json','/contracts/examples/health-check.response.json','/data/market-brief-2026-10-08.json']) assert.equal((await fetch(base+page)).status,200);
   assert.match(await fetch(base+'/').then(r=>r.text()),/个人投资顾问/);
   assert.match(await fetch(base+'/catalog').then(r=>r.text()),/店主财务助手/);
   assert.match(await fetch(base+'/investment').then(r=>r.text()),/现在先检查什么/);
@@ -61,6 +62,15 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   assert.equal(task.request_id,request.request_id);
   assert.equal(task.risk_handoff.execution_allowed,false);
   assert.equal(task.task_state.status,'HANDOFF_REQUIRED');assert.equal(Object.keys(task.tool_results).length,4);
+  const contextualRequest=createRequest({requestId:'req-http-market-context-001',riskProfile:request.input.risk_profile,marketContext:marketBrief});
+  const contextualResponse=await fetch(base+'/api/health-check/run',{method:'POST',headers,body:JSON.stringify(contextualRequest)});
+  assert.equal(contextualResponse.status,200);
+  const contextual=await contextualResponse.json();
+  assert.equal(contextual.artifacts.market_context.brief_id,marketBrief.brief_id);
+  assert.equal(contextual.artifacts.market_context.unresolved_conflicts[0].signal_id,'oil-message-conflict');
+  assert.equal(contextual.risk_handoff.evidence.market_context_id,contextual.artifacts.market_context.context_id);
+  assert.equal(contextual.risk_handoff.execution_allowed,false);
+  assert.ok(Object.values(contextual.tool_results).some(result=>result.tool_name==='market-brief.context'));
   assert.equal((await fetch(base+'/api/audit/'+task.task_state.task_id)).status,200);
   const investmentFile=await fetch(base+'/api/task/'+task.task_state.task_id+'/export');
   assert.match(investmentFile.headers.get('content-disposition'),/attachment/);
