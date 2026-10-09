@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/holding-upload.v0.schema.json",
+  "title": "Holdings Intake Output Contract",
+  "description": "Standalone contract draft for user holdings import. It is not connected to the Core Agent yet.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "import_id", "status", "source", "portfolio", "data_quality"],
+  "properties": {
+    "contract_version": { "const": "holdings-intake.v0" },
+    "import_id": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["INVALID", "READY_FOR_CONFIRMATION", "CONFIRMED"] },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "filename"],
+      "properties": {
+        "type": { "enum": ["CSV", "XLSX", "PDF", "MANUAL"] },
+        "filename": { "type": "string", "minLength": 1 }
+      }
+    },
+    "portfolio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["as_of", "cash", "positions"],
+      "properties": {
+        "as_of": { "type": "string", "minLength": 10 },
+        "cash": { "type": "number", "minimum": 0 },
+        "positions": { "type": "array", "items": { "$ref": "#/$defs/Position" } }
+      }
+    },
+    "data_quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["valid_rows", "invalid_rows", "warnings"],
+      "properties": {
+        "valid_rows": { "type": "integer", "minimum": 0 },
+        "invalid_rows": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "Position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["instrument_id", "name", "asset_type", "quantity", "current_price"],
+      "properties": {
+        "instrument_id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "asset_type": { "type": "string", "minLength": 1 },
+        "quantity": { "type": "number", "exclusiveMinimum": 0 },
+        "current_price": { "type": "number", "exclusiveMinimum": 0 },
+        "cost_basis": { "type": ["number", "null"], "exclusiveMinimum": 0 }
+      }
+    }
+  }
+}

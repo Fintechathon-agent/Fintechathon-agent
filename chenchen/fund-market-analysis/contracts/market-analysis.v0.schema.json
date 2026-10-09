@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/fund-market-analysis.v0.schema.json",
+  "title": "Fund Market Analysis Context Contract",
+  "description": "Standalone market analysis output draft. It is not connected to the Core Agent yet.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "as_of", "data_mode", "regime", "observations", "signals", "evidence", "limitations"],
+  "properties": {
+    "contract_version": { "const": "fund-market-analysis.v0" },
+    "as_of": { "type": "string", "minLength": 10 },
+    "data_mode": { "const": "REFERENCE_FIXTURE" },
+    "regime": { "enum": ["RISK_ON", "RISK_OFF", "MIXED_REVIEW", "INSUFFICIENT_DATA"] },
+    "observations": { "type": "array", "minItems": 1, "items": { "type": "object" } },
+    "signals": { "type": "array", "items": { "$ref": "#/$defs/Signal" } },
+    "evidence": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/Evidence" } },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "Signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["signal_id", "status", "reason"],
+      "properties": {
+        "signal_id": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["OBSERVED", "REVIEW_REQUIRED", "CONFIRMED"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "scope", "status"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["CROSS_CHECKED", "OFFICIAL_SOURCE", "REFERENCE_ONLY"] }
+      }
+    }
+  }
+}

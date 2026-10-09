@@ -1,0 +1,11 @@
+{
+  "name": "personal-ai-fund-manager-market-analysis",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Standalone fund market regime and evidence analysis experiment",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "check": "node scripts/check.js",
+    "test": "npm run check"
+  }
+}

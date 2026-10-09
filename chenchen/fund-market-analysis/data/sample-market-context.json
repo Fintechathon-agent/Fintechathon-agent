@@ -1,0 +1,32 @@
+{
+  "contract_version": "fund-market-analysis.v0",
+  "as_of": "2026-10-08",
+  "data_mode": "REFERENCE_FIXTURE",
+  "regime": "MIXED_REVIEW",
+  "observations": [
+    { "asset_id": "CSI300", "name": "沪深300", "change_pct": -1.09, "source_status": "CROSS_CHECKED" },
+    { "asset_id": "CHINEXT", "name": "创业板指", "change_pct": -3.15, "source_status": "CROSS_CHECKED" },
+    { "asset_id": "NYMEX_CRUDE", "name": "NYMEX原油", "change_pct": 4.15, "source_status": "CROSS_CHECKED" },
+    { "asset_id": "UST30Y", "name": "美债30Y", "yield_pct": 5.67, "previous_yield_pct": 5.64, "source_status": "OFFICIAL_SOURCE" }
+  ],
+  "signals": [
+    {
+      "signal_id": "growth-rate-sensitivity",
+      "status": "OBSERVED",
+      "reason": "成长指数跌幅较大，同时长端利率上行，适合作为利率敏感度复核样本"
+    },
+    {
+      "signal_id": "oil-message-conflict",
+      "status": "REVIEW_REQUIRED",
+      "reason": "原油上涨与地缘缓和消息方向不一致，暂不做单一归因"
+    }
+  ],
+  "evidence": [
+    { "source": "每日市场简报_2026-10-08.pdf", "scope": "market and news reference", "status": "REFERENCE_ONLY" }
+  ],
+  "limitations": [
+    "固定测试夹具，不是实时数据",
+    "没有资金流、基金净值历史和完整类别样本",
+    "不构成投资建议"
+  ]
+}

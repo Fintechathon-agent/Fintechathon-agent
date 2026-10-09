@@ -1,0 +1,3 @@
+snapshot_date,cash,instrument_id,name,asset_type,quantity,current_price,cost_basis
+2026-10-09,10000,DEMO_EQUITY_ALPHA,示例权益资产,stock,100,47.2,50.0
+2026-10-09,10000,DEMO_BOND_ETF,示例债券基金,fund,200,40.5,39.8
