@@ -1,0 +1,44 @@
+# ============================================================
+#  持仓哨兵 Personal AI Fund Manager —— 配置文件
+# ============================================================
+
+# ---------- LLM（支持 DeepSeek / OpenAI 兼容中转）----------
+llm:
+  provider: "deepseek"                    # deepseek | openai-compatible
+  api_key: ""                             # 留空则读环境变量 DEEPSEEK_API_KEY
+  base_url: "https://api.deepseek.com"   # OpenAI 兼容中转站地址
+  model: "deepseek-chat"                  # 模型名
+  temperature: 0.3                        # 金融场景建议偏低（0.2~0.4）
+  timeout: 180
+  max_retries: 3
+
+# ---------- 金融数据源 ----------
+financial:
+  # 行情数据：akshare（免费）/ tushare（需 token）/ mock（开发用）
+  market_source: "mock"                   # akshare | tushare | mock
+  tushare_token: ""                      # tushare token（可选）
+  # 新闻数据源
+  news_source: "mock"                     # akshare | mock
+  # 回测初始资金（元）
+  backtest_initial_cash: 100000.0
+
+# ---------- 风控参数（默认用户章程）----------
+risk:
+  default_risk_tolerance: "稳健"          # 保守 | 稳健 | 积极 | 激进
+  default_max_single_loss: 0.10          # 单笔最大亏损 10%
+  default_max_total_loss: 0.20           # 整体最大亏损 20%
+  default_investment_horizon: "1年以内"  # 投资期限
+  # 置信度低于此值时触发人工审批
+  approval_threshold: 0.70
+
+# ---------- 路径 ----------
+paths:
+  memory_dir: "data/memory"
+  audit_dir: "data/audit"
+  approval_dir: "data/approvals"
+  paper_trade_dir: "data/paper_trades"
+
+# ---------- Session ----------
+session:
+  ttl_minutes: 30                        # 会话超时时间
+  max_retries: 3                         # 自动重试次数

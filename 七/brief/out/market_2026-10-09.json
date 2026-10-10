@@ -1,0 +1,958 @@
+{
+  "date": "2026-10-09",
+  "schema_version": "daily-brief/1.0",
+  "observed_at": "2026-10-09T18:00:41.154756+08:00",
+  "generated_at": "2026-10-09 18:00:41",
+  "markets": {
+    "a_share": [
+      {
+        "name": "沪深300",
+        "last": 4317.2549,
+        "change": 6.98,
+        "change_pct": 0.16,
+        "date": "2026-10-09",
+        "time": "15:35:36"
+      },
+      {
+        "name": "上证指数",
+        "last": 3813.7913,
+        "change": 1.89,
+        "change_pct": 0.05,
+        "date": "2026-10-09",
+        "time": "15:35:24"
+      },
+      {
+        "name": "创业板指",
+        "last": 3043.335,
+        "change": 6.68,
+        "change_pct": 0.22,
+        "date": "2026-10-09",
+        "time": "15:00:03"
+      }
+    ],
+    "hk": [
+      {
+        "name": "恒生指数",
+        "last": 24211.35,
+        "change": 425.56,
+        "change_pct": 1.79,
+        "date": "2026-10-09",
+        "time": "16:09:02"
+      }
+    ],
+    "us": [
+      {
+        "name": "道琼斯",
+        "last": 51231.6406,
+        "change": 51.77,
+        "change_pct": 0.1,
+        "date": "2026-10-09",
+        "time": "04:47:05"
+      },
+      {
+        "name": "纳斯达克",
+        "last": 27193.3403,
+        "change": -345.3504,
+        "change_pct": -1.25,
+        "date": "2026-10-09",
+        "time": "09:48:08"
+      },
+      {
+        "name": "标普500",
+        "last": 7765.3599,
+        "change": -36.41,
+        "change_pct": -0.47,
+        "date": "2026-10-09",
+        "time": "04:47:05"
+      }
+    ],
+    "commodity": [
+      {
+        "name": "COMEX黄金",
+        "last": 4213.862,
+        "change": 56.862,
+        "change_pct": 1.37,
+        "date": "2026-10-09",
+        "time": "18:00:38"
+      },
+      {
+        "name": "NYMEX原油",
+        "last": 90.424,
+        "change": -1.066,
+        "change_pct": -1.17,
+        "date": "2026-10-09",
+        "time": "18:00:41"
+      },
+      {
+        "name": "COMEX白银",
+        "last": 60.706,
+        "change": 1.282,
+        "change_pct": 2.16,
+        "date": "2026-10-09",
+        "time": "18:00:37"
+      },
+      {
+        "name": "NYMEX天然气",
+        "last": 3.12,
+        "change": -0.048,
+        "change_pct": -1.52,
+        "date": "2026-10-09",
+        "time": "18:00:30"
+      }
+    ],
+    "fx": [
+      {
+        "name": "离岸人民币",
+        "last": 6.6923,
+        "change": -0.0109,
+        "change_pct": -0.16,
+        "date": "2026-10-09",
+        "time": "18:00:31"
+      }
+    ]
+  },
+  "rates": {
+    "official": {
+      "date": "2026-10-08",
+      "us10y": 5.22,
+      "us30y": 5.6,
+      "prev_date": "2026-10-07",
+      "prev_us10y": 5.28,
+      "prev_us30y": 5.67,
+      "source": "美国财政部官网 daily_treasury_yield_curve"
+    },
+    "us10y": {
+      "series": "DGS10",
+      "date": "2026-10-07",
+      "value": 5.28
+    },
+    "us30y": {
+      "series": "DGS30",
+      "date": "2026-10-07",
+      "value": 5.67
+    }
+  },
+  "news": [
+    {
+      "time": "2026-10-09 17:56:13",
+      "title": "时隔12年 公募基金运作办法修订 十大亮点看变化 多举措支持逆周期布局",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891345268.html"
+    },
+    {
+      "time": "2026-10-09 17:53:00",
+      "title": "证监会严管“窄基漂移”和“宽基窄投”",
+      "category": [
+        "policy"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891343951.html"
+    },
+    {
+      "time": "2026-10-09 17:52:27",
+      "title": "权益类基金成立门槛拟降至5000万元",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891343569.html"
+    },
+    {
+      "time": "2026-10-09 17:49:37",
+      "title": "证监会就《公开募集证券投资基金运作管理办法》及配套规则征求意见",
+      "category": [
+        "policy"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891342061.html"
+    },
+    {
+      "time": "2026-10-09 17:49:30",
+      "title": "广汽集团：2026年9月汽车销量12.86万辆 同比下降25.72%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891345148.html"
+    },
+    {
+      "time": "2026-10-09 17:48:46",
+      "title": "北方稀土：2026年第四季度稀土精矿交易价格调整为不含税38769元/吨",
+      "category": [
+        "commodity"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891344641.html"
+    },
+    {
+      "time": "2026-10-09 17:45:33",
+      "title": "两家银行IPO审核“中止” A股已逾4年无银行新股",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891340774.html"
+    },
+    {
+      "time": "2026-10-09 17:39:29",
+      "title": "桂林旅游：全资子公司停业",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891339665.html"
+    },
+    {
+      "time": "2026-10-09 17:38:58",
+      "title": "欧洲股市涨幅扩大 德国DAX30指数涨1.24%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891336117.html"
+    },
+    {
+      "time": "2026-10-09 17:38:16",
+      "title": "南向资金净买近3亿港元 净买入友邦保险近11亿港元",
+      "category": [
+        "other"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891334992.html"
+    },
+    {
+      "time": "2026-10-09 17:35:03",
+      "title": "航天工程：控股子公司航天氢能拟1.91亿元收购新乡气体45%股权",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891334811.html"
+    },
+    {
+      "time": "2026-10-09 17:34:55",
+      "title": "汇丰银行在联想集团的持股多头头寸降至4.56%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891334764.html"
+    },
+    {
+      "time": "2026-10-09 17:33:41",
+      "title": "网传懂车帝内部整顿通知系伪造",
+      "category": [
+        "other"
+      ],
+      "url": "http://piyao.eastmoney.com/a/202610093891333721.html"
+    },
+    {
+      "time": "2026-10-09 17:30:54",
+      "title": "匈牙利总理：匈牙利政府预计在2027年将从财富税中获得2000亿福林",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891331419.html"
+    },
+    {
+      "time": "2026-10-09 17:30:29",
+      "title": "巴克莱上调Strategy目标价",
+      "category": [
+        "company"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891332343.html"
+    },
+    {
+      "time": "2026-10-09 17:29:03",
+      "title": "中国信通院智能体标识与身份网络面向社会开放接入",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891329694.html"
+    },
+    {
+      "time": "2026-10-09 17:26:51",
+      "title": "雅居乐集团9月合约销售额2.30亿元",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891329490.html"
+    },
+    {
+      "time": "2026-10-09 17:26:14",
+      "title": "民和股份：9月销售商品代鸡苗收入4070.21万元",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891329124.html"
+    },
+    {
+      "time": "2026-10-09 17:24:14",
+      "title": "厦门空港：9月旅客吞吐量227.51万人次 同比下降1.56%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891328918.html"
+    },
+    {
+      "time": "2026-10-09 17:23:04",
+      "title": "金冠电气：全资子公司签订不超2.96亿美元光储充项目EPC框架合同",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891328689.html"
+    },
+    {
+      "time": "2026-10-09 17:21:50",
+      "title": "秘鲁对原产于中国的陶瓷马桶作出反倾销终裁",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891323990.html"
+    },
+    {
+      "time": "2026-10-09 17:21:31",
+      "title": "川金诺：预计2026年前三季度净利润同比下降40.87%-47.44%",
+      "category": [
+        "earnings"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891323620.html"
+    },
+    {
+      "time": "2026-10-09 17:21:14",
+      "title": "美银全球研究上调法国股票评级",
+      "category": [
+        "company"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891328191.html"
+    },
+    {
+      "time": "2026-10-09 17:19:20",
+      "title": "日租从万元降到千元以下 机器人新鲜感红利快速消退",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891324118.html"
+    },
+    {
+      "time": "2026-10-09 17:18:44",
+      "title": "美银全球研究下调欧洲软件板块评级",
+      "category": [
+        "company"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891321565.html"
+    },
+    {
+      "time": "2026-10-09 17:12:27",
+      "title": "从光芯片到覆铜板 A股AI硬件板块因何轮番走低？",
+      "category": [
+        "commodity"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891318544.html"
+    },
+    {
+      "time": "2026-10-09 17:11:16",
+      "title": "9月两融新开户10.89万户 环比增长1.4%",
+      "category": [
+        "other"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891316518.html"
+    },
+    {
+      "time": "2026-10-09 17:11:00",
+      "title": "央行9月公开市场国债买卖净投放1000亿元",
+      "category": [
+        "macro"
+      ],
+      "url": "http://bond.eastmoney.com/a/202610093891317575.html"
+    },
+    {
+      "time": "2026-10-09 17:09:50",
+      "title": "摩根大通上调雪佛龙目标价",
+      "category": [
+        "company"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891317377.html"
+    },
+    {
+      "time": "2026-10-09 17:08:31",
+      "title": "豆包正在逐步建设包括出行服务、生活缴费等生活场景下的办事能力",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891319036.html"
+    },
+    {
+      "time": "2026-10-09 17:07:49",
+      "title": "三环集团：已回购864.62万股 使用资金总额9.95亿元",
+      "category": [
+        "company"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891316770.html"
+    },
+    {
+      "time": "2026-10-09 17:06:43",
+      "title": "SK海力士押注需求增长 拟加速光州半导体集群的建设",
+      "category": [
+        "other"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891306472.html"
+    },
+    {
+      "time": "2026-10-09 17:05:46",
+      "title": "贝莱德在中兴通讯H股的持股比例于10月6日从6.17%降至5.96%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891317154.html"
+    },
+    {
+      "time": "2026-10-09 17:05:18",
+      "title": "嵘泰股份：控股股东拟协议转让6%股份",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891307868.html"
+    },
+    {
+      "time": "2026-10-09 17:04:55",
+      "title": "上交所终止企查查主板发行上市审核",
+      "category": [
+        "other"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891306859.html"
+    },
+    {
+      "time": "2026-10-09 17:04:26",
+      "title": "鸿富瀚：预计前三季度净利润同比增长108%-145% 液冷板模组产能逐步释放",
+      "category": [
+        "earnings"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891306656.html"
+    },
+    {
+      "time": "2026-10-09 17:04:13",
+      "title": "贝莱德在恒瑞医药H股的持股比例于10月6日从6.34%降至5.76%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891305444.html"
+    },
+    {
+      "time": "2026-10-09 17:03:25",
+      "title": "豫光金铅：半导体光电新材料科创产业化基地项目目前处于前期筹备阶段",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891305318.html"
+    },
+    {
+      "time": "2026-10-09 17:02:44",
+      "title": "联合国机构：2026年全球经济增速预计放缓至2.6%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891304924.html"
+    },
+    {
+      "time": "2026-10-09 17:01:57",
+      "title": "美国银行在金风科技H股的持股比例于10月6日从3.24%升至5.62%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891305146.html"
+    },
+    {
+      "time": "2026-10-09 16:55:38",
+      "title": "油价回落叠加AI乐观情绪 新兴市场股市终结两连跌",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891300822.html"
+    },
+    {
+      "time": "2026-10-09 16:55:13",
+      "title": "包钢股份：拟调整2026年第四季度稀土精矿关联交易价格至3.88万元/吨",
+      "category": [
+        "commodity"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891301647.html"
+    },
+    {
+      "time": "2026-10-09 16:53:46",
+      "title": "新五丰：2026年前三季度生猪销量同比增长22.58%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891301739.html"
+    },
+    {
+      "time": "2026-10-09 16:53:43",
+      "title": "“俄版谷歌”Yandex：保持服务运行是首要任务 但十分困难",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891301339.html"
+    },
+    {
+      "time": "2026-10-09 16:52:57",
+      "title": "围海股份：中标苕溪防洪治理工程 金额1.62亿元",
+      "category": [
+        "company"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891299378.html"
+    },
+    {
+      "time": "2026-10-09 16:45:57",
+      "title": "OpenAI因符号错误撤回三篇数学论文 陶哲轩转发“停止与OpenAI合作”的倡议",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891296439.html"
+    },
+    {
+      "time": "2026-10-09 16:44:33",
+      "title": "天士力：注射用吲哚菁绿获得药品注册证书",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891296348.html"
+    },
+    {
+      "time": "2026-10-09 16:44:09",
+      "title": "美国现券债市下周一休市",
+      "category": [
+        "other"
+      ],
+      "url": "http://bond.eastmoney.com/a/202610093891296727.html"
+    },
+    {
+      "time": "2026-10-09 16:42:56",
+      "title": "步长制药：获得盐酸托莫西汀口服溶液药品注册证书",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891295397.html"
+    },
+    {
+      "time": "2026-10-09 16:42:10",
+      "title": "美元迈向连续第四周上涨 势创2025年初以来最长连涨纪录",
+      "category": [
+        "other"
+      ],
+      "url": "http://forex.eastmoney.com/a/202610093891295255.html"
+    },
+    {
+      "time": "2026-10-09 16:39:06",
+      "title": "中国巨石：预计前三季度净利润同比增长100%-110%",
+      "category": [
+        "earnings"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891292744.html"
+    },
+    {
+      "time": "2026-10-09 16:37:47",
+      "title": "正邦科技：9月销售生猪收入5.41亿元",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891293360.html"
+    },
+    {
+      "time": "2026-10-09 16:37:47",
+      "title": "金新农：9月生猪销售收入5302.32万元",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891293237.html"
+    },
+    {
+      "time": "2026-10-09 16:36:52",
+      "title": "美股狂欢即将落幕？债券巨头警告：10年期美债收益率或升破6%",
+      "category": [
+        "macro"
+      ],
+      "url": "http://bond.eastmoney.com/a/202610093891297277.html"
+    },
+    {
+      "time": "2026-10-09 16:34:01",
+      "title": "英特尔美股盘前涨2%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891292621.html"
+    },
+    {
+      "time": "2026-10-09 16:32:39",
+      "title": "沃华医药：前三季度净利润同比增长44.78%",
+      "category": [
+        "earnings"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891286685.html"
+    },
+    {
+      "time": "2026-10-09 16:30:58",
+      "title": "在岸人民币兑美元收盘报6.6921",
+      "category": [
+        "other"
+      ],
+      "url": "http://forex.eastmoney.com/a/202610093891285512.html"
+    },
+    {
+      "time": "2026-10-09 16:28:10",
+      "title": "安杰思：拟以3500万元至7000万元回购公司股份",
+      "category": [
+        "company"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891282853.html"
+    },
+    {
+      "time": "2026-10-09 16:28:09",
+      "title": "电影《生化危机：爆发夜》票房破2亿",
+      "category": [
+        "other"
+      ],
+      "url": "http://biz.eastmoney.com/a/202610093891282362.html"
+    },
+    {
+      "time": "2026-10-09 16:27:21",
+      "title": "万德斯：公司中标1.14亿元委托运维服务项目",
+      "category": [
+        "company"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891282644.html"
+    },
+    {
+      "time": "2026-10-09 16:27:02",
+      "title": "欧盟理事会正式批准旨在强化国防工业与战备水平的简化法案",
+      "category": [
+        "other"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891282295.html"
+    },
+    {
+      "time": "2026-10-09 16:25:57",
+      "title": "日本气象厅称厄尔尼诺现象已增至有记录以来最强",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891281748.html"
+    },
+    {
+      "time": "2026-10-09 16:22:44",
+      "title": "伯特利董事长谈尊界刹车被踩断 公司否认供货",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891279247.html"
+    },
+    {
+      "time": "2026-10-09 16:18:28",
+      "title": "金融监管总局：要求保险公司对产品合规性和适应性进行评估 对不适宜继续销售的产品及时调整或停止销售",
+      "category": [
+        "policy"
+      ],
+      "url": "http://insurance.eastmoney.com/a/202610093891274532.html"
+    },
+    {
+      "time": "2026-10-09 16:18:10",
+      "title": "达仁堂：分公司获得洛索洛芬钠贴剂药品注册证书",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891273594.html"
+    },
+    {
+      "time": "2026-10-09 16:17:30",
+      "title": "英特尔战略奏效：英伟达或将采用其Foveros封装技术",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891273879.html"
+    },
+    {
+      "time": "2026-10-09 16:16:31",
+      "title": "环旭电子：9月合并营业收入为74.87亿元 同比增加25.64%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891272198.html"
+    },
+    {
+      "time": "2026-10-09 16:16:09",
+      "title": "泰恩康：全资子公司收到地夸磷索钠滴眼液药品注册证书",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891273084.html"
+    },
+    {
+      "time": "2026-10-09 16:15:21",
+      "title": "德国电信股份公司跌幅达7.9%",
+      "category": [
+        "other"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891271439.html"
+    },
+    {
+      "time": "2026-10-09 16:15:20",
+      "title": "沙特联军发言人称摧毁了胡塞武装3座导弹发射平台",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891270413.html"
+    },
+    {
+      "time": "2026-10-09 16:12:09",
+      "title": "东瑞股份：9月销售生猪收入1.77亿元",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891268667.html"
+    },
+    {
+      "time": "2026-10-09 16:11:50",
+      "title": "美股AI硬件股盘前多数上涨 阿斯麦、博通、ARM涨超2%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891268256.html"
+    },
+    {
+      "time": "2026-10-09 16:11:22",
+      "title": "惠誉确认澳大利亚评级为“AAA”",
+      "category": [
+        "company"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891265893.html"
+    },
+    {
+      "time": "2026-10-09 16:11:16",
+      "title": "益生股份：9月白羽肉鸡苗销售收入1.31亿元",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891268761.html"
+    },
+    {
+      "time": "2026-10-09 16:10:48",
+      "title": "10月9日港股收盘：恒指涨1.79% 恒生科技指数涨3.06%",
+      "category": [
+        "other"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891264952.html"
+    },
+    {
+      "time": "2026-10-09 16:10:39",
+      "title": "欧洲斯托克600电信指数创下自2月份以来最低点",
+      "category": [
+        "other"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891267830.html"
+    },
+    {
+      "time": "2026-10-09 16:09:48",
+      "title": "苹果股价盘前跌超2%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891267124.html"
+    },
+    {
+      "time": "2026-10-09 16:08:39",
+      "title": "中证协：不得以项目数量、收入规模作为保代唯一考核指标",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891262796.html"
+    },
+    {
+      "time": "2026-10-09 16:08:16",
+      "title": "欧盟委员会选定46个新的战略性关键矿产项目",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891265361.html"
+    },
+    {
+      "time": "2026-10-09 16:08:04",
+      "title": "中证协：不得过度包装、炒作“明星保荐代表人”",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891262494.html"
+    },
+    {
+      "time": "2026-10-09 16:06:58",
+      "title": "美股存储芯片股盘前小幅走高",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891265161.html"
+    },
+    {
+      "time": "2026-10-09 16:06:41",
+      "title": "中证协：保荐代表人禁止违规承揽项目",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891261821.html"
+    },
+    {
+      "time": "2026-10-09 16:06:27",
+      "title": "5连板时代万恒：公司产品未涉及固态电池",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891263984.html"
+    },
+    {
+      "time": "2026-10-09 16:06:24",
+      "title": "中证协：保荐代表人不得以人工智能辅助工具替代专业判断",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891262058.html"
+    },
+    {
+      "time": "2026-10-09 16:06:23",
+      "title": "美银：货币市场基金迎来2020年4月以来最大资金流入 抵消前一周的资金流出",
+      "category": [
+        "other"
+      ],
+      "url": "http://stock.eastmoney.com/a/202610093891263647.html"
+    },
+    {
+      "time": "2026-10-09 16:05:25",
+      "title": "西班牙创新银行扩大与谷歌云的战略合作",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891263587.html"
+    },
+    {
+      "time": "2026-10-09 16:05:19",
+      "title": "立昂微：拟公开摘牌受让金瑞泓微电子3.6221%股权",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891263247.html"
+    },
+    {
+      "time": "2026-10-09 16:05:19",
+      "title": "SpaceX股票美股盘前上涨3.6%",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891263037.html"
+    },
+    {
+      "time": "2026-10-09 16:04:10",
+      "title": "德国DAX指数日内涨1%突破25000点",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891260272.html"
+    },
+    {
+      "time": "2026-10-09 16:03:21",
+      "title": "金融监管总局印发《财产保险公司保险产品开发管理规定》 系统性压实公司产品开发管理主体责任",
+      "category": [
+        "policy"
+      ],
+      "url": "http://insurance.eastmoney.com/a/202610093891261560.html"
+    },
+    {
+      "time": "2026-10-09 16:02:42",
+      "title": "伦铜库存减少2200吨",
+      "category": [
+        "commodity"
+      ],
+      "url": "http://xianhuo.eastmoney.com/a/202610093891260945.html"
+    },
+    {
+      "time": "2026-10-09 16:02:30",
+      "title": "纳斯达克100指数期货上涨0.82%",
+      "category": [
+        "other"
+      ],
+      "url": "http://futures.eastmoney.com/a/202610093891261242.html"
+    },
+    {
+      "time": "2026-10-09 16:01:06",
+      "title": "美股光通信板块盘前反弹 Lumentum称光学元件产能已“售罄”至2029年初",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891258784.html"
+    },
+    {
+      "time": "2026-10-09 16:00:47",
+      "title": "晓鸣股份：9月销售鸡产品收入9645.35万元",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891258968.html"
+    },
+    {
+      "time": "2026-10-09 15:59:19",
+      "title": "iPhone 18 Pro系列被曝削减零部件产量 供应链人士回应：订单总量未发生实质性变化",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891258232.html"
+    },
+    {
+      "time": "2026-10-09 15:58:12",
+      "title": "探路者等成立科技新公司 含集成电路芯片业务",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891257322.html"
+    },
+    {
+      "time": "2026-10-09 15:55:40",
+      "title": "大全能源：已围绕新型储能装备、固态变压器进行研发项目立项",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891254151.html"
+    },
+    {
+      "time": "2026-10-09 15:54:27",
+      "title": "惠通科技：中标3.66亿元涤纶化纤项目",
+      "category": [
+        "company"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891254288.html"
+    },
+    {
+      "time": "2026-10-09 15:50:44",
+      "title": "沙特称利雅得机场遭袭3死多伤",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891254513.html"
+    },
+    {
+      "time": "2026-10-09 15:50:15",
+      "title": "消息人士：沙特不会屈服于胡塞武装的“军事讹诈”",
+      "category": [
+        "other"
+      ],
+      "url": "http://finance.eastmoney.com/a/202610093891254343.html"
+    }
+  ],
+  "earnings_forecast": {
+    "report_date": "20260930",
+    "total": 159,
+    "positive": 122,
+    "negative": 29,
+    "loss_narrowed": 6,
+    "uncertain": 2,
+    "breakdown": {
+      "预增": 32,
+      "略减": 13,
+      "略增": 72,
+      "减亏": 6,
+      "扭亏": 6,
+      "预减": 4,
+      "续盈": 12,
+      "首亏": 7,
+      "不确定": 2,
+      "续亏": 5
+    },
+    "source": "东方财富数据中心 RPT_PUBLIC_OP_NEWPREDICT（PREDICT_TYPE 分类）"
+  }
+}

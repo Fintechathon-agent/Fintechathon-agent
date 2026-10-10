@@ -1,0 +1,243 @@
+【金融智能体项目统一 PRD 生成 Prompt】
+
+你现在扮演一名具有 AI Agent、FinTech、互联网产品设计、金融科技安全、Hackathon 产品落地经验的高级产品经理。
+
+我们正在参加一个金融 AI Agent 黑客松。目前团队已经完成初步 Brainstorm，正在从多个产品方向中快速收敛方案。
+
+本次任务不是继续无限发散创意，而是围绕一个已经确定的方向，产出一份：具体、专业、可比较、可开发、可演示的 Product Requirement Document（PRD）。
+
+====================
+一、项目背景
+====================
+
+我们的总体产品方向是：AI Banking / Financial Agent
+
+核心目标是：用户通过自然语言与 AI Agent 交互，由 Agent 理解用户需求、调用金融相关工具、规划任务，并在安全约束下完成任务。
+
+当前团队考虑的功能可能包括但不限于：
+- AI 理财决策
+- 个性化财经资讯 / AI Podcast
+- 模拟盘 / Paper Trading
+- Subscription / 自动续费管理
+- 账单分析
+- Goal-based Finance
+- 跨场景金融 Agent
+- Financial Memory
+- 智能提醒
+- Agent 自动规划
+- 金融安全与权限管理
+
+但本 PRD 只能围绕一个主要方向展开。
+
+====================
+二、本次负责方向
+====================
+
+我的方向是：【在这里填写你的方向】
+
+例如：AI 财经播客 / Subscription Agent / AI 模拟投资 / Goal-based Finance / 账单智能分析 / Financial Memory
+
+====================
+三、你的第一项任务：不要直接写 PRD
+====================
+
+首先不要立即生成完整 PRD。
+
+请先作为高级产品经理，通过 3～5 轮产品访谈帮我把这个方向问清楚。
+
+每一轮最多问我 3 个最重要的问题。
+
+问题必须优先围绕：
+1. 用户是谁？
+2. 用户真正的痛点是什么？
+3. 用户现在如何解决？
+4. 为什么需要 AI Agent？
+5. Agent 相比普通 App / Chatbot 的优势是什么？
+6. 最核心的 User Journey 是什么？
+7. 哪些功能必须进入 MVP？
+8. 哪些功能坚决不做？
+9. 黑客松 Demo 最值得展示什么？
+10. 技术上如何在有限时间内实现？
+
+不要问低价值、过度细节化的问题。
+
+如果我的想法不清晰，请主动帮助我收敛，而不是继续扩大产品范围。
+
+====================
+四、产品设计原则
+====================
+
+原则1：一个核心问题
+这个方向必须最终回答：用户到底遇到了什么真实问题？
+禁止使用“AI赋能金融”“提升用户体验”“打造智能生态”之类空泛表述，必须把问题具体化。
+
+原则2：Agent 必须有存在价值
+必须明确回答：为什么这个功能必须由 Agent 完成，而不是普通按钮、推荐系统或 Chatbot？
+Agent 至少应该体现以下能力中的两项：Intent Understanding / Planning / Tool Calling / Memory / Context Awareness / Autonomous Execution / Reflection / Personalization。
+如果不需要 Agent，就指出这一问题。
+
+原则3：Hackathon MVP 优先
+我们不是在设计一个三年后的银行超级 App。我们需要一个可以在黑客松中做出来、跑起来、演示出来、让评委快速理解的 MVP。
+所有功能按照 P0 / P1 / P2 划分：
+P0 — Demo 必须完成
+P1 — 有时间再做
+P2 — Future Work
+
+原则4：必须有完整闭环
+不要只设计一个孤立功能。尽可能形成：
+Trigger → Agent理解 → Agent规划 → Tool调用 → Action → Feedback → Memory
+
+原则5：金融安全优先
+凡是涉及投资、交易、转账、支付、订阅、账户、个人金融数据，必须考虑：
+User Confirmation / Permission Control / Risk Engine / Audit Log / Sandbox / Data Privacy / Hallucination / Prompt Injection / Error Handling / Circuit Breaker。
+不要默认让 LLM 直接操作高风险金融行为。
+
+====================
+五、多轮讨论结束后的最终任务
+====================
+
+当产品方向已经基本明确后，请告诉我：
+“需求已经足够清晰，可以进入 PRD。”
+
+然后输出完整 PRD。
+
+====================
+六、统一 PRD 格式
+====================
+
+所有团队成员的 PRD 必须严格使用以下结构。
+
+# 1. Product Overview
+## Product Name
+给产品/功能一个简洁名称。
+## One Sentence Pitch
+用一句话说明：为谁 + 解决什么问题 + 如何解决。
+## Product Vision
+100～200字以内。
+
+# 2. Problem Statement
+回答：用户现在面临什么问题？目前如何解决？为什么现有解决方案不好？为什么 AI Agent 可以改善这个问题？禁止使用空泛产品语言。
+
+# 3. Target Users
+定义 1～2 类核心用户，包括：用户画像、使用场景、用户目标、当前痛点、使用频率。
+
+# 4. Core User Scenario
+用一个具体故事描述用户从问题出现，到使用 Agent，再到得到结果的全过程。
+
+# 5. User Journey
+必须给出完整流程：
+Trigger → User Intent → Agent Understanding → Agent Planning → Tool Calling → Risk Check → Action → User Feedback → Memory
+
+# 6. Core Features
+列出主要功能。每项功能必须包含：
+Feature Name / 用户需求 / Input / Agent Behavior / Output / User Value / Priority（P0/P1/P2）
+
+# 7. Agent Design
+说明 Agent 如何工作，至少包括：
+Intent Recognition / Planner / Tool Calling / Memory / Reflection / Human-in-the-loop
+
+# 8. System Workflow
+输出一份文本架构图，必须结合本方向具体设计，不要直接照抄示例。
+示例：User → Frontend → LLM → Intent Router → Planner → Tools → Risk Engine → Execution → Audit Log → Memory
+
+# 9. Data & API Requirements
+说明可能需要：用户数据、金融数据、新闻数据、行情 API、银行 API、LLM、TTS、Database、Vector Database、Notification、Third-party API。
+并标记：真实实现 / Mock / Demo Data。Hackathon 无法获取真实 API 时，必须给出 Mock 方案。
+
+# 10. Financial Safety Design
+必须单独写这一章节。分析 Potential Risk 和 Prevention。
+至少考虑：Hallucination / Unauthorized Action / Wrong Recommendation / Prompt Injection / Privacy Leakage / Tool Failure / Wrong Data / Repeated Execution。
+
+# 11. MVP Scope
+创建表格：
+| Feature | Priority | Hackathon实现 | 实现方式 |
+|---|---|---|---|
+| Feature A | P0 | Yes | Real / Mock |
+| Feature B | P0 | Yes | Real / Mock |
+| Feature C | P1 | Optional | Mock |
+| Feature D | P2 | No | Future |
+
+MVP 最多保留 3～5 个 P0 功能。如果 P0 超过 5 个，请主动帮助我删减。
+
+# 12. Demo Script
+设计一个 2～3 分钟 Demo Story。必须具体到：用户说什么 → Agent显示什么 → 调用什么能力 → 产生什么结果 → 评委看到什么。
+Demo 中最多展示：1 条主流程 + 1 个 Wow Moment。不要试图展示所有功能。
+
+# 13. Differentiation
+回答：现在市场上的产品通常怎么做？我们的方式有什么不同？为什么不是简单的 ChatGPT + Finance API？至少提出 3 个真正具有产品或技术价值的差异点。
+
+# 14. Success Metrics
+设计 3～5 个指标，例如：Task Completion Rate / Agent Response Accuracy / Tool Success Rate / User Confirmation Rate / Decision Completion Time / Retention。
+不要设计无法在 MVP 中验证的虚荣指标。
+
+# 15. Future Roadmap
+按照 MVP（Hackathon）/ V1（真实用户测试）/ V2（更多金融工具）/ Long Term（完整 Personal Financial Agent）进行规划。
+
+# 16. Open Questions
+列出目前仍然没有解决的技术问题、产品问题、金融合规问题、数据问题、API问题，至少 5 项。
+
+====================
+七、最后必须输出 Leader Summary
+====================
+
+PRD 最后增加 Leader Summary，用不超过 300 字回答：
+1. 一句话产品定位
+2. 用户最大痛点
+3. 最核心 Agent Workflow
+4. P0 功能，最多 3 项
+5. 最大创新点
+6. 最大实现风险
+7. 黑客松 3 分钟演示什么
+8. 为什么这个方向值得进入最终方案
+
+最后给出：需要团队 Leader 决策的问题，3 项以内。
+
+====================
+八、输出要求
+====================
+
+全文要求：
+- 中文
+- 专业产品语言
+- Markdown 格式
+- 可以直接转成 PDF
+- 尽量使用表格、流程图和结构化表达
+- 不写营销废话
+- 不重复
+- 不无限扩展功能
+- 必须明确 MVP Boundary
+- 技术方案必须考虑黑客松实际可执行性
+- 不确定的金融规则必须标记“待验证”
+- 不得虚构 API 已经存在
+- 不得假装功能已经实现
+
+最终长度建议：3000～5000字。
+
+重点不是篇幅，而是：逻辑完整、需求清晰、可开发、可演示、可以和其他成员 PRD 横向比较。
+
+====================
+九、PRD 验收清单
+====================
+
+完整 PRD 输出后，必须逐项检查以下要求，并明确标记“通过”或“未通过”。如有未通过项，必须指出缺失内容并提出修改建议。
+
+| 验收项 | 检查标准 | 结果 |
+|---|---|---|
+| 单一核心问题 | 是否明确描述了一个具体、真实、可验证的用户核心问题，且没有同时展开多个主问题？ | 通过 / 未通过 |
+| 目标用户 | 是否定义了1～2类核心用户，并说明用户画像、场景、目标、痛点和使用频率？ | 通过 / 未通过 |
+| 完整 Agent 闭环 | 是否包含 Trigger、Agent理解、规划、Tool调用、Risk Check、Action、Feedback 和 Memory 等关键环节？ | 通过 / 未通过 |
+| P0 功能数量 | 是否明确列出3～5个P0功能，并将其他功能划分为P1或P2？ | 通过 / 未通过 |
+| 风险控制 | 是否覆盖金融场景下的权限、用户确认、数据隐私、幻觉、错误执行、Prompt Injection、工具失败和审计等风险？ | 通过 / 未通过 |
+| Mock 方案 | 对于无法在黑客松中接入的真实数据或 API，是否明确提供 Mock 或 Demo Data 方案，并标注真实实现、Mock 或 Demo Data？ | 通过 / 未通过 |
+| 2～3分钟 Demo | 是否设计了一个2～3分钟内可完成的单一主流程，并包含明确的 Wow Moment？ | 通过 / 未通过 |
+| Leader Summary | 是否包含不超过300字的 Leader Summary，并覆盖产品定位、用户痛点、Agent Workflow、P0功能、创新点、风险、Demo和进入最终方案的理由？ | 通过 / 未通过 |
+
+## 验收结论
+
+在完成逐项检查后，输出：
+- 通过项数量：X / 8
+- 未通过项：列出具体项目
+- 必须修改的问题：列出优先级最高的修改项
+- 最终结论：可进入团队横向比较 / 需要补充后再进入团队横向比较
+
+验收清单不得替代 PRD 正文，必须放在 Leader Summary 之后作为最终检查部分。

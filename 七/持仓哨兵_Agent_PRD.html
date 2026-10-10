@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>持仓哨兵 Agent　产品需求文档</title>
+<style>
+@page {
+  size: A4;
+  margin: 20mm 18mm 18mm 18mm;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  font-size: 10.5pt; line-height: 1.85; color: #2b3440; margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- 封面页 ---------- */
+.cover {
+  page-break-after: always;
+  padding-top: 52mm;
+}
+.cover .brand {
+  font-size: 30pt; font-weight: 700; color: #0d3b2e;
+  letter-spacing: 1px; line-height: 1.3; margin: 0 0 6mm;
+}
+.cover .brand-en {
+  font-size: 12pt; color: #7d8f88; letter-spacing: 3px;
+  font-weight: 400; margin: 0 0 12mm;
+}
+.cover .rule { width: 64mm; height: 3px; background: #0d3b2e; margin: 0 0 12mm; }
+.cover .tagline {
+  font-size: 13pt; color: #33544a; line-height: 1.9; margin: 0 0 16mm;
+  max-width: 130mm;
+}
+.cover .meta { font-size: 10pt; color: #63706b; line-height: 2.1; }
+.cover .meta strong { color: #2b3440; font-weight: 600; }
+
+/* ---------- 标题 ---------- */
+h1 {
+  font-size: 17pt; color: #0d3b2e; font-weight: 700;
+  margin: 26px 0 14px; padding-bottom: 6px;
+  border-bottom: 2px solid #0d3b2e; page-break-after: avoid;
+}
+h2 {
+  font-size: 12.5pt; color: #1d4a3b; font-weight: 600;
+  margin: 20px 0 10px; padding-left: 9px;
+  border-left: 4px solid #4d8a75; page-break-after: avoid;
+}
+h3 { font-size: 11pt; color: #33544a; margin: 14px 0 7px; page-break-after: avoid; }
+p { margin: 9px 0; text-align: justify; }
+
+/* ---------- 表格：无边框 + 浅灰表头 ---------- */
+table {
+  width: 100%; border-collapse: collapse; margin: 14px 0 18px;
+  font-size: 9.5pt; line-height: 1.7;
+}
+thead { display: table-header-group; }
+th {
+  background: #eef3f1; color: #1d4a3b; font-weight: 600;
+  padding: 9px 12px; text-align: left;
+  border: none; border-bottom: 1.5px solid #c3d4cd;
+}
+td {
+  padding: 9px 12px; border: none;
+  border-bottom: 1px solid #e6ece9; vertical-align: top;
+}
+tr { page-break-inside: avoid; }
+td:first-child, th:first-child { min-width: 58px; }
+
+ul, ol { margin: 9px 0; padding-left: 20px; }
+li { margin: 5px 0; }
+blockquote {
+  margin: 14px 0; padding: 11px 16px;
+  border-left: 3px solid #9dc0b3; background: #f6faf8;
+  color: #3d5c52; font-size: 9.5pt;
+}
+code {
+  font-family: Consolas, Monaco, monospace; font-size: 9pt;
+  background: #eef3f1; color: #0d3b2e; padding: 1px 5px; border-radius: 3px;
+}
+pre {
+  background: #f8fbfa; border: 1px solid #e0eae6; border-radius: 6px;
+  padding: 14px 16px; font-size: 8pt; line-height: 1.55;
+  page-break-inside: avoid; margin: 14px 0;
+}
+pre code { background: none; padding: 0; color: #24413a; font-size: 8pt; }
+strong { color: #0d3b2e; font-weight: 600; }
+hr { border: none; border-top: 1px solid #e6ece9; margin: 22px 0; }
+
+/* ---------- 可视化流程图 ---------- */
+.flow {
+  margin: 16px 0 20px; page-break-inside: avoid;
+  font-size: 9.5pt; line-height: 1.6;
+}
+.flow-row { display: flex; justify-content: center; }
+.flow-arrow {
+  text-align: center; color: #7d8f88; font-size: 9pt;
+  margin: 5px 0; letter-spacing: .5px;
+}
+.flow-box {
+  border-radius: 7px; padding: 10px 16px; text-align: center;
+  min-width: 96mm; border: 1.2px solid #c3d4cd; background: #f8fbfa;
+}
+.flow-box .fb-title { font-weight: 600; color: #0d3b2e; font-size: 10.5pt; }
+.flow-box .fb-sub {
+  color: #56675f; font-size: 8.8pt; margin-top: 3px; line-height: 1.6;
+}
+.flow-box .fb-tag {
+  display: inline-block; margin-top: 6px; padding: 2px 9px;
+  border-radius: 9px; font-size: 8.2pt;
+  background: #e4efe9; color: #21604b;
+}
+.box-user   { background: #f2f6f8; border-color: #c9d8de; }
+.box-green  { background: #f0f8f4; border-color: #a8d0bd; }
+.box-agent  { background: #eef4fb; border-color: #b7cde4; }
+.box-agent .fb-title { color: #14456f; }
+.box-tool   { background: #f6f4fb; border-color: #c8c1e0; }
+.box-tool .fb-title { color: #3f3372; }
+.box-risk   { background: #fdf6ec; border-color: #e8cfa8; }
+.box-risk .fb-title { color: #7a4f11; }
+.box-red    { background: #fdf1f1; border-color: #e9b9b9; }
+.box-red .fb-title { color: #8c2f2f; }
+.box-action { background: #f4f2ee; border-color: #cfc7b8; }
+.box-action .fb-title { color: #574c36; }
+.box-audit  { background: #f1f5f3; border-color: #bfd0c9; }
+.box-memory { background: #f1f5f3; border-color: #bfd0c9; }
+.flow-box.small { min-width: 62mm; }
+
+/* 权限分叉：绿黄走左侧，红走右侧 */
+.flow-split {
+  display: flex; gap: 10mm; justify-content: center;
+  align-items: flex-start; margin: 6px 0;
+}
+.flow-branch { display: flex; flex-direction: column; align-items: center; }
+.branch-label {
+  font-size: 8.6pt; font-weight: 600; color: #21604b;
+  background: #e4efe9; border-radius: 9px; padding: 2px 11px; margin-bottom: 6px;
+}
+.branch-label.red { color: #8c2f2f; background: #f6e0e0; }
+
+/* ---------- 亮点卡片 ---------- */
+.highlights {
+  display: flex; gap: 5mm; margin: 16px 0 18px;
+  page-break-inside: avoid;
+}
+.hl-card {
+  flex: 1; background: #f6faf8; border: 1px solid #d5e5de;
+  border-radius: 8px; padding: 12px 14px;
+}
+.hl-card .hl-num {
+  font-size: 15pt; font-weight: 700; color: #a8c9bc;
+  line-height: 1; margin-bottom: 5px;
+}
+.hl-card .hl-title {
+  font-size: 10.5pt; font-weight: 700; color: #0d3b2e; margin-bottom: 5px;
+}
+.hl-card .hl-desc { font-size: 8.8pt; color: #4a5f57; line-height: 1.65; }
+</style></head><body>
+
+<div class="cover">
+  <div class="brand">持仓哨兵 Agent</div>
+  <div class="brand-en">PORTFOLIO SENTINEL</div>
+  <div class="rule"></div>
+  <div class="tagline">
+    主动监护持仓，模拟先行验证，<br>在分级权限约束下安全执行。
+  </div>
+  <div class="meta">
+    <strong>产品需求文档</strong>　｜　供团队横向比较<br>
+    赛道：银行 AI 智能体（人工智能赛道）<br>
+    主方向：赛题场景 3「理财操作」<br>
+    参赛方案 · 2026 年 9 月
+  </div>
+</div>
+
+<h1>1. Product Overview</h1>
+<h2>产品名称</h2>
+<p><strong>持仓哨兵 Agent（PortfolioSentinel）</strong></p>
+<h2>一句话定位</h2>
+<p>为持有基金、但没时间盯盘的 20–35 岁城市个人用户，Agent 在后台持续监护持仓，用同侪行为信号与持仓诊断主动提醒「该看一看了」，先经模拟盘回测后果，再在绿 / 黄 / 红三级权限与全程审计约束下，把调仓这件事真正执行完。</p>
+<h2>产品愿景</h2>
+<p>用户要的不是又一个显示收益曲线的页面，而是有人在他没空的时候替他盯着，并且在需要动手时把「判断依据、操作后果、执行动作」一次性给全。</p>
+<p>持仓哨兵把理财从<strong>查询工具</strong>推进为<strong>受托监护</strong>：Agent 自动监测持仓与同侪行为信号，主动发起对话，给出可解释的调仓建议，先模拟再执行，每一次高风险操作都经过强验证并留下可回放的决策链路。</p>
+<div class="highlights">
+
+<div class="hl-card">
+  <div class="hl-num">01</div>
+  <div class="hl-title">主动监护</div>
+  <div class="hl-desc">用户没提问时 Agent 也在工作。监护循环持续计算持仓风险与同侪行为变化，发现异常主动触达——这是被动式 App 做不到的。</div>
+</div>
+
+<div class="hl-card">
+  <div class="hl-num">02</div>
+  <div class="hl-title">模拟先行</div>
+  <div class="hl-desc">任何建议先落模拟盘：历史回测回答「如果当时做了会怎样」，三情景区间回答「做了之后可能怎样」，看清代价再决定。</div>
+</div>
+
+<div class="hl-card">
+  <div class="hl-num">03</div>
+  <div class="hl-title">权限在工具层强制</div>
+  <div class="hl-desc">LLM 不持有交易工具直连权，红色操作必须过独立强验证，审计链路可回放。权限判定与 LLM 解耦，注入无法绕过。</div>
+</div>
+
+</div>
+
+<blockquote>
+<p>MVP 仅在演示环境中运行，不连接真实银行账户，不执行真实资金交易。</p>
+</blockquote>
+<hr />
+<h1>2. Problem Statement</h1>
+<h2>用户现在面临什么问题</h2>
+<p>持有基金的上班族在波动行情中面对三个连续的空洞：<strong>该不该动、动哪只、动多少</strong>。</p>
+<p>手机银行和基金 App 能准确回答「你今天亏了 328 元」，但不会回答「所以呢」。用户看到的是一串数字，需要自己完成从数字到动作的全部翻译工作。</p>
+<p>问题不在于信息不足，而在于<strong>信息与行动之间缺一个负责人</strong>。</p>
+<h2>用户现在如何解决</h2>
+<ul>
+<li>每天打开 App 看收益数字——看到亏损，但分不清是市场整体回调还是自己的持仓结构有问题；</li>
+<li>去社区论坛搜别人持仓——搜到的与自己差异很大，无法判断是否可比；</li>
+<li>看资讯、听博主观点——观点互相矛盾，且不知道对方风险偏好是否与自己一致；</li>
+<li>凭感觉决定，或干脆不看——忙起来连续几周不打开，回神时已错过调整窗口。</li>
+</ul>
+<h2>为什么现有方案不够好</h2>
+<p>理财 App 提供数据展示，社区提供他人观点，资讯提供市场情绪。三者都不对用户的最终结果负责，也没有任何一层把「我的持仓 + 风险承受能力 + 当前市场状态」合成一个可执行动作。</p>
+<p>更关键的是时间维度：用户不是每天都想看理财，而是<strong>在需要看的时候没人提醒</strong>。</p>
+<h2>为什么必须是 Agent</h2>
+<table>
+<thead>
+<tr>
+  <th>能力</th>
+  <th>为什么普通方案做不到</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>组合判断</td>
+  <td>没有固定阈值规则能回答「该不该调」，它依赖风险偏好、持仓集中度、市场状态与群体行为的组合推理</td>
+</tr>
+<tr>
+  <td>意图理解</td>
+  <td>用户表达天然模糊（「我那个基金是不是该跑了」），按钮无法承载</td>
+</tr>
+<tr>
+  <td>主动触达</td>
+  <td>Agent 能在用户没提问时工作，监护循环持续运行；被动式 App 做不到</td>
+</tr>
+<tr>
+  <td>确定性执行</td>
+  <td>LLM 负责理解、规划与解释，数字与执行由确定性工具承担，数字永不来自模型生成</td>
+</tr>
+</tbody>
+</table>
+<p>用户没时间做的不是「看数字」，而是「盯着、判断、然后去操作」这一整条链路。</p>
+<hr />
+<h1>3. Target Users</h1>
+<table>
+<thead>
+<tr>
+  <th>用户</th>
+  <th>场景与目标</th>
+  <th>当前痛点</th>
+  <th>使用频率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>核心</strong>：24–35 岁有基金持仓的职场个人<br>月收入 8K–25K，持有 2–5 只基金，单只 3,000–50,000 元</td>
+  <td>市场波动或收到提醒时，想快速知道该不该动，尽量少花时间</td>
+  <td>App 只报数字不给建议；想参考他人操作但找不到可比对象；忙起来完全失联于自己的持仓</td>
+  <td>期望每日被动接收一次简报（30 秒读完）；主动交互每周 1–2 次（待验证）</td>
+</tr>
+<tr>
+  <td><strong>次要</strong>：18–24 岁希望练习投资的学生<br>资金量 1,000–10,000 元</td>
+  <td>用模拟盘理解组合风险，建立决策纪律</td>
+  <td>只看单只资产涨跌，缺少组合视角与复盘</td>
+  <td>按学习节奏，不固定</td>
+</tr>
+</tbody>
+</table>
+<p>MVP 以核心用户为准。两类用户的共同点是：<strong>都需要先看清后果再动手</strong>——这正是模拟盘先行设计的依据。</p>
+<hr />
+<h1>4. Core User Scenario</h1>
+<p>小周，29 岁，产品经理，持有两只基金共 3.6 万元。过去两周他连续加班，只在午休时扫过一眼 App，看到浮亏 4.3%，没做任何处理就继续开会。</p>
+<p><strong>周二晚</strong>，Agent 的监护循环检测到异常：与小周持仓重合度较高的用户群体中，有相当比例在近 5 个交易日降低了其中一只基金的仓位；同时该基金波动率超出了小周设定的容忍区间。</p>
+<p><strong>周三早 8:20</strong>，他在地铁上收到简报卡片：「你持有的 A 基金，与你持仓相似的用户中 38% 近 5 日降低了仓位；你的当前仓位高于设定的波动容忍区间。需要我帮你看一下吗？」</p>
+<p>他回了句：「是不是该跑了？帮我看看。」</p>
+<p>Agent 没有直接回答「该不该跑」，而是先补齐信息：确认可接受的单次调整比例（30% 以内）与观察期限（3 个月）。随后调用诊断工具，指出亏损的两个来源——指数整体回调贡献了大部分，且他的两只基金在同一行业上有 41% 重合，风险比他以为的更集中。</p>
+<p>接着 Agent 提出建议：「赎回转出 A 基金的 30%（约 5,400 元），转入货币基金作为缓冲，保留其余仓位」，并立刻放进模拟盘试跑。屏幕上出现两条曲线：<strong>「若 3 个交易日前跟进该信号」与「一直持有至今」</strong>。回测显示若当时调整，这段回撤会少 6.7%（约减少浮亏 740 元）。</p>
+<p>小周点了「按这个方案执行」。系统识别出这是基金赎回，属于<strong>红色权限</strong>，弹出强验证：短信验证码 + 人脸识别（演示为 Mock）。通过后 Mock 交易网关返回执行成功，页面展开完整<strong>审计时间线</strong>：从信号触发、意图识别、任务规划、工具调用、风险检查、用户确认到执行回执，每一步都可点开查看。</p>
+<p><strong>当晚</strong>，Agent 推送复盘提醒并写入记忆：接受 30% 以内的分批调整、偏好「先转货币基金缓冲」的低冲击路径、下次同类信号出现时优先复核。</p>
+<p>全程没有任何真实资金动作，但产品闭环完整走完一遍。</p>
+<hr />
+<h1>5. User Journey</h1>
+<table>
+<thead>
+<tr>
+  <th>阶段</th>
+  <th>系统行为与用户可见结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Trigger</strong></td>
+  <td>监护循环后台运行（每日定时 + 事件驱动）：拉取持仓与净值、计算波动指标、比对同侪行为信号。命中阈值时生成提醒。此阶段为<strong>绿色权限，自动执行</strong>。</td>
+</tr>
+<tr>
+  <td><strong>User Intent</strong></td>
+  <td>用户口语化回应：「是不是该跑了」。允许模糊、省略、无主语。</td>
+</tr>
+<tr>
+  <td><strong>Agent 理解</strong></td>
+  <td>识别意图类型（诊断 / 建议 / 直接执行 / 仅咨询），抽取实体（基金、金额、比例、期限）。缺失关键信息时<strong>只追问必要项</strong>，不猜测风险偏好。</td>
+</tr>
+<tr>
+  <td><strong>Agent 规划</strong></td>
+  <td>拆解为有序 DAG：校验输入 → 持仓诊断 → 同侪信号复核 → 候选动作 → 模拟试算 → 回测与情景推演 → 适当性检查 → 建议输出 → 等待确认。任一节点失败则回退或降级，不跳步。</td>
+</tr>
+<tr>
+  <td><strong>Tool 调用</strong></td>
+  <td>依次调用持仓查询、净值读取、诊断计算器、同侪信号聚合器、模拟盘引擎、历史回放器、情景推演器、适当性规则引擎。<strong>数字只来自工具返回的结构化结果。</strong></td>
+</tr>
+<tr>
+  <td><strong>Risk Check</strong></td>
+  <td>三道检查：数值复核（金额守恒、份额 × 净值 = 市值）、适当性检查（调整比例 vs 容忍区间、集中度上限）、权限判定（查询 = 绿；保存方案 / 改规则 = 黄；申赎 = 红）。</td>
+</tr>
+<tr>
+  <td><strong>Action</strong></td>
+  <td>绿色自动执行；黄色展示详情后等待确认；红色触发强验证（短信 + 人脸，演示为 Mock），通过后由 <strong>Action Gateway</strong> 调用 Mock 交易网关。LLM 无交易工具直连权。</td>
+</tr>
+<tr>
+  <td><strong>Feedback</strong></td>
+  <td>返回执行回执（含幂等键与回执编号）、更新后的持仓视图、可展开的审计时间线。失败时给出明确原因与恢复路径。</td>
+</tr>
+<tr>
+  <td><strong>Memory</strong></td>
+  <td>经同意后写入：风险容忍区间、本次接受的调整比例、偏好的操作路径、拒绝过的建议及原因、下次复核时间。原始持仓默认仅保留会话内，可一键清除。</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>6. Core Features</h1>
+<h2>P0 功能（Demo 必须完成）</h2>
+<table>
+<thead>
+<tr>
+  <th>功能</th>
+  <th>用户需求</th>
+  <th>Agent 行为</th>
+  <th>用户价值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>主动监护与同侪行为信号</strong></td>
+  <td>没时间盯盘，希望有人替我盯着并叫我</td>
+  <td>后台监护循环计算波动与集中度；聚合同持仓群体行为变化（k-匿名，仅输出聚合统计）</td>
+  <td>不再错过调整窗口</td>
+</tr>
+<tr>
+  <td><strong>持仓诊断与一句话调仓建议</strong></td>
+  <td>亏了，但不知道亏在哪、该不该动</td>
+  <td>追问必要缺项；拆解亏损来源与集中度；生成候选动作并给出可解释理由</td>
+  <td>从「看数字」变成「看结论和理由」</td>
+</tr>
+<tr>
+  <td><strong>模拟盘沙箱与回测对比回放</strong></td>
+  <td>想先知道做了会怎样，不想拿真钱试错</td>
+  <td>在模拟盘执行候选动作；生成历史回测双曲线与未来三情景区间</td>
+  <td>把决策后悔成本降到最低</td>
+</tr>
+<tr>
+  <td><strong>分级授权执行与审计链路</strong></td>
+  <td>希望 Agent 真的帮我办了，但要有安全边界</td>
+  <td>判定权限级别；红色操作触发强验证；全程写入审计日志</td>
+  <td>从「给建议」到「完成任务」，过程可信可查</td>
+</tr>
+<tr>
+  <td><strong>每日持仓简报</strong></td>
+  <td>想用最少时间了解仓位状态</td>
+  <td>生成 30 秒可读完的简报（文本为主，TTS 为增强项）</td>
+  <td>建立每日打开习惯</td>
+</tr>
+</tbody>
+</table>
+<h2>P1 / P2 功能</h2>
+<ul>
+<li><strong>P1</strong>：赎回资金去向建议（场景 6 跨场景联动雏形）｜决策复盘与记忆｜错误恢复与人工接管</li>
+<li><strong>P2</strong>：真实行情 API｜真实银行账户与交易接口｜多资产扩展（股票 / 理财 / 存款）</li>
+</ul>
+<hr />
+<h1>7. Agent Design</h1>
+<h2>意图识别</h2>
+<p>识别四类意图并区分「仅咨询」与「要求执行」，后者才进入执行链路。</p>
+<table>
+<thead>
+<tr>
+  <th>用户表达</th>
+  <th>解析结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>「是不是该跑了？」</td>
+  <td>诊断类，不触发执行</td>
+</tr>
+<tr>
+  <td>「帮我看看要不要动」</td>
+  <td>诊断 + 建议请求</td>
+</tr>
+<tr>
+  <td>「把 A 基金赎 30%」</td>
+  <td>执行请求，进入权限判定</td>
+</tr>
+<tr>
+  <td>「随便」「你定」</td>
+  <td>识别为信息不足，<strong>拒绝代替用户决策</strong>，转为最小必要追问</td>
+</tr>
+</tbody>
+</table>
+<h2>规划器</h2>
+<p>固定主链路 DAG：<code>校验输入 → 持仓诊断 → 同侪信号复核 → 候选动作生成 → 模拟盘试算 → 回测与情景推演 → 适当性检查 → 建议输出 → 等待确认 → 权限判定 → 执行</code>。</p>
+<p>规划器只决定「调用哪些工具、以什么顺序」，<strong>不决定「数字是多少」</strong>。支持中断（用户随时喊停）、回退（回到上一节点重算）、人工接管。</p>
+<h2>工具调用</h2>
+<table>
+<thead>
+<tr>
+  <th>工具</th>
+  <th>关键约束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>持仓查询 / 净值读取</td>
+  <td>只读绿色；数据带截至日期，缺失或过期则停止计算，<strong>不填造</strong></td>
+</tr>
+<tr>
+  <td>诊断计算器</td>
+  <td>亏损归因、集中度、波动指标；确定性计算，可复算</td>
+</tr>
+<tr>
+  <td>同侪信号聚合器</td>
+  <td>仅输出聚合行为统计，k-匿名阈值 ≥100 人（待验证）</td>
+</tr>
+<tr>
+  <td>模拟盘引擎 / 历史回放器 / 情景推演器</td>
+  <td>与真实资金隔离；只给区间与分布，<strong>不给方向性涨跌结论</strong></td>
+</tr>
+<tr>
+  <td>适当性规则引擎</td>
+  <td>判定建议是否超出用户容忍；阈值需专业人员校准（待验证）</td>
+</tr>
+<tr>
+  <td>Action Gateway</td>
+  <td>唯一交易出口；校验权限级别 + 强验证结果 + 幂等键后才放行</td>
+</tr>
+</tbody>
+</table>
+<h2>记忆</h2>
+<p>分层存储，逐层需授权：<strong>会话记忆</strong>（会话结束即释放）、<strong>偏好记忆</strong>（风险容忍区间、操作路径偏好，需明确同意）、<strong>决策记忆</strong>（历史选择、拒绝原因、复核时间）。支持查看、修改与一键清除。</p>
+<h2>反思与错误恢复</h2>
+<table>
+<thead>
+<tr>
+  <th>触发</th>
+  <th>Agent 行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>工具超时或报错</td>
+  <td>重试 → 仍失败则降级为「该项数据暂不可用」并说明，不编造替代值</td>
+</tr>
+<tr>
+  <td>数值复核不通过</td>
+  <td>中止输出，回到计算节点重算；连续失败则终止任务并告知原因</td>
+</tr>
+<tr>
+  <td>用户拒绝建议</td>
+  <td>记录拒绝原因，重新理解目标后给出替代方向，不重复推销</td>
+</tr>
+<tr>
+  <td>执行被网关拒绝</td>
+  <td>展示原因，判断是否补充信息后重试；<strong>不无限循环</strong></td>
+</tr>
+<tr>
+  <td>连续失败或可疑行为</td>
+  <td>触发<strong>熔断</strong>：锁定链路并提示用户，需人工确认后恢复（阈值待验证）</td>
+</tr>
+</tbody>
+</table>
+<h2>人工介入原则</h2>
+<p><strong>Agent 可以自主调查、计算和准备，但资金相关操作必须由用户明确确认。</strong> 绿色自动执行、事后可查；黄色展示完整详情（对象、金额、理由、依据、后果）后确认；红色在确认之上追加多因子强验证，Agent 无权跳过；用户随时可中断、回退或转人工。</p>
+<hr />
+<h1>8. System Workflow</h1>
+<div class="flow">
+
+<div class="flow-row">
+  <div class="flow-box box-user">
+    <div class="fb-title">用户</div>
+    <div class="fb-sub">网页 Demo / Mock 银行界面</div>
+  </div>
+</div>
+<div class="flow-arrow">↓ 自然语言 / 卡片点击</div>
+
+<div class="flow-row">
+  <div class="flow-box box-green">
+    <div class="fb-title">监护循环</div>
+    <div class="fb-sub">每日定时 + 事件驱动</div>
+    <div class="fb-tag">绿色权限：自动分析、自动触达</div>
+  </div>
+</div>
+<div class="flow-arrow">↓ 命中阈值，触发提醒</div>
+
+<div class="flow-row">
+  <div class="flow-box box-agent">
+    <div class="fb-title">Agent Orchestrator</div>
+    <div class="fb-sub">Intent Router → Task Planner (DAG)　↕　Memory（会话 / 偏好 / 决策）</div>
+  </div>
+</div>
+<div class="flow-arrow">↓ 工具编排</div>
+
+<div class="flow-row">
+  <div class="flow-box box-tool">
+    <div class="fb-title">Tool Layer</div>
+    <div class="fb-sub">持仓查询 · 净值行情 · 诊断计算器 · 同侪信号聚合<br>模拟盘引擎 · 历史回放 · 三情景推演 · 适当性规则引擎</div>
+    <div class="fb-tag">数字来源唯一</div>
+  </div>
+</div>
+<div class="flow-arrow">↓ 结构化结果</div>
+
+<div class="flow-row">
+  <div class="flow-box box-risk">
+    <div class="fb-title">Risk Engine</div>
+    <div class="fb-sub">数值一致性复核 · 适当性检查 · 权限判定 · 异常熔断</div>
+  </div>
+</div>
+
+<div class="flow-split">
+  <div class="flow-branch">
+    <div class="branch-label">绿 / 黄</div>
+    <div class="flow-box box-green small">
+      <div class="fb-title">直接输出 / 等待确认</div>
+    </div>
+  </div>
+  <div class="flow-branch">
+    <div class="branch-label red">红</div>
+    <div class="flow-box box-red small">
+      <div class="fb-title">强验证</div>
+      <div class="fb-sub">短信 + 人脸（Mock）</div>
+    </div>
+    <div class="flow-arrow">↓ 验证通过</div>
+    <div class="flow-box box-action small">
+      <div class="fb-title">Action Gateway</div>
+      <div class="fb-sub">唯一交易出口 + 幂等键</div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-box box-action small">
+      <div class="fb-title">Mock 交易网关</div>
+      <div class="fb-sub">申购 / 赎回</div>
+    </div>
+  </div>
+</div>
+
+<div class="flow-arrow">↓ 结果反馈</div>
+<div class="flow-row">
+  <div class="flow-box box-audit">
+    <div class="fb-title">审计日志</div>
+    <div class="fb-sub">决策链路全记录</div>
+  </div>
+</div>
+<div class="flow-arrow">↓</div>
+<div class="flow-row">
+  <div class="flow-box box-memory">
+    <div class="fb-title">记忆写入</div>
+    <div class="fb-sub">偏好 / 决策 / 复核时间</div>
+  </div>
+</div>
+
+</div>
+
+<p><strong>三个架构要点</strong></p>
+<ol>
+<li><strong>数字来源唯一</strong>——所有数值从 Tool Layer 结构化返回，LLM 仅负责理解、规划与解释；</li>
+<li><strong>权限在工具层强制</strong>——LLM 不持有交易工具直连权，唯一出口是 Action Gateway；</li>
+<li><strong>链路可回放</strong>——审计日志记录每一步的输入、工具、输出与用户确认。</li>
+</ol>
+<hr />
+<h1>9. Data &amp; API Requirements</h1>
+<table>
+<thead>
+<tr>
+  <th>数据 / 能力</th>
+  <th>MVP 来源与 Mock 方案</th>
+  <th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>用户持仓与风险偏好</td>
+  <td>演示环境预置虚构持仓 + 表单录入</td>
+  <td>Demo Data</td>
+</tr>
+<tr>
+  <td>基金净值与历史行情</td>
+  <td>固定版本演示数据文件，标注「演示数据」与截至日</td>
+  <td>Demo Data</td>
+</tr>
+<tr>
+  <td>同侪行为聚合信号</td>
+  <td>Mock 聚合引擎，接口契约与真实实现一致</td>
+  <td>Mock</td>
+</tr>
+<tr>
+  <td>诊断计算器 / 历史回放器 / 情景推演器</td>
+  <td>本地确定性计算库，真实运行、结果可复算</td>
+  <td>Real</td>
+</tr>
+<tr>
+  <td>适当性规则引擎</td>
+  <td>本地规则引擎；阈值需专业校准（待验证）</td>
+  <td>Real Logic</td>
+</tr>
+<tr>
+  <td>LLM</td>
+  <td>真实调用（DeepSeek），负责理解、规划与解释</td>
+  <td>Real</td>
+</tr>
+<tr>
+  <td>Mock 交易网关（申购 / 赎回）</td>
+  <td>本地 Mock endpoint，返回回执编号与状态</td>
+  <td>Mock</td>
+</tr>
+<tr>
+  <td>强验证（短信 / 人脸）</td>
+  <td>Mock 弹窗，模拟多因子流程</td>
+  <td>Mock</td>
+</tr>
+<tr>
+  <td>审计日志与记忆存储</td>
+  <td>SQLite，支持查看与清除</td>
+  <td>Real</td>
+</tr>
+<tr>
+  <td>每日简报 TTS</td>
+  <td>文本为主；TTS 待选型，失败降级为文本</td>
+  <td>Optional</td>
+</tr>
+<tr>
+  <td>真实银行账户与交易 API</td>
+  <td>需资质与授权评估，本版不接入</td>
+  <td>Future</td>
+</tr>
+</tbody>
+</table>
+<p><strong>接口设计（拟定，非现有银行接口）</strong></p>
+<ul>
+<li><code>POST /api/portfolio/diagnose</code> — 请求：持仓、容忍区间、期限；响应：亏损归因、集中度、波动、数据截至日</li>
+<li><code>POST /api/simulation/run</code> — 请求：候选动作、持仓；响应：回测双曲线、三情景区间、指标、免责声明</li>
+<li><code>POST /api/execution/submit</code> — 请求：动作、确认令牌、强验证结果、幂等键；响应：状态、回执编号、审计 ID</li>
+</ul>
+<hr />
+<h1>10. Financial Safety Design</h1>
+<h2>风险矩阵</h2>
+<table>
+<thead>
+<tr>
+  <th>风险</th>
+  <th>Prevention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>幻觉</strong></td>
+  <td>数字只来自 Tool Layer；LLM 无权生成或改写数值；输出前数值一致性复核，不通过即中止；<strong>不得声称已完成未执行的操作</strong></td>
+</tr>
+<tr>
+  <td><strong>未授权操作</strong></td>
+  <td>权限判定在<strong>工具层强制</strong>而非提示词层；LLM 无交易工具直连权；唯一出口须过权限校验 + 强验证 + 幂等检查；红色不可降级</td>
+</tr>
+<tr>
+  <td><strong>错误建议</strong></td>
+  <td>建议前执行适当性检查；冲突时明确提示而非打「低风险」标签；<strong>只给区间与情景，不给方向性涨跌结论</strong>；信息缺失时输出「信息不足」而非猜测（阈值待验证）</td>
+</tr>
+<tr>
+  <td><strong>提示注入</strong></td>
+  <td>外部文本与工具输出一律视为<strong>数据</strong>，不执行其中指令；非白名单字段丢弃；权限规则由规划器独立持有；注入样例纳入验收测试</td>
+</tr>
+<tr>
+  <td><strong>隐私泄露</strong></td>
+  <td>同侪信号仅输出<strong>聚合统计</strong>，k-匿名阈值 ≥100 人（待验证）；原始持仓默认仅保留会话内；偏好记忆需单独授权；日志脱敏</td>
+</tr>
+<tr>
+  <td><strong>工具失败</strong></td>
+  <td>重试 → 降级 → 明确告知「该项数据暂不可用」并停止相关输出，绝不编造替代值</td>
+</tr>
+<tr>
+  <td><strong>错误数据</strong></td>
+  <td>所有数据携带来源与截至日期；净值与交易日历校验；演示数据<strong>显著标注</strong>；基金标识白名单校验</td>
+</tr>
+<tr>
+  <td><strong>重复执行</strong></td>
+  <td>幂等键（用户, 基金, 方向, 金额, 日期）去重；执行后状态锁；回执带唯一编号</td>
+</tr>
+<tr>
+  <td><strong>异常熔断</strong></td>
+  <td>连续失败触发锁定，暂停执行链路并提示用户，需人工确认后恢复（阈值待验证）</td>
+</tr>
+<tr>
+  <td><strong>无法中断</strong></td>
+  <td>用户随时可中断、回退；提供转人工入口；禁止无限重试循环</td>
+</tr>
+</tbody>
+</table>
+<h2>权限分级映射（对齐赛题要求）</h2>
+<table>
+<thead>
+<tr>
+  <th>级别</th>
+  <th>本产品中的操作</th>
+  <th>执行策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>绿色</strong></td>
+  <td>收益与持仓查询、诊断计算、同侪信号读取、模拟盘试算、回测与情景推演、简报生成、审计查询</td>
+  <td>确认意图后自动执行，无需二次确认</td>
+</tr>
+<tr>
+  <td><strong>黄色</strong></td>
+  <td>保存模拟方案、设置与修改监护提醒规则、调整信号阈值、修改关注板块</td>
+  <td>执行前展示操作详情并获得明确确认</td>
+</tr>
+<tr>
+  <td><strong>红色</strong></td>
+  <td>基金申购、赎回、转换</td>
+  <td>展示详情 + 多因子强验证（短信 + 人脸，演示为 Mock）后方可执行</td>
+</tr>
+</tbody>
+</table>
+<h2>演示环境声明</h2>
+<p>MVP 全程在演示环境中运行：不连接真实银行账户，不执行真实资金交易。所有对外展示的回测与情景数据均在界面标注「演示数据 / 历史回测 / 不构成收益承诺」。涉及投资者适当性、模拟业绩展示与投顾边界的合规要求（<strong>待验证</strong>），需专业评审后确认，不以免责声明替代合规判断。</p>
+<hr />
+<h1>11. MVP Scope</h1>
+<table>
+<thead>
+<tr>
+  <th>Feature</th>
+  <th>Priority</th>
+  <th>Hackathon 实现</th>
+  <th>实现方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>主动监护与同侪行为信号</td>
+  <td>P0</td>
+  <td>Yes</td>
+  <td>Real Logic + Mock 聚合引擎</td>
+</tr>
+<tr>
+  <td>持仓诊断与一句话调仓建议</td>
+  <td>P0</td>
+  <td>Yes</td>
+  <td>Real 计算器 + Real LLM 解释</td>
+</tr>
+<tr>
+  <td>模拟盘沙箱与回测对比回放</td>
+  <td>P0</td>
+  <td>Yes</td>
+  <td>Real 回测引擎 + Demo Data</td>
+</tr>
+<tr>
+  <td>分级授权执行与审计链路</td>
+  <td>P0</td>
+  <td>Yes</td>
+  <td>Real Logic + Mock 网关 + Mock 强验证</td>
+</tr>
+<tr>
+  <td>每日持仓简报</td>
+  <td>P0</td>
+  <td>Yes</td>
+  <td>Real（文本）；TTS 为 Optional</td>
+</tr>
+<tr>
+  <td>赎回资金去向建议</td>
+  <td>P1</td>
+  <td>Optional</td>
+  <td>Real Logic</td>
+</tr>
+<tr>
+  <td>决策复盘与记忆</td>
+  <td>P1</td>
+  <td>Optional</td>
+  <td>Real（SQLite）</td>
+</tr>
+<tr>
+  <td>错误恢复与人工接管</td>
+  <td>P1</td>
+  <td>Optional</td>
+  <td>Real Logic</td>
+</tr>
+<tr>
+  <td>真实行情 / 银行接口 / 多资产</td>
+  <td>P2</td>
+  <td>No</td>
+  <td>Future</td>
+</tr>
+</tbody>
+</table>
+<p><strong>MVP Boundary（明确不做）</strong></p>
+<ul>
+<li>不做涨跌方向预测，不给「一定涨 / 建议买入」类结论；</li>
+<li>不连接真实银行账户，不执行真实资金交易；</li>
+<li>不做全量资产管理、记账、转账、订阅管理；</li>
+<li>不做推荐具体产品的销售导流；</li>
+<li>不承诺任何收益，不把回测结果包装为预期收益。</li>
+</ul>
+<hr />
+<h1>12. Demo Script</h1>
+<p><strong>总时长 2 分 50 秒 ｜ 1 条主流程 + 1 个 Wow Moment</strong></p>
+<table>
+<thead>
+<tr>
+  <th>时间</th>
+  <th>用户 / Agent 行为</th>
+  <th>评委看到什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>0:00–0:20</td>
+  <td>用户刚打开 App，简报卡片弹出：持仓概览 + 异常提示「与你持仓相似的用户中 38% 近 5 日降低了 A 基金仓位」</td>
+  <td>Agent 在用户<strong>没提问时</strong>主动发现问题——被动 App 做不到</td>
+</tr>
+<tr>
+  <td>0:20–0:45</td>
+  <td>用户：「是不是该跑了？帮我看看」。Agent 确认意图，只追问两项：可接受的调整比例、观察期限。用户答「30% 以内，三个月」</td>
+  <td>口语化输入 + 精准追问，不做无意义盘问</td>
+</tr>
+<tr>
+  <td>0:45–1:15</td>
+  <td>诊断卡片：亏损归因（指数回调为主 / 行业重合度 41%）、集中度提示；一句话建议「赎回转出 30%（约 5,400 元）转入货币基金，保留其余仓位」</td>
+  <td>从「亏了 328 元」升级为「亏在哪 + 建议怎么做」，理由可查</td>
+</tr>
+<tr>
+  <td><strong>1:15–1:50</strong></td>
+  <td>用户点「先模拟看看」。<strong>双曲线回放</strong>：「若 3 日前跟进」vs「一直持有至今」，回撤少 6.7%（约减少浮亏 740 元）；下方并排显示三情景区间与免责声明</td>
+  <td><strong>Wow Moment</strong>：把「如果当时…」变成看得见的曲线，数字现场计算</td>
+</tr>
+<tr>
+  <td>1:50–2:15</td>
+  <td>用户：「按这个方案执行」。系统判定<strong>红色权限</strong>，弹出强验证（短信 + 人脸，Mock）</td>
+  <td>赛题最看重的权限分级：<strong>高风险必须强验证</strong>，Agent 无权跳过</td>
+</tr>
+<tr>
+  <td>2:15–2:35</td>
+  <td>验证通过 → 执行回执（编号 + 状态）→ 展开<strong>审计时间线</strong>：信号触发 → 意图识别 → 任务规划 → 7 次工具调用 → 数值复核 → 适当性检查 → 用户确认 → 强验证 → 执行</td>
+  <td>决策链路全透明可回放——安全合规性的直观证明</td>
+</tr>
+<tr>
+  <td>2:35–2:50</td>
+  <td>记忆写入确认 + 复盘提醒：「已将本次偏好记入记忆，3 个月后提醒你复盘」</td>
+  <td>闭环完整：Trigger → 理解 → 规划 → 工具 → 风控 → 动作 → 反馈 → 记忆</td>
+</tr>
+</tbody>
+</table>
+<p><strong>演示保障</strong>：所有数值现场从固定演示数据集计算，不预写虚构收益率。若模型或网络异常，载入同一数据集已算好的结果并标注「回放模式」，主流程不中断。</p>
+<hr />
+<h1>13. Differentiation</h1>
+<h2>市场上通常怎么做</h2>
+<table>
+<thead>
+<tr>
+  <th>类型</th>
+  <th>做法</th>
+  <th>局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>手机银行 / 基金 App</td>
+  <td>展示收益曲线、提供查询与下单入口</td>
+  <td>只报数字，不给判断，不主动触达</td>
+</tr>
+<tr>
+  <td>社区 / 论坛</td>
+  <td>用户晒持仓、分享观点</td>
+  <td>可比性差、风险偏好不明、无法执行</td>
+</tr>
+<tr>
+  <td>财经资讯 / 博主</td>
+  <td>提供市场观点与情绪</td>
+  <td>观点矛盾、与用户持仓无关联</td>
+</tr>
+<tr>
+  <td>通用 AI 助手</td>
+  <td>用户提问，模型回答</td>
+  <td>数字不可靠、无工具约束、无权限体系、不能执行</td>
+</tr>
+</tbody>
+</table>
+<h2>我们的四个差异点</h2>
+<p><strong>1. 主动监护 + 同侪行为信号，而不是被动问答。</strong> Agent 在用户没提问时就工作：监护循环持续计算持仓风险与群体行为变化，发现异常主动触达。这依赖「持续运行 + 数据聚合 + 触发阈值判断」，Chatbot 架构天然做不到。</p>
+<p><strong>2. 先模拟后执行，把决策后悔成本降到最低。</strong> 任何建议都先落到模拟盘：用历史回测回答「如果当时做了会怎样」，用三情景区间回答「做了之后可能怎样」，用户看清代价再决定。市面产品要么只给建议不给后果，要么直接让你下单。</p>
+<p><strong>3. 权限在工具层强制，不靠提示词自觉。</strong> LLM 不持有交易工具直连权，红色操作必须经独立验证服务，审计链路可回放。多数同类作品把权限规则写在 prompt 里，本质上是可被注入绕过的——我们的权限判定与 LLM 解耦。</p>
+<p><strong>4. 团队内互补定位，而非重复。</strong> 与《理财三案模拟智能体》PRD 互为补充：那份做「要不要调」的分析深度，本方案做「何时提醒 + 替你安全执行」。两者合并即构成完整的「主动理财 Agent」：分析层 + 触达执行层。</p>
+<h2>为什么不是简单的 ChatGPT + Finance API</h2>
+<p>因为本产品拥有 ChatGPT + API 组合不具备的四件事：<strong>监护循环</strong>（持续运行并主动触发的常驻进程）、<strong>确定性数字链路</strong>（数值来自可复算工具，LLM 只解释不生成）、<strong>强制权限体系</strong>（三级分级 + 强验证 + 单点出口 + 幂等与熔断）、<strong>可回放审计</strong>（每步决策全程留痕）。</p>
+<p>核心产品价值不是「生成一段理财建议」，而是<strong>在安全约束下把一次调仓任务完整办完</strong>。</p>
+<hr />
+<h1>14. Success Metrics</h1>
+<table>
+<thead>
+<tr>
+  <th>指标</th>
+  <th>定义</th>
+  <th>MVP 验证方法与目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>主流程完成率</strong>（对应官方 40% 完成率）</td>
+  <td>从信号触达到模拟方案生成 / 执行回执的链路成功率</td>
+  <td>10 组预设输入，≥9 组在 3 分钟内走完</td>
+</tr>
+<tr>
+  <td><strong>数值一致率</strong></td>
+  <td>曲线末值、卡片数字、解释引用是否完全一致</td>
+  <td>预设算例中一致性 100%</td>
+</tr>
+<tr>
+  <td><strong>风险拦截率</strong>（对应官方 30% 安全合规性）</td>
+  <td>越权、注入、缺字段、过期数据是否被拦截或警示</td>
+  <td>预置 8 类风险样例，拦截率 100%</td>
+</tr>
+<tr>
+  <td><strong>对话轮次效率</strong>（对应官方 30% 交互体验）</td>
+  <td>从首次提问到产出可执行建议的轮次</td>
+  <td>≤3 轮（含确认），追问仅限必要项</td>
+</tr>
+<tr>
+  <td><strong>错误恢复率</strong></td>
+  <td>工具失败、执行被拒、用户拒绝时是否给出恢复路径</td>
+  <td>预置 5 类失败样例，全部给出明确选项，无死循环</td>
+</tr>
+<tr>
+  <td><strong>用户理解度</strong></td>
+  <td>是否理解「模拟盘 ≠ 真实交易」</td>
+  <td>5 名目标用户，≥4 名能正确说明区别</td>
+</tr>
+</tbody>
+</table>
+<p>以上指标均可在 MVP 阶段用固定测试集验证，不使用注册量、留存率等无法在黑客松周期内验证的虚荣指标。</p>
+<hr />
+<h1>15. Future Roadmap</h1>
+<table>
+<thead>
+<tr>
+  <th>阶段</th>
+  <th>交付重点</th>
+  <th>前置条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>MVP（Hackathon）</strong></td>
+  <td>监护循环、同侪信号（Mock）、持仓诊断、模拟盘与回测回放、分级授权执行（Mock 网关 + Mock 强验证）、审计链路、每日简报</td>
+  <td>演示数据集与 Mock 接口就位</td>
+</tr>
+<tr>
+  <td><strong>V1（真实用户测试）</strong></td>
+  <td>接入可用行情数据源、真实持仓读取（授权）、规则阈值专业校准、合规评审、验证用户对主动推送的接受度</td>
+  <td>合规评审通过；数据授权获取</td>
+</tr>
+<tr>
+  <td><strong>V2（更多金融工具）</strong></td>
+  <td>真实交易网关对接、赎回资金去向自动执行、多资产（理财 / 存款 / 股票）、记忆与复盘体系完善</td>
+  <td>牌照与合规路径明确；银行接口授权</td>
+</tr>
+<tr>
+  <td><strong>Long Term（完整 Personal Financial Agent）</strong></td>
+  <td>从「持仓监护」扩展为个人财务 Agent 的一个能力模块，与账单、订阅、目标储蓄、转账共享记忆与权限框架</td>
+  <td>平台级权限与合规体系建成</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>16. Open Questions</h1>
+<ol>
+<li><strong>同侪行为信号的合规边界</strong>——聚合口径如何定义？k-匿名阈值设为多少？是否会被认定为投顾建议？需法律与合规专业评审（<strong>待验证</strong>）。</li>
+<li><strong>「持仓重合度」的计算定义</strong>——按基金代码、资产类别还是行业分布计算？真实场景下的数据可得性未知（<strong>待验证</strong>）。</li>
+<li><strong>赛事是否提供行情 / 交易 Sandbox API</strong>——未证实。若提供则接入；否则全程使用演示数据集与 Mock 网关。</li>
+<li><strong>红色强验证的 Demo 呈现方式</strong>——Mock 弹窗是否被评委认可为「权限分级实现」的有效展示？是否需在技术文档中补充真实实现路径？</li>
+<li><strong>基金申赎的实际业务规则</strong>——T+1 确认、净值基准时点、赎回费阶梯如何影响模拟精确度？费率与成交时点假设需专家确认（<strong>待验证</strong>）。</li>
+<li><strong>回测与情景参数是否会引发「变相预测」质疑</strong>——展示方式是否需要额外合规标注？参数选取标准待定（<strong>待验证</strong>）。</li>
+<li><strong>每日简报的资讯来源与版权</strong>——若接入第三方资讯，来源、授权与内容责任如何界定？</li>
+<li><strong>主动推送的接受度</strong>——用户是否接受 Agent 主动打扰？推送频率与免打扰策略需用户访谈验证。</li>
+<li><strong>熔断阈值设定</strong>——连续失败几次触发锁定？恢复流程如何设计才不会误伤正常用户？</li>
+<li><strong>记忆的保留期限与撤回机制</strong>——用户删除后审计日志是否仍需留存以满足合规要求？</li>
+</ol>
+<hr />
+<h1>Leader Summary</h1>
+<p><strong>定位</strong>：为没时间盯盘的基金持有者提供「主动监护 + 模拟先行 + 安全执行」的理财 Agent。</p>
+<p><strong>痛点</strong>：理财 App 只报数字，不告诉用户该不该动、怎么动，等想起来看窗口已错过。</p>
+<p><strong>核心 Workflow</strong>：监护触发 → 意图理解 → DAG 规划 → 工具计算 → 数值复核与适当性检查 → 权限判定与强验证 → 执行 → 审计 → 记忆。</p>
+<p><strong>P0 三项</strong>：主动监护与同侪信号；持仓诊断与回测模拟；分级授权执行与审计。</p>
+<p><strong>最大创新点</strong>：把「如果当时…」变成可见回测曲线；权限判定与 LLM 解耦，在工具层强制。</p>
+<p><strong>最大风险</strong>：同侪信号的合规边界，及红色强验证的 Mock 呈现说服力。</p>
+<p><strong>3 分钟演示</strong>：简报发现异常 → 口语化提问 → 诊断建议 → 回测双曲线 → 强验证 → 执行回执与审计 → 记忆。</p>
+<p><strong>入选理由</strong>：需求真实、Agent 必要性明确，安全设计命中赛题高优先级要求，与队友三案模拟互补。</p>
+<p><strong>需要团队 Leader 决策的问题</strong></p>
+<ol>
+<li>本方案与《理财三案模拟智能体》并行提交，还是合并为一份（三案做分析层，本方案做触达与执行层）？</li>
+<li>红色强验证演示中采用 Mock 弹窗，还是额外准备真实短信 / 人脸方案以增强说服力？</li>
+<li>同侪行为信号是否保留？若合规风险被评估为高，是否降级 P1 或改用「本人持仓历史对比」替代？</li>
+</ol>
+<hr />
+<h1>PRD 验收清单</h1>
+<table>
+<thead>
+<tr>
+  <th>验收项</th>
+  <th>检查标准</th>
+  <th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>单一核心问题</strong></td>
+  <td>是否明确描述了一个具体、真实、可验证的用户核心问题，且没有同时展开多个主问题？</td>
+  <td><strong>通过</strong>——全文聚焦「App 只报数字不给行动，用户错过调整窗口」</td>
+</tr>
+<tr>
+  <td><strong>目标用户</strong></td>
+  <td>是否定义了 1～2 类核心用户，并说明用户画像、场景、目标、痛点和使用频率？</td>
+  <td><strong>通过</strong>——核心与次要用户各含五要素，频率标注待验证</td>
+</tr>
+<tr>
+  <td><strong>完整 Agent 闭环</strong></td>
+  <td>是否包含 Trigger、理解、规划、Tool 调用、Risk Check、Action、Feedback 和 Memory？</td>
+  <td><strong>通过</strong>——第 5 章九阶段完整覆盖</td>
+</tr>
+<tr>
+  <td><strong>P0 功能数量</strong></td>
+  <td>是否明确列出 3～5 个 P0 功能，并将其他功能划分为 P1 或 P2？</td>
+  <td><strong>通过</strong>——5 个 P0、3 个 P1、3 个 P2，并给出 MVP Boundary</td>
+</tr>
+<tr>
+  <td><strong>风险控制</strong></td>
+  <td>是否覆盖权限、用户确认、数据隐私、幻觉、错误执行、Prompt Injection、工具失败和审计？</td>
+  <td><strong>通过</strong>——第 10 章 10 行矩阵覆盖全部要求项，含熔断与中断接管</td>
+</tr>
+<tr>
+  <td><strong>Mock 方案</strong></td>
+  <td>是否明确提供 Mock 或 Demo Data 方案，并标注实现类型？</td>
+  <td><strong>通过</strong>——第 9 章逐条标注 Real / Mock / Demo Data / Future</td>
+</tr>
+<tr>
+  <td><strong>2～3 分钟 Demo</strong></td>
+  <td>是否设计了单一主流程并包含明确的 Wow Moment？</td>
+  <td><strong>通过</strong>——2 分 50 秒分镜，Wow 标注于 1:15–1:50</td>
+</tr>
+<tr>
+  <td><strong>Leader Summary</strong></td>
+  <td>是否包含不超过 300 字的 Summary，并覆盖八项要素？</td>
+  <td><strong>通过</strong>——八项要素齐备，实测 270 字</td>
+</tr>
+</tbody>
+</table>
+<h2>验收结论</h2>
+<ul>
+<li><strong>通过项数量</strong>：8 / 8</li>
+<li><strong>未通过项</strong>：无</li>
+<li><strong>必须修改的问题</strong>：无阻塞项。以下为进入开发前需优先处理的事项：<ol>
+<li><strong>优先级最高</strong>——确认同侪行为信号的合规边界（Open Question 1）。若被判定为高风险，需降级为 P1 或替换为「本人持仓历史对比」。</li>
+<li><strong>优先级次高</strong>——确认红色强验证的演示呈现方式（Open Question 4），建议在技术文档中同步说明真实实现路径。</li>
+<li><strong>优先级第三</strong>——与 Leader 确认本方案与《理财三案模拟智能体》是并行提交还是合并。</li>
+</ol>
+</li>
+<li><strong>最终结论</strong>：<strong>可进入团队横向比较</strong>。合规边界与强验证呈现方式列为进入真实用户测试或正式提交前的待核对事项，不影响本 PRD 参与横向评估。</li>
+</ul>
+
+</body></html>
