@@ -60,6 +60,7 @@ class FundConfig:
     audit_dir: Path = PROJECT_ROOT / "data" / "audit"
     approval_dir: Path = PROJECT_ROOT / "data" / "approvals"
     paper_trade_dir: Path = PROJECT_ROOT / "data" / "paper_trades"
+    breaker_dir: Path = PROJECT_ROOT / "data" / "breaker"
 
 
 def load_fund_config(path: str | Path | None = None) -> FundConfig:
@@ -113,6 +114,7 @@ def load_fund_config(path: str | Path | None = None) -> FundConfig:
         audit_dir=_resolve(paths_raw.get("audit_dir", "data/audit")),
         approval_dir=_resolve(paths_raw.get("approval_dir", "data/approvals")),
         paper_trade_dir=_resolve(paths_raw.get("paper_trade_dir", "data/paper_trades")),
+        breaker_dir=_resolve(paths_raw.get("breaker_dir", "data/breaker")),
     )
 
 

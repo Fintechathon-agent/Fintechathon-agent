@@ -110,6 +110,52 @@ class DecisionMaker:
         portfolio = ctx.portfolio
         positions = portfolio.positions
 
+        # 0. 用户自然语言意图优先：带标的的买卖指令走意图分支
+        #    （数量/价格仍由闸门校验，此处只把"用户要求"翻译成建议）
+        if getattr(ctx, "user_question", ""):
+            from ..core.intent import parse_intent_rules
+
+            intent = parse_intent_rules(ctx.user_question, portfolio)
+            if intent.direction and intent.symbols:
+                sym = intent.symbols[0]
+                pos = next((p for p in positions if p.symbol == sym), None)
+                if intent.direction == "sell" and pos:
+                    ratio = intent.sell_ratio or 0.5
+                    qty = _round_lot(pos.quantity, ratio)
+                    if qty > 0:
+                        return Recommendation(
+                            action=ActionType.SELL,
+                            symbol=sym,
+                            quantity=qty,
+                            price=pos.current_price,
+                            reason=(
+                                f"用户要求减持 {pos.name} 约 {ratio:.0%}"
+                                + (f"（{intent.horizon}内）" if intent.horizon else "")
+                            ),
+                            evidence=[
+                                f"用户原话：{ctx.user_question}",
+                                f"当前持仓 {pos.quantity:g} 股，按 {ratio:.0%} 减持 {qty:g} 股",
+                            ],
+                            confidence=0.80,
+                            risk_impact=f"减持后释放约 {pos.current_price * qty:.0f} 元",
+                            alternative="若改变想法，可先观察一个交易周期",
+                        )
+                elif intent.direction == "buy" and pos:
+                    return Recommendation(
+                        action=ActionType.BUY,
+                        symbol=sym,
+                        quantity=100,
+                        price=pos.current_price,
+                        reason=f"用户要求加仓 {pos.name}",
+                        evidence=[
+                            f"用户原话：{ctx.user_question}",
+                            f"当前价 {pos.current_price:.2f}，试加一手 100 股",
+                        ],
+                        confidence=0.62,
+                        risk_impact="加仓将占用现金（闸门校验资金充足性）",
+                        alternative="可先小额定投试仓",
+                    )
+
         # 1. 找跌幅最大且超限的持仓 → 建议卖出
         worst = min(positions, key=lambda p: p.return_pct) if positions else None
         max_loss_threshold = ctx.user_profile.max_single_loss * 100  # 转成 %
@@ -358,8 +404,10 @@ def build_orchestrator(
     """
     from ..config_fund import load_fund_config
     from ..core.loop import AgentLoop
+    from ..risk.circuit_breaker import init_breaker
 
     cfg = load_fund_config(config_path)
+    init_breaker(cfg.breaker_dir)  # 熔断器状态目录（重启后锁定状态保持）
 
     memory = MemoryStore(cfg.memory_dir)
     init_memory_tools(memory)  # 注册到 MCP 风格工具

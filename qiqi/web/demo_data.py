@@ -292,6 +292,11 @@ def response_dict(resp, pf: Portfolio, health: dict, engine: str) -> dict:
         "gate": gate_dict(gate),
         "whatif": whatif_dict(getattr(resp, "whatif", None)),
         "auto_executed": bool(getattr(resp, "executed", False)),
+        "assistant_message": getattr(resp, "assistant_message", ""),
+        "intent": getattr(resp, "intent", {}),
+        "plan": getattr(resp, "plan", {}),
+        "breaker": getattr(resp, "circuit_breaker", {}),
+        "circuit_locked": bool(getattr(resp, "circuit_locked", False)),
         "portfolio": portfolio_dict(pf),
         "health": health,
         "engine": engine,
@@ -330,4 +335,3 @@ def approval_dict(raw: dict, meta: Optional[dict] = None) -> dict:
 # ============================================================
 #  注：情景推演由 agent/tools/whatif.py 的 WhatIfEngine 提供（本地确定性计算，
 #  把建议应用到组合副本后重算风险指标），Web 层只做序列化，不再自造行情曲线。
-

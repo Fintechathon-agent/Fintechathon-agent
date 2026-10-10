@@ -28,6 +28,14 @@ class ContextBuilder:
         self.ctx.memory_summary = summary
         return self
 
+    def with_question(self, question: str) -> "ContextBuilder":
+        self.ctx.user_question = question
+        return self
+
+    def with_question(self, question: str) -> "ContextBuilder":
+        self.ctx.user_question = question or ""
+        return self
+
     def with_prev_recommendations(self, recs: list[Recommendation]) -> "ContextBuilder":
         self.ctx.prev_recommendations = recs
         return self

@@ -1,0 +1,13 @@
+llm:
+  api_key: ""
+  timeout: 5
+  max_retries: 1
+financial:
+  market_source: mock
+  news_source: mock
+paths:
+  memory_dir: data/test_runtime/memory
+  audit_dir: data/test_runtime/audit
+  approval_dir: data/test_runtime/approvals
+  paper_trade_dir: data/test_runtime/paper_trades
+  breaker_dir: data/test_runtime/breaker

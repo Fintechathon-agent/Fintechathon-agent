@@ -32,7 +32,9 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 from agent.config_fund import load_fund_config           # noqa: E402
+from agent.core.intent import DEFAULT_QUESTION              # noqa: E402
 from agent.orchestrator import build_orchestrator        # noqa: E402
+from agent.risk.circuit_breaker import get_breaker       # noqa: E402
 from contracts.types import ActionType, Portfolio, Position  # noqa: E402
 from web.demo_data import (                              # noqa: E402
     DEMO_TAG,
@@ -61,6 +63,9 @@ ACTION_LABELS = {
     "approval_rejected": "用户拒绝建议",
     "portfolio_updated": "组合按成交结果更新",
     "demo_reset": "重置演示状态",
+    "memory_write_rejected": "记忆写入被门卫拦截",
+    "breaker_locked": "异常熔断 · 执行链路锁定",
+    "breaker_reset": "熔断 · 人工确认恢复",
 }
 
 
@@ -351,6 +356,7 @@ class DemoApp:
                 "memory_summary": self._memory_summary(),
                 "approvals": self.list_approvals(),
                 "tier_matrix": self._tier_matrix(),
+                "breaker": get_breaker().state(),
             }
 
     def review(self, question: str = "") -> dict:
@@ -370,7 +376,7 @@ class DemoApp:
 
             started = time.time()
             resp = self.orch.handle_review_request(
-                user, pf, question=question or "请检查我的持仓健康状况"
+                user, pf, question=question or DEFAULT_QUESTION
             )
             elapsed_ms = int((time.time() - started) * 1000)
 
@@ -400,6 +406,7 @@ class DemoApp:
             data["queued"] = queued
             data["elapsed_ms"] = elapsed_ms
             data["data_tag"] = DEMO_TAG
+            data["breaker"] = getattr(resp, "circuit_breaker", None) or get_breaker().state()
             self.state.last_review = data
             return data
 
@@ -450,6 +457,13 @@ class DemoApp:
         approved = bool(payload.get("approved"))
         comment = str(payload.get("comment", "")).strip()
 
+        # 熔断锁定期间拒绝一切裁决（fail-closed，需先人工恢复）
+        if approved and get_breaker().is_locked():
+            return {
+                "success": False,
+                "message": "⛔ 系统熔断锁定中：连续安全事件超过阈值，已暂停执行链路，请先人工确认恢复。",
+            }
+
         meta = self.state.approval_meta.get(approval_id, {})
         tier = meta.get("tier", "red")
 
@@ -477,8 +491,15 @@ class DemoApp:
                 result="success" if passed else "failure",
             )
             if not passed:
+                # 强验证连续失败属"可疑行为"——计入熔断（赛题：连续失败触发安全锁定）
+                get_breaker().record_failure(
+                    "strong_verify_failed",
+                    {"approval_id": approval_id, "sms_code_ok": sms_ok, "face_ok": face},
+                    USER_ID,
+                )
                 return {
                     "success": False, "tier": tier, "executed": False,
+                    "breaker": get_breaker().state(),
                     "message": "强验证未通过：需要 6 位短信验证码并完成人脸识别（演示为 Mock）。",
                 }
             self._log("user_confirmation", approval_id,
@@ -599,6 +620,12 @@ class DemoApp:
             "action": action, "symbol": sym, "quantity": qty, "price": price,
             "note": "组合已按成交结果更新（演示）",
         })
+
+    def breaker_reset(self) -> dict:
+        """熔断人工恢复——用户确认系统状态无异常后解锁。"""
+        state = get_breaker().reset(note="用户人工确认恢复")
+        self._log("breaker_reset", "", {"note": "用户人工确认恢复"}, "success")
+        return {"success": True, "breaker": state, "message": "熔断已解除，执行链路恢复。"}
 
     def reset(self) -> dict:
         """重置演示状态：仅清空审批与纸交易记录，长期记忆不删除"""
@@ -807,6 +834,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(self.app.review(str(body.get("question", ""))))
             if path == "/api/decide":
                 return self._json(self.app.decide(body))
+            if path == "/api/breaker/reset":
+                return self._json(self.app.breaker_reset())
             if path == "/api/reset":
                 return self._json(self.app.reset())
         except Exception as exc:      # noqa: BLE001

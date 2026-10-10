@@ -9,6 +9,8 @@
 </head>
 <body>
 
+<div id="breaker-banner" class="hidden"></div>
+
 <header class="topbar">
   <div class="brand">
     <div class="logo">哨</div>
@@ -92,17 +94,14 @@
       <p class="agent-desc">
         完整链路：行情读取 → 资讯检索 → 组合诊断 → 风险检查 → 决策生成 → 风控闸门 → 情景推演 → 权限判定 → 用户确认 → 执行回执。
       </p>
-      <button class="btn btn-primary btn-block" id="btn-review">开始组合体检</button>
-      <ol class="steps" id="agent-steps">
-        <li data-step="1"><span class="dot"></span>信号触发</li>
-        <li data-step="2"><span class="dot"></span>行情读取</li>
-        <li data-step="3"><span class="dot"></span>资讯检索</li>
-        <li data-step="4"><span class="dot"></span>组合诊断</li>
-        <li data-step="5"><span class="dot"></span>风险检查</li>
-        <li data-step="6"><span class="dot"></span>决策生成</li>
-        <li data-step="7"><span class="dot"></span>风控闸门</li>
-        <li data-step="8"><span class="dot"></span>情景推演</li>
-        <li data-step="9"><span class="dot"></span>确认 / 执行回执</li>
+      <div class="nl-box">
+        <input id="nl-question" type="text" maxlength="80"
+               placeholder="试试：把平安银行减仓30%（留空 = 全身体检；说不清会自动追问）" />
+      </div>
+      <button class="btn btn-primary btn-block" id="btn-review">发起体检（支持自然语言）</button>
+      <div id="intent-area"></div>
+      <ol class="steps" id="agent-steps" aria-label="本轮任务计划">
+        <li><span class="dot"></span>等待自然语言请求</li>
       </ol>
       <div id="rec-area"></div>
     </div>

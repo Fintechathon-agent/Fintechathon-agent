@@ -75,7 +75,7 @@ _INJECTION_PATTERNS: list[tuple[re.Pattern, str]] = [
     ), "英文忽略指令"),
     (re.compile(
         r"忽略(以上|上述|之前|此前|前面|上面)?(一切|所有|全部)?"
-        r"(指令|命令|提示词?|规则|限制|设定)",
+        r"(的)?(指令|命令|提示词?|规则|限制|设定)",
     ), "中文忽略指令"),
     (re.compile(
         r"disregard\s+(all\s+)?(previous|prior|above|earlier)"
@@ -181,7 +181,7 @@ def _audit_reject(
     reason: str,
     content: str = "",
 ) -> None:
-    """拦截留痕——审计失败不影响拦截本身。"""
+    """拦截留痕 + 熔断计数——审计/熔断失败均不影响拦截本身。"""
     try:
         from agent.risk.audit import log_action
 
@@ -199,3 +199,14 @@ def _audit_reject(
         )
     except Exception as exc:  # pragma: no cover
         logger.warning("拦截审计写入失败（不影响拦截）：%s", exc)
+
+    try:
+        from agent.risk.circuit_breaker import get_breaker
+
+        get_breaker().record_failure(
+            "memory_write_rejected",
+            {"layer": layer.value, "source": source or "", "reason": reason},
+            user_id=user_id or "",
+        )
+    except Exception as exc:  # pragma: no cover
+        logger.warning("拦截熔断计数失败（不影响拦截）：%s", exc)

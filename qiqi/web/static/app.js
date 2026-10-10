@@ -28,6 +28,7 @@ const DETAIL_LABELS = {
   quantity: '数量', result: '结果', reason: '原因', method: '验证方式', channel: '通道',
   sms_code_ok: '短信验证', face_ok: '人脸识别', note: '说明', tier: '权限', removed_files: '清理文件',
   price: '参考价', message: '回执',
+  intent: '意图', failure_count: '连续失败', breaker_locked: '熔断状态',
 };
 
 /* ---------------- 工具 ---------------- */
@@ -75,6 +76,64 @@ function actionBadge(action) {
 function tierBadge(tier, label) {
   const map = { green: 'badge-tier-green', yellow: 'badge-tier-yellow', red: 'badge-tier-red' };
   return `<span class="badge ${map[tier] || 'badge-tier-green'}">${esc(label || tier)}</span>`;
+}
+
+function renderIntent(intent, message = '') {
+  const box = $('#intent-area');
+  if (!intent || !intent.name) { box.innerHTML = ''; return; }
+  const slots = Object.entries(intent.slots || {}).map(([k, v]) => (
+    `<span class="chip chip-dim">${esc(k)}：${esc(v)}</span>`
+  )).join('');
+  const missing = (intent.missing || []).map((v) => (
+    `<span class="chip gold">待确认：${esc(v)}</span>`
+  )).join('');
+  box.innerHTML = `
+    <div class="intent-row">
+      <span class="chip ${intent.blocked ? 'red' : 'green'}">意图：${esc(intent.label)}</span>
+      ${slots}${missing}
+    </div>
+    ${message ? `<div class="assistant-line">${esc(message)}</div>` : ''}`;
+}
+
+function renderPlan(plan) {
+  const box = $('#agent-steps');
+  const nodes = plan?.nodes || [];
+  if (!nodes.length) {
+    box.innerHTML = '<li><span class="dot"></span>本轮未进入工具执行</li>';
+    return;
+  }
+  const classOf = (status) => ({
+    done: 'done', running: 'doing', waiting: 'doing', blocked: 'blocked',
+    failed: 'blocked', skipped: 'skip', pending: '',
+  }[status] || '');
+  box.innerHTML = nodes.map((node, index) => `
+    <li class="${classOf(node.status)}" data-step="${index + 1}" title="工具：${esc(node.tool)}">
+      <span class="dot"></span>${esc(node.label)}
+    </li>`).join('');
+}
+
+function renderBreaker(state) {
+  const banner = $('#breaker-banner');
+  if (!state) { banner.className = 'hidden'; return; }
+  const count = Number(state.consecutive_failures || 0);
+  if (!state.locked && count === 0) { banner.className = 'hidden'; return; }
+  banner.className = `breaker-banner${state.locked ? '' : ' warn'}`;
+  banner.innerHTML = `
+    <span class="bb-title">${state.locked ? '执行链路已熔断' : `安全事件 ${count}/${state.threshold}`}</span>
+    <span class="bb-detail">${state.locked ? '查询与诊断仍可使用；资金操作暂停，需人工确认后恢复。' : '连续干净运行会清零；达到阈值后锁定资金操作。'}</span>
+    ${state.locked ? '<button class="btn btn-outline btn-sm" id="btn-breaker-reset">人工确认恢复</button>' : ''}`;
+  const reset = $('#btn-breaker-reset');
+  if (reset) reset.onclick = async () => {
+    if (!confirm('确认已检查异常原因，并恢复资金执行链路？')) return;
+    try {
+      const result = await api('/api/breaker/reset', { method: 'POST' });
+      renderBreaker(result.breaker);
+      toast(result.message || '执行链路已恢复');
+      await loadTab('audit');
+    } catch (err) {
+      toast(`恢复失败：${err.message}`);
+    }
+  };
 }
 
 /* ---------------- 顶栏 / 左列 ---------------- */
@@ -263,17 +322,27 @@ async function runReview() {
   btn.disabled = true;
   $('#agent-status').textContent = '体检中…';
   $('#rec-area').innerHTML = '<div class="muted" style="margin-top:14px">Agent 正在分析，请稍候…（LLM 不可用时会自动降级为规则决策）</div>';
-  animateSteps();
+  resetSteps();
+  $('#agent-steps').innerHTML = '<li class="doing"><span class="dot"></span>正在解析意图并生成 DAG…</li>';
 
   try {
-    const data = await api('/api/review', { method: 'POST', body: { question: '请检查我的持仓健康状况' } });
+    const q = ($('#nl-question').value || '').trim();
+    const data = await api('/api/review', { method: 'POST', body: { question: q || '请检查我的持仓健康状况' } });
     clearInterval(S.stepTimer);
     S.stepTimer = null;
-    for (let i = 1; i <= 8; i += 1) markStep(i, 'done');
-
     S.review = data;
     S.decision = null;
+
+    renderIntent(data.intent, data.assistant_message);
+    renderPlan(data.plan);
+    if (data.breaker) renderBreaker(data.breaker);
     renderRecommendation(data);
+
+    if (data.circuit_locked) {
+      $('#agent-status').textContent = '熔断锁定';
+      await reloadData();
+      return;
+    }
 
     const tier = data.recommendation?.tier || 'green';
     if (data.queued) {
@@ -286,7 +355,9 @@ async function runReview() {
     await reloadData();
     $('#agent-status').textContent = data.queued
       ? '待用户确认'
-      : `已完成 · ${(data.elapsed_ms / 1000).toFixed(1)}s`;
+      : data.recommendation
+        ? `已完成 · ${(data.elapsed_ms / 1000).toFixed(1)}s`
+        : '等待补充';
   } catch (err) {
     clearInterval(S.stepTimer);
     S.stepTimer = null;
@@ -306,7 +377,8 @@ function renderRecommendation(data) {
   renderWhatIf(data.whatif);
 
   if (!r) {
-    area.innerHTML = '<div class="alert bad">本次未生成建议，请查看审计日志。</div>';
+    const tone = data.intent?.blocked ? ' bad' : '';
+    area.innerHTML = `<div class="alert${tone}">${esc(data.assistant_message || data.risk_alert || '本轮未进入建议生成。')}</div>`;
     return;
   }
 
@@ -473,7 +545,7 @@ function fmtVal(v, unit) {
 /* ---------------- 审计 / 记忆 / 纸交易 ---------------- */
 
 function detailChips(entry) {
-  const skip = new Set(['timestamp', 'action', 'label', 'user_id', 'session_id', 'result']);
+  const skip = new Set(['timestamp', 'action', 'label', 'user_id', 'session_id', 'result', 'nodes', 'breaker', 'slots', 'missing']);
   const chips = [];
   Object.entries(entry).forEach(([k, v]) => {
     if (skip.has(k) || v === '' || v === null || v === undefined) return;
@@ -623,6 +695,7 @@ async function reloadData() {
   renderBrief(boot.brief);
   renderNews(boot.news);
   renderApprovals(boot.approvals);
+  renderBreaker(boot.breaker);
   await loadTab(S.tab);
 }
 
@@ -781,6 +854,7 @@ async function init() {
     renderNews(boot.news);
     renderTierMatrix(boot.tier_matrix);
     renderApprovals(boot.approvals);
+    renderBreaker(boot.breaker);
     await loadTab('audit');
   } catch (err) {
     toast(`初始化失败：${err.message}`, 6000);
@@ -790,6 +864,9 @@ async function init() {
 document.addEventListener('DOMContentLoaded', () => {
   init();
   $('#btn-review').onclick = runReview;
+  $('#nl-question').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.isComposing) runReview();
+  });
   $('#tabs').addEventListener('click', (e) => {
     const t = e.target.closest('.tab');
     if (t) loadTab(t.dataset.tab).catch((err) => toast(`加载失败：${err.message}`));
@@ -802,7 +879,7 @@ document.addEventListener('DOMContentLoaded', () => {
       S.review = null;
       S.decision = null;
       $('#rec-area').innerHTML = '';
-      $('#card-sim').classList.add('hidden');
+      $('#card-whatif').classList.add('hidden');
       resetSteps();
       $('#agent-status').textContent = '待发起';
       await reloadData();

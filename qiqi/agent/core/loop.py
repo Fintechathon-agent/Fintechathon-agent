@@ -28,6 +28,9 @@ from .state import AgentState
 from .memory import MemoryStore, MemoryQuery
 from .session import Session, SessionManager
 from .retry import RetryConfig, RetryableError, retry_on_error
+from .intent import IntentResult, parse_intent
+from .planner import TaskPlan, build_plan
+from agent.risk.circuit_breaker import get_breaker
 
 logger = logging.getLogger(__name__)
 
@@ -78,50 +81,106 @@ class AgentLoop:
         user_profile: UserProfile,
         question: str = "",
     ) -> AgentResponse:
-        """执行完整的 Agent 流程"""
-        # 1. 创建或恢复 Session
+        """解析自然语言，生成 DAG，并在安全约束下执行本轮流程。"""
         session = self.session_manager.create(user_id)
         state = AgentState()
         session.set_phase(AgentPhase.ANALYZING, "理解用户需求")
+        breaker = get_breaker()
+        intent = parse_intent(question, portfolio)
+        plan = build_plan(intent)
+        self._audit(
+            "intent_parsed", user_id, session.session_id,
+            {"intent": intent.name, "slots": intent.slots, "missing": intent.missing},
+            "failure" if intent.blocked else "success",
+        )
+        self._audit(
+            "dag_planned", user_id, session.session_id,
+            {"intent": intent.name, "nodes": [node.id for node in plan.nodes]},
+        )
+
+        if intent.name == "unsafe":
+            breaker_state = breaker.record_failure(
+                "unsafe_request", {"reason": intent.message}, user_id=user_id,
+            )
+            session.set_phase(AgentPhase.ERROR, "可疑请求已拦截")
+            self._audit(
+                "request_blocked", user_id, session.session_id,
+                {"reason": intent.message, "breaker": breaker_state}, "failure",
+            )
+            return self._early_response(session.session_id, intent, plan, breaker_state)
+
+        if intent.name in {"out_of_scope", "insufficient"} or intent.missing:
+            session.set_phase(AgentPhase.IDLE, "等待用户补充信息")
+            return self._early_response(
+                session.session_id, intent, plan, breaker.state(),
+            )
+
+        # 熔断只锁资金执行，诊断与查询仍可用，避免安全机制误伤只读能力。
+        if intent.name == "execute" and breaker.is_locked():
+            intent.blocked = True
+            intent.message = (
+                f"执行链路已熔断：{breaker.state().get('reason') or '连续安全事件'}。"
+                "查询与诊断仍可使用，资金操作需人工解锁。"
+            )
+            plan.mark("validate", "blocked")
+            plan.skip_after("validate")
+            session.set_phase(AgentPhase.ERROR, "执行链路已熔断")
+            return self._early_response(
+                session.session_id, intent, plan, breaker.state(),
+            )
 
         try:
+            plan.mark("validate", "done")
             # 2. 收集市场数据
             session.set_phase(AgentPhase.FETCHING_MARKET, "获取行情数据")
+            plan.mark("market", "running")
             symbols = [p.symbol for p in portfolio.positions]
             market = self._fetch_market_safe(symbols)
+            plan.mark("market", "done")
 
             # 3. 获取相关新闻
             session.set_phase(AgentPhase.FETCHING_NEWS, "获取相关新闻")
+            plan.mark("news", "running")
             top_symbol = portfolio.positions[0].symbol if portfolio.positions else ""
             news = self._fetch_news_safe(top_symbol)
+            plan.mark("news", "done")
 
             # 4. 组合分析
             session.set_phase(AgentPhase.ANALYZING, "分析持仓健康状况")
+            plan.mark("analyze", "running")
             analysis = self.portfolio_analyzer(portfolio, market)
+            plan.mark("analyze", "done")
 
             # 5. 风险检查
             session.set_phase(AgentPhase.RISK_CHECK, "检查风险边界")
+            plan.mark("risk", "running")
             risk_report = self.risk_engine(portfolio, user_profile, market)
+            plan.mark("risk", "done")
 
             # 5.1 风险警告写入 observation 层（Hindsight 记忆闭环）
             self._record_observations(user_id, risk_report)
 
             # 6. 决策生成
             session.set_phase(AgentPhase.DECIDING, "生成决策建议")
+            plan.mark("decide", "running")
             from .context import ContextBuilder
             ctx_builder = ContextBuilder(user_profile, portfolio, session.session_id)
             ctx = (ctx_builder
                    .with_market(market)
                    .with_news(news)
                    .with_memory(self._build_memory_context(user_id, portfolio))
+                   .with_question(question or "")
                    .build())
 
             recommendation = self.decision_maker(ctx, risk_report)
+            plan.mark("decide", "done")
 
             # 6.1 情景推演——"执行这条建议会发生什么"
+            plan.mark("simulate", "running")
             whatif = self._evaluate_whatif(
                 portfolio, recommendation, user_profile, market, risk_report,
             )
+            plan.mark("simulate", "done" if whatif is not None else "skipped")
 
             # 6.1.1 若主推方案效果不佳，自动扫描备选方案
             alternatives: list[WhatIfResult] = []
@@ -131,9 +190,25 @@ class AgentLoop:
                 )
 
             # 6.2 风控闸门——LLM proposes, Python disposes
+            plan.mark("gate", "running")
             gate = self._check_gate(
                 recommendation, portfolio, user_profile, market,
             )
+            plan.mark("gate", "done" if gate is None or gate.passed else "blocked")
+
+            # 6.2.1 熔断计数：闸门拦截 / fail-closed 属安全事件；干净运行清零
+            gate_failed = gate is not None and (not gate.passed or gate.fail_closed)
+            if gate_failed:
+                breaker_state = breaker.record_failure(
+                    "gate_block",
+                    {
+                        "symbol": recommendation.symbol,
+                        "reasons": list(gate.blocked_reasons[:3]),
+                    },
+                    user_id=user_id,
+                )
+            else:
+                breaker_state = breaker.state()
 
             # 7. 风险提示
             risk_alert = self._build_risk_alert(risk_report, recommendation)
@@ -142,10 +217,12 @@ class AgentLoop:
             #    闸门拦截的建议一律不放行：不自动执行，也不占用审批队列，
             #    而是带着拦截原因直接返回给用户，让他看到"为什么被挡下"。
             blocked = gate is not None and not gate.passed
-            requires_approval = (
-                not blocked
-                and recommendation.requires_approval(self.approval_threshold)
+            financial_action = (
+                recommendation.action != ActionType.HOLD and recommendation.quantity > 0
             )
+            execution_locked = financial_action and breaker.is_locked()
+            # 资金动作无论置信度多高都必须由用户确认；置信度不能替代授权。
+            requires_approval = not blocked and not execution_locked and financial_action
             approval_req: Optional[ApprovalRequest] = None
             executed = False
 
@@ -154,6 +231,14 @@ class AgentLoop:
                 risk_alert = self._merge_alert(
                     risk_alert, "⛔ " + "；".join(gate.blocked_reasons)
                 )
+                plan.skip_after("gate")
+            elif execution_locked:
+                session.set_phase(AgentPhase.ERROR, "执行链路已熔断")
+                risk_alert = self._merge_alert(
+                    risk_alert,
+                    "执行链路已熔断：连续安全事件达到阈值。查询结果保留，资金操作需人工解锁。",
+                )
+                plan.skip_after("gate")
             elif requires_approval:
                 session.set_phase(AgentPhase.AWAITING_APPROVAL, "等待人工审批")
                 approval_req = ApprovalRequest(
@@ -165,14 +250,23 @@ class AgentLoop:
                     user_id=user_profile.user_id,
                 )
                 state.pending_approval = approval_req
+                plan.mark("approval", "waiting")
             else:
-                # 置信度足够且通过闸门，自动执行 Paper Trade
-                session.set_phase(AgentPhase.EXECUTING, "执行纸交易")
-                self._execute_paper_trade_safe(recommendation, session.session_id)
-                executed = True
+                # 查询、诊断与持有属于绿色权限，不产生交易副作用。
                 session.set_phase(AgentPhase.IDLE, "完成")
+                plan.mark("respond", "done")
 
             session.touch()
+
+            # 本轮无安全事件：清除熔断连续计数（已锁定则不自动解锁）
+            if not gate_failed:
+                breaker_state = breaker.record_ok()
+
+            self._audit(
+                "dag_completed", user_id, session.session_id,
+                {"nodes": plan.to_dict()["nodes"], "breaker": breaker_state},
+                "failure" if blocked or execution_locked else "success",
+            )
 
             return AgentResponse(
                 session_id=session.session_id,
@@ -191,17 +285,79 @@ class AgentLoop:
                 alternatives=alternatives,
                 gate=gate,
                 executed=executed,
+                assistant_message=self._assistant_message(intent, recommendation),
+                intent=intent.to_dict(),
+                plan=plan.to_dict(),
+                circuit_breaker=breaker_state,
+                circuit_locked=execution_locked,
             )
 
         except Exception as exc:
             logger.exception("Agent loop error: %s", exc)
+            breaker_state = breaker.record_failure(
+                "loop_error", {"error": str(exc)[:200]}, user_id=user_id,
+            )
             session.error = str(exc)
             session.set_phase(AgentPhase.ERROR, f"错误：{exc}")
+            running = next((node for node in plan.nodes if node.status == "running"), None)
+            if running:
+                running.status = "failed"
+                plan.skip_after(running.id)
+            self._audit(
+                "dag_failed", user_id, session.session_id,
+                {"error": str(exc), "breaker": breaker_state}, "failure",
+            )
             return AgentResponse(
                 session_id=session.session_id,
                 timestamp=datetime.now().isoformat(),
                 risk_alert=f"系统异常：{exc}",
+                assistant_message="本轮未完成。我已保留失败节点，没有生成交易结果。",
+                intent=intent.to_dict(),
+                plan=plan.to_dict(),
+                circuit_breaker=breaker_state,
+                circuit_locked=bool(breaker_state.get("locked")),
             )
+
+    @staticmethod
+    def _early_response(
+        session_id: str,
+        intent: IntentResult,
+        plan: TaskPlan,
+        breaker_state: dict,
+    ) -> AgentResponse:
+        """返回拦截、超范围或澄清响应，不调用行情和交易工具。"""
+        return AgentResponse(
+            session_id=session_id,
+            timestamp=datetime.now().isoformat(),
+            risk_alert=intent.message if intent.blocked else "",
+            assistant_message=intent.message,
+            intent=intent.to_dict(),
+            plan=plan.to_dict(),
+            circuit_breaker=breaker_state,
+            circuit_locked=bool(breaker_state.get("locked") and intent.name == "execute"),
+        )
+
+    @staticmethod
+    def _assistant_message(intent: IntentResult, rec: Recommendation) -> str:
+        if intent.name == "execute":
+            return "我已把你的口语指令转换成结构化操作方案；通过风控后仍需你确认和强验证。"
+        if intent.name == "advise":
+            return "我已按你的问题完成诊断、建议、模拟推演和风控复核。"
+        return "我已完成持仓诊断；数字来自确定性工具，模型只负责解释。"
+
+    @staticmethod
+    def _audit(
+        action: str,
+        user_id: str,
+        session_id: str,
+        detail: dict,
+        result: str = "success",
+    ) -> None:
+        try:
+            from agent.risk.audit import log_action
+            log_action(action, user_id, session_id, detail, result)
+        except Exception as exc:  # pragma: no cover
+            logger.warning("审计写入失败（不影响主链路）：%s", exc)
 
     # ---- 安全的工具调用（带重试）----
 
