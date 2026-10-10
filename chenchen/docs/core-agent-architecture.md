@@ -1,49 +1,48 @@
 # Core Agent 主链路架构
 
-## 北极星和边界
-
-Core Agent 负责把用户请求变成可追踪的任务、调用已有工具、整理证据并把结果交给 Risk。它不重新计算 Quant，不修改 Memory 规则，也不绕过 Risk。
+更新：2026-10-10 22:00 北京时间。以下实线表示当前实现，虚线表示独立接口或待 Owner 接入；不是完整 Risk 服务端到端成功证明。
 
 ~~~mermaid
 flowchart LR
-    UI[UI / 调用方] --> API[Backend API]
-    API --> V[Contract Validator\ninvestment-agent.v1]
-    V -->|不通过| E[Error Envelope\ncode / stage / recovery]
-    V --> H[Harness]
-    H --> S[Session + Context]
-    H --> T[Task State\n状态 / checkpoint / resume]
-    H --> Q[现有 Tools / Quant\n只调用，不复制计算]
-    H -.只按既有规则.-> M[Memory\n规则由 Memory Owner 维护]
-    Q --> A[Artifacts + Tool Results]
-    S --> A
-    T --> A
-    H --> AU[Audit Evidence\n事件 / 时间 / trace]
-    A --> RH[Risk Handoff\n证据引用]
-    AU --> RH
-    RH --> R[Risk / Safety / Eval]
-    R --> UI
+    UI["UI / Caller"] --> API["Backend API"]
+    API --> V["Contract Validator: investment-agent.v1"]
+    V -->|非法输入| E["Error Envelope / HTTP 422"]
+    V --> C["Core Agent: runHealthCheckContract"]
+    C --> H["Harness: create / reuse Task"]
+    H --> S["Session: session_id"]
+    H --> CTX["Context: risk_profile / portfolio"]
+    H --> TS["TaskState / Checkpoint: task_id"]
+    H --> Q["Tools / 现有 Quant"]
+    Q --> A["Artifacts / ToolResults"]
+    H --> AU["Audit Evidence: 进程内事件"]
+    C --> MC["市场夹具校验 / REVIEW_REQUIRED"]
+    MC --> A
+    A --> RSP["统一 Response / trace"]
+    TS --> RSP
+    AU --> RSP
+    RSP --> RH["Risk Handoff: PENDING_REVIEW"]
+    RH --> STOP["停止: HANDOFF_REQUIRED / execution_allowed=false"]
+    RSP --> API
+    API --> UI
+    API --> B["只读 Risk Workbench Adapter"]
+    B --> UI
+    UI -.人工对照 / 待版本化接收接口.-> R["独立 Risk Owner / 审核回写待接入"]
+    API -.独立 save / list / clear 路由.-> M["Memory: session-only / consent"]
     E --> UI
-    H --> X{异常或重试}
-    X -->|首次失败| H
-    X -->|重试仍失败| E
 ~~~
 
-## 模块职责
-
-| 模块 | Core Agent 的调用方式 | 不负责什么 |
+| 模块 | 当前职责与数据 | 边界 / 停止点 |
 | --- | --- | --- |
-| UI | 发送版本化 Request，展示状态、证据和 Risk 结果 | 不把前端 approval 当作交易授权 |
-| Backend | 校验 Request，返回统一 Response / Error | 不隐藏 task、session 或 audit 关联 |
-| Harness | 编排 Session、Context、Task State、checkpoint、重试 | 不拥有 Quant 公式 |
-| Tools / Quant | 返回已有健康报告、候选和模拟结果 | 不因市场简报被 Core Agent 重算 |
-| Memory | 按既有 consent、范围和生命周期提供能力 | Core Agent 不修改 Memory 规则 |
-| Risk | 消费 Handoff 证据并做独立判断 | Core Agent 不替 Risk 决策 |
-| Audit | 保存每个阶段事件和引用 | 不把事件解释成收益承诺 |
+| Core Agent | 校验版本化请求，装配市场证据、trace、响应与 Handoff | 不复制 Quant 公式，不产生批准或执行授权 |
+| Backend | HTTP 路由、请求错误映射、审计读取、只读适配 | 只读包 HTTP 200 不表示 Risk 接收成功 |
+| Harness | 4 阶段编排、最多 2 次尝试、结果复用、输入变化失效 | 缺偏好 WAITING_INPUT；无效持仓 BLOCKED；失败 FAILED / CIRCUIT_OPEN |
+| Session | Harness 创建 session_id，续跑核验与 task 的绑定 | 会话不匹配停止；当前进程内存，不保证跨进程恢复 |
+| Context | RequestContext 的 actor/environment/data_mode 和 task/session；input 持仓及偏好 | 当前 demo / SYNTHETIC_REPLAY；不是长期 Memory 自动装载 |
+| TaskState | stage/status、checkpoint.completed/result_refs/resume_token | 所有权归 Harness；Risk/UI 不能改成批准 |
+| Tools / Quant | validatePortfolio、diagnosePortfolio、generateCandidates、runSimulation 现有结果 | 健康指标、候选 target_weights、模拟 comparisons 原样消费 |
+| Memory | 独立 session save/list/clear；保存须 consent=true | 主健康检查未自动读取；授权、范围、生命周期、清理由既有模块负责 |
+| Risk | 消费 Handoff 证据，独立复核 | 当前只有 PENDING_REVIEW 交接包；正式 Consumer/决策回写未接入 |
+| UI | 展示 task_state、trace、证据、错误恢复提示；人工打开工作台 | approval 不是交易授权；Pages 是固定 JSON 展示 |
+| Audit | audit_id、task/session/request/version、阶段事件 | 进程内事件，不是长期 Memory 或持久化审计存储 |
 
-## 一次请求的统一关联键
-
-contract_version 固定接口版本；request_id 标记一次请求；task_id 标记可恢复任务；session_id 标记会话；trace 连接响应；audit_evidence.audit_id 连接审计链；risk_handoff.evidence 指向实际产物。
-
-## 风险停止点
-
-主链路到达 HANDOFF_REQUIRED 后停止，固定返回 execution_allowed: false。Risk 尚未接入或返回决策前，Core Agent 不生成执行授权。
+当前完整响应的 trace 与 TaskState、AuditEvidence 可对齐；Handoff 自身没有 request_id，须连同响应 trace/audit 或 bridge.source 交接。续跑后审计信封 request_id 为最新请求，历史 contract.accepted payload 保留旧编号。失败信封尚不含 task_id/session_id/audit_id。证据与复现见 core-agent-verification-2026-10-10.md；字段必填与归属见 ../contracts/README.md。

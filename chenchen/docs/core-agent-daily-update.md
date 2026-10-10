@@ -4,6 +4,52 @@
 
 ## 2026-10-10
 
+### 22:00 自动化收尾核验（本轮新增记录）
+
+**今日真实产出**：按运行实现修订完整架构图和模块时序图，补齐统一 Contract 字段必填/生产方/消费方/不可修改责任表，新增可复现主链路核验报告。修正“自动提交 Risk”和审计事件写入顺序的误导。证据：core-agent-architecture.md、core-agent-sequence.md、../contracts/README.md、core-agent-verification-2026-10-10.md。
+
+**代码变化口径**：今天已有业务代码变更：统一 trace/audit、10 月 9 日市场回放、只读工作台适配与静态夹具服务（团队 2c72f2b/99a8371/2990446/781bcf0，个人 1fa41ff/1d05738/5880607/836fb6f）。本次自动化只改文档，没有业务代码变更；不把此前提交记为本轮新增实现。
+
+#### A. 已完成的核心接口
+
+| 名称 / 版本 | 生产方 → 消费方 | 当前字段状态 / 证据 |
+| --- | --- | --- |
+| HealthCheckRequest / investment-agent.v1 | Caller → Backend/Core Agent | version/request_id/operation/context/input 必填；请求 Schema、示例与 contracts/README.md |
+| HealthCheckResponse / investment-agent.v1 | Core Agent → Backend/UI/Risk | trace/task_state/artifacts/tool_results/audit_evidence/risk_handoff 必填；四个追踪键成功路径一致；contracts Schema、core/harness.js |
+| TaskState / Checkpoint（嵌入 v1） | Harness → Backend/UI | 7 状态；4 个 checkpoint 引用有效；版本/request 在 TaskState 内仍是 Schema 可选；报告及 tests/regressions.test.js |
+| RiskHandoff（嵌入 v1） | Core Agent → Risk/UI | PENDING_REVIEW/REQUIRED，execution_allowed=false；Handoff 无独立 request_id，需父 trace；audit_id/market_context_id 条件完整；contracts/investment-contract.js |
+| Error envelope / investment-agent.v1 | Backend → Caller/UI | code/message/retryable/stage/recovery 必填；尚缺 task/session/audit；server.js、tests/contracts.test.js |
+| risk-workbench.bridge@0.1.0 | Adapter → UI/人工复核 | source 含 version/request/task/session/audit；READ_ONLY_HANDOFF_PREVIEW；独立 Schema、远程 Consumer 未完成；integrations/risk-workbench-adapter.js |
+
+#### B. 可验证的集成进度
+
+- 两仓库各在 chenchen 执行 npm run check 和 npm test：语法通过，各 52/52 测试通过、0 失败、0 跳过。
+- 运行当前仓库服务并调用 scripts/smoke.js：19 个页面/静态资源及内容一致性通过。完整 PowerShell 复现命令在 core-agent-verification-2026-10-10.md。
+- 额外 HTTP 字段追踪：health-check、audit 读取、同 task 续跑、只读 bridge 均 HTTP 200；非法 Contract HTTP 422；伪造客户端 approval HTTP 503。
+- 成功响应 request_id/task_id/session_id/contract_version 与 trace、TaskState、AuditEvidence 相等；4 个 checkpoint 引用解析成功，带市场上下文共 5 个 ToolResult，Handoff.audit_id 可追踪。
+- 同 task 续跑 audit_id 不变，但审计信封只标记最新 request_id；历史编号位于 contract.accepted payload，未达到所有阶段事件逐请求归因。失败信封追踪缺口仍在。
+- 金融数据测试：2026-10-08/09 固定夹具回放通过，metrics、target_weights、comparisons 无漂移；10 月 9 日 rates-view-data-conflict 保持 REVIEW_REQUIRED。不代表当天实时行情验证，不产生自动交易。
+
+#### C. 需要其他 Owner 配合的阻塞项
+
+| Owner | 待确认字段 / 行为 | 阻塞原因 → 期望产出 |
+| --- | --- | --- |
+| Risk | 接收路径、request/task/session/audit、review_status/rejection_reason/decision | 当前只有人工只读包，无正式消费回写 → 版本化接收/回写 Contract 和真实消费测试 |
+| Backend | 失败 task/session/audit 关联、后置 contract.accepted、续跑事件归因、条件 evidence 校验 | 成功路径可追踪不等于失败/跨请求可追踪 → 错误升版和语义校验方案；持久化恢复验收 |
+| Memory | session 读取边界、audit 与长期 Memory 归属 | 主链路尚无自动 Memory 读取适配 → 保留既有 consent/生命周期的接口确认 |
+| Quant | 既有 ToolResult.version/data_as_of 与剩余独立接口版本 | 主健康检查已冻结，独立 import/diagnose/strategy/simulation 尚未统一 → 输出兼容与版本确认 |
+| UI | trace/task_state/error recovery 展示和只读包状态 | Risk 回写字段未冻结 → 字段消费清单与人工复核/等待状态验收 |
+| Data | as_of、来源可信度、刷新和冲突协议 | 仅固定 SYNTHETIC_REPLAY → 真实数据接入 Contract 与验收夹具 |
+
+**主链路阶段 / 今日结论**：本地请求→Session/Context→Harness→现有 Tools/Quant→统一响应→Risk Handoff 可核验；停在 HANDOFF_REQUIRED，未证明独立 Risk 审核闭环。Core Agent 调用 validatePortfolio、diagnosePortfolio、generateCandidates、runSimulation 的现有结果，未重复计算或修改 Quant。未修改 Memory consent、范围、生命周期、清理；主链路未自动读取 Memory。已经过 Risk 停止边界，execution_allowed=false，前端 approval 不构成授权。
+
+**下一步**：优先由 Risk 提供正式接收/回写协议，Backend 明确失败与续跑追踪、语义校验规则；之后按字段责任表与 Memory/Quant/UI/Data 联调。日报不修改任何 Owner 实现来使测试通过。
+
+**同步说明**：本节与核验报告、两张图、Contract 说明分别提交并推送两个 origin/main；最终提交编号和远程核对结果见本次自动化运行回执，不用本地检查代替远程同步确认。
+
+
+
+
 ### 今日结论
 
 风控工作台 Demo 已完成公开演示部署：个人仓库提供独立的 `/risk-workbench/` 页面，展示固定的 Risk Handoff 结果；本地页面继续保留真实 Core Agent 联调。公开页不伪造远程工作台写入，也不触发执行。
