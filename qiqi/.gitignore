@@ -26,3 +26,6 @@ data/contest/*
 # Daily Market Brief 生成物：飞书全量备份与预览图可再生，不入库
 brief/out/feishu_backup_*
 brief/out/*.png
+
+# 微信群分析报告：仅保留本地，不同步 GitHub
+docs/KOSX三队微信群状态分析_*.md
