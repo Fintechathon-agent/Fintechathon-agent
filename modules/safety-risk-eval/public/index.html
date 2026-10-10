@@ -31,6 +31,7 @@
       <details><summary>技术边界</summary><p class="fine">规则由程序计算；服务器保存当前方案与确认。此页不能授予真实交易权限。日志存于本机，未接团队正式认证与集中审计。</p></details>
     </aside>
     <div class="results">
+      <section aria-labelledby="handoff-title"><h2 id="handoff-title">接收 Core 交接包</h2><p>粘贴完整 Core 响应或含 agent_response 的交接结果。接收后保留原始证据并生成本会话的风控任务；外部来源尚未认证，只能评审，不能执行。</p><details id="handoff-import-form"><summary>导入 JSON 或载入契约示例</summary><label for="handoff-json">完整交接 JSON（仅虚构资料，最大 64 KB）</label><textarea id="handoff-json" rows="7" spellcheck="false" placeholder="包含 trace、artifacts、tool_results、audit_evidence 的完整响应"></textarea><div class="actions"><button id="load-handoff-example" type="button" class="secondary">载入已记录的 Core 示例</button><button id="import-handoff" type="button">校验并导入交接包</button></div><p class="fine">示例来自已运行的团队 Core 输出，不是此刻调用大模型。公网联调页只有编号的摘要包不能替代完整响应。</p></details><p id="handoff-status" role="status" aria-live="polite">尚未导入外部交接包。</p><pre id="handoff-lineage" hidden></pre></section>
       <section aria-labelledby="result-title"><div class="section-title"><h2 id="result-title">风险检查</h2><span id="decision" class="status empty">尚未检查</span></div><p id="summary">运行后将展示每条规则的判断与证据口径。</p><div id="reasons"></div>
         <details id="rules-detail"><summary>查看十条规则与测算值</summary><div class="table-scroll"><table><thead><tr><th>规则</th><th>状态</th><th>测算与说明</th></tr></thead><tbody id="rules"></tbody></table></div></details>
         <p id="binding" class="fine mono"></p>

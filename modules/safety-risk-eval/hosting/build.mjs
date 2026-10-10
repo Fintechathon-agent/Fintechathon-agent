@@ -23,6 +23,11 @@ ajv.addSchema(json(path.join(contractDir, "common.schema.json")));
 const ids = {};
 for (const name of ["input", "output", "rule"]) { const schema = json(path.join(contractDir, `risk-${name}.schema.json`)); ajv.addSchema(schema); ids[name] = schema.$id; }
 const generated = path.join(root, "generated"); fs.mkdirSync(generated, { recursive: true });
+const handoffAjv = new Ajv({ allErrors: true, strict: false, strictNumbers: true, code: { source: true } });
+formats(handoffAjv);
+const handoffSchema = json(path.join(root, "../handoff/upstream.schema.json"));
+handoffAjv.addSchema(handoffSchema);
+fs.writeFileSync(path.join(generated, "handoff-validator.cjs"), standalone(handoffAjv, handoffAjv.compile({ $ref: `${handoffSchema.$id}#/$defs/HealthCheckResponse` })));
 fs.writeFileSync(path.join(generated, "validators.cjs"), standalone(ajv, ids));
 const dictionary = {};
 for (const directory of ["", "rules", "examples"]) {
@@ -49,6 +54,7 @@ await build({ entryPoints: [path.join(root, "worker.mjs")], outfile: path.join(t
   build.onResolve({ filter: /^virtual:risk-assets$/ }, () => ({ path: "assets", namespace: "risk-assets" }));
   build.onLoad({ filter: /.*/, namespace: "risk-assets" }, () => ({ contents: `export default ${JSON.stringify(assets)}`, loader: "js" }));
   build.onLoad({ filter: /contracts[\\/]validate\.cjs$/ }, () => ({ contents: fs.readFileSync(path.join(generated, "contract.cjs"), "utf8"), loader: "js", resolveDir: generated }));
+  build.onLoad({ filter: /handoff[\\/]validate\.cjs$/ }, () => ({ contents: fs.readFileSync(path.join(generated, "handoff-validator.cjs"), "utf8"), loader: "js", resolveDir: generated }));
   build.onLoad({ filter: /investment-contract\.js$/ }, ({ path: p }) => {
     let contents = fs.readFileSync(p, "utf8");
     contents = contents.replace('const fs = require("node:fs");', "").replace('const path = require("node:path");', "").replace(/const schema = JSON.parse\(fs.readFileSync\([^\n]+\);/, `const schema = ${JSON.stringify(json(path.join(repo, "chenchen/contracts/investment-agent.v1.schema.json")))};`);

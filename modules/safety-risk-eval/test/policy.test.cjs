@@ -23,14 +23,14 @@ test("Policy: research reads and memory writes have distinct capabilities", () =
 test("Gateway: policy update after review requires recheck before confirmation", (t) => {
   let policy = structuredClone(p.currentPolicy());
   const f = h.fixture(t, { getPolicy: () => policy }), i = h.input(), r = f.gateway.register(i);
-  policy.version = "financial-policy-v2";
+  policy.version = "financial-policy-test-update";
   assert.throws(() => h.confirm(f.gateway, i, r), /策略或业务内容/);
   h.confirm(f.gateway, i, f.gateway.review(i.binding.task_id, i.binding.user_id));
 });
 test("Gateway: policy update after confirmation prevents execution with zero tool calls", async (t) => {
   let policy = structuredClone(p.currentPolicy());
   const f = h.fixture(t, { getPolicy: () => policy }), i = h.input(), r = f.gateway.register(i); h.confirm(f.gateway, i, r);
-  policy.version = "financial-policy-v2";
+  policy.version = "financial-policy-test-update";
   const result = await execute(f, i); assert.equal(result.status, "NOT_STARTED"); assert.equal(f.calls(), 0);
   assert.ok(result.policy.reasons.some((reason) => reason.code === "POLICY_APPROVAL_STALE"));
 });

@@ -37,7 +37,7 @@ class ActionGateway {
     const result = policyModule.decide({ subject: actor, owner: record.input.binding.user_id,
       source: record.action_source, scenario: memory ? "MEMORY" : "SIMULATION", tool: memory ? "memory.write" : "paper_trade",
       operation: memory ? "MEMORY_WRITE" : record.input.context.requested_operation === "REAL_TRADE" ? "REAL_TRADE" : "PAPER_TRADE",
-      stage, request_hash: requestHash, memory_consent: record.memory_consent,
+      stage, request_hash: requestHash, memory_consent: record.memory_consent, provenance_verified: !record.handoff_import,
       approval_matches: record.input.approval.status === "CONFIRMED" && receipt?.policy_digest === digest && receipt?.request_hash === requestHash && receipt?.approval_id === record.input.approval.approval_id,
       risk_eligible: riskEligible }, policy ?? null, this.now());
     this.event("POLICY_DECIDED", record, { policy: result });

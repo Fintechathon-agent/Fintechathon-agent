@@ -5,6 +5,7 @@ const ruleNames = ["权限与工具范围", "必要数据与证据", "资金及�
 const eventNames = { TASK_REGISTERED: "已接收健康检查", RISK_CHECK_COMPLETED: "风险检查完成", PLAN_CONFIRMED: "用户确认完整计划", PLAN_REJECTED: "用户拒绝计划", PLAN_REVOKED: "用户撤回确认", PLAN_INVALIDATED: "旧版本授权失效", EXECUTION_REQUESTED: "收到执行请求", EXECUTION_STARTED: "开始模拟执行", EXECUTION_SUCCEEDED: "模拟执行成功", EXECUTION_BLOCKED: "执行入口阻止操作", EXECUTION_UNKNOWN: "执行结果待核查", EXECUTION_ABORTED: "执行前中止", DUPLICATE_REQUEST: "重复请求返回原状态", MEMORY_UPDATED: "经同意写入演示记忆", MEMORY_UPDATE_FAILED: "演示记忆写入失败", REQUEST_REJECTED: "请求未通过安全校验" };
 let csrf, record = null, lastExecution = null, executionKey = null, dirty = false, busy = false;
 eventNames.POLICY_DECIDED = "确定性权限策略检查";
+Object.assign(eventNames, { HANDOFF_IMPORTED: "已接收 Core 交接包（来源待验证）", HANDOFF_IMPORT_REPLAY: "重复交接返回原任务", HANDOFF_IMPORT_REJECTED: "交接包未通过验证" });
 const node = (tag, text, className) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (className) e.className = className; return e; };
 const notice = (text, error = false) => { $("notice").textContent = text; $("notice").classList.toggle("error", error); };
 async function api(route, data) {
@@ -25,6 +26,8 @@ function renderButtons() {
   const accepted = [...document.querySelectorAll("#acceptances input")].every((box) => box.checked);
   $("create").disabled = busy || !csrf;
   $("run-attack").disabled = busy || !csrf;
+  $("import-handoff").disabled = busy || !csrf;
+  $("load-handoff-example").disabled = busy || !csrf;
   $("update").disabled = busy || !record;
   $("whole-plan").disabled = busy || !canConfirm;
   $("approve").disabled = busy || !canConfirm || !accepted || !$("whole-plan").checked;
@@ -41,6 +44,10 @@ function numeric(m) {
 }
 function render() {
   if (!record) return;
+  const imported = record.handoff_import;
+  $("handoff-status").textContent = imported ? "已导入本会话，来源尚未认证。可以查看检查与审计，不能确认或执行此导入任务。" : "当前任务由本工作台生成。";
+  $("handoff-lineage").hidden = !imported;
+  $("handoff-lineage").textContent = imported ? JSON.stringify({ source: imported.source, source_digest: imported.source_digest, local_task_id: taskId(), provenance: imported.provenance }, null, 2) : "";
   const policy = lastExecution?.policy || record.policy;
   $("policy-decision").textContent = policy ? `${labels[policy.decision]} · ${policy.decision}` : "旧任务需要重新检查";
   $("policy-decision").className = `status ${policy?.decision || "empty"}`;
@@ -84,6 +91,19 @@ async function audit() {
   }
   $("flow-audit").classList.toggle("done", events.length > 0);
 }
+$("load-handoff-example").addEventListener("click", () => action(async () => {
+  $("handoff-json").value = JSON.stringify(await api("/api/safety/handoffs/example"), null, 2);
+  $("handoff-status").textContent = "已载入记录的虚构 Core 输出，尚未提交或创建任务。";
+}));
+$("import-handoff").addEventListener("click", () => action(async () => {
+  let parsed;
+  try { parsed = JSON.parse($("handoff-json").value); } catch { throw new Error("JSON 格式无效，请复制完整 Core 响应。"); }
+  const payload = { import_version: "risk-handoff.import.v1", agent_response: parsed.agent_response || parsed };
+  if (new TextEncoder().encode(JSON.stringify(payload)).length > 65536) throw new Error("交接包超过 64 KB，请缩减到本次任务所需证据。");
+  const result = await api("/api/safety/handoffs", payload);
+  record = { input: { binding: { task_id: result.task_id } } }; lastExecution = null; executionKey = null; dirty = false; $("whole-plan").checked = false;
+  await reload(); notice(result.replay ? "重复交接已返回原任务，没有重复创建。" : "交接包已接收并生成风控任务。来源待认证，执行权限保持关闭。");
+}));
 $("profile-form").addEventListener("submit", (event) => { event.preventDefault(); action(async () => {
   const result = await api("/api/safety/tasks", settings()); record = { input: { binding: result.risk.binding } }; lastExecution = null; executionKey = null; dirty = false; $("whole-plan").checked = false; await reload(); notice("健康检查与风险判断已完成，请查看结果。");
 }); });

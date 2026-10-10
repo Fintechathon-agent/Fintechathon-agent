@@ -8,6 +8,7 @@ const { ActionGateway, GatewayError } = require("./gateway.cjs");
 const adapter = require("./core-adapter.cjs");
 const { runAttackDemo } = require("./security.cjs");
 const policy = require("./policy.cjs");
+const handoffReceiver = require("./handoff/receiver.cjs");
 const baseRequest = require("../../chenchen/contracts/examples/health-check.request.json");
 const { server: originalServer, harness } = require("../../chenchen/server.js");
 const originalHandler = originalServer.listeners("request")[0];
@@ -66,6 +67,7 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
       s = session(req, res);
       if (req.method === "GET" && url.pathname === "/api/safety/session") { send(res, 200, { csrf: s.csrf, user_id: s.user_id, mode: "LOCAL_SYNTHETIC_DEMO" }); return; }
       if (req.method === "GET" && url.pathname === "/api/safety/policy") { send(res, 200, policy.describe()); return; }
+      if (req.method === "GET" && url.pathname === "/api/safety/handoffs/example") { send(res, 200, { import_version: handoffReceiver.VERSION, agent_response: require("./handoff/example.response.json") }); return; }
       if (req.method === "GET" && url.pathname === "/api/demo/portfolio") { originalHandler(req, res); return; }
       if (req.method === "GET" && (url.pathname.startsWith("/api/task/") || url.pathname === "/api/safety/task")) {
         const id = url.pathname === "/api/safety/task" ? url.searchParams.get("task_id") : url.pathname.slice("/api/task/".length).replace(/\/export$/, "");
@@ -78,12 +80,16 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
         send(res, 200, store.events.filter((e) => (e.task_id || e.binding?.task_id) === taskId)); return;
       }
       if (req.method === "GET" && url.pathname.startsWith("/api/audit/")) {
-        const taskId = decodeURIComponent(url.pathname.slice("/api/audit/".length)); gateway.inspect(taskId, s.user_id);
+        const taskId = decodeURIComponent(url.pathname.slice("/api/audit/".length)); const task = gateway.inspect(taskId, s.user_id);
+        if (task.handoff_import) { send(res, 200, { core: task.handoff_import.original_response.audit_evidence, core_provenance: task.handoff_import.provenance, safety: store.events.filter((e) => (e.task_id || e.binding?.task_id) === taskId) }); return; }
         send(res, 200, harness.getAudit(taskId)); return;
       }
       if (req.method !== "POST") throw new GatewayError("NOT_FOUND", "接口不存在。", "ERROR", 404);
       if (req.headers["x-risk-csrf"] !== s.csrf) throw new GatewayError("CSRF_REQUIRED", "缺少当前会话的确认来源标识。", "BLOCK", 403);
       payload = await body(req);
+      if (url.pathname === "/api/safety/handoffs") {
+        send(res, 200, handoffReceiver.receive({ payload, actor: s.user_id, gateway })); return;
+      }
       if (url.pathname === "/api/safety/attack-demo") {
         only(payload, ["source", "text"]);
         send(res, 200, await runAttackDemo({ gateway, harness, actor: s.user_id, source: payload.source, text: payload.text })); return;

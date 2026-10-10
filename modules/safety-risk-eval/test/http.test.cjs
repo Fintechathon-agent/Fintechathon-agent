@@ -41,3 +41,16 @@ test("HTTP: session isolation and unchanged team static page", async (t) => {
   assert.equal((await fetch(f.base + `/api/safety/task?task_id=${task_id}`)).status, 403);
   const main = await fetch(f.base + "/investment"); assert.equal(main.status, 200); assert.match(await main.text(), /html/);
 });
+test("HTTP: handoff receiver validates CSRF, isolates ownership and persists evidence", async (t) => {
+  const f = await start(t), payload = { import_version: "risk-handoff.import.v1", agent_response: require("../handoff/example.response.json") };
+  assert.equal((await f.post("/api/safety/handoffs", payload, { "x-risk-csrf": "wrong" })).status, 403);
+  assert.equal((await f.post("/api/safety/handoffs", payload, { origin: "https://external.invalid" })).status, 403);
+  const imported = await f.post("/api/safety/handoffs", payload);
+  assert.equal(imported.status, 200); assert.equal(imported.data.execution_allowed, false);
+  const id = imported.data.task_id;
+  assert.equal((await fetch(f.base + `/api/safety/task?task_id=${id}`)).status, 403);
+  const task = await fetch(f.base + `/api/safety/task?task_id=${id}`, { headers: { cookie: f.cookie } }).then(r => r.json());
+  assert.equal(task.handoff_import.source_digest, h.hash(payload.agent_response));
+  assert.equal((await f.post("/api/safety/handoffs", payload)).data.replay, true);
+  assert.equal((await f.post("/api/paper-trade/execute", { task_id: id, idempotency_key: "import-http-execute" })).data.status, "NOT_STARTED");
+});

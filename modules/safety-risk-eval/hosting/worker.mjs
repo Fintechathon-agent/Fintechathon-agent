@@ -3,6 +3,8 @@ import gatewayModule from "../gateway.cjs";
 import adapter from "../core-adapter.cjs";
 import security from "../security.cjs";
 import policy from "../policy.cjs";
+import handoffReceiver from "../handoff/receiver.cjs";
+import handoffExample from "../handoff/example.response.json" with { type: "json" };
 import core from "../../../chenchen/core/harness.js";
 import baseRequest from "../../../chenchen/contracts/examples/health-check.request.json" with { type: "json" };
 import financialTools from "../../../chenchen/tools/financial-tools.js";
@@ -42,6 +44,7 @@ export default {
       session = await getSession(env.DB, request);
       if (request.method === "GET" && url.pathname === "/api/safety/session") return json({ csrf: session.csrf, user_id: session.user_id, mode: "ONLINE_SYNTHETIC_DEMO" }, 200, session);
       if (request.method === "GET" && url.pathname === "/api/safety/policy") return json(policy.describe(), 200, session);
+      if (request.method === "GET" && url.pathname === "/api/safety/handoffs/example") return json({ import_version: handoffReceiver.VERSION, agent_response: handoffExample }, 200, session);
       if (request.method === "GET" && url.pathname === "/api/demo/portfolio") return json(financialTools.validatePortfolio(financialTools.getDemoPortfolio()), 200, session);
       if (request.method === "POST") {
         if (request.headers.get("x-risk-csrf") !== session.csrf) throw new GatewayError("CSRF_REQUIRED", "请使用当前浏览器会话确认。", "BLOCK", 403);
@@ -78,9 +81,11 @@ export default {
         const id = url.searchParams.get("task_id"); gateway.inspect(id, actor); result = store.events.filter((e) => (e.task_id || e.binding?.task_id) === id);
       } else if (request.method === "GET" && url.pathname.startsWith("/api/audit/")) {
         const record = gateway.inspect(url.pathname.slice(11), actor);
-        result = { core: record.core_audit || null, safety: store.events.filter((e) => (e.task_id || e.binding?.task_id) === record.input.binding.task_id) };
+        result = { core: record.handoff_import?.original_response.audit_evidence || record.core_audit || null, core_provenance: record.handoff_import?.provenance || "LOCAL_CORE", safety: store.events.filter((e) => (e.task_id || e.binding?.task_id) === record.input.binding.task_id) };
       } else if (request.method === "GET" && url.pathname.startsWith("/api/task/")) {
         const id = url.pathname.slice(10).replace(/\/export$/, ""); result = gateway.inspect(id, actor);
+      } else if (request.method === "POST" && url.pathname === "/api/safety/handoffs") {
+        result = handoffReceiver.receive({ payload, actor, gateway });
       } else if (request.method === "POST" && url.pathname === "/api/safety/tasks") {
         const settings = profile(payload), request = structuredClone(baseRequest); request.input.risk_profile.max_drawdown = settings.maxDrawdown;
         result = createTask({ ...settings, memoryConsent: payload.memory_consent === true }, request);
@@ -104,6 +109,7 @@ export default {
       await store.flush();
       return json(result, 200, session);
     } catch (error) {
+      if (store && url.pathname === "/api/safety/handoffs") { try { await store.flush(); } catch { /* No execution is permitted when audit persistence fails. */ } }
       if (store && payload?.task_id && gateway) {
         try { const record = gateway.inspect(payload.task_id, session.user_id); gateway.event("REQUEST_REJECTED", record, { decision: error.decision || "ERROR", code: error.code || "PERSISTENCE_UNAVAILABLE" }); await store.flush(); } catch { /* Do not fabricate durable audit success. */ }
       }

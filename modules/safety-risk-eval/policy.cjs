@@ -4,9 +4,9 @@ const { hash } = require("../../docs/safety-risk-eval/contracts/validate.cjs");
 
 // Trusted server configuration. Neither prompts nor HTTP request bodies can replace it.
 const bundle = Object.freeze({
-  version: "financial-policy-v1",
+  version: "financial-policy-v2",
   implementation: "LOCAL_DETERMINISTIC_POLICY",
-  rules: Object.freeze(["DEFAULT_DENY", "SAME_OWNER", "NO_EXTERNAL_AUTHORITY", "NO_REAL_TRADE", "BOUND_APPROVAL", "RISK_ELIGIBLE", "MEMORY_CONSENT"]),
+  rules: Object.freeze(["DEFAULT_DENY", "SAME_OWNER", "NO_EXTERNAL_AUTHORITY", "NO_REAL_TRADE", "BOUND_APPROVAL", "RISK_ELIGIBLE", "MEMORY_CONSENT", "VERIFIED_HANDOFF_PROVENANCE"]),
   tools: Object.freeze({
     "portfolio.review": Object.freeze({ scenario: "PORTFOLIO", operation: "ANALYZE", effect: "READ_ONLY" }),
     paper_trade: Object.freeze({ scenario: "SIMULATION", operation: "PAPER_TRADE", effect: "SIMULATED_WRITE" }),
@@ -31,6 +31,7 @@ function decide(input, policy = currentPolicy(), now = new Date().toISOString())
     if (!input || !["REVIEW", "EXECUTE"].includes(input.stage) || !["USER", "EXTERNAL_CONTENT"].includes(input.source) || !input.subject || !input.owner || !input.tool || !input.operation || !input.scenario || typeof input.request_hash !== "string") throw new Error("POLICY_INPUT_INVALID");
     if (input.subject !== input.owner) add("POLICY_OWNER_MISMATCH", "不能操作其他用户的资源。", "由资源所属用户重新发起。");
     if (input.source !== "USER") add("POLICY_UNTRUSTED_AUTHORITY", "外部内容只能作为业务数据，不能发起有权限的操作。", "保留原文作为证据，由用户独立发起任务。");
+    if (input.provenance_verified === false) add("POLICY_HANDOFF_UNVERIFIED", "交接包来源尚未认证，允许查看评审，禁止取得执行授权。", "由团队接通可信 Core 服务身份验证；用户确认不能替代来源验证。");
     if (input.operation === "REAL_TRADE") add("POLICY_REAL_TRADE_DISABLED", "此环境禁止真实交易。", "仅使用模拟操作。");
     const tool = policy.tools[input.tool];
     if (!Object.hasOwn(policy.tools, input.tool) || !tool || tool.scenario !== input.scenario || tool.operation !== input.operation) add("POLICY_TOOL_NOT_ALLOWED", "工具、场景与操作类型不在允许组合内。", "通过团队评审登记工具及其执行边界。");
