@@ -1,0 +1,109 @@
+{
+  "generated_at": "2026-10-10T02:24:14.793Z",
+  "scope": "Local synthetic implementation, contract and integration tests; not production security certification or live financial execution",
+  "runtime": "v24.19.0",
+  "suites": [
+    {
+      "name": "Risk / Gateway / Core integration",
+      "command": "node --test --test-reporter=tap test/engine.test.cjs test/gateway.test.cjs test/http.test.cjs test/ledger.test.cjs test/security.test.cjs",
+      "exit_code": 0,
+      "tests": 54,
+      "passed": 54,
+      "failed": 0
+    },
+    {
+      "name": "Draft contract regression",
+      "command": "node --test --test-reporter=tap tests/contracts.test.cjs",
+      "exit_code": 0,
+      "tests": 29,
+      "passed": 29,
+      "failed": 0
+    },
+    {
+      "name": "Existing team contract regression",
+      "command": "node --test --test-reporter=tap chenchen/tests/contracts.test.js",
+      "exit_code": 0,
+      "tests": 4,
+      "passed": 4,
+      "failed": 0
+    }
+  ],
+  "sources": [
+    {
+      "path": "modules/safety-risk-eval/core-adapter.cjs",
+      "sha256": "df0e61d9e862273840b6afadfb147fc445c0840de487a15a4db2d36dd0297280"
+    },
+    {
+      "path": "modules/safety-risk-eval/engine.cjs",
+      "sha256": "30bb9701757d4b62c05d853debcc45eaf699010e798c1583ecb9c7344e351a9f"
+    },
+    {
+      "path": "modules/safety-risk-eval/gateway.cjs",
+      "sha256": "b2e85859ed60a3a265ed82626c20daef81c84f67e76edb960025396ffbee441c"
+    },
+    {
+      "path": "modules/safety-risk-eval/package.json",
+      "sha256": "d39bc84c366309ba4dbc2b96183c33df43445393b8f2466a834325aa3f45d90a"
+    },
+    {
+      "path": "modules/safety-risk-eval/public/app.js",
+      "sha256": "26ce8ea3394d7a8470e2bd4e6aae7ce0d0191cfd5320f66ca30c8e4c11969566"
+    },
+    {
+      "path": "modules/safety-risk-eval/public/index.html",
+      "sha256": "dad1f404341de7408ef43c11b735ddcb15d147d0ec4191f5de20fea9b3774497"
+    },
+    {
+      "path": "modules/safety-risk-eval/public/style.css",
+      "sha256": "0b4216a68b516c6b3ec90851b0010906ec746e32ff7be04c12bf2ab26cc368c6"
+    },
+    {
+      "path": "modules/safety-risk-eval/public/team-bootstrap.js",
+      "sha256": "3c2b23ebf6c80357ad89caba437e3553a42b80a22749907b633d02057de1c7ae"
+    },
+    {
+      "path": "modules/safety-risk-eval/scripts/browser-check.cjs",
+      "sha256": "3fc4c0640dfeb7a92faafbba4e199e30c8428c286b73796bed7beb4281dd7e20"
+    },
+    {
+      "path": "modules/safety-risk-eval/scripts/evaluate.cjs",
+      "sha256": "f59dc7e27dfebb9a37341c7c380d0829fe3c0a105919b870ea1907eeeadfb427"
+    },
+    {
+      "path": "modules/safety-risk-eval/security.cjs",
+      "sha256": "ea8b853d93ff2c55cf8b834ee1b910e53854e6f24d8b66afa1938ece660f05aa"
+    },
+    {
+      "path": "modules/safety-risk-eval/server.cjs",
+      "sha256": "35a81f5e1e2f367c5305f0f47b2e7910a27ab22564ab70d5bfed5373edf74b99"
+    },
+    {
+      "path": "modules/safety-risk-eval/store.cjs",
+      "sha256": "236138a8ffb86a31479d9bd9725a1f6fccdf983213d26d4ceb954d9a256fec4e"
+    },
+    {
+      "path": "modules/safety-risk-eval/test/engine.test.cjs",
+      "sha256": "990260a1826a2c3580421570dd06c8c6b6e17ff8aaf7faa2f643a09d8f5d9e01"
+    },
+    {
+      "path": "modules/safety-risk-eval/test/gateway.test.cjs",
+      "sha256": "76728d0730eba9866bcc1c877fbf82ecb51314bee1ef119a3e85f114f2f342fc"
+    },
+    {
+      "path": "modules/safety-risk-eval/test/helpers.cjs",
+      "sha256": "18798e7bf8a016fb23d03da661bef0be7b2a4a8ae8631c04788c10dc2ea7d2be"
+    },
+    {
+      "path": "modules/safety-risk-eval/test/http.test.cjs",
+      "sha256": "166f41da652bc300d9d605f5385e79eafc9fa4d029425caf885da7e951eb53e0"
+    },
+    {
+      "path": "modules/safety-risk-eval/test/ledger.test.cjs",
+      "sha256": "bcf243458b7c650ed3d9050e5127b86da916b092d350d634877e2214909c3c20"
+    },
+    {
+      "path": "modules/safety-risk-eval/test/security.test.cjs",
+      "sha256": "17cf88b84b1065b0088fe7e53507a8522d56eee6591359a0a1f569a579245e96"
+    }
+  ]
+}
