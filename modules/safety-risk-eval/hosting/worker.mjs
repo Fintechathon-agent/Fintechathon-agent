@@ -3,6 +3,7 @@ import gatewayModule from "../gateway.cjs";
 import adapter from "../core-adapter.cjs";
 import security from "../security.cjs";
 import policy from "../policy.cjs";
+import modelAgent from "../model-agent.cjs";
 import handoffReceiver from "../handoff/receiver.cjs";
 import handoffExample from "../handoff/example.response.json" with { type: "json" };
 import core from "../../../chenchen/core/harness.js";
@@ -44,6 +45,7 @@ export default {
       session = await getSession(env.DB, request);
       if (request.method === "GET" && url.pathname === "/api/safety/session") return json({ csrf: session.csrf, user_id: session.user_id, mode: "ONLINE_SYNTHETIC_DEMO" }, 200, session);
       if (request.method === "GET" && url.pathname === "/api/safety/policy") return json(policy.describe(), 200, session);
+      if (request.method === "GET" && url.pathname === "/api/safety/model-status") return json(modelAgent.status(env), 200, session);
       if (request.method === "GET" && url.pathname === "/api/safety/handoffs/example") return json({ import_version: handoffReceiver.VERSION, agent_response: handoffExample }, 200, session);
       if (request.method === "GET" && url.pathname === "/api/demo/portfolio") return json(financialTools.validatePortfolio(financialTools.getDemoPortfolio()), 200, session);
       if (request.method === "POST") {
@@ -76,7 +78,12 @@ export default {
         return { upstream, risk };
       }
       let result;
-      if (request.method === "GET" && url.pathname === "/api/safety/task") result = gateway.inspect(url.searchParams.get("task_id"), actor);
+      if (request.method === "POST" && url.pathname === "/api/safety/model-demo") result = await modelAgent.run({ gateway, harness, actor, payload, env, persist: () => store.flush(), claimBudget: async () => {
+        const day = new Date().toISOString().slice(0, 10);
+        const claimed = await env.DB.prepare("INSERT INTO risk_model_budget(day,calls) VALUES(?1,1) ON CONFLICT(day) DO UPDATE SET calls=calls+1 WHERE calls<30").bind(day).run();
+        if (!claimed.success || claimed.meta.changes !== 1) throw new GatewayError("MODEL_DAILY_LIMIT", "今日模型演示次数已达30次上限。", "REVIEW", 429);
+      } });
+      else if (request.method === "GET" && url.pathname === "/api/safety/task") result = gateway.inspect(url.searchParams.get("task_id"), actor);
       else if (request.method === "GET" && url.pathname === "/api/safety/audit") {
         const id = url.searchParams.get("task_id"); gateway.inspect(id, actor); result = store.events.filter((e) => (e.task_id || e.binding?.task_id) === id);
       } else if (request.method === "GET" && url.pathname.startsWith("/api/audit/")) {

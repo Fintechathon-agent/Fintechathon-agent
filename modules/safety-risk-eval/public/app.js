@@ -4,6 +4,7 @@ const labels = { ALLOW: "通过", REVIEW: "需要复核", BLOCK: "阻止", ERROR
 const ruleNames = ["权限与工具范围", "必要数据与证据", "资金及用户约束", "单只与前三集中度", "行业集中与未知", "历史最大回撤", "高相关资产集中", "完整计划确认", "防重复执行", "必要审计写入"];
 const eventNames = { TASK_REGISTERED: "已接收健康检查", RISK_CHECK_COMPLETED: "风险检查完成", PLAN_CONFIRMED: "用户确认完整计划", PLAN_REJECTED: "用户拒绝计划", PLAN_REVOKED: "用户撤回确认", PLAN_INVALIDATED: "旧版本授权失效", EXECUTION_REQUESTED: "收到执行请求", EXECUTION_STARTED: "开始模拟执行", EXECUTION_SUCCEEDED: "模拟执行成功", EXECUTION_BLOCKED: "执行入口阻止操作", EXECUTION_UNKNOWN: "执行结果待核查", EXECUTION_ABORTED: "执行前中止", DUPLICATE_REQUEST: "重复请求返回原状态", MEMORY_UPDATED: "经同意写入演示记忆", MEMORY_UPDATE_FAILED: "演示记忆写入失败", REQUEST_REJECTED: "请求未通过安全校验" };
 let csrf, record = null, lastExecution = null, executionKey = null, dirty = false, busy = false;
+let modelConfiguration = null;
 eventNames.POLICY_DECIDED = "确定性权限策略检查";
 Object.assign(eventNames, { HANDOFF_IMPORTED: "已接收 Core 交接包（来源待验证）", HANDOFF_IMPORT_REPLAY: "重复交接返回原任务", HANDOFF_IMPORT_REJECTED: "交接包未通过验证" });
 const node = (tag, text, className) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (className) e.className = className; return e; };
@@ -26,6 +27,7 @@ function renderButtons() {
   const accepted = [...document.querySelectorAll("#acceptances input")].every((box) => box.checked);
   $("create").disabled = busy || !csrf;
   $("run-attack").disabled = busy || !csrf;
+  $("run-model").disabled = busy || !csrf || modelConfiguration?.configured !== true;
   $("import-handoff").disabled = busy || !csrf;
   $("load-handoff-example").disabled = busy || !csrf;
   $("update").disabled = busy || !record;
@@ -135,8 +137,29 @@ $("run-attack").addEventListener("click", () => action(async () => {
   $("attack-audit").textContent = JSON.stringify(result.audit, null, 2);
   notice(blocked ? "安全演示完成：攻击原文、阻断节点、固定原因及审计记录均已展示。" : "请查看本次演示的异常结果。", !blocked);
 }));
+function showModelCase() { $("model-case-text").textContent = modelConfiguration?.cases?.[$("model-case").value]?.text || ""; }
+$("model-case").addEventListener("change", showModelCase);
+$("run-model").addEventListener("click", () => action(async () => {
+  $("model-result").hidden = true; $("model-progress").textContent = "正在调用真实模型并保存审计，请等待；不会自动重试。";
+  try {
+    const result = await api("/api/safety/model-demo", { case_id: $("model-case").value });
+    $("model-result").hidden = false;
+    const outcome = result.gateway;
+    $("model-verdict").textContent = outcome.decision === "ERROR" ? "模型链路已暂停" : outcome.blocking_node === "ACTION_GATEWAY" ? "模型提出的动作被网关阻止" : outcome.blocking_node === "CORE_AGENT" ? "模型拒绝了越权指令" : "模型完成分析，未发起投资操作";
+    $("model-summary").textContent = `原因：${outcome.reason_codes.join(" / ")}。模拟执行工具调用 ${outcome.paper_tool_calls} 次。`;
+    $("model-raw").textContent = result.model.raw || "本次没有有效模型原文。";
+    $("model-evidence").textContent = JSON.stringify({ task_id: result.task_id, run_id: result.model.run_id, provider: result.model.provider, model: result.model.returned_model, risk_decision: result.risk.decision, gateway: outcome }, null, 2);
+    $("model-audit").textContent = JSON.stringify(result.audit, null, 2);
+    $("model-progress").textContent = outcome.message_zh || "调用结束，原始输出和本次审计已展示。";
+  } catch (error) { $("model-progress").textContent = "请求未完成，请勿视为模型成功；检查服务状态后再运行。"; throw error; }
+}));
 action(async () => {
   const session = await api("/api/safety/session"); csrf = session.csrf;
+  try {
+    modelConfiguration = await api("/api/safety/model-status"); showModelCase();
+    $("model-status").textContent = modelConfiguration.configured ? "服务已配置，待实际调用" : "尚未配置模型服务";
+    $("model-progress").textContent = modelConfiguration.configured ? `服务 ${modelConfiguration.provider} · 模型 ${modelConfiguration.model}；选择案例开始，配置存在不代表调用已成功。` : "等待团队在服务端配置授权的模型服务。当前无法运行真实模型案例，执行入口保持关闭。";
+  } catch { $("model-status").textContent = "模型状态读取失败"; $("model-progress").textContent = "刷新后重试；无法确认服务状态时不调用模型。"; }
   try {
     const manifest = await api("/api/safety/policy");
     $("policy-runtime").textContent = "确定性策略已接入"; $("policy-runtime").className = "status ALLOW";

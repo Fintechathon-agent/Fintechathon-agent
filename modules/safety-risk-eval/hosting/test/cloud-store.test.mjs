@@ -13,6 +13,14 @@ async function fixture(t) {
   const session = await getSession(db, new Request("https://demo.example/api/safety/session"));
   return { db, session };
 }
+test("D1: global model budget atomically caps all sessions at thirty attempts", async t => {
+  const { db } = await fixture(t);
+  const claim = day => db.prepare("INSERT INTO risk_model_budget(day,calls) VALUES(?1,1) ON CONFLICT(day) DO UPDATE SET calls=calls+1 WHERE calls<30").bind(day).run();
+  const attempts = await Promise.all(Array.from({ length: 40 }, () => claim("2026-10-10")));
+  assert.equal(attempts.filter(r => r.meta.changes === 1).length, 30);
+  assert.equal((await db.prepare("SELECT calls FROM risk_model_budget WHERE day=?1").bind("2026-10-10").first()).calls, 30);
+  assert.equal((await claim("2026-10-11")).meta.changes, 1);
+});
 test("D1: sessions are isolated and the secure cookie restores the same visitor", async (t) => {
   const { db, session } = await fixture(t);
   const restored = await getSession(db, new Request("https://demo.example/api", { headers: { cookie: `risk_session=${session.session_id}` } }));

@@ -5,6 +5,7 @@ export class SQLiteD1 {
   constructor(file = ":memory:") {
     this.db = new DatabaseSync(file);
     this.db.exec(fs.readFileSync(new URL("../drizzle/0000_lazy_human_cannonball.sql", import.meta.url), "utf8").replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS"));
+    this.db.exec(fs.readFileSync(new URL("../drizzle/0001_model_budget.sql", import.meta.url), "utf8").replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS"));
   }
   prepare(sql) {
     const statement = this.db.prepare(sql);

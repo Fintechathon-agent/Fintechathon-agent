@@ -9,3 +9,7 @@ export const sessions = sqliteTable("risk_demo_sessions", {
   revision: integer("revision").notNull().default(0),
   updatedAt: integer("updated_at").notNull()
 });
+export const modelBudget = sqliteTable("risk_model_budget", {
+  day: text("day").primaryKey(),
+  calls: integer("calls").notNull()
+});

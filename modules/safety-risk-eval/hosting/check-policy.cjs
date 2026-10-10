@@ -12,7 +12,7 @@ async function main() {
     await page.goto(base + "/risk");
     await page.waitForFunction(() => document.querySelector("#policy-runtime").textContent === "确定性策略已接入");
     const manifest = JSON.parse(await page.locator("#policy-manifest").textContent());
-    assert.equal(manifest.version, "financial-policy-v2");
+    assert.equal(manifest.version, "financial-policy-v3");
     assert.equal(manifest.opa_runtime_connected, false);
     cases.push("deployed-policy-manifest");
     await page.locator("#profile-confirmed").check(); await page.locator("#create").click();

@@ -25,7 +25,7 @@ class ActionGateway {
     return clone(record);
   }
   authority(record) {
-    return { user_id: record.input.binding.user_id, allowed_tools: ["portfolio.review", "paper_trade"], expected_binding: record.input.binding, project_plan: this.projectPlan, approval_check_id: record.review?.risk_check_id, action_source: record.action_source || "USER", supports_real_data: false };
+    return { user_id: record.input.binding.user_id, allowed_tools: record.model_scope === "ANALYZE_ONLY" ? ["portfolio.review"] : ["portfolio.review", "paper_trade"], expected_binding: record.input.binding, project_plan: this.projectPlan, approval_check_id: record.review?.risk_check_id, action_source: record.action_source || "USER", supports_real_data: false };
   }
   policyCheck(record, actor, stage, riskEligible = false, memory = false) {
     let policy;
@@ -39,7 +39,7 @@ class ActionGateway {
       operation: memory ? "MEMORY_WRITE" : record.input.context.requested_operation === "REAL_TRADE" ? "REAL_TRADE" : "PAPER_TRADE",
       stage, request_hash: requestHash, memory_consent: record.memory_consent, provenance_verified: !record.handoff_import,
       approval_matches: record.input.approval.status === "CONFIRMED" && receipt?.policy_digest === digest && receipt?.request_hash === requestHash && receipt?.approval_id === record.input.approval.approval_id,
-      risk_eligible: riskEligible }, policy ?? null, this.now());
+      risk_eligible: riskEligible, allowed_tools: record.model_scope === "ANALYZE_ONLY" ? ["portfolio.review"] : undefined }, policy ?? null, this.now());
     this.event("POLICY_DECIDED", record, { policy: result });
     return result;
   }
@@ -103,6 +103,34 @@ class ActionGateway {
     this.store.transaction((data) => { data.tasks[taskId].input = clone(input); data.tasks[taskId].input.approval = { ...emptyApproval(), status: "INVALIDATED" }; data.tasks[taskId].invalidated = true; return null; });
   }
   inspect(taskId, actor) { return this.owner(taskId, actor); }
+  async dispatchModelProposal(taskId, actor, runId) {
+    const record = this.owner(taskId, actor), receipt = record.model_receipt;
+    if (record.model_scope !== "ANALYZE_ONLY" || receipt?.run_id !== runId || receipt.status !== "VALIDATED" || receipt.provenance !== "SERVER_MODEL_CALL") throw new GatewayError("MODEL_PROVENANCE_INVALID", "缺少本任务真实模型调用凭据。", "BLOCK");
+    if (record.model_outcome) return { ...clone(record.model_outcome), replay: true };
+    const proposal = receipt.proposal;
+    if (proposal.disposition !== "PROPOSE") {
+      const result = { decision: "ALLOW", status: "NOT_STARTED", blocking_node: proposal.disposition === "REFUSE" ? "CORE_AGENT" : null, reason_codes: [proposal.disposition === "REFUSE" ? "MODEL_REFUSED" : "MODEL_ANALYSIS_ONLY"], paper_tool_calls: 0 };
+      this.event("MODEL_NO_ACTION", record, { run_id: runId, disposition: proposal.disposition, result });
+      return result;
+    }
+    const tool = proposal.action.tool;
+    const mapping = { "portfolio.review": ["PORTFOLIO", "ANALYZE"], paper_trade: ["SIMULATION", "PAPER_TRADE"], real_trade: ["SIMULATION", "REAL_TRADE"], "memory.write": ["MEMORY", "MEMORY_WRITE"] };
+    const [scenario, operation] = Object.hasOwn(mapping, tool) ? mapping[tool] : ["UNKNOWN", "UNKNOWN"];
+    const riskInput = clone(record.input);
+    riskInput.context.requested_tool = tool;
+    riskInput.context.requested_operation = ["PAPER_TRADE", "REAL_TRADE"].includes(operation) ? operation : "ANALYZE";
+    riskInput.context.authorized_tools = ["portfolio.review"];
+    const actionRisk = evaluate(riskInput, this.authority(record), { now: this.now() });
+    this.event("MODEL_ACTION_RISK_DECIDED", record, { run_id: runId, actual_model_action: proposal.action, risk: actionRisk });
+    let bundle; try { bundle = this.getPolicy(); } catch { bundle = null; }
+    const result = policyModule.decide({ subject: actor, owner: record.input.binding.user_id, source: "USER", scenario, operation, tool, stage: "EXECUTE", allowed_tools: ["portfolio.review"], request_hash: policyModule.snapshot(record.input), approval_matches: false, risk_eligible: false, memory_consent: false }, bundle ?? null, this.now());
+    this.event("MODEL_ACTION_POLICY_DECIDED", record, { run_id: runId, actual_model_action: proposal.action, policy: result });
+    // No dynamic tool lookup: this boundary has exactly one read-only implementation.
+    const outcome = { decision: result.decision, status: result.allow ? "READ_ONLY_RESULT" : "NOT_STARTED", blocking_node: result.allow ? null : "ACTION_GATEWAY", reason_codes: result.reasons.map(r => r.code), policy: result, action_risk: actionRisk, paper_tool_calls: 0 };
+    if (result.allow) outcome.result = { task_id: taskId, risk: record.review, note: "读取本任务已有健康检查，不进行账户或记忆写入。" };
+    this.event(result.allow ? "MODEL_READ_RETURNED" : "MODEL_ACTION_BLOCKED", record, { run_id: runId, outcome });
+    return outcome;
+  }
   async execute(taskId, actor, key) {
     const record = this.owner(taskId, actor);
     if (typeof key !== "string" || key.length < 8 || key.length > 128) throw new GatewayError("IDEMPOTENCY_KEY_REQUIRED", "必须提供8到128字符的执行标识。");
