@@ -71,3 +71,9 @@ contract_version、request_id、task_id、session_id、audit_id、evidence、dec
 http://127.0.0.1:4175/risk-workbench
 
 点击“运行一次联调 Demo”，再点击“打开安全攻防与风控工作台”进行人工对照。页面明确显示“只读联调 Demo”和“尚未写入远程工作台”，避免把适配层预览误认为线上接入。
+
+GitHub Pages 公开演示：
+
+https://realchenchenluo.github.io/agent/risk-workbench/
+
+公开页使用固定演示 JSON，只读展示同一份 Handoff 结果，不连接后端；需要真实运行 Core Agent 时仍使用本地地址。

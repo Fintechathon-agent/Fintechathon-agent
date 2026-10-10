@@ -1,6 +1,7 @@
 import { $, esc, api, healthCheckRequest } from "./common.js";
 
 const profile = { investment_horizon_days: 365, max_drawdown: 0.1, liquidity_need: "medium" };
+const staticDemo = location.hostname.endsWith("github.io");
 const controlLabels = {
   no_execution: "不允许执行：execution_allowed 固定为 false。",
   no_quant_recalculation: "不重算 Quant：市场和风险上下文只作为证据交接。",
@@ -43,7 +44,9 @@ function render(result) {
   ].map(([label, value]) => "<div><span>" + esc(label) + "</span><b>" + esc(value || "未生成") + "</b></div>").join("");
   $("#control-list").innerHTML = Object.entries(bridge.controls).map(([key, value]) => "<li class=\"" + (value ? "is-on" : "is-off") + "\"><strong>" + (value ? "已启用" : "未启用") + "</strong>" + esc(controlLabels[key] || key) + "</li>").join("");
   $("#handoff-json").textContent = JSON.stringify(bridge, null, 2);
-  $("#bridge-message").textContent = "Core Agent 已完成 " + result.agent_response.task_state.stage + "；可以打开远程工作台进行人工复核。";
+  $("#bridge-message").textContent = result.static_demo
+    ? "GitHub Pages 静态演示：这里展示固定联调结果；本地版会真实调用 Core Agent。"
+    : "Core Agent 已完成 " + result.agent_response.task_state.stage + "；可以打开远程工作台进行人工复核。";
   $("#bridge-result").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -52,9 +55,14 @@ $("#run-bridge").addEventListener("click", async () => {
   button.disabled = true;
   button.textContent = "正在运行 Core Agent…";
   try {
-    const portfolio = await api("/api/demo/portfolio");
-    const request = healthCheckRequest({ riskProfile: profile, portfolio: portfolio.output.snapshot });
-    const result = await api("/api/risk-workbench/handoff", { request: { ...request, input: { ...request.input, portfolio: portfolioInput(portfolio.output.snapshot) } } });
+    let result;
+    if (staticDemo) {
+      result = { static_demo: true, agent_response: { task_state: { stage: "RISK_CHECK" } }, risk_workbench: await fetch("./risk-workbench-demo.json").then(response => response.json()) };
+    } else {
+      const portfolio = await api("/api/demo/portfolio");
+      const request = healthCheckRequest({ riskProfile: profile, portfolio: portfolio.output.snapshot });
+      result = await api("/api/risk-workbench/handoff", { request: { ...request, input: { ...request.input, portfolio: portfolioInput(portfolio.output.snapshot) } } });
+    }
     render(result);
   } catch (error) {
     $("#bridge-status").textContent = "运行失败";

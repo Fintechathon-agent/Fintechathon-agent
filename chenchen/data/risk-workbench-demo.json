@@ -1,0 +1,39 @@
+{
+  "bridge_version": "risk-workbench.bridge@0.1.0",
+  "integration_mode": "READ_ONLY_HANDOFF_PREVIEW",
+  "workbench_url": "https://fund-risk-workbench.panxintian44.chatgpt.site/risk",
+  "source": {
+    "contract_version": "investment-agent.v1",
+    "operation": "PORTFOLIO_HEALTH_CHECK",
+    "request_id": "req-pages-risk-workbench-001",
+    "task_id": "task-pages-risk-workbench-001",
+    "session_id": "session-pages-risk-workbench-001",
+    "audit_id": "audit-task-pages-risk-workbench-001"
+  },
+  "decision": {
+    "status": "PENDING_REVIEW",
+    "decision": "REQUIRED",
+    "execution_allowed": false,
+    "reason": "Risk decision is outside Agent Core and Tools ownership."
+  },
+  "evidence": {
+    "portfolio_snapshot_id": "snapshot-pages-demo-001",
+    "health_report_id": "health-pages-demo-001",
+    "proposal_ids": ["proposal-a-pages-demo", "proposal-b-pages-demo", "proposal-c-pages-demo"],
+    "simulation_id": "simulation-pages-demo-001",
+    "market_context_id": null,
+    "audit_id": "audit-task-pages-risk-workbench-001",
+    "market_review_items": []
+  },
+  "controls": {
+    "no_execution": true,
+    "no_quant_recalculation": true,
+    "no_memory_rule_change": true,
+    "external_content_is_not_authoritative": true
+  },
+  "remote_capability": {
+    "can_import_external_handoff": false,
+    "action": "OPEN_WORKBENCH_FOR_MANUAL_REVIEW",
+    "note": "GitHub Pages 只展示固定联调结果；远程工作台没有公开的外部 Handoff 导入接口。"
+  }
+}

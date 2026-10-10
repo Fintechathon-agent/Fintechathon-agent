@@ -2,6 +2,35 @@
 
 > 用途：每天 22:00 前更新一次，供团队同步主链路进展。本文档只记录 Core Agent 主链路，不替代 Risk、Memory、Quant 或 UI 的专项日报。
 
+## 2026-10-10
+
+### 今日结论
+
+风控工作台 Demo 已完成公开演示部署：个人仓库提供独立的 `/risk-workbench/` 页面，展示固定的 Risk Handoff 结果；本地页面继续保留真实 Core Agent 联调。公开页不伪造远程工作台写入，也不触发执行。
+
+### 今日完成
+
+- 为 GitHub Pages 增加独立的风控工作台入口，不覆盖持仓导入台和基金市场雷达。
+- 增加固定 `risk-workbench-demo.json`，保留 `investment-agent.v1`、request/task/session/audit 关联、证据 ID 和四项安全控制。
+- GitHub Pages 使用只读静态演示；本地 `/risk-workbench` 仍通过 `/api/risk-workbench/handoff` 真实运行 Core Agent。
+- 在接入说明中标明远程风控工作台暂无公开的外部 Handoff 导入接口，当前只能人工复核。
+
+### 验证结果
+
+- 个人仓库 Pages 工作流已加入 `/risk-workbench/` 构建和发布步骤。
+- 团队仓库同步同一份页面、适配数据和说明；团队仓库仍不单独发布 Pages，因为当前 GitHub 计划不支持该部署能力。
+- 本地测试和 Smoke Test 继续验证原有页面、Contract、固定数据及风控工作台资源。
+
+### 需要其他 Owner 配合的阻塞项
+
+1. Risk Owner：提供版本化的外部 Handoff 接收接口后，才能把只读预览升级为真正的系统间接入。
+2. Risk Owner：确认 `review_status`、`decision`、`execution_allowed` 和审计回写字段。
+
+### 下一步
+
+- 发布后检查公开页面在电脑端和手机端的加载、按钮运行及证据展示。
+- 等 Risk 接口 Contract 冻结后，再补真实接收回放，不在 Core Agent 内重新计算 Quant 或修改 Memory 规则。
+
 ## 2026-10-09
 
 ### 今日结论
