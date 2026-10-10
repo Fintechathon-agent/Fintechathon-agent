@@ -39,7 +39,11 @@ for (const file of ["index.html", "style.css", "app.js", "team-bootstrap.js"]) {
   assets[file === "index.html" ? "/risk" : "/risk/" + file] = { body, type: mime[path.extname(file)] };
 }
 for (const file of ["style.css", "product-overrides.css", "investment.js", "common.js", "presentation.mjs"]) assets["/versions/" + file] = { body: fs.readFileSync(path.join(repo, "chenchen/versions", file), "utf8"), type: file.endsWith("css") ? mime[".css"] : mime[".js"] };
-assets["/investment"] = { body: fs.readFileSync(path.join(repo, "chenchen/versions/investment.html"), "utf8").replace("</head>", '<script src="/risk/team-bootstrap.js"></script></head>'), type: mime[".html"] };
+const investmentSource = fs.readFileSync(path.join(repo, "chenchen/versions/investment.html"), "utf8");
+const merchantEntry = '<a class="back-link" href="/merchant">店主财务助手</a>';
+if (!investmentSource.includes(merchantEntry)) throw new Error("Review the investment navigation before publishing: upstream markup changed");
+// Scope the borrowed navigation to the two modules included in this deployment.
+assets["/investment"] = { body: investmentSource.replace(merchantEntry, '<a class="back-link" href="/risk">风控工作台</a>').replace("</head>", '<script src="/risk/team-bootstrap.js"></script></head>'), type: mime[".html"] };
 fs.mkdirSync(path.join(target, "dist/server"), { recursive: true });
 await build({ entryPoints: [path.join(root, "worker.mjs")], outfile: path.join(target, "dist/server/index.js"), bundle: true, platform: "neutral", format: "esm", target: "es2022", external: ["node:crypto", "node:util"], banner: { js: 'import * as cloudCrypto from "node:crypto"; import * as cloudUtil from "node:util"; var require = (name) => { if(name === "node:crypto") return cloudCrypto; if(name === "node:util") return cloudUtil; throw new Error("Unbundled dependency"); };' }, nodePaths: [path.join(contractDir, "node_modules")], plugins: [{ name: "frozen-data-and-validators", setup(build) {
   build.onResolve({ filter: /^virtual:risk-assets$/ }, () => ({ path: "assets", namespace: "risk-assets" }));

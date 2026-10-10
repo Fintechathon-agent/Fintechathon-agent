@@ -27,6 +27,8 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/") return Response.redirect(url.origin + "/risk", 302);
+    // Recover links saved from the original navigation; the merchant module is not hosted here.
+    if (["/merchant", "/merchant/"].includes(url.pathname)) return Response.redirect(url.origin + "/investment", 302);
     if (!url.pathname.startsWith("/api/")) {
       const asset = assets[url.pathname === "/risk/" ? "/risk" : url.pathname];
       if (!asset) return new Response("页面不存在", { status: 404 });
