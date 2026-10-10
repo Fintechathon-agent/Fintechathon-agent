@@ -7,6 +7,7 @@ const test = require("node:test");
 const { Harness } = require("../core/harness");
 const tools = require("../tools/financial-tools");
 const contract = require("../contracts/investment-contract");
+const { buildRiskWorkbenchHandoff } = require("../integrations/risk-workbench-adapter");
 
 const examples = path.join(__dirname, "..", "contracts", "examples");
 
@@ -59,4 +60,21 @@ test("contract keeps investment errors traceable", () => {
     }
   });
   assert.equal(error.request_id, "req-contract-error-001");
+});
+
+test("Risk Workbench adapter preserves evidence and stays read-only", () => {
+  const request = contract.createRequest({
+    requestId: "req-risk-workbench-test-001",
+    riskProfile: { investment_horizon_days: 365, max_drawdown: 0.1, liquidity_need: "medium" },
+    portfolio: tools.getDemoPortfolio()
+  });
+  const response = new Harness().runHealthCheckContract(request);
+  const handoff = buildRiskWorkbenchHandoff(response);
+  assert.equal(handoff.integration_mode, "READ_ONLY_HANDOFF_PREVIEW");
+  assert.equal(handoff.source.request_id, response.request_id);
+  assert.equal(handoff.source.task_id, response.task_state.task_id);
+  assert.equal(handoff.source.audit_id, response.audit_evidence.audit_id);
+  assert.equal(handoff.evidence.health_report_id, response.risk_handoff.evidence.health_report_id);
+  assert.equal(handoff.decision.execution_allowed, false);
+  assert.equal(handoff.remote_capability.can_import_external_handoff, false);
 });

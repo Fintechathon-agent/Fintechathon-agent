@@ -6,6 +6,7 @@ const path = require("node:path");
 const { Harness } = require("./core/harness");
 const tools = require("./tools/financial-tools");
 const contract = require("./contracts/investment-contract");
+const { buildRiskWorkbenchHandoff } = require("./integrations/risk-workbench-adapter");
 const { randomUUID } = require("node:crypto");
 const { MerchantSession, demo: merchantDemo } = require("./merchant/ledger");
 const merchantSessions = new Map();
@@ -166,6 +167,21 @@ async function handleApi(request, response, pathname, url) {
     sendJson(response, 200, result);
     return true;
   }
+  if (method === "POST" && pathname === "/api/risk-workbench/handoff") {
+    let agentResponse;
+    try {
+      agentResponse = harness.runHealthCheckContract(body.request || body);
+    } catch (error) {
+      error.requestId = (body.request || body).request_id || null;
+      throw error;
+    }
+    sendJson(response, 200, {
+      integration_version: "core-agent-to-risk-workbench.demo@0.1.0",
+      agent_response: agentResponse,
+      risk_workbench: buildRiskWorkbenchHandoff(agentResponse)
+    });
+    return true;
+  }
   if (method === "POST" && pathname === "/api/portfolio/import") {
     sendJson(response, 200, tools.validatePortfolio(resolvePortfolio(body)));
     return true;
@@ -230,10 +246,10 @@ function serveStatic(response, pathname) {
     sendJson(response, 400, { error: { code: "INVALID_PATH", message: "invalid URL path" } });
     return;
   }
-  const routes = { "/": "versions/investment.html", "/index.html": "versions/investment.html", "/catalog": "versions/home.html", "/investment": "versions/investment.html", "/investment-v0.10": "versions/investment-legacy.html", "/merchant": "versions/merchant.html" };
+  const routes = { "/": "versions/investment.html", "/index.html": "versions/investment.html", "/catalog": "versions/home.html", "/investment": "versions/investment.html", "/investment-v0.10": "versions/investment-legacy.html", "/merchant": "versions/merchant.html", "/risk-workbench": "versions/risk-workbench.html" };
   const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
-  const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html",
-    "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/common.js",
+  const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html", "versions/risk-workbench.html",
+    "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/risk-workbench.js", "versions/common.js",
     "contracts/investment-agent.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json",
     "data/market-brief-2026-10-08.json", "data/market-brief-2026-10-09.json", "index.html", "app.js", "styles.css"]);
   if (!allowed.has(relativePath)) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "not found" } }); return; }

@@ -8,7 +8,7 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));
   const base='http://127.0.0.1:'+server.address().port;
-  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/versions/merchant.js','/versions/investment-legacy.js','/contracts/investment-agent.v1.schema.json','/contracts/examples/health-check.request.json','/contracts/examples/health-check.response.json','/data/market-brief-2026-10-08.json']) assert.equal((await fetch(base+page)).status,200);
+  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/risk-workbench','/versions/merchant.js','/versions/investment-legacy.js','/versions/risk-workbench.js','/contracts/investment-agent.v1.schema.json','/contracts/examples/health-check.request.json','/contracts/examples/health-check.response.json','/data/market-brief-2026-10-08.json','/data/market-brief-2026-10-09.json']) assert.equal((await fetch(base+page)).status,200);
   assert.match(await fetch(base+'/').then(r=>r.text()),/个人投资顾问/);
   assert.match(await fetch(base+'/catalog').then(r=>r.text()),/店主财务助手/);
   assert.match(await fetch(base+'/investment').then(r=>r.text()),/现在先检查什么/);
@@ -82,6 +82,13 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   assert.deepEqual(next.artifacts.market_context.unresolved_conflicts.map(signal=>signal.signal_id),['rates-view-data-conflict']);
   assert.equal(next.risk_handoff.evidence.audit_id,next.audit_evidence.audit_id);
   assert.equal(next.risk_handoff.execution_allowed,false);
+  const bridgeResponse=await fetch(base+'/api/risk-workbench/handoff',{method:'POST',headers,body:JSON.stringify({request:nextRequest})});
+  assert.equal(bridgeResponse.status,200);
+  const bridge=await bridgeResponse.json();
+  assert.equal(bridge.risk_workbench.integration_mode,'READ_ONLY_HANDOFF_PREVIEW');
+  assert.equal(bridge.risk_workbench.source.request_id,nextRequest.request_id);
+  assert.equal(bridge.risk_workbench.evidence.audit_id,bridge.agent_response.audit_evidence.audit_id);
+  assert.equal(bridge.risk_workbench.decision.execution_allowed,false);
   assert.equal((await fetch(base+'/api/audit/'+task.task_state.task_id)).status,200);
   const investmentFile=await fetch(base+'/api/task/'+task.task_state.task_id+'/export');
   assert.match(investmentFile.headers.get('content-disposition'),/attachment/);

@@ -97,7 +97,7 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 ### 验证结果
 
 - JavaScript 语法检查：通过。
-- 自动化测试：51/51 通过。
+- 自动化测试：52/52 通过。
 - HTTP Contract 测试：2026-10-09 市场上下文请求返回 200，Risk Handoff 证据完整。
 - 页面与静态资源 Smoke Test：启动当前版本服务后通过；首次执行因服务未启动无法连接，已复跑通过。
 - 市场简报测试记录：见 `docs/market-brief-test-report-2026-10-08.md`。
@@ -143,6 +143,8 @@ Core Agent 已完成架构图、模块调用时序和统一 Contract 的第一�
 - 新增架构图：docs/core-agent-architecture.md。
 - 新增模块调用时序图：docs/core-agent-sequence.md。
 - 更新公共说明：contracts/README.md；更新响应示例和 investment-agent.v1 Schema。
+- 新增 /risk-workbench 联调页面和 POST /api/risk-workbench/handoff 适配接口：Core Agent 生成统一 Handoff，页面展示给风控工作台人工复核。
+- 新增 docs/risk-workbench-integration.md，记录接入流程、接口示例和当前限制。
 
 ### B. 可验证的集成进度
 
@@ -153,6 +155,7 @@ Core Agent 已完成架构图、模块调用时序和统一 Contract 的第一�
 - 新增 market-brief-test-report-2026-10-09.md，记录数据样本、来源边界、回放路径和结果。
 - 新增自动化用例验证：市场简报能进入 Core Agent；Quant metrics、候选 target_weights、模拟 comparisons 不漂移；Risk Handoff 带 audit_id；execution_allowed 仍为 false。
 - 本轮仍未接入独立 Risk Consumer；Risk 只验证到 Handoff 边界。
+- 已验证远程风控工作台为独立会话流程，目前没有公开外部 Handoff 导入接口；本次 Demo 明确标记为只读预览，不冒充线上写入。
 
 ### C. 需要其他 Owner 配合的阻塞项
 
@@ -171,10 +174,12 @@ Core Agent 已完成架构图、模块调用时序和统一 Contract 的第一�
 ### 验证结果
 
 - JavaScript 语法检查：通过。
-- 自动化测试：51/51 通过。
+- 自动化测试：52/52 通过。
+- 风控工作台 Demo：本地页面实际运行成功，显示 Risk Handoff、证据 ID 和四项安全控制。
 - HTTP 回放：2026-10-09 市场简报请求返回 200，观点/数据冲突进入 REVIEW_REQUIRED，execution_allowed=false。
 - 页面与静态资源 Smoke Test：独立端口复跑通过。
 - 测试数据和结论：见 docs/market-brief-test-report-2026-10-09.md。
+- 风控工作台联调说明：见 docs/risk-workbench-integration.md。
 - 原始市场简报不进入仓库，只保留固定夹具、来源说明和测试结果。
 
 ### 下一步

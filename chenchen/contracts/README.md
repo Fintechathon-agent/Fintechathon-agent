@@ -36,6 +36,8 @@ Risk 只消费 risk_handoff.evidence 指向的结果，并按 contract_version�
 - 在线运行时请求示例：/contracts/examples/health-check.request.json
 - 在线运行时响应示例：/contracts/examples/health-check.response.json
 - 市场简报测试夹具：data/market-brief-2026-10-08.json、data/market-brief-2026-10-09.json
+- 风控工作台联调页面：/risk-workbench
+- 风控工作台适配接口：POST /api/risk-workbench/handoff
 
 PowerShell 调用示例：
 
@@ -43,3 +45,5 @@ PowerShell 调用示例：
     Invoke-RestMethod -Method Post -Uri http://127.0.0.1:4175/api/health-check/run -ContentType 'application/json' -Body $body
 
 错误响应的 error 固定包含 code、message、retryable、stage 和 recovery；需要人工修复时由 recovery 给出恢复方向。缺少 contract_version、request_id、context 或 input 时，Backend 返回 422 INVALID_CONTRACT。不要在生产代码中拼接旧的裸字段请求。
+
+风控工作台适配接口当前只生成 READ_ONLY_HANDOFF_PREVIEW，不伪造远程写入，不提交确认，不触发执行。远程工作台没有公开外部 Handoff 导入接口前，Core Agent 只能通过适配层把证据整理给人工复核。

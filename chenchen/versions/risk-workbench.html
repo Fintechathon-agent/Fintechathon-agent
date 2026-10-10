@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Core Agent · 风控工作台联调 Demo</title><link rel="stylesheet" href="/versions/style.css"><link rel="stylesheet" href="/versions/product-overrides.css"></head>
+<body class="investment-product">
+<header class="product-header"><a class="brand" href="/investment"><span class="brand-mark">01</span><span class="brand-copy">个人投资顾问<small>YOUR FUND MANAGER</small></span></a><nav class="product-nav"><span class="product-label">Core Agent × Risk</span><a class="back-link" href="/investment">返回投资分析</a></nav></header>
+<main class="compact-main">
+  <section class="hero compact-hero bridge-hero">
+    <div><p class="eyebrow">统一 Contract · 证据交接 · 不直接执行</p><h1>把分析交给风控工作台</h1><p class="muted hero-lede">先由 Core Agent 生成可追踪的 Risk Handoff，再交给风控人员复核。</p></div>
+    <span class="product-stamp">只读联调 Demo</span>
+  </section>
+  <section class="panel bridge-notice"><strong>当前接入方式：适配层预览</strong><p>这个风控工作台目前没有公开的外部 Handoff 导入接口，所以本 Demo 会真实运行 Core Agent、生成适配包，并打开工作台供人工查看；不会伪造“已写入远程任务”，也不会触发真实交易。</p><a class="secondary bridge-link" href="https://fund-risk-workbench.panxintian44.chatgpt.site/risk" target="_blank" rel="noopener">打开安全攻防与风控工作台 ↗</a></section>
+  <section class="panel bridge-panel">
+    <div class="row"><div><p class="section-kicker">一次联调</p><h2>Core Agent → Risk Handoff → 风控工作台</h2></div><span class="tag" id="bridge-status">尚未运行</span></div>
+    <div class="bridge-flow" aria-label="联调流程"><article><span>01</span><h3>Agent 分析</h3><p>生成健康报告、候选方案和模拟结果。</p></article><i aria-hidden="true">→</i><article><span>02</span><h3>统一交接</h3><p>保留 request、task、session、audit 关联。</p></article><i aria-hidden="true">→</i><article><span>03</span><h3>Risk 复核</h3><p>固定不允许执行，等待独立风控决定。</p></article></div>
+    <button id="run-bridge" type="button">运行一次联调 Demo →</button><p id="bridge-message" class="small muted" role="status">使用固定演示持仓，不连接真实账户。</p>
+  </section>
+  <section id="bridge-result" class="bridge-result" hidden>
+    <section class="snapshot-card">
+      <div class="row"><div><p class="section-kicker">交接结果</p><h2 id="handoff-title">等待结果</h2></div><span class="verdict-tag" id="handoff-decision">待复核</span></div>
+      <div class="bridge-metrics" id="handoff-metrics"></div>
+      <p class="small muted" id="handoff-reason"></p>
+    </section>
+    <section class="panel"><div class="row"><div><p class="section-kicker">给 Risk 的证据</p><h2>同一条追踪链</h2></div><span class="tag">可核对</span></div><div id="handoff-evidence" class="bridge-evidence"></div><details class="compact-detail"><summary>查看适配包 JSON</summary><pre id="handoff-json"></pre></details></section>
+    <section class="panel bridge-controls"><div class="row"><div><p class="section-kicker">安全控制</p><h2>这次 Demo 明确做了什么限制</h2></div></div><ul id="control-list"></ul></section>
+  </section>
+</main>
+<footer class="footer">Core Agent × Risk Workbench · 固定演示 · 不接真实账户 · 不构成投资建议</footer>
+<div id="status" role="status" aria-live="polite"></div>
+<script type="module" src="/versions/risk-workbench.js"></script>
+</body>
+</html>
