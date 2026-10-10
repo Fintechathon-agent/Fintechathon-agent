@@ -1,0 +1,52 @@
+"use strict";
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const { chromium } = require("playwright");
+async function main() {
+  const base = process.env.RISK_BASE_URL || "http://127.0.0.1:8780";
+  const browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) });
+  const page = await browser.newPage({ viewport: { width: 1365, height: 960 } });
+  const errors = []; page.on("pageerror", (e) => errors.push(e.message));
+  const cases = [];
+  try {
+    await page.goto(base + "/risk");
+    await page.locator("#profile-confirmed").check();
+    await page.locator("#create").click();
+    await page.waitForFunction(() => document.querySelector("#decision").textContent.includes("ALLOW"));
+    assert.equal(await page.locator("#execute").isDisabled(), true);
+    await page.locator("#whole-plan").check(); await page.locator("#approve").click();
+    await page.waitForFunction(() => !document.querySelector("#execute").disabled);
+    await page.locator("#execute").click();
+    await page.waitForFunction(() => document.querySelector("#execution-state").textContent === "模拟成功");
+    await page.locator("#repeat").click();
+    await page.waitForFunction(() => document.querySelector("#notice").textContent.includes("没有重复写入"));
+    cases.push({ name: "normal-confirm-execute-replay", passed: true });
+    await page.locator("#reserve").fill("6000"); await page.locator("#drawdown").focus();
+    assert.equal(await page.locator("#approve").isDisabled(), true);
+    await page.locator("#update").click(); await page.waitForFunction(() => document.querySelector("#notice").textContent.includes("旧确认已失效"));
+    assert.equal(await page.locator("#execute").isDisabled(), true);
+    cases.push({ name: "profile-change-invalidates", passed: true });
+    await page.locator("#preset").selectOption("review"); await page.locator("#profile-confirmed").check(); await page.locator("#create").click();
+    await page.waitForFunction(() => document.querySelector("#decision").textContent.includes("REVIEW"));
+    await page.locator("#whole-plan").check(); assert.equal(await page.locator("#approve").isDisabled(), true);
+    await page.locator("#acceptances input").check(); await page.locator("#approve").click();
+    await page.waitForFunction(() => !document.querySelector("#execute").disabled);
+    await page.locator("#execute").click(); await page.waitForFunction(() => document.querySelector("#execution-state").textContent === "模拟成功");
+    cases.push({ name: "review-needs-item-acceptance", passed: true });
+    await page.locator("#preset").selectOption("block"); await page.locator("#profile-confirmed").check(); await page.locator("#create").click();
+    await page.waitForFunction(() => document.querySelector("#decision").textContent.includes("BLOCK"));
+    assert.equal(await page.locator("#approve").isDisabled(), true); assert.equal(await page.locator("#execute").isDisabled(), true);
+    cases.push({ name: "hard-block-controls-disabled", passed: true });
+    await page.locator("#preset").selectOption("missing"); await page.locator("#profile-confirmed").check(); await page.locator("#create").click();
+    await page.waitForFunction(() => document.querySelector("#decision").textContent.includes("ERROR"));
+    assert.equal(await page.locator("#execute").isDisabled(), true);
+    cases.push({ name: "missing-trading-plan-fails-closed", passed: true });
+    assert.deepEqual(errors, []);
+    const output = { scope: "Local synthetic integration browser interactions, not live trading", cases, page_errors: errors };
+    const destination = path.resolve(__dirname, "../../../docs/safety-risk-eval/implementation-v0.1/browser-results.json");
+    fs.mkdirSync(path.dirname(destination), { recursive: true }); fs.writeFileSync(destination, JSON.stringify(output, null, 2) + "\n");
+    console.log(JSON.stringify(output));
+  } finally { await browser.close(); }
+}
+main().catch((error) => { console.error(error); process.exitCode = 1; });

@@ -1,0 +1,26 @@
+{
+  "scope": "Local synthetic integration browser interactions, not live trading",
+  "cases": [
+    {
+      "name": "normal-confirm-execute-replay",
+      "passed": true
+    },
+    {
+      "name": "profile-change-invalidates",
+      "passed": true
+    },
+    {
+      "name": "review-needs-item-acceptance",
+      "passed": true
+    },
+    {
+      "name": "hard-block-controls-disabled",
+      "passed": true
+    },
+    {
+      "name": "missing-trading-plan-fails-closed",
+      "passed": true
+    }
+  ],
+  "page_errors": []
+}
