@@ -251,7 +251,7 @@ function serveStatic(response, pathname) {
   const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html", "versions/risk-workbench.html",
     "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/risk-workbench.js", "versions/common.js",
     "contracts/investment-agent.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json",
-    "data/market-brief-2026-10-08.json", "data/market-brief-2026-10-09.json", "index.html", "app.js", "styles.css"]);
+    "data/market-brief-2026-10-08.json", "data/market-brief-2026-10-09.json", "data/risk-workbench-demo.json", "index.html", "app.js", "styles.css"]);
   if (!allowed.has(relativePath)) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "not found" } }); return; }
   const filePath = path.resolve(root, relativePath);
   const relativeToRoot = path.relative(root, filePath);

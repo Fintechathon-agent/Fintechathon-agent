@@ -11,6 +11,7 @@ const base = "http://127.0.0.1:" + (process.env.PORT || 4175);
     ["/data/market-brief-2026-10-08.json","data/market-brief-2026-10-08.json"],
     ["/data/market-brief-2026-10-09.json","data/market-brief-2026-10-09.json"],
     ["/risk-workbench","versions/risk-workbench.html"],
+    ["/data/risk-workbench-demo.json","data/risk-workbench-demo.json"],
     ...["style.css","product-overrides.css","common.js","presentation.mjs","investment.js","investment-legacy.js","merchant.js","risk-workbench.js"].map(file=>["/versions/"+file,"versions/"+file])
   ]) {
     const response=await fetch(base+route,{signal:AbortSignal.timeout(5000)});
