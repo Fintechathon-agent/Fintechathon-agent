@@ -66,6 +66,11 @@ ACTION_LABELS = {
     "memory_write_rejected": "记忆写入被门卫拦截",
     "breaker_locked": "异常熔断 · 执行链路锁定",
     "breaker_reset": "熔断 · 人工确认恢复",
+    "intent_parsed": "自然语言意图识别",
+    "dag_planned": "任务 DAG 已生成",
+    "dag_completed": "任务 DAG 执行完成",
+    "dag_failed": "任务 DAG 执行失败",
+    "request_blocked": "可疑自然语言请求被拦截",
 }
 
 
@@ -743,6 +748,13 @@ class DemoApp:
 class Handler(BaseHTTPRequestHandler):
     server_version = "PortfolioSentinelWeb/0.1"
     protocol_version = "HTTP/1.1"
+
+    def handle(self) -> None:
+        """浏览器关闭 keep-alive 连接时静默结束，不把正常断连打印成服务异常。"""
+        try:
+            super().handle()
+        except (BrokenPipeError, ConnectionResetError):
+            pass
 
     # ---- 基础输出 ----
 

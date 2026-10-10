@@ -74,6 +74,13 @@ class AuditLogger:
 _audit_logger: Optional[AuditLogger] = None
 
 
+def init_audit_logger(log_dir: Path | str = "data/audit") -> AuditLogger:
+    """让全局安全钩子与当前应用使用同一个审计目录。"""
+    global _audit_logger
+    _audit_logger = AuditLogger(log_dir)
+    return _audit_logger
+
+
 def get_audit_logger() -> AuditLogger:
     global _audit_logger
     if _audit_logger is None:

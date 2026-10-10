@@ -28,7 +28,7 @@ from ..tools.paper_trade import PaperTradingTool
 from ..tools.whatif import WhatIfEngine, round_lot as _round_lot
 from ..risk.engine import RiskEngine
 from ..risk.gate import RiskGate
-from ..risk.audit import AuditLogger
+from ..risk.audit import AuditLogger, init_audit_logger
 from ..risk.approval import ApprovalManager
 from ..tools.memory_tools import init_memory_tools
 
@@ -414,6 +414,7 @@ def build_orchestrator(
     sessions = SessionManager(ttl_minutes=cfg.session.ttl_minutes)
     paper_trader = PaperTradingTool(cfg.paper_trade_dir)
     audit = AuditLogger(cfg.audit_dir)
+    init_audit_logger(cfg.audit_dir)
     approvals = ApprovalManager(cfg.approval_dir)
 
     market_tool = MarketDataTool(use_mock=(cfg.financial.market_source == "mock"))
@@ -479,6 +480,7 @@ def build_orchestrator(
         whatif_evaluator=whatif_fn,
         risk_gate=risk_gate_fn,
         alternatives_scanner=alternatives_fn,
+        audit_logger=audit,
     )
 
     return Orchestrator(

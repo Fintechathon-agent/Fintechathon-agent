@@ -6,7 +6,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional, Callable
+from typing import Any, Optional, Callable
 
 from contracts.types import (
     AgentPhase,
@@ -69,6 +69,7 @@ class AgentLoop:
     whatif_evaluator: Optional[ToolWhatIf] = None
     risk_gate: Optional[ToolRiskGate] = None
     alternatives_scanner: Optional[ToolAlternatives] = None
+    audit_logger: Optional[Any] = None
 
     # 配置
     retry_config: RetryConfig = field(default_factory=RetryConfig)
@@ -345,8 +346,8 @@ class AgentLoop:
             return "我已按你的问题完成诊断、建议、模拟推演和风控复核。"
         return "我已完成持仓诊断；数字来自确定性工具，模型只负责解释。"
 
-    @staticmethod
     def _audit(
+        self,
         action: str,
         user_id: str,
         session_id: str,
@@ -354,8 +355,11 @@ class AgentLoop:
         result: str = "success",
     ) -> None:
         try:
-            from agent.risk.audit import log_action
-            log_action(action, user_id, session_id, detail, result)
+            if self.audit_logger is not None:
+                self.audit_logger.log(action, user_id, session_id, detail, result)
+            else:
+                from agent.risk.audit import log_action
+                log_action(action, user_id, session_id, detail, result)
         except Exception as exc:  # pragma: no cover
             logger.warning("审计写入失败（不影响主链路）：%s", exc)
 

@@ -11,6 +11,7 @@ from agent.core.session import SessionManager
 from agent.orchestrator.orchestrator import DecisionMaker
 from agent.risk.circuit_breaker import CircuitBreaker
 from agent.risk.circuit_breaker import init_breaker
+from agent.risk.audit import AuditLogger
 from contracts.types import (
     ActionType,
     Context,
@@ -142,6 +143,7 @@ class AgentLoopPermissionTests(unittest.TestCase):
                 memory_store=MemoryStore(f"{tmp}/memory"),
                 session_manager=SessionManager(),
                 risk_gate=lambda rec, pf, profile, market: GateResult(passed=True),
+                audit_logger=AuditLogger(f"{tmp}/audit"),
             )
             response = loop.run(user.user_id, portfolio, user, "检查我的持仓")
         return response, called

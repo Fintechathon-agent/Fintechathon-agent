@@ -8,9 +8,10 @@ const outputDir = path.join(os.tmpdir(), 'portfolio-sentinel-browser-smoke');
 fs.mkdirSync(outputDir, { recursive: true });
 
 async function check(viewport, name) {
-  const executablePath = process.env.PLAYWRIGHT_CHROME || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-  const browser = await chromium.launch({ headless: true, executablePath });
-  const page = await browser.newPage({ viewportSize: viewport });
+  const commonChrome = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+  const executablePath = process.env.PLAYWRIGHT_CHROME || (fs.existsSync(commonChrome) ? commonChrome : undefined);
+  const browser = await chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
+  const page = await browser.newPage({ viewport });
   const errors = [];
   page.on('console', (msg) => { if (msg.type() === 'error') errors.push(msg.text()); });
   page.on('pageerror', (error) => errors.push(error.message));
@@ -24,6 +25,14 @@ async function check(viewport, name) {
   const input = page.locator('#nl-question');
   const inputBox = await input.boundingBox();
   if (!inputBox || inputBox.height < 44) throw new Error(`${name}: input target is under 44px`);
+  const buttonBox = await page.locator('#btn-review').boundingBox();
+  if (!buttonBox || buttonBox.height < 44) throw new Error(`${name}: primary button is under 44px`);
+
+  if (name === 'mobile') {
+    const agentTop = (await page.locator('.agent-card').boundingBox()).y;
+    const assetsTop = (await page.locator('.col-main > .card').first().boundingBox()).y;
+    if (agentTop >= assetsTop) throw new Error('mobile: natural-language entry is not first');
+  }
 
   const hit = await page.evaluate(() => {
     const el = document.querySelector('#nl-question');
@@ -44,6 +53,7 @@ async function check(viewport, name) {
     name,
     screenshot,
     inputHeight: inputBox.height,
+    buttonHeight: buttonBox.height,
     planNodes: await page.locator('#agent-steps li').count(),
     scrollWidth: await page.evaluate(() => document.scrollingElement.scrollWidth),
     clientWidth: await page.evaluate(() => document.scrollingElement.clientWidth),
