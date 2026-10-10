@@ -4,6 +4,7 @@ const labels = { ALLOW: "通过", REVIEW: "需要复核", BLOCK: "阻止", ERROR
 const ruleNames = ["权限与工具范围", "必要数据与证据", "资金及用户约束", "单只与前三集中度", "行业集中与未知", "历史最大回撤", "高相关资产集中", "完整计划确认", "防重复执行", "必要审计写入"];
 const eventNames = { TASK_REGISTERED: "已接收健康检查", RISK_CHECK_COMPLETED: "风险检查完成", PLAN_CONFIRMED: "用户确认完整计划", PLAN_REJECTED: "用户拒绝计划", PLAN_REVOKED: "用户撤回确认", PLAN_INVALIDATED: "旧版本授权失效", EXECUTION_REQUESTED: "收到执行请求", EXECUTION_STARTED: "开始模拟执行", EXECUTION_SUCCEEDED: "模拟执行成功", EXECUTION_BLOCKED: "执行入口阻止操作", EXECUTION_UNKNOWN: "执行结果待核查", EXECUTION_ABORTED: "执行前中止", DUPLICATE_REQUEST: "重复请求返回原状态", MEMORY_UPDATED: "经同意写入演示记忆", MEMORY_UPDATE_FAILED: "演示记忆写入失败", REQUEST_REJECTED: "请求未通过安全校验" };
 let csrf, record = null, lastExecution = null, executionKey = null, dirty = false, busy = false;
+eventNames.POLICY_DECIDED = "确定性权限策略检查";
 const node = (tag, text, className) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (className) e.className = className; return e; };
 const notice = (text, error = false) => { $("notice").textContent = text; $("notice").classList.toggle("error", error); };
 async function api(route, data) {
@@ -20,7 +21,7 @@ async function action(fn) {
 function settings() { return { confirmed: $("profile-confirmed").checked, reserve_cash: Number($("reserve").value), max_drawdown: Number($("drawdown").value) / 100, forbidden: [], plan_id: $("plan").value, memory_consent: $("memory-consent").checked }; }
 const taskId = () => record?.input.binding.task_id;
 function renderButtons() {
-  const review = record?.review, canConfirm = review && !dirty && !["ERROR", "BLOCK"].includes(review.decision) && review.reasons.every((r) => r.acceptance_allowed);
+  const review = record?.review, canConfirm = review && record?.policy?.allow === true && !dirty && !["ERROR", "BLOCK"].includes(review.decision) && review.reasons.every((r) => r.acceptance_allowed);
   const accepted = [...document.querySelectorAll("#acceptances input")].every((box) => box.checked);
   $("create").disabled = busy || !csrf;
   $("run-attack").disabled = busy || !csrf;
@@ -40,6 +41,12 @@ function numeric(m) {
 }
 function render() {
   if (!record) return;
+  const policy = lastExecution?.policy || record.policy;
+  $("policy-decision").textContent = policy ? `${labels[policy.decision]} · ${policy.decision}` : "旧任务需要重新检查";
+  $("policy-decision").className = `status ${policy?.decision || "empty"}`;
+  $("policy-explanation").textContent = policy ? policy.reasons.length ? policy.reasons.map((r) => `${r.message_zh} 恢复：${r.recovery}`).join("；") : "权限策略通过。执行仍需金融风险具备执行资格、有效确认和审计持久化。" : "此任务尚未绑定当前策略，请点击修改约束并重新检查。";
+  $("policy-evidence").hidden = !policy;
+  $("policy-evidence").textContent = policy ? JSON.stringify({ policy, approval_binding: record.approval_policy || null }, null, 2) : "";
   const result = lastExecution?.risk || record.review;
   $("decision").className = `status ${result.decision}`; $("decision").textContent = `${labels[result.decision]} · ${result.decision}`;
   $("summary").textContent = result.reasons.length ? `本次检查共发现 ${result.reasons.length} 项原因。可接受的复核与必须修复的事项分别处理。` : "当前阶段所需规则通过。完成用户确认及执行前检查后，才可运行模拟。";
@@ -102,7 +109,7 @@ $("run-attack").addEventListener("click", () => action(async () => {
   const rows = [
     ["Core · 数据与权限分离", `原文：${result.document.text}`, `信任等级 ${result.document.trust}；提升为指令 ${result.core.promoted_instruction_count} 次。`],
     ["Risk · 拒绝外部内容发起的操作", result.risk.reasons.map((r) => r.message_zh).join("；"), result.risk.reasons.map((r) => r.code).join(" / ")],
-    ["Action Gateway · 未获得用户授权", `执行状态：${labels[result.gateway.status] || result.gateway.status}`, (result.gateway.risk?.reasons || []).map((r) => r.code).join(" / ")]
+    ["Action Gateway · 未获得用户授权", `执行状态：${labels[result.gateway.status] || result.gateway.status}`, [...(result.gateway.risk?.reasons || []), ...(result.gateway.policy?.reasons || [])].map((r) => r.code).join(" / ")]
   ];
   for (const [title, detail, code] of rows) { const li = node("li"); li.append(node("h3", title), node("p", detail), node("code", code)); $("attack-nodes").append(li); }
   $("attack-audit").textContent = JSON.stringify(result.audit, null, 2);
@@ -110,6 +117,15 @@ $("run-attack").addEventListener("click", () => action(async () => {
 }));
 action(async () => {
   const session = await api("/api/safety/session"); csrf = session.csrf;
+  try {
+    const manifest = await api("/api/safety/policy");
+    $("policy-runtime").textContent = "确定性策略已接入"; $("policy-runtime").className = "status ALLOW";
+    $("policy-summary").textContent = `策略 ${manifest.version} · ${manifest.enforcement_scope}`;
+    $("policy-manifest").textContent = JSON.stringify(manifest, null, 2);
+  } catch {
+    $("policy-runtime").textContent = "策略信息暂不可用"; $("policy-runtime").className = "status ERROR";
+    $("policy-summary").textContent = "未能读取策略信息，请刷新重试；执行资格仍由服务器重新判断。";
+  }
   const id = new URLSearchParams(location.search).get("task_id");
   if (id) { record = { input: { binding: { task_id: id } } }; await reload(); notice("已接收团队健康检查结果，请确认约束后重新检查。"); }
 });

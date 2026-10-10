@@ -3,6 +3,7 @@ const { randomUUID } = require("node:crypto");
 const { isDeepStrictEqual: equal } = require("node:util");
 const { hash } = require("../../docs/safety-risk-eval/contracts/validate.cjs");
 const { evaluate, executionEligible } = require("./engine.cjs");
+const policyModule = require("./policy.cjs");
 const clone = structuredClone;
 class GatewayError extends Error {
   constructor(code, message, decision = "BLOCK", status = 409) { super(message); Object.assign(this, { code, decision, status }); }
@@ -10,8 +11,8 @@ class GatewayError extends Error {
 const emptyApproval = () => ({ status: "UNCONFIRMED", approval_id: null, confirmed_by: null, confirmed_at: null, expires_at: null, risk_check_id: null, binding: null, accepted_risks: [] });
 
 class ActionGateway {
-  constructor({ store, projectPlan, executePlan, now = () => new Date().toISOString(), approvalTtlMs = 15 * 60 * 1000, onSuccess = () => null, beforeExecute = async () => null }) {
-    Object.assign(this, { store, projectPlan, executePlan, now, approvalTtlMs, onSuccess, beforeExecute });
+  constructor({ store, projectPlan, executePlan, now = () => new Date().toISOString(), approvalTtlMs = 15 * 60 * 1000, onSuccess = () => null, beforeExecute = async () => null, getPolicy = policyModule.currentPolicy }) {
+    Object.assign(this, { store, projectPlan, executePlan, now, approvalTtlMs, onSuccess, beforeExecute, getPolicy });
     this.busy = new Set();
     this.toolCalls = new Map();
   }
@@ -25,6 +26,22 @@ class ActionGateway {
   }
   authority(record) {
     return { user_id: record.input.binding.user_id, allowed_tools: ["portfolio.review", "paper_trade"], expected_binding: record.input.binding, project_plan: this.projectPlan, approval_check_id: record.review?.risk_check_id, action_source: record.action_source || "USER", supports_real_data: false };
+  }
+  policyCheck(record, actor, stage, riskEligible = false, memory = false) {
+    let policy;
+    try { policy = this.getPolicy(); } catch { policy = null; }
+    const requestHash = policyModule.snapshot(record.input);
+    let digest = null;
+    try { digest = policyModule.fingerprint(policy); } catch { /* The evaluator returns ERROR. */ }
+    const receipt = record.approval_policy;
+    const result = policyModule.decide({ subject: actor, owner: record.input.binding.user_id,
+      source: record.action_source, scenario: memory ? "MEMORY" : "SIMULATION", tool: memory ? "memory.write" : "paper_trade",
+      operation: memory ? "MEMORY_WRITE" : record.input.context.requested_operation === "REAL_TRADE" ? "REAL_TRADE" : "PAPER_TRADE",
+      stage, request_hash: requestHash, memory_consent: record.memory_consent,
+      approval_matches: record.input.approval.status === "CONFIRMED" && receipt?.policy_digest === digest && receipt?.request_hash === requestHash && receipt?.approval_id === record.input.approval.approval_id,
+      risk_eligible: riskEligible }, policy ?? null, this.now());
+    this.event("POLICY_DECIDED", record, { policy: result });
+    return result;
   }
   register(input, { actionSource = "USER", memoryConsent = false, external = [], deferReview = false } = {}) {
     // Internal adapter only. HTTP callers cannot supply Risk input, authority or stored approval.
@@ -41,11 +58,13 @@ class ActionGateway {
     const input = clone(record.input); input.stage = "PLAN_REVIEW"; input.requested_at = this.now();
     input.approval = emptyApproval();
     const result = evaluate(input, this.authority(record), { now: this.now() });
+    const policy = this.policyCheck(record, actor, "REVIEW");
     this.store.transaction((data) => { data.snapshots[hash(input)] = input; return null; });
     result.audit_event.record_status = "PERSISTED";
     this.store.append(result.audit_event);
     this.store.transaction((data) => {
       data.tasks[taskId].input = input; data.tasks[taskId].review = result; data.tasks[taskId].invalidated = false;
+      data.tasks[taskId].policy = policy; data.tasks[taskId].approval_policy = null;
       return null;
     });
     return clone(result);
@@ -58,10 +77,14 @@ class ActionGateway {
     if (["ERROR", "BLOCK"].includes(record.review.decision) || reasons.some((r) => !r.acceptance_allowed)) throw new GatewayError("RISK_NOT_ACCEPTABLE", "该方案存在不可接受的阻止或需修复事项。");
     const required = reasons.map((r) => r.reason_id).sort();
     if (!equal([...new Set(accepted_reason_ids)].sort(), required)) throw new GatewayError("RISK_ACCEPTANCE_REQUIRED", "请逐项接受当前风险，不能接受未知或旧版本风险。", "REVIEW");
+    const policy = this.policyCheck(record, actor, "REVIEW");
+    if (!policy.allow) throw new GatewayError(policy.reasons[0].code, policy.reasons[0].message_zh, policy.decision);
+    if (record.policy?.policy_digest !== policy.policy_digest || record.policy?.request_hash !== policy.request_hash) throw new GatewayError("POLICY_APPROVAL_STALE", "策略或业务内容已变化，请重新检查再确认。", "REVIEW");
     const now = this.now();
     const approval = { status: "CONFIRMED", approval_id: `approval-${randomUUID()}`, confirmed_by: actor, confirmed_at: now, expires_at: new Date(Date.parse(now) + this.approvalTtlMs).toISOString(), risk_check_id, binding: clone(binding), accepted_risks: required.map((reason_id) => ({ reason_id, risk_check_id, user_id: actor, accepted_at: now, binding: clone(binding) })) };
-    this.event("PLAN_CONFIRMED", record, { approval });
-    this.store.transaction((data) => { data.tasks[taskId].input.approval = approval; return null; });
+    const approvalPolicy = { policy_digest: policy.policy_digest, policy_version: policy.policy_version, request_hash: policy.request_hash, decision_id: policy.decision_id, approval_id: approval.approval_id };
+    this.event("PLAN_CONFIRMED", record, { approval, approval_policy: approvalPolicy });
+    this.store.transaction((data) => { data.tasks[taskId].input.approval = approval; data.tasks[taskId].approval_policy = approvalPolicy; return null; });
     return approval;
   }
   reject(taskId, actor, revoked = false) {
@@ -108,14 +131,18 @@ class ActionGateway {
       this.store.transaction((data) => { data.snapshots[hash(input)] = input; return null; });
       result.audit_event.record_status = "PERSISTED";
       this.store.append(result.audit_event);
-      if (!executionEligible(result)) {
-        this.event("EXECUTION_BLOCKED", record, { decision: result.decision, risk_check_id: result.risk_check_id, reasons: result.reasons, execution: input.execution });
-        return { status: "NOT_STARTED", execution_allowed: false, risk: result };
+      const policy = this.policyCheck(record, actor, "EXECUTE", executionEligible(result));
+      if (!executionEligible(result) || !policy.allow) {
+        this.event("EXECUTION_BLOCKED", record, { decision: policy.allow ? result.decision : policy.decision, policy, risk_check_id: result.risk_check_id, reasons: result.reasons, execution: input.execution });
+        return { status: "NOT_STARTED", execution_allowed: false, risk: result, policy };
       }
       execution = { ...input.execution, status: "RUNNING", user_id: actor, task_id: taskId, result: null };
       this.store.transaction((data) => { data.executions[scope] = execution; return null; });
-      this.event("EXECUTION_STARTED", record, { execution, risk_check_id: result.risk_check_id });
+      this.event("EXECUTION_STARTED", record, { execution, policy, risk_check_id: result.risk_check_id });
       await this.beforeExecute(record, execution);
+      // Revalidate after the asynchronous durable fence, without another await before dispatch.
+      const latest = this.owner(taskId, actor);
+      if (policyModule.fingerprint(this.getPolicy()) !== policy.policy_digest || policyModule.snapshot(latest.input) !== policy.request_hash || latest.action_source !== record.action_source || !equal(latest.input.approval, input.approval) || Date.parse(input.approval.expires_at) <= Date.parse(this.now())) throw new GatewayError("POLICY_DISPATCH_INVALIDATED", "执行前策略或授权已变化，未调用工具。", "ERROR");
       started = true;
       this.toolCalls.set(taskId, (this.toolCalls.get(taskId) || 0) + 1);
       const output = await this.executePlan(clone(input), { approvalId: input.approval.approval_id, idempotencyKey: `${actor}:${key}` });
@@ -125,17 +152,18 @@ class ActionGateway {
       this.event("EXECUTION_SUCCEEDED", record, { execution });
       let memory = null;
       if (record.memory_consent) {
-        try { memory = await this.onSuccess(record, output); this.event("MEMORY_UPDATED", record, { memory }); }
+        try { const memoryPolicy = this.policyCheck(record, actor, "EXECUTE", true, true); if (!memoryPolicy.allow) throw new Error("MEMORY_POLICY_DENIED"); memory = await this.onSuccess(record, output); this.event("MEMORY_UPDATED", record, { memory, policy: memoryPolicy }); }
         catch { this.event("MEMORY_UPDATE_FAILED", record, { execution_id: execution.execution_id }); }
       }
-      return { ...execution, memory, risk: result, replay: false };
+      return { ...execution, memory, risk: result, policy, replay: false };
     } catch (error) {
+      const failureCode = started ? "EXECUTION_RESULT_UNKNOWN" : error instanceof GatewayError ? error.code : "PRE_EXECUTION_AUDIT_FAILED";
       if (execution) {
         execution = { ...execution, status: started ? "UNKNOWN" : "ABORTED", error: "Execution or durable recording could not be completed" };
         try { this.store.transaction((data) => { data.executions[scope] = execution; return null; }); } catch { /* Keep the durable RUNNING claim for reconciliation after restart. */ }
       }
-      try { this.event(started ? "EXECUTION_UNKNOWN" : "EXECUTION_ABORTED", record, { decision: "ERROR", code: started ? "EXECUTION_RESULT_UNKNOWN" : "PRE_EXECUTION_AUDIT_FAILED", execution: execution || null }); } catch { /* Failure is returned; no fabricated successful audit entry. */ }
-      return { status: started ? "UNKNOWN" : "NOT_STARTED", execution_allowed: false, decision: "ERROR", code: started ? "EXECUTION_RESULT_UNKNOWN" : "PRE_EXECUTION_AUDIT_FAILED", message_zh: started ? "执行或结果记录出现异常，先核查，不自动重试。" : "必要检查或持久化失败，未调用执行工具。" };
+      try { this.event(started ? "EXECUTION_UNKNOWN" : "EXECUTION_ABORTED", record, { decision: "ERROR", code: failureCode, execution: execution || null }); } catch { /* Failure is returned; no fabricated successful audit entry. */ }
+      return { status: started ? "UNKNOWN" : "NOT_STARTED", execution_allowed: false, decision: "ERROR", code: failureCode, message_zh: started ? "执行或结果记录出现异常，先核查，不自动重试。" : "必要检查或持久化失败，未调用执行工具。" };
     } finally { this.busy.delete(taskId); }
   }
   reconcile(taskId, actor, key, verifiedReceipt) {

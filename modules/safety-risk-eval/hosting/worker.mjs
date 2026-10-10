@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import gatewayModule from "../gateway.cjs";
 import adapter from "../core-adapter.cjs";
 import security from "../security.cjs";
+import policy from "../policy.cjs";
 import core from "../../../chenchen/core/harness.js";
 import baseRequest from "../../../chenchen/contracts/examples/health-check.request.json" with { type: "json" };
 import financialTools from "../../../chenchen/tools/financial-tools.js";
@@ -40,6 +41,7 @@ export default {
       if (request.headers.get("sec-fetch-site") === "cross-site") throw new GatewayError("CROSS_SITE_REQUEST", "拒绝跨站请求。", "BLOCK", 403);
       session = await getSession(env.DB, request);
       if (request.method === "GET" && url.pathname === "/api/safety/session") return json({ csrf: session.csrf, user_id: session.user_id, mode: "ONLINE_SYNTHETIC_DEMO" }, 200, session);
+      if (request.method === "GET" && url.pathname === "/api/safety/policy") return json(policy.describe(), 200, session);
       if (request.method === "GET" && url.pathname === "/api/demo/portfolio") return json(financialTools.validatePortfolio(financialTools.getDemoPortfolio()), 200, session);
       if (request.method === "POST") {
         if (request.headers.get("x-risk-csrf") !== session.csrf) throw new GatewayError("CSRF_REQUIRED", "请使用当前浏览器会话确认。", "BLOCK", 403);

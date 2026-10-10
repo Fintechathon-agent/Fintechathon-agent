@@ -7,6 +7,7 @@ const { JournalStore } = require("./store.cjs");
 const { ActionGateway, GatewayError } = require("./gateway.cjs");
 const adapter = require("./core-adapter.cjs");
 const { runAttackDemo } = require("./security.cjs");
+const policy = require("./policy.cjs");
 const baseRequest = require("../../chenchen/contracts/examples/health-check.request.json");
 const { server: originalServer, harness } = require("../../chenchen/server.js");
 const originalHandler = originalServer.listeners("request")[0];
@@ -64,6 +65,7 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
       if (!url.pathname.startsWith("/api/")) { originalHandler(req, res); return; }
       s = session(req, res);
       if (req.method === "GET" && url.pathname === "/api/safety/session") { send(res, 200, { csrf: s.csrf, user_id: s.user_id, mode: "LOCAL_SYNTHETIC_DEMO" }); return; }
+      if (req.method === "GET" && url.pathname === "/api/safety/policy") { send(res, 200, policy.describe()); return; }
       if (req.method === "GET" && url.pathname === "/api/demo/portfolio") { originalHandler(req, res); return; }
       if (req.method === "GET" && (url.pathname.startsWith("/api/task/") || url.pathname === "/api/safety/task")) {
         const id = url.pathname === "/api/safety/task" ? url.searchParams.get("task_id") : url.pathname.slice("/api/task/".length).replace(/\/export$/, "");
