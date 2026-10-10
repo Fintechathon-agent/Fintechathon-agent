@@ -48,9 +48,13 @@ def memory_retain(
 
     参数:
         user_id: 用户ID
-        layer: 记忆层，"fact" | "experience" | "observation" | "mental_model"
-        content: 记忆内容
+        layer: 记忆层，"fact" | "experience" | "observation" 可写；
+            "mental_model" 与 "user" 为系统管理层（分别由 reflect /
+            用户画像流程写入），retain 直写会被写入门卫拒绝并抛
+            MemoryWriteRejected（防注入内容篡改用户约束或自我规则）。
+        content: 记忆内容（写入门卫会做注入检测与长度截断，可疑内容拒绝写入）
         source: 来源，如 "market" / "news" / "recommendation" / "self"
+            （按来源映射信任等级 trust，随记忆持久化）
         tags: 检索标签列表
         **kwargs: 各层的特殊字段：
             fact 层：verify_after, last_verified

@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import math
 import re
 import uuid
@@ -33,6 +34,13 @@ from contracts.types import (
     SessionRecord,
     UserProfile,
 )
+from agent.risk.memory_guard import (
+    MemoryWriteRejected,
+    guard_write,
+    max_trust,
+)
+
+logger = logging.getLogger(__name__)
 
 
 # ============================================================
@@ -134,8 +142,16 @@ class HindsightMemoryStore:
 
         去重规则：同一层内已有等价内容时，不新增记录，而是"增强"它
         （置信度 +0.10、刷新时间），返回被增强的那条。
+
+        安全：所有写入先过写入门卫（层策略 + 注入检测 + 长度截断 +
+        信任分级），可疑内容抛 MemoryWriteRejected，绝不落盘。
         """
         now = self._now_iso()
+
+        # 写入门卫（fail-closed）：层策略与注入检测拒绝时抛异常；
+        # 通过时返回净化后的内容与按 source 判定的信任等级。
+        content, trust = guard_write(layer, source, content, user_id=user_id)
+
         new_id = str(uuid.uuid4())[:8]
 
         existing = self._load_layer(user_id, layer)
@@ -151,6 +167,7 @@ class HindsightMemoryStore:
                 dup["confidence"] = min(1.0, dup.get("confidence", 0.5) + CONFidence_SUPPORT)
             dup["updated_at"] = now
             dup["tags"] = sorted(set(dup.get("tags", [])) | set(tags or []))
+            dup["trust"] = max_trust(dup.get("trust", ""), trust)
             dup["reinforce_count"] = dup.get("reinforce_count", 1) + 1
             # 记录这条记忆在哪些日期被再次观察到。reflect 用它判断证据积累，
             # 因为去重后观测条数恒为 1，"条数 >= 阈值" 永远无法成立。
@@ -243,6 +260,7 @@ class HindsightMemoryStore:
             )
 
         # 持久化
+        entry.trust = trust
         entry_dict = self._entry_to_dict(entry)
         # 记录首次被观察到的日期，供 reflect 判断证据积累
         entry_dict["evidence_days"] = [now[:10]]
@@ -395,6 +413,7 @@ class HindsightMemoryStore:
                 existing_model["confidence"] = new_conf
                 existing_model["version"] = new_version
                 existing_model["updated_at"] = now
+                existing_model["trust"] = "SYSTEM"
                 existing_model["supporting_ids"] = [o["id"] for o in obs_list]
                 existing_model["evidence_days"] = sorted(model_days | cluster_days)
                 existing_model["success_count"] = len(model_days | cluster_days)
@@ -410,6 +429,7 @@ class HindsightMemoryStore:
                     "updated_at": now,
                     "confidence": 0.6,
                     "source": "reflect",
+                    "trust": "SYSTEM",
                     "tags": [obs_list[0].get("observation_type", "general")],
                     "superseded_by": "",
                     "supporting_ids": [o["id"] for o in obs_list],
@@ -544,6 +564,7 @@ class HindsightMemoryStore:
             "updated_at": entry.updated_at,
             "confidence": entry.confidence,
             "source": entry.source,
+            "trust": entry.trust,
             "tags": entry.tags,
             "superseded_by": entry.superseded_by,
             "supporting_ids": entry.supporting_ids,
@@ -579,6 +600,7 @@ class HindsightMemoryStore:
             id=d["id"], layer=layer, content=d["content"],
             created_at=d["created_at"], updated_at=d["updated_at"],
             confidence=d.get("confidence", 0.5), source=d.get("source", ""),
+            trust=d.get("trust", ""),
             tags=d.get("tags", []), superseded_by=d.get("superseded_by", ""),
             supporting_ids=d.get("supporting_ids", []),
             contradictory_ids=d.get("contradictory_ids", []),
@@ -715,16 +737,20 @@ class HindsightMemoryStore:
         data.append(rec_entry)
         p.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
-        # 同步写入 experience 层
-        self.retain(
-            user_id=user_id,
-            layer=MemoryLayer.EXPERIENCE,
-            content=f"建议{rec.action.value}{rec.symbol} {rec.quantity}股@{rec.price}，理由：{rec.reason}",
-            source="recommendation",
-            tags=[rec.symbol, rec.action.value],
-            recommendation_ref=f"{session_id}_{now}",
-            outcome="pending",
-        )
+        # 同步写入 experience 层。推荐记录本身照常落盘（审计链），
+        # 但 LLM 生成的理由若被写入门卫判定为可疑，则不进入记忆。
+        try:
+            self.retain(
+                user_id=user_id,
+                layer=MemoryLayer.EXPERIENCE,
+                content=f"建议{rec.action.value}{rec.symbol} {rec.quantity:g}股@{rec.price:g}，理由：{rec.reason}",
+                source="recommendation",
+                tags=[rec.symbol, rec.action.value],
+                recommendation_ref=f"{session_id}_{now}",
+                outcome="pending",
+            )
+        except MemoryWriteRejected as exc:
+            logger.warning("推荐理由未写入经验记忆（写入门卫拦截）：%s", exc)
         return p
 
     def update_feedback(self, user_id: str, timestamp: str, approved: bool, comment: str = "") -> bool:
@@ -838,6 +864,7 @@ class HindsightMemoryStore:
                 # user 层置信度不参与证据演化，固定 0.5 占位（语义见报告 §4）
                 "confidence": 0.5,
                 "source": "user_profile",
+                "trust": "CONFIRMED" if confirmed_by_user else "TOOL",
                 "tags": ["user_memory", ptype],
                 "superseded_by": "",
                 "supporting_ids": [],

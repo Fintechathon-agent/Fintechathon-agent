@@ -348,7 +348,11 @@ class AgentLoop:
             lines = [summary]
             for e in entries:
                 tag = "规则" if e.layer == MemoryLayer.MENTAL_MODEL else "观察"
-                lines.append(f"[历史{tag}|置信度{e.confidence:.0%}] {e.content[:60]}")
+                trust = getattr(e, "trust", "") or "未知"
+                lines.append(
+                    f"[历史{tag}|来源{e.source}|信任{trust}|置信度{e.confidence:.0%}] "
+                    f"{e.content[:60]}"
+                )
             return "；".join(lines)
         except Exception:
             return summary

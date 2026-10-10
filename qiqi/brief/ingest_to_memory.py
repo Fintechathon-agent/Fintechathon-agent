@@ -34,6 +34,7 @@ OUT_DIR = HERE / "out"
 sys.path.insert(0, str(ROOT))
 
 from agent.core.memory import HindsightMemoryStore  # noqa: E402
+from agent.risk.memory_guard import MemoryWriteRejected  # noqa: E402
 from contracts.types import MemoryLayer  # noqa: E402
 
 
@@ -173,23 +174,28 @@ def run(date: str | None, user_id: str, dry_run: bool, include_news: bool,
     store_dir = Path(memory_dir) if memory_dir else (ROOT / "data" / "memory")
     store = HindsightMemoryStore(store_dir)
 
-    written, reinforced = 0, 0
+    written, reinforced, blocked = 0, 0, 0
     for f in facts:
         before = store._load_layer(user_id, MemoryLayer.FACT)
         existed = store._find_duplicate(before, f["content"]) is not None
-        store.retain(
-            user_id=user_id,
-            layer=MemoryLayer.FACT,
-            content=f["content"],
-            source=f["source"],
-            tags=f["tags"],
-        )
+        try:
+            store.retain(
+                user_id=user_id,
+                layer=MemoryLayer.FACT,
+                content=f["content"],
+                source=f["source"],
+                tags=f["tags"],
+            )
+        except MemoryWriteRejected as exc:
+            blocked += 1
+            print(f"  ⛔ 写入门卫拦截：{f['content'][:60]}…（{exc}）")
+            continue
         if existed:
             reinforced += 1
         else:
             written += 1
 
-    print(f"\n完成：新增 {written} 条、去重增强 {reinforced} 条。")
+    print(f"\n完成：新增 {written} 条、去重增强 {reinforced} 条、门卫拦截 {blocked} 条。")
     print(f"落盘目录：{store_dir / user_id}")
     return 0
 
