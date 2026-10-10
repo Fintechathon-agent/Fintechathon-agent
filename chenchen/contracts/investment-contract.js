@@ -131,6 +131,7 @@ function createRequest({ requestId = "req-" + crypto.randomUUID(), taskId = null
 function buildRiskHandoff(result) {
   if (result.task_state.status !== "HANDOFF_REQUIRED") return null;
   const artifacts = result.artifacts || {};
+  const auditEvidence = result.audit_evidence || {};
   return {
     contract_version: CONTRACT_VERSION,
     handoff_id: "handoff-" + result.task_state.task_id,
@@ -145,20 +146,37 @@ function buildRiskHandoff(result) {
       health_report_id: artifacts.health_report?.report_id || "",
       proposal_ids: (artifacts.candidates || []).map((candidate) => candidate.proposal_id),
       simulation_id: artifacts.simulation?.simulation_id || "",
-      ...(artifacts.market_context ? { market_context_id: artifacts.market_context.context_id } : {})
+      ...(artifacts.market_context ? { market_context_id: artifacts.market_context.context_id } : {}),
+      ...(auditEvidence.audit_id ? { audit_id: auditEvidence.audit_id } : {})
     },
     execution_allowed: false
   };
 }
 
 function buildResponse(request, result) {
+  const taskState = result.task_state;
+  const auditEvidence = result.audit_evidence || {
+    audit_id: "audit-" + taskState.task_id,
+    contract_version: CONTRACT_VERSION,
+    request_id: request.request_id,
+    task_id: taskState.task_id,
+    session_id: taskState.session_id,
+    events: []
+  };
   const response = {
     contract_version: CONTRACT_VERSION,
     request_id: request.request_id,
     operation: OPERATION,
-    task_state: result.task_state,
+    trace: {
+      contract_version: CONTRACT_VERSION,
+      request_id: request.request_id,
+      task_id: taskState.task_id,
+      session_id: taskState.session_id
+    },
+    task_state: taskState,
     artifacts: result.artifacts || {},
     tool_results: result.tool_results || {},
+    audit_evidence: auditEvidence,
     risk_handoff: buildRiskHandoff(result)
   };
   return assertAgainst("HealthCheckResponse", response);

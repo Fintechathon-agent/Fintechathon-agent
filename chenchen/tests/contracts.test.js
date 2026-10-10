@@ -28,6 +28,11 @@ test("Agent output creates a Risk handoff from the same contract", () => {
   assert.equal(response.request_id, request.request_id);
   assert.equal(response.risk_handoff.status, "PENDING_REVIEW");
   assert.equal(response.risk_handoff.execution_allowed, false);
+  assert.equal(response.trace.task_id, response.task_state.task_id);
+  assert.equal(response.trace.session_id, response.task_state.session_id);
+  assert.equal(response.audit_evidence.task_id, response.task_state.task_id);
+  assert.ok(response.audit_evidence.events.some(event => event.event_type === "contract.accepted"));
+  assert.equal(response.risk_handoff.evidence.audit_id, response.audit_evidence.audit_id);
   assert.equal(response.risk_handoff.evidence.health_report_id, response.artifacts.health_report.report_id);
   assert.deepEqual(response.risk_handoff.evidence.proposal_ids, response.artifacts.candidates.map(candidate => candidate.proposal_id));
 });
@@ -44,7 +49,14 @@ test("contract keeps investment errors traceable", () => {
     contract_version: contract.CONTRACT_VERSION,
     request_id: "req-contract-error-001",
     operation: contract.OPERATION,
-    error: { code: "INVALID_CONTRACT", message: "request shape is invalid", details: { field: "contract_version" } }
+    error: {
+      code: "INVALID_CONTRACT",
+      message: "request shape is invalid",
+      retryable: false,
+      stage: "BACKEND",
+      recovery: "Correct the request contract and retry.",
+      details: { field: "contract_version" }
+    }
   });
   assert.equal(error.request_id, "req-contract-error-001");
 });

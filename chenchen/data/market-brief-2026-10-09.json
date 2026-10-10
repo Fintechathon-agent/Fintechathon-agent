@@ -1,0 +1,69 @@
+{
+  "brief_id": "market-brief-2026-10-09",
+  "as_of": "2026-10-09",
+  "published_at": "2026-10-09T18:05:00+08:00",
+  "data_mode": "REFERENCE_FIXTURE",
+  "source_reference": "用户提供的每日市场简报_2026-10-09.pdf",
+  "market": [
+    { "asset_id": "CSI300", "name": "沪深300", "latest": 4317.25, "change_pct": 0.16, "data_time": "2026-10-09T15:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "SSE_COMPOSITE", "name": "上证指数", "latest": 3813.79, "change_pct": 0.05, "data_time": "2026-10-09T15:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "CHINEXT", "name": "创业板指", "latest": 3043.34, "change_pct": 0.22, "data_time": "2026-10-09T15:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "HSI", "name": "恒生指数", "latest": 24211.35, "change_pct": 1.79, "data_time": "2026-10-09T16:09:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "DOW", "name": "道琼斯", "latest": 51231.64, "change_pct": 0.10, "data_time": "2026-10-09T04:47:00+08:00", "source_status": "REFERENCE_ONLY" },
+    { "asset_id": "NASDAQ", "name": "纳斯达克", "latest": 27193.34, "change_pct": -1.25, "data_time": "2026-10-09T04:47:00+08:00", "source_status": "REFERENCE_ONLY" },
+    { "asset_id": "SP500", "name": "标普500", "latest": 7765.36, "change_pct": -0.47, "data_time": "2026-10-09T04:47:00+08:00", "source_status": "REFERENCE_ONLY" },
+    { "asset_id": "COMEX_GOLD", "name": "COMEX黄金", "latest": 4213.86, "change_pct": 1.37, "data_time": "2026-10-09T18:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "COMEX_SILVER", "name": "COMEX白银", "latest": 60.71, "change_pct": 2.16, "data_time": "2026-10-09T18:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "NYMEX_CRUDE", "name": "NYMEX原油", "latest": 90.42, "change_pct": -1.17, "data_time": "2026-10-09T18:00:00+08:00", "source_status": "CROSS_CHECKED" },
+    { "asset_id": "NYMEX_GAS", "name": "NYMEX天然气", "latest": 3.12, "change_pct": -1.52, "data_time": "2026-10-09T18:00:00+08:00", "source_status": "REFERENCE_ONLY" },
+    { "asset_id": "CNH", "name": "离岸人民币", "latest": 6.6923, "change_pct": -0.16, "data_time": "2026-10-09T18:00:00+08:00", "source_status": "REFERENCE_ONLY" },
+    { "asset_id": "UST10Y", "name": "美债10Y", "latest": 5.22, "change_pct": null, "previous_value": 5.28, "data_time": "2026-10-08T18:00:00+08:00", "source_status": "OFFICIAL_SOURCE" },
+    { "asset_id": "UST30Y", "name": "美债30Y", "latest": 5.60, "change_pct": null, "previous_value": 5.67, "data_time": "2026-10-08T18:00:00+08:00", "source_status": "OFFICIAL_SOURCE" }
+  ],
+  "signals": [
+    {
+      "signal_id": "rates-view-data-conflict",
+      "type": "VIEW_DATA_CONFLICT",
+      "status": "REVIEW_REQUIRED",
+      "asset_ids": ["UST10Y", "UST30Y"],
+      "reason": "简报中的机构观点提示10年期美债收益率可能上破6%，但官方同日数据为10年期5.22%、30年期5.60%，且两者均低于前一日；必须区分事实数据和前瞻观点。",
+      "source_refs": ["market.UST10Y", "market.UST30Y", "news.rate-warning"]
+    },
+    {
+      "signal_id": "ai-cross-market-divergence",
+      "type": "CROSS_MARKET_DIVERGENCE",
+      "status": "OBSERVED",
+      "asset_ids": ["CHINEXT", "NASDAQ", "SP500"],
+      "reason": "简报描述A股AI硬件轮动走弱、美国AI硬件盘前多数走强；不同市场的方向不能直接互相归因。",
+      "source_refs": ["news.ai-hardware-divergence"]
+    },
+    {
+      "signal_id": "fund-rule-narrow-base-drift",
+      "type": "POLICY_RESEARCH_CONTEXT",
+      "status": "OBSERVED",
+      "asset_ids": [],
+      "reason": "公募基金运作规则修订征求意见稿涉及窄基漂移和宽基窄投，适合作为后续持仓研究的关注标签，不直接改写组合计算。",
+      "source_refs": ["news.fund-rule-consultation"]
+    },
+    {
+      "signal_id": "earnings-disclosure-pace",
+      "type": "DISCLOSURE_PACE",
+      "status": "OBSERVED",
+      "asset_ids": [],
+      "reason": "简报记录159家公司披露三季报预告，其中122家预喜，占77%；样本仍处于披露期，只作为研究上下文，不线性外推收益。",
+      "source_refs": ["earnings.2026Q3"]
+    }
+  ],
+  "source_checks": [
+    { "source": "新浪 / 东财 push2", "scope": "A股、港股、商品价格", "status": "CROSS_CHECKED" },
+    { "source": "美国财政部官网", "scope": "美债10Y与30Y官方数据", "status": "OFFICIAL_SOURCE" },
+    { "source": "简报中的证监会、央行和机构新闻摘要", "scope": "政策、流动性和观点背景", "status": "REFERENCE_ONLY" },
+    { "source": "东财数据中心官方分类", "scope": "三季报预告统计", "status": "REFERENCE_ONLY" }
+  ],
+  "limitations": [
+    "本文件由用户提供的市场简报整理为固定回放夹具，不是实时行情或新闻接口。",
+    "官方数据事实与机构前瞻观点分开记录；观点不覆盖事实，事实也不自动证明未来走势。",
+    "Core Agent 只传递市场上下文和异常/冲突证据，不重新计算 Quant，不修改 Memory 规则，不授权执行。",
+    "市场简报是信息参考，不构成投资建议。"
+  ]
+}

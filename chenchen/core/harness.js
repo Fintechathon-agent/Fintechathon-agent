@@ -36,6 +36,8 @@ class Harness {
     const state = {
       task_id: taskId,
       session_id: sessionId,
+      contract_version: contract.CONTRACT_VERSION,
+      request_id: null,
       intent,
       stage: missingFields.length ? "MINIMUM_CLARIFICATION" : "VALIDATE_INPUT",
       status: missingFields.length ? "WAITING_INPUT" : "READY",
@@ -63,7 +65,12 @@ class Harness {
 
   getTask(taskId) {
     const task = this.tasks.get(taskId);
-    return task ? clone({ task_state: task.state, artifacts: task.artifacts, tool_results: task.results }) : null;
+    return task ? clone({
+      task_state: task.state,
+      artifacts: task.artifacts,
+      tool_results: task.results,
+      audit_evidence: this.buildAuditEvidence(task)
+    }) : null;
   }
 
   validateProfile(profile) {
@@ -80,7 +87,23 @@ class Harness {
   getAudit(taskId) {
     const task = this.tasks.get(taskId);
     if (!task) return null;
-    return clone({ task_id: taskId, task_state: task.state, events: task.events });
+    return clone({
+      task_id: taskId,
+      task_state: task.state,
+      audit_evidence: this.buildAuditEvidence(task),
+      events: task.events
+    });
+  }
+
+  buildAuditEvidence(task) {
+    return {
+      audit_id: "audit-" + task.state.task_id,
+      contract_version: task.state.contract_version || contract.CONTRACT_VERSION,
+      request_id: task.state.request_id || null,
+      task_id: task.state.task_id,
+      session_id: task.state.session_id,
+      events: clone(task.events)
+    };
   }
 
   addEvent(task, eventType, payload = {}) {
@@ -195,7 +218,14 @@ class Harness {
     );
     if (!validation.output.valid) {
       task.state.status = "BLOCKED";
-      task.state.error_state = { code: "INVALID_PORTFOLIO", reasons: validation.output.errors, recovery: "Correct the portfolio snapshot and run validation again." };
+      task.state.error_state = {
+        code: "INVALID_PORTFOLIO",
+        message: "portfolio validation failed",
+        stage: "VALIDATE_INPUT",
+        retryable: true,
+        reasons: validation.output.errors,
+        recovery: "Correct the portfolio snapshot and run validation again."
+      };
       this.addEvent(task, "task.blocked", task.state.error_state);
       return this.getTask(task.state.task_id);
     }
@@ -251,22 +281,31 @@ class Harness {
         throw error;
       }
     }
-    const result = this.runHealthCheck({
+    let result = this.runHealthCheck({
       task_id: canonicalRequest.context.task_id || undefined,
       session_id: canonicalRequest.context.session_id || undefined,
       risk_profile: canonicalRequest.input.risk_profile,
       portfolio: canonicalRequest.input.portfolio || undefined
     });
+    const task = this.tasks.get(result.task_state.task_id);
+    if (task) {
+      task.state.contract_version = canonicalRequest.contract_version;
+      task.state.request_id = canonicalRequest.request_id;
+    }
     if (marketContextResult) {
       result.artifacts.market_context = marketContextResult.output;
       result.tool_results[marketContextResult.tool_result.trace_id] = marketContextResult.tool_result;
-      const task = this.tasks.get(result.task_state.task_id);
       if (task) {
         task.artifacts.market_context = clone(marketContextResult.output);
         task.results[marketContextResult.tool_result.trace_id] = clone(marketContextResult.tool_result);
         if (!task.state.tool_result_refs.includes(marketContextResult.tool_result.trace_id)) task.state.tool_result_refs.push(marketContextResult.tool_result.trace_id);
       }
     }
+    if (task) this.addEvent(task, "contract.accepted", {
+      contract_version: canonicalRequest.contract_version,
+      request_id: canonicalRequest.request_id
+    });
+    result = task ? this.getTask(task.state.task_id) : result;
     return contract.buildResponse(canonicalRequest, result);
   }
 

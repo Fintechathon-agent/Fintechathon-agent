@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const test = require("node:test");
 const marketBrief = require("../tools/market-brief");
 const brief = require("../data/market-brief-2026-10-08.json");
+const briefNext = require("../data/market-brief-2026-10-09.json");
 const tools = require("../tools/financial-tools");
 const { Harness } = require("../core/harness");
 const { createRequest } = require("../contracts/investment-contract");
@@ -40,4 +41,32 @@ test("duplicate market observations stop at the Core Agent input boundary", () =
     riskProfile,
     marketContext: invalid
   })), (error) => error.code === "INVALID_MARKET_CONTEXT" && error.details.errors.some((item) => item.path.endsWith(".asset_id")));
+});
+
+test("2026-10-09 market brief replays with source conflict evidence and no Quant drift", () => {
+  const validation = marketBrief.validateMarketBrief(briefNext);
+  assert.equal(validation.valid, true);
+  assert.equal(validation.output.as_of, "2026-10-09");
+  assert.deepEqual(validation.output.abnormal_moves, []);
+  assert.deepEqual(validation.output.unresolved_conflicts.map(signal => signal.signal_id), ["rates-view-data-conflict"]);
+  assert.equal(validation.output.source_checks.find(check => check.scope === "美债10Y与30Y官方数据").status, "OFFICIAL_SOURCE");
+
+  const portfolio = tools.getDemoPortfolio();
+  const plain = new Harness().runHealthCheckContract(createRequest({
+    requestId: "req-brief-plain-20261009-001",
+    riskProfile,
+    portfolio
+  }));
+  const contextual = new Harness().runHealthCheckContract(createRequest({
+    requestId: "req-brief-context-20261009-001",
+    riskProfile,
+    portfolio,
+    marketContext: briefNext
+  }));
+  assert.equal(contextual.artifacts.market_context.brief_id, briefNext.brief_id);
+  assert.deepEqual(contextual.artifacts.health_report.metrics, plain.artifacts.health_report.metrics);
+  assert.deepEqual(contextual.artifacts.candidates.map(candidate => candidate.target_weights), plain.artifacts.candidates.map(candidate => candidate.target_weights));
+  assert.deepEqual(contextual.artifacts.simulation.comparisons, plain.artifacts.simulation.comparisons);
+  assert.equal(contextual.risk_handoff.execution_allowed, false);
+  assert.equal(contextual.risk_handoff.evidence.audit_id, contextual.audit_evidence.audit_id);
 });

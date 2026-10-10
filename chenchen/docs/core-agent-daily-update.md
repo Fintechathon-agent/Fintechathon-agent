@@ -97,8 +97,8 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 ### 验证结果
 
 - JavaScript 语法检查：通过。
-- 自动化测试：50 项通过。
-- HTTP Contract 测试：市场上下文请求返回 200，Risk Handoff 证据完整。
+- 自动化测试：51/51 通过。
+- HTTP Contract 测试：2026-10-09 市场上下文请求返回 200，Risk Handoff 证据完整。
 - 页面与静态资源 Smoke Test：启动当前版本服务后通过；首次执行因服务未启动无法连接，已复跑通过。
 - 市场简报测试记录：见 `docs/market-brief-test-report-2026-10-08.md`。
 - 团队仓库和个人仓库：代码状态已同步。
@@ -126,6 +126,62 @@ Core Agent 主链路当前处于“统一 Contract 已落地，等待继续扩�
 - 在独立持仓项目中补充预览页、逐行错误报告和用户确认状态，仍保持与主产品隔离。
 - 在独立市场分析项目中补充数据新鲜度、来源可信度、分类比较和冲突回顾，仍保持不生成直接买卖指令。
 - 待产品方向确认后，再设计两个独立项目与主链路的适配层和融合验收清单。
+
+## 2026-10-10
+
+### 今日结论
+
+Core Agent 已完成架构图、模块调用时序和统一 Contract 的第一版收口，并使用用户提供的 2026-10-09 市场简报完成固定数据回放。主链路仍停在 Risk Handoff，未改变 Quant、Memory 或 Risk 的职责边界。
+
+### A. 已完成的核心接口
+
+- 响应新增统一 trace：固定关联 contract_version、request_id、task_id、session_id。
+- 响应新增 audit_evidence：保存 session.created、阶段开始/完成、checkpoint、重试、交接和 contract.accepted 事件。
+- Risk Handoff 的 evidence 新增 audit_id，市场上下文继续通过 market_context_id 引用。
+- 错误信封统一包含 code、message、retryable、stage、recovery、details。
+- Task State 记录 contract_version、request_id 和结构化 error_state，便于失败后恢复和跨模块联调。
+- 新增架构图：docs/core-agent-architecture.md。
+- 新增模块调用时序图：docs/core-agent-sequence.md。
+- 更新公共说明：contracts/README.md；更新响应示例和 investment-agent.v1 Schema。
+
+### B. 可验证的集成进度
+
+- 新增 data/market-brief-2026-10-09.json，来自用户提供的《每日市场简报_2026-10-09.pdf》整理结果；原始 PDF 不上传 GitHub。
+- 14 条市场观察完成字段、唯一性、正数、数据日期和来源状态校验。
+- 10Y / 30Y 美债按官方数据记录为 OFFICIAL_SOURCE；机构“可能上破6%”记录为前瞻观点。
+- 观点与官方数据方向冲突被标记为 rates-view-data-conflict / REVIEW_REQUIRED，没有自动转换成交易动作。
+- 新增 market-brief-test-report-2026-10-09.md，记录数据样本、来源边界、回放路径和结果。
+- 新增自动化用例验证：市场简报能进入 Core Agent；Quant metrics、候选 target_weights、模拟 comparisons 不漂移；Risk Handoff 带 audit_id；execution_allowed 仍为 false。
+- 本轮仍未接入独立 Risk Consumer；Risk 只验证到 Handoff 边界。
+
+### C. 需要其他 Owner 配合的阻塞项
+
+1. Risk Owner：确认独立 Risk Consumer 消费 audit_id、market_context_id、证据状态和回写格式。
+2. Quant Owner：确认市场上下文只作为证据输入，不新增 Core Agent 内的收益、回撤或预测计算。
+3. Memory Owner：确认 audit_evidence 是否只做审计留痕，不进入 Memory 规则、长期记忆或自动回写。
+4. Research / Data Owner：确认真实数据源、时间窗口、来源可信度和新闻观点字段后，才能替换固定夹具。
+5. UI Owner：按统一 trace、task_state、audit_evidence 和 error envelope 对齐展示和重试入口。
+
+### 安全边界
+
+- 未重新计算 Quant：是；只比较带/不带市场上下文的既有输出。
+- 未修改 Memory 规则：是；本轮没有改 consent、范围、生命周期和清理规则。
+- 未绕过 Risk：是；Risk Handoff 仍为 PENDING_REVIEW，execution_allowed 固定为 false。
+
+### 验证结果
+
+- JavaScript 语法检查：通过。
+- 自动化测试：51/51 通过。
+- HTTP 回放：2026-10-09 市场简报请求返回 200，观点/数据冲突进入 REVIEW_REQUIRED，execution_allowed=false。
+- 页面与静态资源 Smoke Test：独立端口复跑通过。
+- 测试数据和结论：见 docs/market-brief-test-report-2026-10-09.md。
+- 原始市场简报不进入仓库，只保留固定夹具、来源说明和测试结果。
+
+### 下一步
+
+- 先由 Risk、Quant、Memory、UI Owner 按统一 Contract 联调并确认字段。
+- 补齐剩余投资接口的版本化 Contract，不把店主财务助手和持仓导入项目混入本主链路。
+- 真实市场数据接入前，先完成来源、时效、可信度和冲突处理的共同验收。
 
 ## 后续日期模板
 

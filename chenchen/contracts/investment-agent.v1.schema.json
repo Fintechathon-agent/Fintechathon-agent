@@ -136,17 +136,19 @@
     "HealthCheckResponse": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["contract_version", "request_id", "operation", "task_state", "artifacts", "tool_results", "risk_handoff"],
+      "required": ["contract_version", "request_id", "operation", "trace", "task_state", "artifacts", "tool_results", "audit_evidence", "risk_handoff"],
       "properties": {
         "contract_version": { "const": "investment-agent.v1" },
         "request_id": { "type": "string", "minLength": 4, "maxLength": 128 },
         "operation": { "const": "PORTFOLIO_HEALTH_CHECK" },
+        "trace": { "$ref": "#/$defs/Trace" },
         "task_state": { "$ref": "#/$defs/TaskState" },
         "artifacts": { "$ref": "#/$defs/Artifacts" },
         "tool_results": {
           "type": "object",
           "additionalProperties": { "$ref": "#/$defs/ToolResult" }
         },
+        "audit_evidence": { "$ref": "#/$defs/AuditEvidence" },
         "risk_handoff": {
           "anyOf": [{ "$ref": "#/$defs/RiskHandoff" }, { "type": "null" }]
         }
@@ -163,10 +165,13 @@
         "error": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["code", "message"],
+          "required": ["code", "message", "retryable", "stage", "recovery"],
           "properties": {
             "code": { "type": "string" },
             "message": { "type": "string" },
+            "retryable": { "type": "boolean" },
+            "stage": { "type": "string", "minLength": 1 },
+            "recovery": { "type": "string", "minLength": 1 },
             "details": {}
           }
         }
@@ -179,12 +184,65 @@
       "properties": {
         "task_id": { "type": "string", "minLength": 1 },
         "session_id": { "type": "string", "minLength": 1 },
+        "contract_version": { "const": "investment-agent.v1" },
+        "request_id": { "type": ["string", "null"] },
         "stage": { "type": "string", "minLength": 1 },
         "status": {
           "enum": ["READY", "RUNNING", "WAITING_INPUT", "HANDOFF_REQUIRED", "BLOCKED", "FAILED", "CIRCUIT_OPEN"]
         },
         "missing_fields": { "type": "array", "items": { "type": "string" } },
+        "error_state": { "anyOf": [{ "$ref": "#/$defs/ErrorState" }, { "type": "null" }] },
         "checkpoint": { "$ref": "#/$defs/Checkpoint" }
+      }
+    },
+    "Trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_version", "request_id", "task_id", "session_id"],
+      "properties": {
+        "contract_version": { "const": "investment-agent.v1" },
+        "request_id": { "type": "string", "minLength": 4, "maxLength": 128 },
+        "task_id": { "type": "string", "minLength": 1 },
+        "session_id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ErrorState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "stage", "retryable", "recovery"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "stage": { "type": "string", "minLength": 1 },
+        "retryable": { "type": "boolean" },
+        "recovery": { "type": "string", "minLength": 1 },
+        "reasons": { "type": "array" }
+      }
+    },
+    "AuditEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_id", "task_id", "actor", "event_type", "payload", "timestamp"],
+      "properties": {
+        "event_id": { "type": "string", "minLength": 1 },
+        "task_id": { "type": "string", "minLength": 1 },
+        "actor": { "type": "string", "minLength": 1 },
+        "event_type": { "type": "string", "minLength": 1 },
+        "payload": { "type": "object" },
+        "timestamp": { "type": "string", "minLength": 10 }
+      }
+    },
+    "AuditEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["audit_id", "contract_version", "request_id", "task_id", "session_id", "events"],
+      "properties": {
+        "audit_id": { "type": "string", "minLength": 1 },
+        "contract_version": { "const": "investment-agent.v1" },
+        "request_id": { "type": ["string", "null"] },
+        "task_id": { "type": "string", "minLength": 1 },
+        "session_id": { "type": "string", "minLength": 1 },
+        "events": { "type": "array", "items": { "$ref": "#/$defs/AuditEvent" } }
       }
     },
     "Checkpoint": {
@@ -355,7 +413,8 @@
             "health_report_id": { "type": "string" },
             "proposal_ids": { "type": "array", "items": { "type": "string" } },
             "simulation_id": { "type": "string" },
-            "market_context_id": { "type": "string" }
+            "market_context_id": { "type": "string" },
+            "audit_id": { "type": "string" }
           }
         },
         "execution_allowed": { "const": false }

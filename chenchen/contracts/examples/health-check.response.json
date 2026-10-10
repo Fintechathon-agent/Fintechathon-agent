@@ -2,9 +2,17 @@
   "contract_version": "investment-agent.v1",
   "request_id": "req-demo-20261007-001",
   "operation": "PORTFOLIO_HEALTH_CHECK",
+  "trace": {
+    "contract_version": "investment-agent.v1",
+    "request_id": "req-demo-20261007-001",
+    "task_id": "task-demo-001",
+    "session_id": "session-demo-001"
+  },
   "task_state": {
     "task_id": "task-demo-001",
     "session_id": "session-demo-001",
+    "contract_version": "investment-agent.v1",
+    "request_id": "req-demo-20261007-001",
     "stage": "RISK_CHECK",
     "status": "HANDOFF_REQUIRED",
     "missing_fields": [],
@@ -21,6 +29,14 @@
   },
   "artifacts": {},
   "tool_results": {},
+  "audit_evidence": {
+    "audit_id": "audit-task-demo-001",
+    "contract_version": "investment-agent.v1",
+    "request_id": "req-demo-20261007-001",
+    "task_id": "task-demo-001",
+    "session_id": "session-demo-001",
+    "events": []
+  },
   "risk_handoff": {
     "contract_version": "investment-agent.v1",
     "handoff_id": "handoff-task-demo-001",
@@ -34,7 +50,8 @@
       "portfolio_snapshot_id": "snapshot-demo-001",
       "health_report_id": "health-demo-001",
       "proposal_ids": ["proposal-a-demo", "proposal-b-demo", "proposal-c-demo"],
-      "simulation_id": "simulation-demo-001"
+      "simulation_id": "simulation-demo-001",
+      "audit_id": "audit-task-demo-001"
     },
     "execution_allowed": false
   }

@@ -3,6 +3,7 @@ const test=require('node:test'), assert=require('node:assert/strict');
 const {server}=require('../server');
 const {createRequest, CONTRACT_VERSION}=require('../contracts/investment-contract');
 const marketBrief=require('../data/market-brief-2026-10-08.json');
+const marketBriefNext=require('../data/market-brief-2026-10-09.json');
 test('HTTP flows: pages, independent cookies, review gating, import failure and disabled execution',async t=>{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));
@@ -61,6 +62,8 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   assert.equal(task.contract_version,CONTRACT_VERSION);
   assert.equal(task.request_id,request.request_id);
   assert.equal(task.risk_handoff.execution_allowed,false);
+  assert.equal(task.trace.task_id,task.task_state.task_id);
+  assert.ok(task.audit_evidence.events.some(event=>event.event_type==='contract.accepted'));
   assert.equal(task.task_state.status,'HANDOFF_REQUIRED');assert.equal(Object.keys(task.tool_results).length,4);
   const contextualRequest=createRequest({requestId:'req-http-market-context-001',riskProfile:request.input.risk_profile,marketContext:marketBrief});
   const contextualResponse=await fetch(base+'/api/health-check/run',{method:'POST',headers,body:JSON.stringify(contextualRequest)});
@@ -71,6 +74,14 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   assert.equal(contextual.risk_handoff.evidence.market_context_id,contextual.artifacts.market_context.context_id);
   assert.equal(contextual.risk_handoff.execution_allowed,false);
   assert.ok(Object.values(contextual.tool_results).some(result=>result.tool_name==='market-brief.context'));
+  const nextRequest=createRequest({requestId:'req-http-market-20261009-001',riskProfile:request.input.risk_profile,marketContext:marketBriefNext});
+  const nextResponse=await fetch(base+'/api/health-check/run',{method:'POST',headers,body:JSON.stringify(nextRequest)});
+  assert.equal(nextResponse.status,200);
+  const next=await nextResponse.json();
+  assert.equal(next.artifacts.market_context.brief_id,marketBriefNext.brief_id);
+  assert.deepEqual(next.artifacts.market_context.unresolved_conflicts.map(signal=>signal.signal_id),['rates-view-data-conflict']);
+  assert.equal(next.risk_handoff.evidence.audit_id,next.audit_evidence.audit_id);
+  assert.equal(next.risk_handoff.execution_allowed,false);
   assert.equal((await fetch(base+'/api/audit/'+task.task_state.task_id)).status,200);
   const investmentFile=await fetch(base+'/api/task/'+task.task_state.task_id+'/export');
   assert.match(investmentFile.headers.get('content-disposition'),/attachment/);
@@ -84,4 +95,7 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   const invalidBody=await invalidResponse.json();
   assert.equal(invalidBody.contract_version,CONTRACT_VERSION);
   assert.equal(invalidBody.request_id,request.request_id);
+  assert.equal(invalidBody.error.retryable,false);
+  assert.equal(invalidBody.error.stage,'BACKEND');
+  assert.ok(invalidBody.error.recovery);
 });
