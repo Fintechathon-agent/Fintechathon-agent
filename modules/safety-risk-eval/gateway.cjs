@@ -10,8 +10,8 @@ class GatewayError extends Error {
 const emptyApproval = () => ({ status: "UNCONFIRMED", approval_id: null, confirmed_by: null, confirmed_at: null, expires_at: null, risk_check_id: null, binding: null, accepted_risks: [] });
 
 class ActionGateway {
-  constructor({ store, projectPlan, executePlan, now = () => new Date().toISOString(), approvalTtlMs = 15 * 60 * 1000, onSuccess = () => null }) {
-    Object.assign(this, { store, projectPlan, executePlan, now, approvalTtlMs, onSuccess });
+  constructor({ store, projectPlan, executePlan, now = () => new Date().toISOString(), approvalTtlMs = 15 * 60 * 1000, onSuccess = () => null, beforeExecute = async () => null }) {
+    Object.assign(this, { store, projectPlan, executePlan, now, approvalTtlMs, onSuccess, beforeExecute });
     this.busy = new Set();
     this.toolCalls = new Map();
   }
@@ -115,6 +115,7 @@ class ActionGateway {
       execution = { ...input.execution, status: "RUNNING", user_id: actor, task_id: taskId, result: null };
       this.store.transaction((data) => { data.executions[scope] = execution; return null; });
       this.event("EXECUTION_STARTED", record, { execution, risk_check_id: result.risk_check_id });
+      await this.beforeExecute(record, execution);
       started = true;
       this.toolCalls.set(taskId, (this.toolCalls.get(taskId) || 0) + 1);
       const output = await this.executePlan(clone(input), { approvalId: input.approval.approval_id, idempotencyKey: `${actor}:${key}` });

@@ -1,0 +1,30 @@
+{
+  "prototype_only": true,
+  "fixture_count": 33,
+  "rules": 10,
+  "viewport_widths": [
+    1440,
+    390
+  ],
+  "javascript_errors": [],
+  "remote_requests": [
+    "https://fund-risk-prototype.panxintian44.chatgpt.site/",
+    "https://fund-risk-prototype.panxintian44.chatgpt.site/style.css",
+    "https://fund-risk-prototype.panxintian44.chatgpt.site/model.js",
+    "https://fund-risk-prototype.panxintian44.chatgpt.site/app.js",
+    "https://fund-risk-prototype.panxintian44.chatgpt.site/architecture.svg"
+  ],
+  "flows": [
+    "all fixed cases",
+    "partial acceptance",
+    "version invalidation",
+    "reject and revoke",
+    "repair",
+    "idempotent replay",
+    "unknown reconciliation",
+    "content conflict",
+    "audit failure",
+    "improvement denial"
+  ],
+  "artifacts": "docs/safety-risk-eval/online-demo/prototype"
+}

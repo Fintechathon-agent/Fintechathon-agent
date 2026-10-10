@@ -65,7 +65,8 @@ async function main() {
     await page.goto(base + "/risk");
     await page.locator("#run-attack").click();
     await page.waitForFunction(() => document.querySelector("#attack-verdict").textContent === "越权操作已阻止");
-    const captures = path.resolve(__dirname, "../../../docs/safety-risk-eval/implementation-v0.1/screenshots");
+    const reportDir = process.env.RISK_BROWSER_ARTIFACTS || path.resolve(__dirname, "../../../docs/safety-risk-eval/implementation-v0.1");
+    const captures = path.join(reportDir, "screenshots");
     fs.mkdirSync(captures, { recursive: true });
     for (const [name, width, height] of [["desktop", 1365, 960], ["mobile", 390, 844]]) {
       await page.setViewportSize({ width, height });
@@ -74,8 +75,8 @@ async function main() {
       await page.screenshot({ path: path.join(captures, `${name}.png`), fullPage: true });
     }
     assert.deepEqual(errors, []);
-    const output = { scope: "Local synthetic integration browser interactions, not live trading", cases, page_errors: errors };
-    const destination = path.resolve(__dirname, "../../../docs/safety-risk-eval/implementation-v0.1/browser-results.json");
+    const output = { scope: "Synthetic integration browser interactions, not live trading", base_url: base, cases, page_errors: errors };
+    const destination = path.join(reportDir, "browser-results.json");
     fs.mkdirSync(path.dirname(destination), { recursive: true }); fs.writeFileSync(destination, JSON.stringify(output, null, 2) + "\n");
     console.log(JSON.stringify(output));
   } finally { await browser.close(); }
