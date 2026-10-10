@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-10-10T02:08:55.573Z",
+  "generated_at": "2026-10-10T02:24:14.793Z",
   "scope": "Local synthetic implementation, contract and integration tests; not production security certification or live financial execution",
   "runtime": "v24.19.0",
   "suites": [
     {
       "name": "Risk / Gateway / Core integration",
-      "command": "node --test --test-reporter=tap test/engine.test.cjs test/gateway.test.cjs test/http.test.cjs test/ledger.test.cjs",
+      "command": "node --test --test-reporter=tap test/engine.test.cjs test/gateway.test.cjs test/http.test.cjs test/ledger.test.cjs test/security.test.cjs",
       "exit_code": 0,
-      "tests": 44,
-      "passed": 44,
+      "tests": 54,
+      "passed": 54,
       "failed": 0
     },
     {
@@ -39,7 +39,7 @@
     },
     {
       "path": "modules/safety-risk-eval/gateway.cjs",
-      "sha256": "a2a94235b21948756cc00472ee8fcc90abe7c959afd627b655962b3b60afb4f5"
+      "sha256": "b2e85859ed60a3a265ed82626c20daef81c84f67e76edb960025396ffbee441c"
     },
     {
       "path": "modules/safety-risk-eval/package.json",
@@ -47,15 +47,15 @@
     },
     {
       "path": "modules/safety-risk-eval/public/app.js",
-      "sha256": "26b816e50e122c5a86308eee64f0a38608c817bdec145293a88da6b5f235f080"
+      "sha256": "26ce8ea3394d7a8470e2bd4e6aae7ce0d0191cfd5320f66ca30c8e4c11969566"
     },
     {
       "path": "modules/safety-risk-eval/public/index.html",
-      "sha256": "fe6ed76ad147a0e46e49156d1127104ef0a5f62777bd31027ba44cc8f0b54667"
+      "sha256": "dad1f404341de7408ef43c11b735ddcb15d147d0ec4191f5de20fea9b3774497"
     },
     {
       "path": "modules/safety-risk-eval/public/style.css",
-      "sha256": "a9091112e46cf4e00eb83e5ad4b363898536781f57d41449a214cd255c04b7ac"
+      "sha256": "0b4216a68b516c6b3ec90851b0010906ec746e32ff7be04c12bf2ab26cc368c6"
     },
     {
       "path": "modules/safety-risk-eval/public/team-bootstrap.js",
@@ -63,15 +63,19 @@
     },
     {
       "path": "modules/safety-risk-eval/scripts/browser-check.cjs",
-      "sha256": "39f27266730e0face77e7cbd0d95a0d30994e026d1f5df84472001c3ba228aae"
+      "sha256": "3fc4c0640dfeb7a92faafbba4e199e30c8428c286b73796bed7beb4281dd7e20"
     },
     {
       "path": "modules/safety-risk-eval/scripts/evaluate.cjs",
       "sha256": "f59dc7e27dfebb9a37341c7c380d0829fe3c0a105919b870ea1907eeeadfb427"
     },
     {
+      "path": "modules/safety-risk-eval/security.cjs",
+      "sha256": "ea8b853d93ff2c55cf8b834ee1b910e53854e6f24d8b66afa1938ece660f05aa"
+    },
+    {
       "path": "modules/safety-risk-eval/server.cjs",
-      "sha256": "e78b157ddf54072ca1852978fb3eb50e0718368e485b3db0e28da7fbfed99a5e"
+      "sha256": "35a81f5e1e2f367c5305f0f47b2e7910a27ab22564ab70d5bfed5373edf74b99"
     },
     {
       "path": "modules/safety-risk-eval/store.cjs",
@@ -96,6 +100,10 @@
     {
       "path": "modules/safety-risk-eval/test/ledger.test.cjs",
       "sha256": "bcf243458b7c650ed3d9050e5127b86da916b092d350d634877e2214909c3c20"
+    },
+    {
+      "path": "modules/safety-risk-eval/test/security.test.cjs",
+      "sha256": "17cf88b84b1065b0088fe7e53507a8522d56eee6591359a0a1f569a579245e96"
     }
   ]
 }

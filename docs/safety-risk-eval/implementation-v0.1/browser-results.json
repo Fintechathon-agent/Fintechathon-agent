@@ -20,6 +20,18 @@
     {
       "name": "missing-trading-plan-fails-closed",
       "passed": true
+    },
+    {
+      "name": "prompt-injection-blocked-with-visible-audit",
+      "passed": true
+    },
+    {
+      "name": "untrusted-html-rendered-as-text",
+      "passed": true
+    },
+    {
+      "name": "team-page-to-risk-unconfirmed-handoff",
+      "passed": true
     }
   ],
   "page_errors": []

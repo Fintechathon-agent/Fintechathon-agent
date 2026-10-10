@@ -23,6 +23,7 @@ function renderButtons() {
   const review = record?.review, canConfirm = review && !dirty && !["ERROR", "BLOCK"].includes(review.decision) && review.reasons.every((r) => r.acceptance_allowed);
   const accepted = [...document.querySelectorAll("#acceptances input")].every((box) => box.checked);
   $("create").disabled = busy || !csrf;
+  $("run-attack").disabled = busy || !csrf;
   $("update").disabled = busy || !record;
   $("whole-plan").disabled = busy || !canConfirm;
   $("approve").disabled = busy || !canConfirm || !accepted || !$("whole-plan").checked;
@@ -91,6 +92,22 @@ async function execute() {
   executionKey ||= crypto.randomUUID(); lastExecution = await api("/api/paper-trade/execute", { task_id: taskId(), idempotency_key: executionKey }); await reload(); notice(lastExecution.replay ? "已返回原执行状态，没有重复写入。" : lastExecution.status === "SUCCEEDED" ? "模拟执行成功；本次结果已记录。" : "执行未放行或结果待核查，请查看原因。", lastExecution.status !== "SUCCEEDED");
 }
 $("execute").addEventListener("click", () => action(execute)); $("repeat").addEventListener("click", () => action(execute)); $("refresh-audit").addEventListener("click", () => action(audit));
+$("run-attack").addEventListener("click", () => action(async () => {
+  const result = await api("/api/safety/attack-demo", { source: $("attack-source").value, text: $("attack-text").value });
+  $("attack-result").hidden = false;
+  const blocked = result.risk.decision === "BLOCK" && result.gateway.status === "NOT_STARTED" && result.paper_tool_calls === 0;
+  $("attack-verdict").textContent = blocked ? "越权操作已阻止" : "存在异常，请核查审计记录";
+  $("attack-tool-count").textContent = `模拟执行工具调用 ${result.paper_tool_calls} 次`;
+  $("attack-nodes").replaceChildren();
+  const rows = [
+    ["Core · 数据与权限分离", `原文：${result.document.text}`, `信任等级 ${result.document.trust}；提升为指令 ${result.core.promoted_instruction_count} 次。`],
+    ["Risk · 拒绝外部内容发起的操作", result.risk.reasons.map((r) => r.message_zh).join("；"), result.risk.reasons.map((r) => r.code).join(" / ")],
+    ["Action Gateway · 未获得用户授权", `执行状态：${labels[result.gateway.status] || result.gateway.status}`, (result.gateway.risk?.reasons || []).map((r) => r.code).join(" / ")]
+  ];
+  for (const [title, detail, code] of rows) { const li = node("li"); li.append(node("h3", title), node("p", detail), node("code", code)); $("attack-nodes").append(li); }
+  $("attack-audit").textContent = JSON.stringify(result.audit, null, 2);
+  notice(blocked ? "安全演示完成：攻击原文、阻断节点、固定原因及审计记录均已展示。" : "请查看本次演示的异常结果。", !blocked);
+}));
 action(async () => {
   const session = await api("/api/safety/session"); csrf = session.csrf;
   const id = new URLSearchParams(location.search).get("task_id");

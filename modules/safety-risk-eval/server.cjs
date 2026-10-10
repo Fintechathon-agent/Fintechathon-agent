@@ -6,6 +6,7 @@ const { randomUUID, randomBytes } = require("node:crypto");
 const { JournalStore } = require("./store.cjs");
 const { ActionGateway, GatewayError } = require("./gateway.cjs");
 const adapter = require("./core-adapter.cjs");
+const { runAttackDemo } = require("./security.cjs");
 const baseRequest = require("../../chenchen/contracts/examples/health-check.request.json");
 const { server: originalServer, harness } = require("../../chenchen/server.js");
 const originalHandler = originalServer.listeners("request")[0];
@@ -81,6 +82,10 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
       if (req.method !== "POST") throw new GatewayError("NOT_FOUND", "接口不存在。", "ERROR", 404);
       if (req.headers["x-risk-csrf"] !== s.csrf) throw new GatewayError("CSRF_REQUIRED", "缺少当前会话的确认来源标识。", "BLOCK", 403);
       payload = await body(req);
+      if (url.pathname === "/api/safety/attack-demo") {
+        only(payload, ["source", "text"]);
+        send(res, 200, await runAttackDemo({ gateway, harness, actor: s.user_id, source: payload.source, text: payload.text })); return;
+      }
       if (url.pathname === "/api/health-check/run") {
         const result = createTask(s.user_id, { confirmed: false, maxDrawdown: payload.input?.risk_profile?.max_drawdown ?? .1 }, payload);
         send(res, 200, result.upstream); return;

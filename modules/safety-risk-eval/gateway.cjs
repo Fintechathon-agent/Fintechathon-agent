@@ -13,6 +13,7 @@ class ActionGateway {
   constructor({ store, projectPlan, executePlan, now = () => new Date().toISOString(), approvalTtlMs = 15 * 60 * 1000, onSuccess = () => null }) {
     Object.assign(this, { store, projectPlan, executePlan, now, approvalTtlMs, onSuccess });
     this.busy = new Set();
+    this.toolCalls = new Map();
   }
   event(type, record, details = {}) {
     return this.store.append({ ...details, event_id: `audit-${randomUUID()}`, event_type: type, occurred_at: this.now(), task_id: record.input.binding.task_id, user_id: record.input.binding.user_id, binding: clone(record.input.binding), correlation_id: record.input.audit_context.correlation_id });
@@ -25,14 +26,14 @@ class ActionGateway {
   authority(record) {
     return { user_id: record.input.binding.user_id, allowed_tools: ["portfolio.review", "paper_trade"], expected_binding: record.input.binding, project_plan: this.projectPlan, approval_check_id: record.review?.risk_check_id, action_source: record.action_source || "USER", supports_real_data: false };
   }
-  register(input, { actionSource = "USER", memoryConsent = false, external = [] } = {}) {
+  register(input, { actionSource = "USER", memoryConsent = false, external = [], deferReview = false } = {}) {
     // Internal adapter only. HTTP callers cannot supply Risk input, authority or stored approval.
     const taskId = input.binding.task_id;
     if (this.store.data.tasks[taskId]) throw new GatewayError("TASK_EXISTS", "任务已存在。", "BLOCK");
     const record = { input: clone(input), review: null, action_source: actionSource, memory_consent: memoryConsent, external: clone(external), invalidated: false };
     this.event("TASK_REGISTERED", record, { external_count: external.length });
     this.store.transaction((data) => { data.tasks[taskId] = record; return null; });
-    return this.review(taskId, input.binding.user_id);
+    return deferReview ? null : this.review(taskId, input.binding.user_id);
   }
   review(taskId, actor) {
     const record = this.owner(taskId, actor);
@@ -115,6 +116,7 @@ class ActionGateway {
       this.store.transaction((data) => { data.executions[scope] = execution; return null; });
       this.event("EXECUTION_STARTED", record, { execution, risk_check_id: result.risk_check_id });
       started = true;
+      this.toolCalls.set(taskId, (this.toolCalls.get(taskId) || 0) + 1);
       const output = await this.executePlan(clone(input), { approvalId: input.approval.approval_id, idempotencyKey: `${actor}:${key}` });
       if (!output || output.status !== "SUCCEEDED" || !output.receipt) throw new Error("EXECUTOR_RESULT_UNVERIFIED");
       execution = { ...execution, status: "SUCCEEDED", result: output };
