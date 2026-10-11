@@ -31,7 +31,7 @@ function inspect(payload) {
   }
   return { raw: structuredClone(u), projection, digest: hash(u), source: { contract_version: u.contract_version, request_id: u.request_id, task_id: u.task_state.task_id, session_id: u.task_state.session_id, handoff_id: u.risk_handoff.handoff_id, audit_id: u.audit_evidence.audit_id } };
 }
-function receive({ payload, actor, gateway }) {
+function receive({ payload, actor, gateway, serviceReceipt = null }) {
   let packet;
   try { packet = inspect(payload); }
   catch (error) {
@@ -39,6 +39,7 @@ function receive({ payload, actor, gateway }) {
     throw error;
   }
   const { audit_id: unusedAuditId, ...sourceIdentity } = packet.source;
+  if (serviceReceipt && (serviceReceipt.endpoint !== "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/api/risk-workbench/handoff" || serviceReceipt.verification !== "SERVER_FETCH_PINNED_HTTPS" || serviceReceipt.capability !== "READ_ONLY_HANDOFF" || serviceReceipt.request_id !== packet.source.request_id || serviceReceipt.response_digest !== packet.digest)) reject("CORE_RECEIPT_INVALID", "服务端接收凭据与交接内容不匹配。");
   const key = hash({ actor, source: sourceIdentity });
   const previous = Object.values(gateway.store.data.tasks).find((r) => r.input.binding.user_id === actor && r.handoff_import?.import_key === key);
   if (previous) {
@@ -54,6 +55,7 @@ function receive({ payload, actor, gateway }) {
   const input = adapter.fromHandoff(u, actor, { confirmed: false, now: gateway.now() });
   gateway.register(input, { deferReview: true, memoryConsent: false });
   const provenance = { import_version: VERSION, import_key: key, source: packet.source, source_digest: packet.digest, provenance: "UNVERIFIED_EXTERNAL_RESPONSE", imported_at: gateway.now(), original_response: packet.raw, execution_allowed: false };
+  if (serviceReceipt) { provenance.provenance = "PINNED_HTTPS_CORE_RESPONSE"; provenance.service_receipt = structuredClone(serviceReceipt); }
   gateway.store.transaction((data) => { data.tasks[localTask].handoff_import = provenance; return null; });
   const record = gateway.inspect(localTask, actor);
   gateway.event("HANDOFF_IMPORTED", record, { source: packet.source, source_digest: packet.digest, provenance: provenance.provenance, local_task_id: localTask, local_session_id: localSession, execution_allowed: false });
@@ -63,4 +65,4 @@ function receive({ payload, actor, gateway }) {
 function result(record, replay) {
   return { import_version: VERSION, task_id: record.input.binding.task_id, source: record.handoff_import.source, source_digest: record.handoff_import.source_digest, provenance: record.handoff_import.provenance, replay, execution_allowed: false, risk: record.review, policy: record.policy, workbench_path: `/risk?task_id=${encodeURIComponent(record.input.binding.task_id)}` };
 }
-module.exports = { VERSION, inspect, receive };
+module.exports = { VERSION, inspect, receive, result };

@@ -7,6 +7,14 @@
   <div class="intro"><div><h1>看清风险，再确认操作。</h1><p>健康检查、风险原因、用户确认与审计，在同一条决策链中查看。</p></div><p class="scope">已连接团队健康检查与模拟工具。<br>仅使用 7 个历史演示观测，不连接真实账户。</p></div>
   <ol class="flow" aria-label="主流程"><li id="flow-core">健康检查</li><li id="flow-risk">风险判断</li><li id="flow-approval">用户确认</li><li id="flow-execution">模拟执行</li><li id="flow-audit">审计记录</li></ol>
   <div id="notice" role="status" aria-live="polite">选择演示条件，运行一次健康检查。</div>
+    <section aria-labelledby="remote-core-title">
+      <div class="section-title"><h2 id="remote-core-title">队友在线 Core Agent</h2><span id="remote-core-status" class="status empty">尚未检查连接</span></div>
+      <p>实时运行队友的健康检查，将完整方案和证据接入本会话的风险复核。使用虚构持仓，交接结果只读。</p>
+      <div class="actions"><button id="run-core" type="button" disabled>运行远程健康检查</button><button id="check-core" type="button" class="secondary" disabled>检查连接</button><button id="repeat-core" type="button" class="secondary" disabled>查看上次请求结果</button></div>
+      <p id="remote-core-note" role="status" aria-live="polite">请求由工作台服务端直接发往队友指定的后端，成功后展示任务和审计编号。</p>
+      <p class="fine">该服务目前运行结构化 Core 工作流，不含大模型调用。来源核实不等于投资执行授权。</p>
+      <details><summary>查看远程调用及来源证据</summary><pre id="remote-core-evidence">暂无调用记录。</pre></details>
+    </section>
   <section class="policy-panel" aria-labelledby="policy-title">
     <div class="section-title"><h2 id="policy-title">由策略约束的金融决策链</h2><span id="policy-runtime" class="status empty">正在读取策略</span></div>
     <p>智能体提出方案，程序判断风险，网关决定能否调用工具。用户确认绑定策略和完整计划；任一必要检查失败，执行暂停。</p>

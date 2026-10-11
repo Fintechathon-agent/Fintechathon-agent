@@ -5,8 +5,10 @@ const ruleNames = ["权限与工具范围", "必要数据与证据", "资金及�
 const eventNames = { TASK_REGISTERED: "已接收健康检查", RISK_CHECK_COMPLETED: "风险检查完成", PLAN_CONFIRMED: "用户确认完整计划", PLAN_REJECTED: "用户拒绝计划", PLAN_REVOKED: "用户撤回确认", PLAN_INVALIDATED: "旧版本授权失效", EXECUTION_REQUESTED: "收到执行请求", EXECUTION_STARTED: "开始模拟执行", EXECUTION_SUCCEEDED: "模拟执行成功", EXECUTION_BLOCKED: "执行入口阻止操作", EXECUTION_UNKNOWN: "执行结果待核查", EXECUTION_ABORTED: "执行前中止", DUPLICATE_REQUEST: "重复请求返回原状态", MEMORY_UPDATED: "经同意写入演示记忆", MEMORY_UPDATE_FAILED: "演示记忆写入失败", REQUEST_REJECTED: "请求未通过安全校验" };
 let csrf, record = null, lastExecution = null, executionKey = null, dirty = false, busy = false;
 let modelConfiguration = null;
+let coreRequestKey = null;
 eventNames.POLICY_DECIDED = "确定性权限策略检查";
-Object.assign(eventNames, { HANDOFF_IMPORTED: "已接收 Core 交接包（来源待验证）", HANDOFF_IMPORT_REPLAY: "重复交接返回原任务", HANDOFF_IMPORT_REJECTED: "交接包未通过验证" });
+Object.assign(eventNames, { HANDOFF_IMPORTED: "已接收 Core 交接包", HANDOFF_IMPORT_REPLAY: "重复交接返回原任务", HANDOFF_IMPORT_REJECTED: "交接包未通过验证" });
+Object.assign(eventNames, { REMOTE_CORE_RECEIVED: "远程 Core 交接已验证并接收", REMOTE_CORE_REPLAY: "返回原远程任务", REMOTE_CORE_REQUESTED: "已发起远程健康检查", REMOTE_CORE_FAILED: "远程检查已暂停" });
 const node = (tag, text, className) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (className) e.className = className; return e; };
 const notice = (text, error = false) => { $("notice").textContent = text; $("notice").classList.toggle("error", error); };
 async function api(route, data) {
@@ -28,6 +30,9 @@ function renderButtons() {
   $("create").disabled = busy || !csrf;
   $("run-attack").disabled = busy || !csrf;
   $("run-model").disabled = busy || !csrf || modelConfiguration?.configured !== true;
+  $("run-core").disabled = busy || !csrf;
+  $("check-core").disabled = busy || !csrf;
+  $("repeat-core").disabled = busy || !csrf || !coreRequestKey;
   $("import-handoff").disabled = busy || !csrf;
   $("load-handoff-example").disabled = busy || !csrf;
   $("update").disabled = busy || !record;
@@ -47,9 +52,10 @@ function numeric(m) {
 function render() {
   if (!record) return;
   const imported = record.handoff_import;
-  $("handoff-status").textContent = imported ? "已导入本会话，来源尚未认证。可以查看检查与审计，不能确认或执行此导入任务。" : "当前任务由本工作台生成。";
+  $("handoff-status").textContent = imported?.provenance === "PINNED_HTTPS_CORE_RESPONSE" ? "已由服务端直接接收队友在线 Core 响应，来源已核实。当前契约仅用于只读风险复核。" : imported ? "已导入本会话，来源尚未认证。可以查看检查与审计，不能确认或执行此导入任务。" : "当前任务由本工作台生成。";
   $("handoff-lineage").hidden = !imported;
   $("handoff-lineage").textContent = imported ? JSON.stringify({ source: imported.source, source_digest: imported.source_digest, local_task_id: taskId(), provenance: imported.provenance }, null, 2) : "";
+  if (imported?.service_receipt) $("remote-core-evidence").textContent = JSON.stringify({ source: imported.source, local_task_id: taskId(), service_receipt: imported.service_receipt }, null, 2);
   const policy = lastExecution?.policy || record.policy;
   $("policy-decision").textContent = policy ? `${labels[policy.decision]} · ${policy.decision}` : "旧任务需要重新检查";
   $("policy-decision").className = `status ${policy?.decision || "empty"}`;
@@ -97,6 +103,33 @@ $("load-handoff-example").addEventListener("click", () => action(async () => {
   $("handoff-json").value = JSON.stringify(await api("/api/safety/handoffs/example"), null, 2);
   $("handoff-status").textContent = "已载入记录的虚构 Core 输出，尚未提交或创建任务。";
 }));
+$("check-core").addEventListener("click", () => action(async () => {
+  $("remote-core-status").textContent = "连接检查中";
+  try {
+    const state = await api("/api/safety/core-status");
+    $("remote-core-status").textContent = "远程 Core 已连接"; $("remote-core-status").className = "status ALLOW";
+    $("remote-core-note").textContent = `健康检查正常，可运行只读交接。检查时间：${new Date(state.checked_at).toLocaleString("zh-CN")}。`;
+  } catch (error) { $("remote-core-status").textContent = "连接暂不可用"; $("remote-core-status").className = "status ERROR"; $("remote-core-note").textContent = error.message; throw error; }
+}));
+async function runCore(repeat) {
+  if (!repeat) coreRequestKey = crypto.randomUUID();
+  $("remote-core-status").textContent = "等待远程检查";
+  $("remote-core-note").textContent = "正在请求队友后端并保存交接证据，请稍候。";
+  try {
+    const result = await api("/api/safety/core-handoff", { request_key: coreRequestKey });
+    record = { input: { binding: { task_id: result.task_id } } }; lastExecution = null; executionKey = null; dirty = false; $("whole-plan").checked = false;
+    await reload();
+    $("remote-core-status").textContent = "已接收远程 Core 结果"; $("remote-core-status").className = "status ALLOW";
+    $("remote-core-note").textContent = result.replay ? "已返回上次任务，没有再次调用队友后端。" : "本次真实远程调用完成。下方已展示 Risk 复核与原始来源，执行资格仍受只读契约限制。";
+    notice("队友在线 Core → 风险复核 → 审计已接通。");
+  } catch (error) {
+    $("remote-core-status").textContent = "远程检查已暂停"; $("remote-core-status").className = "status ERROR"; $("remote-core-note").textContent = error.message;
+    try { $("remote-core-evidence").textContent = JSON.stringify(await api("/api/safety/core-requests"), null, 2); } catch { /* Keep the primary failure visible. */ }
+    throw error;
+  }
+}
+$("run-core").addEventListener("click", () => action(() => runCore(false)));
+$("repeat-core").addEventListener("click", () => action(() => runCore(true)));
 $("import-handoff").addEventListener("click", () => action(async () => {
   let parsed;
   try { parsed = JSON.parse($("handoff-json").value); } catch { throw new Error("JSON 格式无效，请复制完整 Core 响应。"); }

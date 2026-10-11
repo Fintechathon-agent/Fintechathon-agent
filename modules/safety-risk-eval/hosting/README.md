@@ -6,6 +6,8 @@
 
 ## 文件与运行
 
+2026-10-11 已接通队友远程 Core：`GET /api/safety/core-status`、`POST /api/safety/core-handoff`、`GET /api/safety/core-requests`。服务端固定 HTTPS 地址，保留只读权限，不代替真实模型接入。接口和审计说明见 [远程 Core 联调](../../../docs/safety-risk-eval/远程Core联调-v0.1.md)。`check-remote-core.cjs` 通过 `RISK_BASE_URL` 指定站点、`RISK_REMOTE_REPORT` 指定报告路径，调用真实后端验证。
+
 - `worker.mjs`：HTTPS 接口、会话归属和浏览器确认校验，提供原投资组合页面与风控页面。
 - 部署内的投资组合导航返回 `/risk`；未部署的店主入口不出现在本演示中。旧 `/merchant` 地址返回 `/investment`，不修改队友的原页面。
 - `cloud-store.mjs`：D1 持久化、会话租约、审计链及中断执行恢复。

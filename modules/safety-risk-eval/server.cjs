@@ -10,6 +10,7 @@ const { runAttackDemo } = require("./security.cjs");
 const policy = require("./policy.cjs");
 const handoffReceiver = require("./handoff/receiver.cjs");
 const modelAgent = require("./model-agent.cjs");
+const remoteCore = require("./handoff/remote.cjs");
 const baseRequest = require("../../chenchen/contracts/examples/health-check.request.json");
 const { server: originalServer, harness } = require("../../chenchen/server.js");
 const originalHandler = originalServer.listeners("request")[0];
@@ -28,8 +29,9 @@ function profile(data) {
   return { confirmed: data.confirmed, reserveCash: data.reserve_cash, maxDrawdown: data.max_drawdown, forbidden: data.forbidden, planId: data.plan_id };
 }
 
-function createApplication({ directory = path.join(__dirname, ".runtime"), store = new JournalStore(directory), executePlan = adapter.executePlan, modelEnv = process.env, modelFetch = fetch } = {}) {
+function createApplication({ directory = path.join(__dirname, ".runtime"), store = new JournalStore(directory), executePlan = adapter.executePlan, modelEnv = process.env, modelFetch = fetch, coreFetch = fetch } = {}) {
   const modelBusy = new Set();
+  const coreBusy = new Set();
   const gateway = new ActionGateway({ store, projectPlan: adapter.projectPlan, executePlan, onSuccess: (record, result) => harness.saveMemory(record.input.binding.task_id, { type: "decision", consent: true, key: "paper_execution", value: { receipt_id: result.receipt.receipt_id, mode: result.mode, risk_check_id: record.review.risk_check_id } }) });
   function session(req, res) {
     const cookie = /(?:^|;\s*)risk_session=([a-f0-9-]{36})/.exec(req.headers.cookie || "")?.[1];
@@ -70,6 +72,8 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
       if (req.method === "GET" && url.pathname === "/api/safety/session") { send(res, 200, { csrf: s.csrf, user_id: s.user_id, mode: "LOCAL_SYNTHETIC_DEMO" }); return; }
       if (req.method === "GET" && url.pathname === "/api/safety/policy") { send(res, 200, policy.describe()); return; }
       if (req.method === "GET" && url.pathname === "/api/safety/model-status") { send(res, 200, modelAgent.status(modelEnv)); return; }
+      if (req.method === "GET" && url.pathname === "/api/safety/core-status") { send(res, 200, await remoteCore.health(coreFetch)); return; }
+      if (req.method === "GET" && url.pathname === "/api/safety/core-requests") { send(res, 200, store.events.filter(e => e.user_id === s.user_id && e.event_type.startsWith("REMOTE_CORE_"))); return; }
       if (req.method === "GET" && url.pathname === "/api/safety/handoffs/example") { send(res, 200, { import_version: handoffReceiver.VERSION, agent_response: require("./handoff/example.response.json") }); return; }
       if (req.method === "GET" && url.pathname === "/api/demo/portfolio") { originalHandler(req, res); return; }
       if (req.method === "GET" && (url.pathname.startsWith("/api/task/") || url.pathname === "/api/safety/task")) {
@@ -90,6 +94,12 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
       if (req.method !== "POST") throw new GatewayError("NOT_FOUND", "接口不存在。", "ERROR", 404);
       if (req.headers["x-risk-csrf"] !== s.csrf) throw new GatewayError("CSRF_REQUIRED", "缺少当前会话的确认来源标识。", "BLOCK", 403);
       payload = await body(req);
+      if (url.pathname === "/api/safety/core-handoff") {
+        if (coreBusy.has(s.user_id)) throw new GatewayError("CORE_BUSY", "当前会话正在等待 Core 后端，请稍后查看。", "REVIEW", 409);
+        coreBusy.add(s.user_id);
+        try { send(res, 200, await remoteCore.run({ payload, actor: s.user_id, gateway, fetchImpl: coreFetch })); } finally { coreBusy.delete(s.user_id); }
+        return;
+      }
       if (url.pathname === "/api/safety/model-demo") {
         if (modelBusy.has(s.user_id)) throw new GatewayError("MODEL_BUSY", "本会话正在调用模型，请等待结果。", "REVIEW", 409);
         modelBusy.add(s.user_id);

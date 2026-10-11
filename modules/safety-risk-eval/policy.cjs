@@ -4,9 +4,9 @@ const { hash } = require("../../docs/safety-risk-eval/contracts/validate.cjs");
 
 // Trusted server configuration. Neither prompts nor HTTP request bodies can replace it.
 const bundle = Object.freeze({
-  version: "financial-policy-v3",
+  version: "financial-policy-v4",
   implementation: "LOCAL_DETERMINISTIC_POLICY",
-  rules: Object.freeze(["DEFAULT_DENY", "SAME_OWNER", "NO_EXTERNAL_AUTHORITY", "NO_REAL_TRADE", "BOUND_APPROVAL", "RISK_ELIGIBLE", "MEMORY_CONSENT", "VERIFIED_HANDOFF_PROVENANCE", "TASK_TOOL_SCOPE"]),
+  rules: Object.freeze(["DEFAULT_DENY", "SAME_OWNER", "NO_EXTERNAL_AUTHORITY", "NO_REAL_TRADE", "BOUND_APPROVAL", "RISK_ELIGIBLE", "MEMORY_CONSENT", "VERIFIED_HANDOFF_PROVENANCE", "TASK_TOOL_SCOPE", "READ_ONLY_HANDOFF_SCOPE"]),
   tools: Object.freeze({
     "portfolio.review": Object.freeze({ scenario: "PORTFOLIO", operation: "ANALYZE", effect: "READ_ONLY" }),
     paper_trade: Object.freeze({ scenario: "SIMULATION", operation: "PAPER_TRADE", effect: "SIMULATED_WRITE" }),
@@ -33,6 +33,7 @@ function decide(input, policy = currentPolicy(), now = new Date().toISOString())
     if (input.source !== "USER") add("POLICY_UNTRUSTED_AUTHORITY", "外部内容只能作为业务数据，不能发起有权限的操作。", "保留原文作为证据，由用户独立发起任务。");
     if (input.allowed_tools !== undefined && (!Array.isArray(input.allowed_tools) || !input.allowed_tools.includes(input.tool))) add("POLICY_TASK_SCOPE_EXCEEDED", "本次用户仅授权分析，模型输出不能扩大工具权限。", "保留原始模型动作作为证据；需要模拟操作时，由用户另建计划并检查与确认。");
     if (input.provenance_verified === false) add("POLICY_HANDOFF_UNVERIFIED", "交接包来源尚未认证，允许查看评审，禁止取得执行授权。", "由团队接通可信 Core 服务身份验证；用户确认不能替代来源验证。");
+    if (input.handoff_read_only === true) add("POLICY_CORE_READ_ONLY", "已核实本次响应来自队友后端，当前交接约定仅用于只读复核。", "查看 Risk 结论与证据；待团队确认执行交接契约后接入模拟授权。");
     if (input.operation === "REAL_TRADE") add("POLICY_REAL_TRADE_DISABLED", "此环境禁止真实交易。", "仅使用模拟操作。");
     const tool = policy.tools[input.tool];
     if (!Object.hasOwn(policy.tools, input.tool) || !tool || tool.scenario !== input.scenario || tool.operation !== input.operation) add("POLICY_TOOL_NOT_ALLOWED", "工具、场景与操作类型不在允许组合内。", "通过团队评审登记工具及其执行边界。");
