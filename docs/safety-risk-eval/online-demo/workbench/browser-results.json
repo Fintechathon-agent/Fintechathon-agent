@@ -1,0 +1,39 @@
+{
+  "scope": "Synthetic integration browser interactions, not live trading",
+  "base_url": "https://fund-risk-workbench.panxintian44.chatgpt.site",
+  "cases": [
+    {
+      "name": "normal-confirm-execute-replay",
+      "passed": true
+    },
+    {
+      "name": "profile-change-invalidates",
+      "passed": true
+    },
+    {
+      "name": "review-needs-item-acceptance",
+      "passed": true
+    },
+    {
+      "name": "hard-block-controls-disabled",
+      "passed": true
+    },
+    {
+      "name": "missing-trading-plan-fails-closed",
+      "passed": true
+    },
+    {
+      "name": "prompt-injection-blocked-with-visible-audit",
+      "passed": true
+    },
+    {
+      "name": "untrusted-html-rendered-as-text",
+      "passed": true
+    },
+    {
+      "name": "team-page-to-risk-unconfirmed-handoff",
+      "passed": true
+    }
+  ],
+  "page_errors": []
+}

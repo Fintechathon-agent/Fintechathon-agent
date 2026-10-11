@@ -1,0 +1,43 @@
+{
+  "scope": "Synthetic integration browser interactions, not live trading",
+  "base_url": "http://127.0.0.1:8781",
+  "cases": [
+    {
+      "name": "server-policy-manifest-and-honest-runtime-scope",
+      "passed": true
+    },
+    {
+      "name": "normal-confirm-execute-replay",
+      "passed": true
+    },
+    {
+      "name": "profile-change-invalidates",
+      "passed": true
+    },
+    {
+      "name": "review-needs-item-acceptance",
+      "passed": true
+    },
+    {
+      "name": "hard-block-controls-disabled",
+      "passed": true
+    },
+    {
+      "name": "missing-trading-plan-fails-closed",
+      "passed": true
+    },
+    {
+      "name": "prompt-injection-blocked-with-visible-audit",
+      "passed": true
+    },
+    {
+      "name": "untrusted-html-rendered-as-text",
+      "passed": true
+    },
+    {
+      "name": "team-page-to-risk-unconfirmed-handoff",
+      "passed": true
+    }
+  ],
+  "page_errors": []
+}

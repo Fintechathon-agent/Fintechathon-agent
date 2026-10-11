@@ -1,0 +1,11 @@
+{
+  "base_url": "https://fund-risk-workbench.panxintian44.chatgpt.site",
+  "scope": "Deployed synthetic policy enforcement; not OPA or live trading",
+  "policy_digest": "b27fd3faa0916b386e397711c420789e03a6ca08987d846c8a2b83cfdf1e86a8",
+  "cases": [
+    "deployed-policy-manifest",
+    "bound-confirmation-and-server-execution",
+    "untrusted-authority-zero-tool-calls"
+  ],
+  "page_errors": []
+}

@@ -1,0 +1,11 @@
+{
+  "scope": "Published synthetic demo access checks",
+  "base_url": "https://fund-risk-workbench.panxintian44.chatgpt.site",
+  "cases": [
+    "isolated visitor sessions",
+    "missing CSRF rejected",
+    "other visitor cannot read task or audit or export",
+    "client authority field rejected"
+  ],
+  "passed": true
+}
