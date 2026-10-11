@@ -1,12 +1,10 @@
 "use strict";
 
-const fs = require("node:fs");
-const path = require("node:path");
 const crypto = require("node:crypto");
 
 const CONTRACT_VERSION = "investment-agent.v1";
 const OPERATION = "PORTFOLIO_HEALTH_CHECK";
-const schema = JSON.parse(fs.readFileSync(path.join(__dirname, "investment-agent.v1.schema.json"), "utf8"));
+const schema = require("./investment-agent.v1.schema.json");
 
 class ContractError extends Error {
   constructor(message, details = {}) {

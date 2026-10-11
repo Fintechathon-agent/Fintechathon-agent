@@ -1,33 +1,3 @@
-__pycache__/
-*.pyc
-.env
-.env.*
-config.yaml
-*.log
-data/history/*.json
-
-# 金融 Agent 运行时产物（每次 demo 都会重新生成）
-data/memory/
-data/audit/
-data/approvals/
-data/paper_trades/
-data/breaker/
-data/test_runtime/
-
-# Daily Market Brief 本地凭证（含密钥，勿提交）
-brief/feishu.local.json
-
-# 中转站/relay 配置（本机专用，不入库）
-config.relay.yaml
-config.fund.relay.yaml
-
-# 比赛参考资料：只提交赛题要求，他队作品包与临时下载不入库
-data/contest/*
-!data/contest/赛题要求.txt
-
-# Daily Market Brief 生成物：飞书全量备份与预览图可再生，不入库
-brief/out/feishu_backup_*
-brief/out/*.png
-
-# 微信群分析报告：仅保留本地，不同步 GitHub
-docs/KOSX三队微信群状态分析_*.md
+.wrangler/
+.wrangler-dry-run/
+chenchen/.wrangler-dry-run/

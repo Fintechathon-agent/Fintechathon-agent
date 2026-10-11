@@ -4,31 +4,32 @@
 
 当前 Core Agent 已准备好公网 API，但公网地址必须由托管平台创建。GitHub Pages 只能发布前端，不能运行 Node.js 后端。
 
-本仓库已经加入 `render.yaml`，推荐使用 Render Web Service。Render 会给服务分配固定的 `onrender.com` 地址；免费服务会在一段时间无访问后休眠，首次访问可能需要等待唤醒。
+本仓库已经加入 `wrangler.toml` 和 Cloudflare Worker 入口，推荐直接部署到 Cloudflare Workers。Cloudflare 会给 Worker 分配 `workers.dev` 公网地址，前端和 Risk 工作台都可以通过 HTTPS 调用。
 
-## 一键部署
+## Cloudflare 部署
 
-登录自己的 Render 账号后打开：
+在仓库根目录执行：
 
-https://render.com/deploy?repo=https://github.com/realchenchenluo/agent
+```powershell
+npx wrangler login
+npx wrangler deploy
+```
 
-确认使用仓库根目录的 `render.yaml`。它会自动使用：
+`wrangler login` 会打开 Cloudflare 授权页；登录完成后，`wrangler deploy` 会读取根目录的 `wrangler.toml` 并发布 Worker。部署成功后终端会输出类似：
 
-- Root Directory：`chenchen`
-- Build Command：`npm install --omit=dev`
-- Start Command：`npm run start:public`
-- Health Check：`/health`
-- CORS：允许安全攻防与风控工作台来源，以及个人 Pages 来源
+`https://personal-ai-fund-manager-core-agent.<你的账户>.workers.dev`
 
-部署完成后，Render 页面会显示类似下面的地址：
+Cloudflare Workers 官方支持用 `wrangler login` 授权和 `wrangler deploy` 发布；本项目启用了 Node.js compatibility，让 Worker 可以复用现有 Core Agent 的 `node:crypto` 等模块。
 
-`https://personal-ai-fund-manager-core-agent.onrender.com`
+也可以在 Cloudflare Dashboard 的 Workers & Pages 中导入仓库，构建配置以仓库根目录的 `wrangler.toml` 为准。
 
-实际地址以 Render 控制台显示为准，代码仓库无法提前知道平台分配的域名。
+## 目前保留的其他部署配置
+
+`render.yaml` 仍保留作为备用方案，但不需要使用 Render。GitHub Pages 的前端演示也继续保留，不会被 Worker 覆盖。
 
 ## Risk 工作台调用地址
 
-将下面的 `CORE_AGENT_BASE_URL` 替换为 Render 给出的地址：
+将下面的 `CORE_AGENT_BASE_URL` 替换为 Cloudflare Workers 给出的地址：
 
 ```js
 const response = await fetch(`${CORE_AGENT_BASE_URL}/api/risk-workbench/handoff`, {

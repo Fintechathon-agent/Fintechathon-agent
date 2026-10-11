@@ -1,0 +1,8 @@
+name = "personal-ai-fund-manager-core-agent"
+main = "cloudflare/worker.js"
+compatibility_date = "2026-10-11"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[vars]
+CORS_ORIGINS = "https://fund-risk-workbench.panxintian44.chatgpt.site,https://realchenchenluo.github.io"
