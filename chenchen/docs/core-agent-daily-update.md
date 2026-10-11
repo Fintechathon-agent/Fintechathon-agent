@@ -4,6 +4,43 @@
 
 ## 2026-10-11
 
+### 22:00 自动化收尾核验（本轮新增记录）
+
+**今日真实产出**：核对今天四个主链路提交（Cloudflare Worker 公网后端、Risk Workbench 公网调用、CORS/部署说明），并完成两仓库本地检查、测试、Smoke Test 和公网 HTTP 回放。自动化本轮只更新日报与当天 DOCX，没有修改业务实现、Quant、Memory、Risk 或 UI 规则。
+
+#### A. 已完成的核心接口
+
+| 接口 / 版本 | 生产方 → 消费方 | 当前字段状态 / 证据 |
+| --- | --- | --- |
+| /health / investment-agent.v1 | Cloudflare Worker → Caller/监控 | HTTP 200；status、service、contract_version 可读；public-backend-deployment.md |
+| /api/health-check/run / investment-agent.v1 | Cloudflare Worker → Core Agent Caller | 复用 Harness 与现有 Contract；保留 request/task/session、TaskState、Artifacts、ToolResults、Risk Handoff、Audit Evidence；cloudflare/worker.js |
+| /api/risk-workbench/handoff / core-agent-to-risk-workbench.cloudflare@0.1.0 | Cloudflare Worker → UI/Risk 人工复核 | HTTP 200；返回 agent_response 与只读 risk_workbench；execution_allowed=false；risk-workbench-integration.md、versions/risk-workbench.js |
+| CORS 公网调用 | Worker → GitHub Pages UI | 仅允许配置 Origin；预检和响应携带允许方法/请求头；没有把前端 approval 变成交易授权；cloudflare/worker.js |
+| Error envelope / investment-agent.v1 | Worker → Caller/UI | 保留 code/message/retryable/stage/recovery/details 和 request_id（若请求已带）；失败 task/session/audit 的完整归因仍待 Backend Owner 确认。 |
+
+#### B. 可验证的集成进度
+
+- 团队仓库和个人仓库分别执行 npm run check：均通过。
+- 两仓库分别执行 npm test：均为 52/52 通过，0 失败、0 跳过。
+- 两仓库分别启动本地服务后执行 npm run smoke：页面和静态资源检查均通过（http://127.0.0.1:4175）。
+- 两仓库执行 git diff --check：通过。
+- 公网回放命令使用 Invoke-WebRequest：GET /health 200，GET / 200，POST /api/risk-workbench/handoff 200；响应 contract_version=investment-agent.v1，保留 request/task/session/audit 追踪和 execution_allowed=false。
+- 金融数据仍使用固定演示夹具；本轮没有新增实时行情。若价格与新闻方向冲突，继续保持 REVIEW_REQUIRED，不生成交易动作。
+
+#### C. 需要其他 Owner 配合的阻塞项
+
+| Owner | 待确认字段 / 行为 | 阻塞原因 → 期望产出 |
+| --- | --- | --- |
+| Risk | 外部 Handoff 接收地址、review_status、decision、rejection_reason、audit 回写 | 公网只读 Handoff 已可访问，但没有独立 Risk Consumer 写入/审核闭环 → 版本化接收 Contract 与真实消费测试 |
+| Backend | 失败路径 task/session/audit 归因、续跑事件归因、认证/限流/脱敏 | 公网演示接口可回放，生产级安全与失败追踪尚未验收 → 错误/安全 Contract 和恢复验收 |
+| UI | 公网错误、等待 Risk 审核、只读状态的展示 | UI 已能发起公网调用，但 Risk 回写字段未冻结 → 字段消费清单与等待/失败态验收 |
+| Memory / Quant / Data | Memory 规则边界、Quant 结果版本、真实数据来源/时效/冲突 | 本轮只复用现有 Quant 结果和固定数据，没有改 Memory 或重算 Quant → 各 Owner 确认兼容字段与数据协议 |
+
+**主链路阶段 / 今日结论**：请求 → 公网 Backend → Session/Context → Harness → 现有 Tools/Quant → investment-agent.v1 响应 → Risk Handoff 已可复现；仍停在 HANDOFF_REQUIRED/PENDING_REVIEW，未证明独立 Risk 审核闭环。Core Agent 只调用现有 Quant 结果，未重新计算；未修改 Memory consent、范围、生命周期或清理规则；已经过 Risk 停止边界，execution_allowed=false。request_id、task_id、session_id、Contract version 和 audit_evidence 在成功回放中可追踪，失败和跨请求归因仍有限。
+
+**下一步**：Risk Owner 提供正式接收/回写 Contract；Backend Owner 补齐认证、限流、脱敏和失败事件归因；UI 按统一字段验收等待/错误状态。日报与 DOCX 作为两仓库获准文档产出提交，不修改业务实现来让测试通过。
+
+
 ### 今日结论
 
 Core Agent 已通过 Cloudflare Workers 获得稳定公网后端地址，GitHub Pages 风控工作台已从固定静态结果切换为实时调用公网 Core Agent，并完成线上回放。
