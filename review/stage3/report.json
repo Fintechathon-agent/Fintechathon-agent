@@ -1,0 +1,50 @@
+{
+  "scope": "Frontend rehearsal only; no backend authentication claims",
+  "cases": [
+    {
+      "width": 1440,
+      "passed": true,
+      "checks": [
+        "entry gate",
+        "personal route denial",
+        "create event",
+        "analyst opinion",
+        "supervisor conclusion",
+        "unchanged BLOCK",
+        "notification resync",
+        "audit chain",
+        "private note projection",
+        "safe text rendering",
+        "admin denial",
+        "logout",
+        "reset",
+        "reload",
+        "no overflow",
+        "no external requests"
+      ]
+    },
+    {
+      "width": 375,
+      "passed": true,
+      "checks": [
+        "entry gate",
+        "personal route denial",
+        "create event",
+        "analyst opinion",
+        "supervisor conclusion",
+        "unchanged BLOCK",
+        "notification resync",
+        "audit chain",
+        "private note projection",
+        "safe text rendering",
+        "admin denial",
+        "logout",
+        "reset",
+        "reload",
+        "no overflow",
+        "no external requests"
+      ]
+    }
+  ],
+  "errors": []
+}
