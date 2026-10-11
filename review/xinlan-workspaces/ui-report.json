@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "cases": [
+    "personal dashboard uses public status labels",
+    "direct console route is marked as outside personal preview, not server RBAC",
+    "analyst and supervisor demo workflow preserves BLOCK and prevents duplicate resolution",
+    "same-page workspaces share demo progress and acknowledged notification",
+    "ERROR, missing event, and administrator no-review states",
+    "reset clears local logs and reload does not retain a privileged preview identity",
+    "automated WCAG A/AA checks on dashboard and queue"
+  ],
+  "viewports": [
+    375,
+    768,
+    1440
+  ],
+  "screenshots": [
+    "personal-desktop",
+    "personal-mobile",
+    "console-desktop",
+    "console-mobile",
+    "case-review-desktop"
+  ],
+  "browserErrors": [],
+  "boundary": "UI demonstration only; no server RBAC or API integration tested"
+}
