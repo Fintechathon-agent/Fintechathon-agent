@@ -4,7 +4,7 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "../versions");
-const files = new Set(["xinlan/index.html", "xinlan/workspace.css", "xinlan/workspace.js", "xinlan/model.mjs", "xinlan/team-logo.png", "style.css"]);
+const files = new Set(["xinlan/index.html", "xinlan/journey.html", "xinlan/journey.js", "xinlan/journey.mjs", "xinlan/workspace.css", "xinlan/workspace.js", "xinlan/model.mjs", "xinlan/team-logo.png", "style.css"]);
 const types = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png" };
 function createPreviewServer() {
   return http.createServer((request, response) => {

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark">
+<title>风险闭环演示</title><link rel="icon" href="./team-logo.png?v=feb9fa2a3ea3" type="image/png"><link rel="stylesheet" href="./workspace.css"></head>
+<body>
+<a class="skip" href="#content">跳到主要内容</a>
+<div class="shell"><aside class="sidebar">
+<a class="brand" href="#entry" aria-label="返回演示入口"><img class="team-logo" src="./team-logo.png?v=feb9fa2a3ea3" width="84" height="84" alt="团队标识"></a>
+<p class="workspace-label">ONE PLATFORM · TWO WORKSPACES</p><nav id="navigation" aria-label="演示导航"></nav>
+<p class="sidebar-footer">同一页面内连续演示<br>刷新后全部清空</p></aside>
+<div class="surface"><header class="topbar"><span id="identity">尚未进入演示</span><button id="leave" hidden>退出演示身份</button></header>
+<div class="demo-banner"><span class="demo-pill">本地模拟</span><span>预设风险判定 · 无真实登录或服务端权限 · 不执行交易</span></div>
+<main id="content" tabindex="-1"></main>
+<details class="panel technical-footer"><summary>技术说明与接入状态</summary>
+<p>此入口用于演练同一虚构用户的风险事件及四种角色视角，不收集密码。浏览器内的页面限制可被开发者工具修改，不构成安全边界。真实统一登录与服务端 RBAC 等待技术 Owner 审批。</p>
+<p>判定来自既有固定样例，不是本页运行的风控模型。记录只在当前标签页内同步；不跨设备、不持久化，也不等同于服务端审计。无金融健康数字评分。</p></details>
+<footer class="page-footer"><a href="./index.html">原双工作台预览</a><button id="reset">清空本次演示</button></footer></div></div>
+<script type="module" src="./journey.js"></script></body></html>
