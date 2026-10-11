@@ -1,0 +1,486 @@
+{
+  "passed": true,
+  "sha256": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "favicon": "Original PNG; no derivative or transcoding",
+  "login": "No implemented login screen; current entry is a preview shell",
+  "evidence": [
+    {
+      "page": "personal",
+      "width": 1440,
+      "url": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        84,
+        84
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": true,
+      "corner": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "风险概况 · 金融工作台",
+      "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
+      "favicon": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3"
+    },
+    {
+      "page": "console",
+      "width": 1440,
+      "url": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        84,
+        84
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": true,
+      "corner": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "Risk Overview · 金融工作台",
+      "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
+      "favicon": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3"
+    },
+    {
+      "page": "investment",
+      "width": 1440,
+      "url": "http://127.0.0.1:52904/versions/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        64,
+        64
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": true,
+      "corner": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "投资工作台 · 持仓健康管理",
+      "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
+      "favicon": "http://127.0.0.1:52904/versions/xinlan/team-logo.png?v=feb9fa2a3ea3"
+    },
+    {
+      "page": "personal",
+      "width": 375,
+      "url": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        64,
+        64
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": true,
+      "corner": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "风险概况 · 金融工作台",
+      "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
+      "favicon": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3"
+    },
+    {
+      "page": "console",
+      "width": 375,
+      "url": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        64,
+        64
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": true,
+      "corner": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "Risk Overview · 金融工作台",
+      "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
+      "favicon": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3"
+    },
+    {
+      "page": "investment",
+      "width": 375,
+      "url": "http://127.0.0.1:52904/versions/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        48,
+        48
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": true,
+      "corner": [
+        0,
+        0,
+        0,
+        255
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "投资工作台 · 持仓健康管理",
+      "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
+      "favicon": "http://127.0.0.1:52904/versions/xinlan/team-logo.png?v=feb9fa2a3ea3"
+    }
+  ]
+}

@@ -266,4 +266,6 @@ body.investment-product.result-first .snapshot-card,body.investment-product.resu
 
 body.investment-product.result-first .product-stamp,body.investment-product.result-first .data-strip>span{background:#202126;color:#b5b6c0;border-color:#41424b}body.investment-product.result-first .data-strip .date-warning{background:#30251f;color:#ffcdad}body.investment-product.result-first .next-step-tone{background:#292a31;color:#b5b6c0}
 
-body.investment-product.result-first .brand .team-logo{width:64px;height:64px;object-fit:contain;border-radius:8px}@media(max-width:750px){body.investment-product.result-first .brand .team-logo{width:48px;height:48px}}
+body.investment-product.result-first .brand .team-logo{width:64px;height:64px;object-fit:contain;border-radius:0}@media(max-width:750px){body.investment-product.result-first .brand .team-logo{width:48px;height:48px}}
+
+body.investment-product.result-first .brand .team-logo{object-fit:contain;object-position:center;filter:none;mask:none;clip-path:none;opacity:1;transform:none;border-radius:0;padding:0;border:0}

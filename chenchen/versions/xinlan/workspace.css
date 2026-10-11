@@ -7,4 +7,6 @@
 
 .technical-footer{margin:24px 40px;color:var(--muted);font-size:12px}.technical-footer summary{cursor:pointer;color:var(--text)}@media(max-width:700px){.technical-footer{margin:16px}}
 
-.sidebar .brand .team-logo{width:84px;height:84px;object-fit:contain;border-radius:10px}.sidebar .brand{width:fit-content}.sidebar .workspace-label{margin-top:30px}@media(max-width:700px){.sidebar .brand .team-logo{width:64px;height:64px}.sidebar .workspace-label{margin-top:16px}}
+.sidebar .brand .team-logo{width:84px;height:84px;object-fit:contain;border-radius:0}.sidebar .brand{width:fit-content}.sidebar .workspace-label{margin-top:30px}@media(max-width:700px){.sidebar .brand .team-logo{width:64px;height:64px}.sidebar .workspace-label{margin-top:16px}}
+
+.sidebar .brand .team-logo{object-fit:contain;object-position:center;filter:none;mask:none;clip-path:none;opacity:1;transform:none;border-radius:0;padding:0;border:0}
