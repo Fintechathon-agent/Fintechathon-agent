@@ -11,7 +11,7 @@
     {
       "page": "personal",
       "width": 1440,
-      "url": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "url": "http://127.0.0.1:54103/xinlan/team-logo.png?v=feb9fa2a3ea3",
       "natural": [
         1254,
         1254
@@ -88,12 +88,12 @@
       ],
       "title": "风险概况 · 金融工作台",
       "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
-      "favicon": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3"
+      "favicon": "http://127.0.0.1:54103/xinlan/team-logo.png?v=feb9fa2a3ea3"
     },
     {
       "page": "console",
       "width": 1440,
-      "url": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "url": "http://127.0.0.1:54103/xinlan/team-logo.png?v=feb9fa2a3ea3",
       "natural": [
         1254,
         1254
@@ -170,12 +170,12 @@
       ],
       "title": "Risk Overview · 金融工作台",
       "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
-      "favicon": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3"
+      "favicon": "http://127.0.0.1:54103/xinlan/team-logo.png?v=feb9fa2a3ea3"
     },
     {
       "page": "investment",
       "width": 1440,
-      "url": "http://127.0.0.1:52904/versions/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "url": "http://127.0.0.1:54104/versions/xinlan/team-logo.png?v=feb9fa2a3ea3",
       "natural": [
         1254,
         1254
@@ -243,12 +243,12 @@
       ],
       "title": "投资工作台 · 持仓健康管理",
       "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
-      "favicon": "http://127.0.0.1:52904/versions/xinlan/team-logo.png?v=feb9fa2a3ea3"
+      "favicon": "http://127.0.0.1:54104/versions/xinlan/team-logo.png?v=feb9fa2a3ea3"
     },
     {
       "page": "personal",
       "width": 375,
-      "url": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "url": "http://127.0.0.1:54103/xinlan/team-logo.png?v=feb9fa2a3ea3",
       "natural": [
         1254,
         1254
@@ -325,12 +325,12 @@
       ],
       "title": "风险概况 · 金融工作台",
       "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
-      "favicon": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3"
+      "favicon": "http://127.0.0.1:54103/xinlan/team-logo.png?v=feb9fa2a3ea3"
     },
     {
       "page": "console",
       "width": 375,
-      "url": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "url": "http://127.0.0.1:54103/xinlan/team-logo.png?v=feb9fa2a3ea3",
       "natural": [
         1254,
         1254
@@ -407,12 +407,12 @@
       ],
       "title": "Risk Overview · 金融工作台",
       "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
-      "favicon": "http://127.0.0.1:52903/xinlan/team-logo.png?v=feb9fa2a3ea3"
+      "favicon": "http://127.0.0.1:54103/xinlan/team-logo.png?v=feb9fa2a3ea3"
     },
     {
       "page": "investment",
       "width": 375,
-      "url": "http://127.0.0.1:52904/versions/xinlan/team-logo.png?v=feb9fa2a3ea3",
+      "url": "http://127.0.0.1:54104/versions/xinlan/team-logo.png?v=feb9fa2a3ea3",
       "natural": [
         1254,
         1254
@@ -480,7 +480,7 @@
       ],
       "title": "投资工作台 · 持仓健康管理",
       "servedHash": "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b",
-      "favicon": "http://127.0.0.1:52904/versions/xinlan/team-logo.png?v=feb9fa2a3ea3"
+      "favicon": "http://127.0.0.1:54104/versions/xinlan/team-logo.png?v=feb9fa2a3ea3"
     }
   ]
 }

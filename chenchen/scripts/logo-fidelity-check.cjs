@@ -37,6 +37,8 @@ const hash = bytes => createHash("sha256").update(bytes).digest("hex");
         await page.goto(name === "investment" ? investment+"/investment" : shell+"/xinlan/index.html");
         if(name === "console")await page.locator("#role").selectOption("analyst");
         if(name === "investment")await page.locator("#results").waitFor({state:"visible"});
+        await page.locator("h1").click();
+        await page.evaluate(()=>window.scrollTo(0,0));
         const logo = page.locator("img.team-logo");
         await logo.evaluate(image => image.decode());
         const result = await logo.evaluate(image => {
