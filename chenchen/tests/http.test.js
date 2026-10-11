@@ -12,7 +12,7 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
     const assets=new Set(['/versions/presentation.mjs']);
     for(const route of ['/','/catalog','/investment','/merchant']){
       const html=await fetch(base+route).then(r=>r.text());
-      assert.match(html,/product-overrides\.css/);
+      assert.match(html,route==='/'?/landing\.css/:/product-overrides\.css/);
       for(const match of html.matchAll(/(?:src|href)="(\/versions\/[^"]+)"/g))assets.add(match[1]);
     }
     for(const asset of assets){

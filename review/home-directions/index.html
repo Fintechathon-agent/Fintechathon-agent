@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0a09">
+  <title>Finance Lab · 首页方向评审</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#preview">跳到方向预览</a>
+  <header class="review-bar">
+    <a class="brand" href="?direction=B"><span class="brand-mark" aria-hidden="true">K↗</span><span>FINANCE <b>LAB</b></span></a>
+    <span class="review-label">首页方向评审 <span>08 OCT 2026</span></span>
+  </header>
+  <main>
+    <section class="review-intro" aria-labelledby="review-title">
+      <div><p class="eyebrow">DESIGN REVIEW / 01</p><h1 id="review-title">同一座天平，<br class="mobile-break">三个入口方向。</h1></div>
+      <p>先选怎样讲清投资主链路。<br>独立交互原型 · 正式首页尚未修改</p>
+    </section>
+    <nav class="directions" aria-label="首页方向">
+      <a href="?direction=A" data-direction="A"><span class="option-letter">A</span><span><b>股票 ⇄ 基金 / ETF</b><small>以资产分类进入</small></span></a>
+      <a href="?direction=B" data-direction="B"><span class="option-letter">B</span><span><b>风险 ⇄ 计划确认</b><small>以决策步骤进入 · 建议方向</small></span></a>
+      <a href="?direction=C" data-direction="C"><span class="option-letter">C</span><span><b>单卡 · 收益 / 风险</b><small>以一个投资入口进入</small></span></a>
+    </nav>
+    <section class="preview-shell" id="preview" tabindex="-1" aria-labelledby="preview-title">
+      <div class="preview-top"><span>FINANCE LAB / 首页功能区</span><span class="sample-label">布局样例 · 非业务结果</span></div>
+      <div class="preview-heading"><div><p class="eyebrow" id="preview-eyebrow"></p><h2 id="preview-title"></h2></div><p id="preview-copy"></p></div>
+      <div id="stage"></div>
+      <div class="preview-bottom"><p id="interaction-note" aria-live="polite">点按容器体验天平，装饰液位不代表金额、收益或风险等级。</p><button id="reset" type="button">天平回正 <span aria-hidden="true">↺</span></button></div>
+      <div class="path"><span>导入持仓</span><i aria-hidden="true">→</i><span>风险报告</span><i aria-hidden="true">→</i><span>计划确认</span><i aria-hidden="true">→</i><span>日志留痕</span></div>
+    </section>
+    <section class="direction-summary" aria-labelledby="summary-title">
+      <div><p class="eyebrow">DIRECTION <span id="summary-letter"></span></p><h2 id="summary-title"></h2></div>
+      <div><h3>第 02 张卡怎么变</h3><p id="change-copy"></p></div>
+      <div><h3>保留与改动</h3><p id="cost-copy"></p></div>
+      <div><h3>选择时看这一点</h3><p id="tradeoff-copy"></p></div>
+    </section>
+    <details class="comparison"><summary>展开三种方向对照与评审说明</summary>
+      <div class="compare-grid">
+        <article><h3>A / 资产分类</h3><p>股票与基金 / ETF 并排。适合先找资产，再看组合；两侧最后进入同一投资工作台。</p></article>
+        <article><h3>B / 决策步骤</h3><p>先看风险，再确认完整计划。保留双卡天平，最贴近比赛中“依据 → 确认 → 留痕”的讲述。</p></article>
+        <article><h3>C / 单一入口</h3><p>一个组合健康检查入口。收益 / 风险天平收进卡内；不表示两者可以相抵，也不提供收益承诺。</p></article>
+      </div>
+      <p>三种均下线原型中的店主入口。正式首页、产品导航、工作台与公网演示未改；选定后才统一修改。此处 A / B / C 是布局方向，与投资候选方案 A / B / C 无关。按钮仅打开入口说明，不请求 API、不提交确认、不执行交易。容器交互用于评审布局，正式硬币四来回动画的迁移需在选定后回归。</p>
+    </details>
+  </main>
+  <footer><span>第五板块 / 产品交互与演示</span><span>固定风险规则已发现 · 跨模块 Contract 待确认</span></footer>
+  <dialog id="entry-dialog" aria-labelledby="dialog-title">
+    <form method="dialog"><button class="close" aria-label="关闭入口预览">×</button></form>
+    <p class="eyebrow">ENTRY PREVIEW / 入口示意</p><h2 id="dialog-title"></h2><p id="dialog-copy"></p>
+    <ol id="dialog-steps"></ol><p class="dialog-boundary">仅展示入口结构，未接业务接口。检查通过不等于用户已确认；没有可信回执，不显示成交成功。</p>
+    <form method="dialog"><button class="primary">返回方向预览</button></form>
+  </dialog>
+  <noscript><p>此原型需要 JavaScript 才能切换方向和查看入口说明；没有运行脚本时不会产生任何业务操作。</p></noscript>
+</body>
+</html>

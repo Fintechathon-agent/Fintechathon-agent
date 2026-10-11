@@ -1,3 +1,4 @@
+import { initArchiveWorkbench } from './archive.js';
 import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip, feedback } from "./common.js";
 import { allocationView, userError } from './ui-model.mjs';
 import { dateStatus, planComparison } from "./presentation.mjs";
@@ -15,7 +16,7 @@ function invalidate() {
 }
 async function init() {
   $('#retry-load').hidden = true; $('#load-error').hidden = true;
-  $('#portfolio-total').textContent = '读取中';
+  $('#portfolio-total').textContent = ''; $('#portfolio-total').classList.add('archive-skeleton'); $('#portfolio-total').setAttribute('aria-busy','true');
   const data=await api("/api/demo/portfolio"), p=data.output.snapshot;
   const raw={portfolio_id:p.portfolio_id,as_of:p.as_of,cash:p.cash,positions:p.positions.map(({instrument_id,type,quantity,price,name,sector})=>({instrument_id,type,quantity,price,name,sector}))};
   $("#portfolio-json").value=JSON.stringify(raw,null,2);
@@ -23,7 +24,9 @@ async function init() {
 }
 function renderHoldings(p) {
   const dated=dateStatus(p.as_of,today());
-  const allocation = allocationView(p);
+  const palette=['#eee5d8','#b9ac9a','#8b8074','#655f58','#dad4cc'];
+  const allocation = allocationView(p).map((item,index)=>({...item,color:palette[index%palette.length]}));
+  $('#portfolio-total').classList.remove('archive-skeleton'); $('#portfolio-total').removeAttribute('aria-busy');
   $('#portfolio-total').textContent = money(p.total_value * 100);
   $('#overview-numbers').innerHTML = [['现金储备',money(p.cash*100)],['持仓标的',p.positions.length+' 个'],['现金占比',pct(p.cash_weight)]].map(([label,value])=>'<div><small>'+esc(label)+'</small><strong>'+esc(value)+'</strong></div>').join('');
   $('#allocation-count').textContent = allocation.filter(item=>item.weight>0).length;
@@ -89,7 +92,7 @@ $("#export").onclick=()=>{if(result)downloadLink("/api/task/"+encodeURIComponent
 async function loadPortfolio() {
   try { await init(); }
   catch(error) {
-    $('#portfolio-total').textContent = '暂不可用'; $('#portfolio-stamp').textContent = '数据读取失败';
+    $('#portfolio-total').classList.remove('archive-skeleton'); $('#portfolio-total').removeAttribute('aria-busy'); $('#portfolio-total').textContent = '暂不可用'; $('#portfolio-stamp').textContent = '数据读取失败';
     $('#portfolio-health').textContent = '暂未取得数据，点击下方按钮重试。';
     $('#overview-numbers').textContent = '组合数据未加载。'; $('#allocation-legend').textContent = '暂无可展示数据。';
     $('#load-error').hidden=false; $('#load-error').textContent='数据读取失败：'+error.message;
@@ -98,3 +101,5 @@ async function loadPortfolio() {
 }
 $('#retry-load').onclick = loadPortfolio;
 loadPortfolio();
+
+initArchiveWorkbench();

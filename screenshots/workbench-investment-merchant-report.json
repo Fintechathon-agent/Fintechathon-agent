@@ -1,0 +1,32 @@
+[
+  {
+    "route": "investment",
+    "width": 1440,
+    "status": "passed"
+  },
+  {
+    "route": "investment",
+    "width": 1024,
+    "status": "passed"
+  },
+  {
+    "route": "investment",
+    "width": 375,
+    "status": "passed"
+  },
+  {
+    "route": "merchant",
+    "width": 1440,
+    "status": "passed"
+  },
+  {
+    "route": "merchant",
+    "width": 1024,
+    "status": "passed"
+  },
+  {
+    "route": "merchant",
+    "width": 375,
+    "status": "passed"
+  }
+]

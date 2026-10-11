@@ -4,8 +4,8 @@ const fs = require("node:fs"), path = require("node:path");
 const base = "http://127.0.0.1:" + (process.env.PORT || 4175);
 (async()=>{
   for (const [route,file] of [
-    ["/","versions/investment.html"],["/catalog","versions/home.html"],["/investment","versions/investment.html"],["/merchant","versions/merchant.html"],
-    ...["style.css","product-overrides.css","kosx.css","favicon.svg","common.js","ui-model.mjs","presentation.mjs","investment.js","merchant.js"].map(file=>["/versions/"+file,"versions/"+file])
+    ["/","versions/landing.html"],["/catalog","versions/home.html"],["/investment","versions/investment.html"],["/merchant","versions/merchant.html"],
+    ...["landing.css","landing.js","glass.css","style.css","product-overrides.css","kosx.css","favicon.svg","common.js","ui-model.mjs","presentation.mjs","investment.js","merchant.js"].map(file=>["/versions/"+file,"versions/"+file])
   ]) {
     const response=await fetch(base+route,{signal:AbortSignal.timeout(5000)});
     if(!response.ok)throw new Error(route+" HTTP "+response.status+"; stop the old server and restart npm start.");

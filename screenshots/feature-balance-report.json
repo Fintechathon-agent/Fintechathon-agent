@@ -1,0 +1,14 @@
+[
+  {
+    "width": 1440,
+    "status": "passed"
+  },
+  {
+    "width": 1024,
+    "status": "passed"
+  },
+  {
+    "width": 375,
+    "status": "passed"
+  }
+]

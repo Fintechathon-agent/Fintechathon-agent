@@ -1,0 +1,85 @@
+{
+  "scope": "Isolated home directions only; no backend integration",
+  "cases": [
+    {
+      "width": 1440,
+      "direction": "A",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 1440,
+      "direction": "B",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 1440,
+      "direction": "C",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 1024,
+      "direction": "A",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 1024,
+      "direction": "B",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 1024,
+      "direction": "C",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 375,
+      "direction": "A",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 375,
+      "direction": "B",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 375,
+      "direction": "C",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 320,
+      "direction": "A",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 320,
+      "direction": "B",
+      "result": "passed",
+      "accessibilityViolations": 0
+    },
+    {
+      "width": 320,
+      "direction": "C",
+      "result": "passed",
+      "accessibilityViolations": 0
+    }
+  ],
+  "additional": [
+    "Back and reload",
+    "Unknown URL value is not rendered",
+    "Reduced motion",
+    "Keyboard navigation",
+    "HTTP read-only isolation"
+  ],
+  "jsonExamples": 3
+}

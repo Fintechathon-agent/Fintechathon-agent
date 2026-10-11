@@ -1,6 +1,6 @@
 {
   "name": "portfolio-sentinel",
-  "version": "0.11.0",
+  "version": "0.12.1",
   "private": true,
   "description": "Portfolio Sentinel and evidence-first merchant finance demos",
   "scripts": {
@@ -9,7 +9,9 @@
     "check": "node scripts/check.js",
     "test": "node --test",
     "smoke": "node scripts/smoke.js",
-    "test:ui": "node scripts/ui-check.cjs"
+    "test:ui": "node scripts/ui-check.cjs",
+    "build:static": "node scripts/build-static.cjs",
+    "test:static": "node scripts/static-check.cjs"
   },
   "engines": {
     "node": ">=22"
