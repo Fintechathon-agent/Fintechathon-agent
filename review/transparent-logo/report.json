@@ -1,0 +1,650 @@
+{
+  "passed": true,
+  "sha256": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "favicon": "Transparent derivative, user-approved background removal",
+  "login": "No implemented login screen; current entry is a preview shell",
+  "evidence": [
+    {
+      "page": "personal",
+      "width": 1440,
+      "url": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        84,
+        84
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": false,
+      "corner": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "风险概况 · 金融工作台",
+      "servedHash": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+      "favicon": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b"
+    },
+    {
+      "page": "console",
+      "width": 1440,
+      "url": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        84,
+        84
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": false,
+      "corner": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "Risk Overview · 金融工作台",
+      "servedHash": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+      "favicon": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b"
+    },
+    {
+      "page": "investment",
+      "width": 1440,
+      "url": "http://127.0.0.1:56175/versions/xinlan/team-logo-transparent.png?v=fba7a4e1b36b",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        64,
+        64
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": false,
+      "corner": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "投资工作台 · 持仓健康管理",
+      "servedHash": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+      "favicon": "http://127.0.0.1:56175/versions/xinlan/team-logo-transparent.png?v=fba7a4e1b36b"
+    },
+    {
+      "page": "journey",
+      "width": 1440,
+      "url": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        84,
+        84
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": false,
+      "corner": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "风险闭环演示",
+      "servedHash": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+      "favicon": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b"
+    },
+    {
+      "page": "personal",
+      "width": 375,
+      "url": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        64,
+        64
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": false,
+      "corner": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "风险概况 · 金融工作台",
+      "servedHash": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+      "favicon": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b"
+    },
+    {
+      "page": "console",
+      "width": 375,
+      "url": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        64,
+        64
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": false,
+      "corner": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "Risk Overview · 金融工作台",
+      "servedHash": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+      "favicon": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b"
+    },
+    {
+      "page": "investment",
+      "width": 375,
+      "url": "http://127.0.0.1:56175/versions/xinlan/team-logo-transparent.png?v=fba7a4e1b36b",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        48,
+        48
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": false,
+      "corner": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "投资工作台 · 持仓健康管理",
+      "servedHash": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+      "favicon": "http://127.0.0.1:56175/versions/xinlan/team-logo-transparent.png?v=fba7a4e1b36b"
+    },
+    {
+      "page": "journey",
+      "width": 375,
+      "url": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b",
+      "natural": [
+        1254,
+        1254
+      ],
+      "rendered": [
+        64,
+        64
+      ],
+      "fit": "contain",
+      "position": "50% 50%",
+      "radius": "0px",
+      "opaque": false,
+      "corner": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "ancestors": [
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "clip",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        },
+        {
+          "filter": "none",
+          "mask": "none",
+          "clip": "none",
+          "opacity": "1",
+          "transform": "none",
+          "overflow": "visible",
+          "containsLogo": true
+        }
+      ],
+      "title": "风险闭环演示",
+      "servedHash": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+      "favicon": "http://127.0.0.1:56174/xinlan/team-logo-transparent.png?v=fba7a4e1b36b"
+    }
+  ]
+}

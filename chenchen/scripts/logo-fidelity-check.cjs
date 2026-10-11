@@ -6,15 +6,15 @@ const { createHash } = require("node:crypto");
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
 const { createPreviewServer } = require("./xinlan-preview.cjs");
 const { server: core } = require("../server");
-const expected = "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b";
+const expected = "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6";
 const hash = bytes => createHash("sha256").update(bytes).digest("hex");
 (async () => {
-  const file = path.resolve(__dirname, "../versions/xinlan/team-logo.png");
+  const file = path.resolve(__dirname, "../versions/xinlan/team-logo-transparent.png");
   const original = fs.readFileSync(file);
   assert.equal(hash(original), expected);
   assert.equal(original.readUInt32BE(16), 1254);
   assert.equal(original.readUInt32BE(20), 1254);
-  if (process.env.LOGO_SOURCE) assert.equal(hash(fs.readFileSync(process.env.LOGO_SOURCE)), expected);
+  if (process.env.LOGO_SOURCE) assert.equal(hash(fs.readFileSync(process.env.LOGO_SOURCE)), "feb9fa2a3ea39e41230ebc67f604141fa7f07c353d2f13b68f91ca43418fbe7b");
   const preview = createPreviewServer();
   let browser;
   const evidence = [];
@@ -27,18 +27,18 @@ const hash = bytes => createHash("sha256").update(bytes).digest("hex");
     const page = await context.newPage();
     const browserImages = new Map();
     page.on("response", response => {
-      if(new URL(response.url()).pathname.endsWith("/team-logo.png"))browserImages.set(response.url(),response);
+      if(new URL(response.url()).pathname.endsWith("/team-logo-transparent.png"))browserImages.set(response.url(),response);
     });
     const out = process.env.LOGO_SCREENSHOTS;
     if(out)fs.mkdirSync(out,{recursive:true});
     for(const width of [1440,375]) {
       await page.setViewportSize({width,height:1000});
-      for(const name of ["personal","console","investment"]) {
-        await page.goto(name === "investment" ? investment+"/investment" : shell+"/xinlan/index.html");
+      for(const name of ["personal","console","investment","journey"]) {
+        await page.goto(name === "investment" ? investment+"/investment" : shell+(name === "journey" ? "/xinlan/journey.html" : "/xinlan/index.html"));
         if(name === "console")await page.locator("#role").selectOption("analyst");
         if(name === "investment")await page.locator("#results").waitFor({state:"visible"});
         await page.locator("h1").click();
-        await page.evaluate(()=>window.scrollTo(0,0));
+        await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo(0,0);});
         const logo = page.locator("img.team-logo");
         await logo.evaluate(image => image.decode());
         const result = await logo.evaluate(image => {
@@ -56,7 +56,7 @@ const hash = bytes => createHash("sha256").update(bytes).digest("hex");
         });
         assert.deepEqual(result.natural,[1254,1254]); assert.equal(result.rendered[0],result.rendered[1]);
         assert.equal(result.fit,"contain");assert.equal(result.position,"50% 50%");assert.equal(result.radius,"0px");
-        assert.equal(result.opaque,true);assert.deepEqual(result.corner,[0,0,0,255]);
+        assert.equal(result.opaque,false);assert.deepEqual(result.corner,[0,0,0,0]);
         for(const ancestor of result.ancestors) {
           assert.equal(ancestor.filter,"none");assert.equal(ancestor.mask,"none");assert.equal(ancestor.clip,"none");assert.equal(ancestor.opacity,"1");assert.equal(ancestor.transform,"none");
           if(["hidden","clip"].includes(ancestor.overflow))assert.equal(ancestor.containsLogo,true,"Logo must fit entirely inside any clipped ancestor");
@@ -74,9 +74,9 @@ const hash = bytes => createHash("sha256").update(bytes).digest("hex");
         evidence.push({page:name,width,...result,servedHash,favicon});
       }
     }
-    const report={passed:true,sha256:expected,dimensions:[1254,1254],favicon:"Original PNG; no derivative or transcoding",login:"No implemented login screen; current entry is a preview shell",evidence};
+    const report={passed:true,sha256:expected,dimensions:[1254,1254],favicon:"Transparent derivative, user-approved background removal",login:"No implemented login screen; current entry is a preview shell",evidence};
     if(out)fs.writeFileSync(path.join(out,"report.json"),JSON.stringify(report,null,2)+"\n");
-    console.log(JSON.stringify({passed:true,sha256:expected,pages:6,opaque:true,originalBytesServed:true}));
+    console.log(JSON.stringify({passed:true,sha256:expected,pages:8,opaque:false,derivativeBytesServed:true}));
   } finally {
     if(browser)await browser.close();
     await Promise.all([preview,core].filter(server=>server.listening).map(server=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);})));
