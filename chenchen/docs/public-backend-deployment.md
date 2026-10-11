@@ -17,7 +17,9 @@ npx wrangler deploy
 
 `wrangler login` 会打开 Cloudflare 授权页；登录完成后，`wrangler deploy` 会读取根目录的 `wrangler.toml` 并发布 Worker。部署成功后终端会输出类似：
 
-`https://personal-ai-fund-manager-core-agent.<你的账户>.workers.dev`
+本次已经发布的公网地址：
+
+`https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev`
 
 Cloudflare Workers 官方支持用 `wrangler login` 授权和 `wrangler deploy` 发布；本项目启用了 Node.js compatibility，让 Worker 可以复用现有 Core Agent 的 `node:crypto` 等模块。
 
@@ -29,7 +31,7 @@ Cloudflare Workers 官方支持用 `wrangler login` 授权和 `wrangler deploy` 
 
 ## Risk 工作台调用地址
 
-将下面的 `CORE_AGENT_BASE_URL` 替换为 Cloudflare Workers 给出的地址：
+本项目在线风控工作台已经使用上面的公网地址；Risk Owner 如果接入自己的前端或后端，也使用同一个地址：
 
 ```js
 const response = await fetch(`${CORE_AGENT_BASE_URL}/api/risk-workbench/handoff`, {
@@ -56,7 +58,7 @@ const handoff = await response.json();
 
 部署完成后，在浏览器打开：
 
-`https://你的服务地址.onrender.com/health`
+`https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/health`
 
 应返回：
 

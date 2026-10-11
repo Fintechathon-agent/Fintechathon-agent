@@ -76,4 +76,4 @@ GitHub Pages 公开演示：
 
 https://realchenchenluo.github.io/agent/risk-workbench/
 
-公开页使用固定演示 JSON，只读展示同一份 Handoff 结果，不连接后端；需要真实运行 Core Agent 时仍使用本地地址。
+公开页已经通过 CORS 调用 Cloudflare Core Agent 公网后端；本地地址仍保留，用于本地调试。两者都只返回 Risk 复核所需的只读 Handoff，不允许执行。

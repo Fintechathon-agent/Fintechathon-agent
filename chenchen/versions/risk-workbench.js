@@ -2,6 +2,7 @@ import { $, esc, api, healthCheckRequest } from "./common.js";
 
 const profile = { investment_horizon_days: 365, max_drawdown: 0.1, liquidity_need: "medium" };
 const staticDemo = location.hostname.endsWith("github.io");
+const publicCoreAgentUrl = "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev";
 const controlLabels = {
   no_execution: "不允许执行：execution_allowed 固定为 false。",
   no_quant_recalculation: "不重算 Quant：市场和风险上下文只作为证据交接。",
@@ -45,7 +46,7 @@ function render(result) {
   $("#control-list").innerHTML = Object.entries(bridge.controls).map(([key, value]) => "<li class=\"" + (value ? "is-on" : "is-off") + "\"><strong>" + (value ? "已启用" : "未启用") + "</strong>" + esc(controlLabels[key] || key) + "</li>").join("");
   $("#handoff-json").textContent = JSON.stringify(bridge, null, 2);
   $("#bridge-message").textContent = result.static_demo
-    ? "GitHub Pages 静态演示：这里展示固定联调结果；本地版会真实调用 Core Agent。"
+    ? "GitHub Pages 已连接 Cloudflare Core Agent：本次结果由公网后端实时生成。"
     : "Core Agent 已完成 " + result.agent_response.task_state.stage + "；可以打开远程工作台进行人工复核。";
   $("#bridge-result").scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -57,7 +58,14 @@ $("#run-bridge").addEventListener("click", async () => {
   try {
     let result;
     if (staticDemo) {
-      result = { static_demo: true, agent_response: { task_state: { stage: "RISK_CHECK" } }, risk_workbench: await fetch("./risk-workbench-demo.json").then(response => response.json()) };
+      const request = healthCheckRequest({ riskProfile: profile, portfolio: null });
+      const response = await fetch(publicCoreAgentUrl + "/api/risk-workbench/handoff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ request })
+      });
+      if (!response.ok) throw new Error("公网 Core Agent 返回 HTTP " + response.status);
+      result = { ...(await response.json()), static_demo: true };
     } else {
       const portfolio = await api("/api/demo/portfolio");
       const request = healthCheckRequest({ riskProfile: profile, portfolio: portfolio.output.snapshot });
