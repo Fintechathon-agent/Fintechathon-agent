@@ -35,7 +35,7 @@ function rows(events, internal = false) {
 }
 function dashboard() {
   const summary = overview(state.events);
-  return heading("YOUR FINANCIAL PERSPECTIVE", "看清风险，再做决定。", "每一条提醒都有解释，每一步操作都由你确认。", '<a class="primary-link" href="#personal/alerts">查看风险提醒 &nbsp;' + arrow + "</a>") +
+  return heading("YOUR FINANCIAL PERSPECTIVE", "看清风险，再做决定。", "每一条提醒都有解释，每一步操作都由你确认。", '<a class="primary-link" href="http://127.0.0.1:4319/investment">进入投资工作台 &nbsp;' + arrow + "</a>") +
     '<section class="cards" aria-label="模拟风险概况">' +
     metric("需要你关注的提醒", summary.unread, "当前样例未读数量 · 非真实账户", true) +
     metric("等待核实的案例", summary.pending, "包含服务异常与模拟拦截") +

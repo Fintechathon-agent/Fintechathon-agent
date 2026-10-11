@@ -2,6 +2,8 @@
 
 本阶段交付可交互的前端模拟页面，不提供服务端登录、RBAC、银行交易或持久化审计。
 
+组员反馈后的新增入口与运行方式见 [进入即看结果](FEEDBACK-RESULT-FIRST.md)：静态工作台仍为 4318，本机实际 Core 投资页在 4319；该页复用既有 API 自动诊断，尚未接通截图中的内网完整 Agent。
+
 ## 基线与保护范围
 
 - 正式仓库：Fintechathon-agent/Fintechathon-agent。
