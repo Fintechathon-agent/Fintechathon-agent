@@ -598,3 +598,99 @@ button:focus-visible, .tab:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* ============================================================
+   银行 AI 智能体 · 六场景统一入口（2026-10-11）
+   ============================================================ */
+
+.banking { padding: 16px 26px 0; }
+
+.scenario-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+.scenario-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+
+.scenario-chip:hover {
+  border-color: var(--brand-mid);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.scenario-icon { font-size: 18px; }
+.scenario-name { font-weight: 600; color: var(--ink); font-size: 13.5px; }
+.scenario-desc { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+.scenario-tier { font-size: 10.5px; color: var(--gold); }
+
+.banking-tier-matrix { display: flex; flex-direction: column; gap: 6px; margin: 0 0 12px; }
+.btm-row { display: flex; gap: 10px; align-items: baseline; font-size: 12px; }
+.btm-items { color: var(--muted); }
+
+.banking-result { border-top: 1px dashed var(--line-2); padding-top: 12px; margin-top: 12px; }
+.br-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.br-icon { font-size: 18px; }
+
+.quick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 8px 0; }
+.quick-col { background: #fbfdfc; border: 1px solid var(--line-2); border-radius: var(--radius-sm); padding: 10px 12px; }
+.quick-title { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.quick-item { font-size: 12.5px; color: var(--text); padding: 2px 0; }
+
+.sub-title { font-size: 12.5px; font-weight: 600; color: var(--ink); margin: 10px 0 6px; }
+.plain-list { font-size: 12.5px; color: var(--text); }
+
+.cat-row { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.cat-name { width: 64px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+.cat-bar { flex: 1; height: 8px; background: var(--line-2); border-radius: 4px; overflow: hidden; }
+.cat-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--brand-mid), var(--brand)); border-radius: 4px; }
+.cat-val { width: 90px; text-align: right; font-size: 12px; color: var(--text); font-variant-numeric: tabular-nums; }
+
+.anom-row { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; font-size: 12.5px; }
+.anom-warn { color: var(--gold); }
+
+.gate-row { display: flex; gap: 8px; align-items: flex-start; padding: 3px 0; font-size: 12px; }
+.gate-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.gate-dot.ok { background: var(--brand-mid); }
+.gate-dot.no { background: var(--red); }
+.gate-name { color: var(--muted); flex-shrink: 0; min-width: 84px; }
+.gate-detail { color: var(--text); }
+.gate-fail .gate-detail { color: var(--red); }
+
+.dag-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 8px 0; font-size: 11.5px; }
+.dag-node { padding: 2px 8px; border-radius: 6px; border: 1px solid var(--line); color: var(--muted); background: #fff; }
+.dag-node.done { color: var(--ink-2); border-color: #bfe0d2; background: var(--brand-soft); }
+.dag-node.blocked { color: var(--red); border-color: #f2c6c2; background: var(--red-soft); }
+.dag-node.sched { color: var(--gold); border-color: #ecd9b8; background: var(--gold-soft); }
+.dag-node.skip { text-decoration: line-through; opacity: .55; }
+.dag-arrow { color: var(--faint); }
+
+.cs-steps { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.cs-step { border-left: 3px solid var(--brand-soft); padding: 4px 10px; font-size: 12.5px; }
+
+.pend-row { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px dashed var(--line-2); flex-wrap: wrap; }
+.pend-main { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pend-msg { font-size: 12.5px; }
+.pend-actions { display: flex; gap: 6px; align-items: center; }
+.verify-box { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.sms-input { width: 92px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 7px; font-size: 12px; }
+.face-check { font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; }
+
+.danger-line { color: var(--red); font-weight: 600; }
+
+/* 六场景板块：窄屏下允许卡片头与标签换行，避免横向溢出 */
+.banking .card-head { flex-wrap: wrap; }
+.banking .tag { white-space: normal; text-align: left; }

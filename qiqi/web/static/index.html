@@ -16,7 +16,7 @@
     <div class="logo">哨</div>
     <div class="brand-text">
       <h1>持仓哨兵</h1>
-      <p>银行 AI 智能体 · 理财操作场景深度覆盖</p>
+      <p>银行 AI 智能体 · 六场景全覆盖（理财旗舰 + 转账 / 账单 / 卡片 / 订阅 / 跨场景联动）</p>
     </div>
   </div>
   <div class="topbar-right">
@@ -25,6 +25,27 @@
     <div class="user-chip" id="user-chip"></div>
   </div>
 </header>
+
+<section class="banking" id="banking-section">
+  <div class="card">
+    <div class="card-head">
+      <h2>银行 AI 智能体 · 六场景统一入口</h2>
+      <span class="tag">对齐赛题：至少 3 个核心场景（鼓励全覆盖）</span>
+    </div>
+    <p class="agent-desc">
+      用一句话办业务。智能转账、账单分析、理财操作、卡片管理、订阅代扣、跨场景联动——
+      每个场景都经过确定性闸门与三级权限分级，全程可审计。
+    </p>
+    <div class="scenario-chips" id="scenario-chips"></div>
+    <div class="nl-box">
+      <input id="banking-question" type="text" maxlength="120"
+             placeholder="试试：给陈大黄转500元备注聚餐 ｜ 这个月账单分析 ｜ 取消健身房会员 ｜ 尾号8888挂失 ｜ 我爱人10月25日生日，锁定1000元活期" />
+    </div>
+    <button class="btn btn-primary btn-block" id="btn-banking-run">发起（六场景统一入口）</button>
+    <div id="banking-result"></div>
+    <div id="banking-pending"></div>
+  </div>
+</section>
 
 <main class="layout">
 
@@ -174,5 +195,6 @@
 <div id="modal-root"></div>
 
 <script src="/static/app.js"></script>
+<script src="/static/banking.js"></script>
 </body>
 </html>

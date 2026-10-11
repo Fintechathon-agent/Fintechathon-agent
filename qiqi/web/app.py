@@ -71,6 +71,19 @@ ACTION_LABELS = {
     "dag_completed": "任务 DAG 执行完成",
     "dag_failed": "任务 DAG 执行失败",
     "request_blocked": "可疑自然语言请求被拦截",
+    "banking_request_blocked": "六场景入口 · 可疑请求被拦截",
+    "banking_transfer_review": "智能转账 · 请求受理",
+    "banking_transfer_executed": "智能转账 · 执行回执（演示模拟）",
+    "banking_bill_report": "账单分析 · 报告生成",
+    "banking_subscription_scan": "订阅/代扣 · 识别扫描",
+    "banking_subscription_cancel_requested": "订阅取消 · 待确认请求",
+    "banking_subscription_cancel_blocked": "订阅取消 · 被闸门拦截",
+    "banking_subscription_cancelled": "订阅取消 · 已生效（演示模拟）",
+    "banking_card_action": "卡片管理 · 操作受理",
+    "banking_card_action_executed": "卡片管理 · 操作生效（演示模拟）",
+    "banking_cross_scene_plan": "跨场景联动 · 计划生成",
+    "banking_strong_verification": "六场景 · 红色权限强验证（演示 Mock）",
+    "banking_pending_rejected": "六场景 · 用户拒绝待确认操作",
 }
 
 
@@ -650,10 +663,16 @@ class DemoApp:
             self.state.approval_meta.clear()
             self.state.last_review = None
             self.state.portfolio = fresh_portfolio()
+            # 六场景运行态一并复位（卡片/订阅回 fixture，清空待办与当日转账累计）
+            try:
+                from web.banking_demo import get_banking_state
+                get_banking_state().reset()
+            except Exception as exc:      # noqa: BLE001
+                logger.warning("六场景状态复位失败：%s", exc)
             self._refresh_health()
             self._log("demo_reset", "", {
                 "removed_files": removed,
-                "note": "仅清空审批与纸交易记录；长期记忆保持不变",
+                "note": "仅清空审批、纸交易与六场景运行态；长期记忆保持不变",
             })
             return {"success": True, "removed_files": removed,
                     "message": f"已重置演示状态（清理 {removed} 个文件，记忆保留）"}
@@ -834,6 +853,12 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"trades": self.app.trades()})
             if path == "/api/brief":
                 return self._json(self.app.brief())
+            if path == "/api/scenarios/boot":
+                from web.banking_service import scenario_overview
+                return self._json(scenario_overview())
+            if path == "/api/scenarios/pending":
+                from web.banking_service import pending_list
+                return self._json({"pending": pending_list()})
         except Exception as exc:      # noqa: BLE001
             return self._error(exc)
         self._send(404, "404".encode(), "text/plain; charset=utf-8")
@@ -850,6 +875,15 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(self.app.breaker_reset())
             if path == "/api/reset":
                 return self._json(self.app.reset())
+            if path == "/api/scenarios/run":
+                from web.banking_service import run_scenario
+                return self._json(run_scenario(str(body.get("question", ""))))
+            if path == "/api/scenarios/confirm":
+                from web.banking_service import confirm_action
+                return self._json(confirm_action(body))
+            if path == "/api/scenarios/cancel":
+                from web.banking_service import cancel_pending
+                return self._json(cancel_pending(str(body.get("id", ""))))
         except Exception as exc:      # noqa: BLE001
             return self._error(exc)
         self._send(404, "404".encode(), "text/plain; charset=utf-8")

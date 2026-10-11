@@ -11,6 +11,9 @@ data/memory/
 data/audit/
 data/approvals/
 data/paper_trades/
+data/breaker/
+data/banking/
+data/test_runtime/
 
 # Daily Market Brief 本地凭证（含密钥，勿提交）
 brief/feishu.local.json
