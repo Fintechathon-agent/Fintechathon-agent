@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: personal-ai-fund-manager-core-agent
+    runtime: node
+    plan: free
+    rootDir: chenchen
+    buildCommand: npm install --omit=dev
+    startCommand: npm run start:public
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: PUBLIC_ACCESS
+        value: "true"
+      - key: CORS_ORIGINS
+        value: "https://fund-risk-workbench.panxintian44.chatgpt.site,https://realchenchenluo.github.io"

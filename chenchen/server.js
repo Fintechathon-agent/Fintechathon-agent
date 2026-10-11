@@ -25,6 +25,7 @@ const root = __dirname;
 const port = Number(process.env.PORT || 4175);
 const harness = new Harness({ toolset: tools });
 const publicAccessEnabled = () => process.env.PUBLIC_ACCESS === "true";
+const corsOrigins = new Set((process.env.CORS_ORIGINS || "").split(",").map(value => value.trim()).filter(Boolean));
 const mime = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -40,6 +41,16 @@ function sendJson(response, status, payload) {
     "Cache-Control": "no-store"
   });
   response.end(JSON.stringify(payload));
+}
+
+function applyCors(request, response) {
+  const origin = request.headers.origin;
+  if (!origin || (!corsOrigins.has("*") && !corsOrigins.has(origin))) return false;
+  response.setHeader("Access-Control-Allow-Origin", corsOrigins.has("*") ? "*" : origin);
+  response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Core-Agent-Key");
+  response.setHeader("Vary", "Origin");
+  return true;
 }
 
 function sendError(response, error, fallbackStatus = 400) {
@@ -273,11 +284,21 @@ const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, `http://${request.headers.host || "127.0.0.1"}`);
     const localHost = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+    const corsApplied = applyCors(request, response);
+    if (request.method === "OPTIONS" && corsApplied) {
+      response.writeHead(204);
+      response.end();
+      return;
+    }
     if (!localHost && !publicAccessEnabled()) {
       sendJson(response, 403, { error: { code: "LOCAL_ONLY", message: "Local demo only" } }); return;
     }
     if (!publicAccessEnabled() && request.headers.origin && request.headers.origin !== url.origin) {
       sendJson(response, 403, { error: { code: "ORIGIN_MISMATCH", message: "Cross-origin requests are disabled" } }); return;
+    }
+    if (request.method === "GET" && url.pathname === "/health") {
+      sendJson(response, 200, { status: "ok", service: "core-agent", contract_version: contract.CONTRACT_VERSION });
+      return;
     }
     if (url.pathname.startsWith("/api/")) {
       const handled = await handleApi(request, response, url.pathname, url);

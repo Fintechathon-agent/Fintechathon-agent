@@ -8,7 +8,10 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));
   const base='http://127.0.0.1:'+server.address().port;
-  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/risk-workbench','/versions/merchant.js','/versions/investment-legacy.js','/versions/risk-workbench.js','/contracts/investment-agent.v1.schema.json','/contracts/examples/health-check.request.json','/contracts/examples/health-check.response.json','/data/market-brief-2026-10-08.json','/data/market-brief-2026-10-09.json']) assert.equal((await fetch(base+page)).status,200);
+  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/risk-workbench','/versions/merchant.js','/versions/investment-legacy.js','/versions/risk-workbench.js','/contracts/investment-agent.v1.schema.json','/contracts/examples/health-check.request.json','/contracts/examples/health-check.response.json','/data/market-brief-2026-10-08.json','/data/market-brief-2026-10-09.json','/data/risk-workbench-demo.json']) assert.equal((await fetch(base+page)).status,200);
+  const health=await fetch(base+'/health');
+  assert.equal(health.status,200);
+  assert.equal((await health.json()).status,'ok');
   assert.match(await fetch(base+'/').then(r=>r.text()),/个人投资顾问/);
   assert.match(await fetch(base+'/catalog').then(r=>r.text()),/店主财务助手/);
   assert.match(await fetch(base+'/investment').then(r=>r.text()),/现在先检查什么/);
