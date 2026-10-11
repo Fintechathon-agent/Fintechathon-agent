@@ -201,7 +201,18 @@
         </table></div>
         ${reminders ? `<div class="sub-title">⏰ 7 天内续费提醒</div>${reminders}` : ''}`;
     }
-    if (result.scenario === 'transfer') {
+    if (result.scenario === 'transfer' && d.balance_query) {
+      html = `
+        <div class="sub-title">💰 账户余额</div>
+        <div class="quick-grid">
+          <div class="quick-col">
+            <div class="quick-item">可用余额：<b>¥${money(d.balance)}</b></div>
+            <div class="quick-item">今日已累计转账：¥${money(d.daily_cumulative)}</div>
+          </div>
+        </div>
+        <div class="muted">绿色权限：查询类操作确认意图后自动执行，无需二次确认。</div>`;
+    }
+    if (result.scenario === 'transfer' && !d.balance_query) {
       const req = d.request || {};
       const checks = (d.gate_checks || []).map((c) => `
         <div class="gate-row ${c.passed ? '' : 'gate-fail'}">
@@ -234,16 +245,33 @@
           <span class="gate-name">${esc(c.name)}</span>
           <span class="gate-detail">${esc(c.detail)}</span>
         </div>`).join('');
-      html = card.last4 ? `
-        <div class="sub-title">💳 尾号 ${esc(card.last4)}（${esc(card.bank)} ${esc(card.card_type)}）</div>
-        <div class="quick-grid">
-          <div class="quick-col">
-            <div class="quick-item">状态：<span class="chip ${card.status === 'normal' ? 'green' : 'gold'}">${esc(card.status)}</span></div>
-            <div class="quick-item">额度：${card.credit_limit ? `¥${num(card.credit_limit)}` : '—'}</div>
+      if (!card.last4 && Array.isArray(d.cards) && d.cards.length) {
+        const rows = d.cards.map((c) => `
+          <tr>
+            <td>尾号 ${esc(c.last4)}</td>
+            <td>${esc(c.bank)} ${esc(c.card_type)}</td>
+            <td>${c.status === 'normal' ? '<span class="chip green">正常</span>' : '<span class="chip gold">' + esc(c.status) + '</span>'}</td>
+            <td class="num">${c.credit_limit ? '¥' + num(c.credit_limit) : '—'}</td>
+            <td class="num">¥${num(c.daily_txn_limit)}</td>
+          </tr>`).join('');
+        html = `
+          <div class="sub-title">💳 名下卡片（${d.cards.length} 张）</div>
+          <div class="table-wrap"><table class="tbl">
+            <thead><tr><th>卡号</th><th>卡片</th><th>状态</th><th class="num">额度</th><th class="num">单日限额</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table></div>`;
+      } else if (card.last4) {
+        html = `
+          <div class="sub-title">💳 尾号 ${esc(card.last4)}（${esc(card.bank)} ${esc(card.card_type)}）</div>
+          <div class="quick-grid">
+            <div class="quick-col">
+              <div class="quick-item">状态：<span class="chip ${card.status === 'normal' ? 'green' : 'gold'}">${esc(card.status)}</span></div>
+              <div class="quick-item">额度：${card.credit_limit ? `¥${num(card.credit_limit)}` : '—'}</div>
+            </div>
+            <div class="quick-col"><div class="quick-item">单日交易限额：¥${num(card.daily_txn_limit)}</div></div>
           </div>
-          <div class="quick-col"><div class="quick-item">单日交易限额：¥${num(card.daily_txn_limit)}</div></div>
-        </div>
-        <div class="sub-title">🛡️ 确定性闸门</div>${checks}` : '';
+          <div class="sub-title">🛡️ 确定性闸门</div>${checks}`;
+      }
     }
     if (result.scenario === 'cross_scene' && d.plan) {
       const steps = (d.plan.steps || []).map((s) => `

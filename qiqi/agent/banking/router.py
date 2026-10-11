@@ -54,11 +54,11 @@ def detect_scenario(text: str) -> str:
         return "cross_scene"
     if re.search(r"(转账|转给|汇款|打款|AA|分摊|平分|转\s*\d)", text):
         return "transfer"
-    if re.search(r"(挂失|锁卡|解锁|解挂|额度|限额|信用卡|银行卡|尾号)", text):
+    if re.search(r"(挂失|锁卡|解锁|解挂|额度|限额|信用卡|银行卡|尾号|卡丢了|卡不见了|卡被盗|卡被偷)", text):
         return "card"
     if re.search(r"(订阅|会员|自动续费|代扣|取消.*(会员|订阅)|续费)", text):
         return "subscription"
-    if re.search(r"(账单|消费|流水|异常交易|花销|支出)", text):
+    if re.search(r"(账单|消费|流水|异常交易|花销|花了|花费|开支|开销|支出|钱都花)", text):
         return "bill"
     return "wealth"
 
@@ -111,6 +111,31 @@ def route(
     scenario = detect_scenario(question)
     label = SCENARIO_LABELS[scenario]
     plan = build_scenario_plan(scenario)
+
+    # 1.5 余额查询（赛题绿色查询类）：只有落到理财兜底（无任何场景动作关键词）
+    # 且提到余额时才走这里。「余额全转给X」「锁定额度」等含动作的句子不受影响。
+    if scenario == "wealth" and re.search(
+        r"(余额|还剩多少|还有多少|剩多少|账户里有多少)", question
+    ):
+        return ScenarioResult(
+            scenario="transfer", scenario_label="余额查询",
+            intent={"name": "transfer", "label": "余额查询", "question": question,
+                    "slots": {"query": "balance"}},
+            plan={"intent": "transfer", "nodes": [
+                {"id": "validate", "label": "校验输入与权限", "tool": "intent_router",
+                 "depends_on": [], "status": "done"},
+                {"id": "balance", "label": "读取账户余额", "tool": "balance_query",
+                 "depends_on": ["validate"], "status": "done"},
+            ]},
+            tier="green", status="done",
+            data={"balance_query": True, "balance": balance,
+                  "daily_cumulative": daily_cumulative},
+            message=f"账户可用余额 {balance:,.2f} 元；今日已累计转账 {daily_cumulative:,.2f} 元。"
+                    f"绿色权限：查询类自动执行。",
+            audit_actions=[("banking_balance_query", {
+                "balance": balance, "daily_cumulative": daily_cumulative,
+            })],
+        )
 
     # 2. 场景执行（确定性）
     result: ScenarioResult
@@ -342,6 +367,37 @@ def _run_subscription(question, bills_data, plan, label) -> ScenarioResult:
             })],
         )
 
+    if re.search(r"(取消|退订|停止|关了|不要了)", question) and active:
+        # 表达了取消意图但未指明商户：追问哪一个，而不是静默退回列表
+        mark_plan(plan, "gate", "done")
+        mark_plan(plan, "respond", "done")
+        return ScenarioResult(
+            scenario="subscription", scenario_label=label,
+            intent={"name": "subscription", "label": "订阅/代扣管理",
+                    "question": question, "slots": {"cancel": None}},
+            plan=plan, tier="green", status="needs_clarification",
+            data={
+                "subscriptions": [{
+                    "sub_id": s.sub_id, "merchant": s.merchant, "amount": s.amount,
+                    "cadence": s.cadence, "next_charge_at": s.next_charge_at,
+                    "first_seen_at": s.first_seen_at, "last_charge_at": s.last_charge_at,
+                    "status": s.status, "due_soon": s.due_soon(),
+                } for s in subs],
+                "renewal_reminders": [{"merchant": s.merchant, "amount": s.amount,
+                                       "next_charge_at": s.next_charge_at}
+                                      for s in reminders],
+                "clarify_cancel": True,
+            },
+            message="请告诉我要取消哪一个订阅："
+                    + "；".join(
+                        f"{s.merchant}（{s.amount:,.2f} 元/{'月' if s.cadence == 'monthly' else '年'}）"
+                        for s in active)
+                    + "。",
+            audit_actions=[("banking_subscription_clarify", {
+                "active": len(active),
+            })],
+        )
+
     finish_plan(plan, "done")
     return ScenarioResult(
         scenario="subscription", scenario_label=label,
@@ -367,6 +423,7 @@ def _run_subscription(question, bills_data, plan, label) -> ScenarioResult:
 
 def _run_card(question, cards_data, plan, label) -> ScenarioResult:
     res = cards.handle_card_action(question, cards_data)
+    _, new_limit = cards.parse_card_operation(question)
     mark_plan(plan, "validate", "done")
     mark_plan(plan, "locate", "blocked" if res.tier == "blocked" else "done")
     mark_plan(plan, "gate", "blocked" if res.tier == "blocked" else "done")
@@ -381,10 +438,16 @@ def _run_card(question, cards_data, plan, label) -> ScenarioResult:
         plan=plan, tier=res.tier, status=res.status,
         data={
             "operation": res.operation,
+            "new_limit": new_limit,
             "card": ({"last4": card.last4, "bank": card.bank, "card_type": card.card_type,
                       "status": card.status, "credit_limit": card.credit_limit,
                       "daily_txn_limit": card.daily_txn_limit} if card else None),
             "gate_checks": res.gate_checks,
+            **({"cards": [{
+                "last4": c.last4, "bank": c.bank, "card_type": c.card_type,
+                "status": c.status, "credit_limit": c.credit_limit,
+                "daily_txn_limit": c.daily_txn_limit,
+            } for c in cards_data]} if card is None else {}),
         },
         message=res.message,
         audit_actions=[("banking_card_action", {
@@ -427,7 +490,9 @@ def _run_cross_scene(question, user_id, plan, label) -> ScenarioResult:
         scenario="cross_scene", scenario_label=label,
         intent={"name": "cross_scene", "label": "跨场景联动", "question": question,
                 "slots": {"birthday": birthday}},
-        plan=plan, tier="green", status="pending_confirmation" if result_plan.pending_confirmations else "done",
+        plan=plan,
+        tier="yellow" if result_plan.pending_confirmations else "green",
+        status="pending_confirmation" if result_plan.pending_confirmations else "done",
         data={
             "plan": {
                 "plan_id": result_plan.plan_id,

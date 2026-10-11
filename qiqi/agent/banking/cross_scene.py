@@ -37,6 +37,12 @@ def parse_cross_scene(text: str) -> dict:
             if candidate < datetime.now():
                 candidate = datetime(year + 1, month, day)   # 今年已过，算明年
             birthday = candidate.strftime("%Y-%m-%d")
+    if not birthday:
+        # 相对日期：明天/后天（赛题示例「我爱人生日」常省略具体日期）
+        if re.search(r"(明天|明日)", text):
+            birthday = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+        elif re.search(r"(后天|後天)", text):
+            birthday = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
 
     lock_amount = 0.0
     am = _AMOUNT_RE.search(text)
@@ -45,7 +51,7 @@ def parse_cross_scene(text: str) -> dict:
         unit = am.group(2)
         lock_amount *= {"万": 10000, "千": 1000, "百": 100}.get(unit or "", 1)
 
-    wants_order = bool(re.search(r"(订|买|送|准备)\s*(花|鲜花|蛋糕|礼物)", text))
+    wants_order = bool(re.search(r"(订|买|送|准备)\s*(?:个|一个|束|份)?\s*(花|鲜花|蛋糕|礼物)", text))
     return {
         "relation": relation,
         "birthday": birthday,
@@ -69,7 +75,11 @@ def build_cross_scene_plan(text: str) -> CrossScenePlan:
         )
 
     birthday_dt = datetime.strptime(parts["birthday"], "%Y-%m-%d")
-    order_date = (birthday_dt - timedelta(days=2)).strftime("%Y-%m-%d")
+    # 若「生日前 2 天」已过去（如明天生日），订花/订蛋糕计划改从今天起
+    order_date = max(
+        birthday_dt - timedelta(days=2),
+        datetime.now().replace(hour=0, minute=0, second=0, microsecond=0),
+    ).strftime("%Y-%m-%d")
     relation_label = parts["relation"] or "家人"
     relation_holder = {
         "爱人": "爱人", "老婆": "爱人", "老公": "爱人", "妻子": "爱人", "丈夫": "爱人",

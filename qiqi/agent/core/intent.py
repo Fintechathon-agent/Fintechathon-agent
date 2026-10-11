@@ -63,8 +63,8 @@ class IntentResult:
         }
 
 
-_EXECUTE_RE = re.compile(r"(赎回|卖出|减仓|清仓|买入|加仓|调仓|执行|按.{0,8}方案)")
-_ADVISE_RE = re.compile(r"(建议|要不要|该不该|怎么办|怎么调|怎么处理|是不是该跑)")
+_EXECUTE_RE = re.compile(r"(赎回|卖出|减仓|清仓|买入|加仓|申购|认购|调仓|执行|按.{0,8}方案)")
+_ADVISE_RE = re.compile(r"(建议|推荐|要不要|该不该|怎么办|怎么调|怎么处理|是不是该跑)")
 _DIAGNOSE_RE = re.compile(r"(体检|看看|检查|分析|诊断|风险|持仓|亏损|收益|集中度)")
 _VAGUE_RE = re.compile(r"^(随便|你定|都行|看着办|帮我决定)[吧。！!？?\s]*$")
 _OUT_OF_SCOPE_RE = re.compile(r"(机票|酒店|外卖|天气|写代码|写作文|订花|打车)")
@@ -118,7 +118,7 @@ def parse_intent(
 
     slots = _extract_slots(text, portfolio)
     if _EXECUTE_RE.search(text):
-        action = "buy" if re.search(r"(买入|加仓)", text) else "sell"
+        action = "buy" if re.search(r"(买入|加仓|申购|认购)", text) else "sell"
         slots["action"] = action
         missing: list[str] = []
         if not slots.get("symbol"):

@@ -56,7 +56,11 @@ def parse_transfer_request(text: str, contacts: list[Contact]) -> TransferReques
                 payee = c.name
                 break
     if not payee:
-        pm = re.search(r"(?:给|转给|转账给)\s*([\u4e00-\u9fa5A-Za-z]{2,8})", text)
+        # 非贪婪 + 停词边界：避免「给小李转200」把「转」吃进名字里
+        pm = re.search(
+            r"(?:给|转给|转账给)\s*([\u4e00-\u9fa5A-Za-z·]{2,8}?)(?=转|汇款|备注|给|\d|[，。！？!?\s]|$)",
+            text,
+        )
         if pm:
             payee = pm.group(1)
 
