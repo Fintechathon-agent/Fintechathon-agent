@@ -53,20 +53,22 @@ cloudflared tunnel --url http://127.0.0.1:4175
 
 ## 长期部署与自动更新
 
-当前代码适合部署为 Render Web Service。Render 连接 GitHub 的 `main` 分支后，每次推送成功会自动构建并更新同一个网址；设置 `Root Directory` 后，仓库中其他目录的变化不会触发这个服务。长期稳定运行需要在 Render 选择合适的实例；免费实例可能休眠，网址仍保留但首次访问会等待唤醒。
+本项目的 Core Agent 已部署到 Cloudflare Workers，当前公网后端地址是：
 
-在 Render 新建 Web Service 时填写：
+`https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev`
 
-- Repository：`realchenchenluo/agent`
-- Branch：`main`
-- Root Directory：`chenchen`
-- Runtime：`Node`
-- Build Command：`npm install --omit=dev`
-- Start Command：`npm run start:public`
-- Health Check Path：`/api/demo/portfolio`
-- Auto-Deploy：`On Commit`
+接口地址：
 
-部署完成后，Render 会提供固定的 `onrender.com` 地址。以后只要把更新推送到个人仓库 `main`，网页会继续使用同一个地址并自动更新。当前项目仍是虚构数据演示，不应放入真实账单或账户信息。
+`https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/api/risk-workbench/handoff`
+
+以后修改 Worker 代码后，在仓库根目录执行：
+
+```powershell
+npx wrangler login
+npx wrangler deploy
+```
+
+Cloudflare 的 Worker 配置在仓库根目录的 `wrangler.toml`，入口是 `cloudflare/worker.js`。Render 配置仍保留作备用，但不需要使用 Render。当前项目仍是虚构数据演示，不应放入真实账单或账户信息。
 
 代码更新后请先在旧服务终端按 Ctrl+C，再重新运行 `npm start`。仅刷新网页不会更新运行中的后端。服务启动后可在另一个终端执行 `npm run smoke`，核对实际页面、样式和脚本是否与本地文件一致；使用其他端口时两个终端需设置相同的 `PORT`。
 

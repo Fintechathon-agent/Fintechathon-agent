@@ -2,6 +2,43 @@
 
 > 用途：每天 22:00 前更新一次，供团队同步主链路进展。本文档只记录 Core Agent 主链路，不替代 Risk、Memory、Quant 或 UI 的专项日报。
 
+## 2026-10-11
+
+### 今日结论
+
+Core Agent 已通过 Cloudflare Workers 获得稳定公网后端地址，GitHub Pages 风控工作台已从固定静态结果切换为实时调用公网 Core Agent，并完成线上回放。
+
+### 今日完成
+
+- 新增 `cloudflare/worker.js` 和 `wrangler.toml`，复用现有 Harness、Tools、Contract 与 Risk Handoff，不复制 Quant 逻辑。
+- 公网接口：`/health`、`POST /api/health-check/run`、`POST /api/risk-workbench/handoff`。
+- 配置 Risk 工作台来源的 CORS，GitHub Pages 点击联调按钮会实时生成新的 request/task/session/audit 追踪链。
+- 公网地址：`https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev`。
+
+### 可验证的集成进度
+
+- Cloudflare 本地模拟：`/health` 200，Handoff 200，CORS 正常。
+- 公网回放：Handoff 200，`contract_version=investment-agent.v1`，`integration_mode=READ_ONLY_HANDOFF_PREVIEW`，`execution_allowed=false`。
+- 线上页面回放成功，显示实时任务 ID、审计 ID、证据链和四项安全控制。
+- 个人仓库 Pages Actions 部署成功；团队仓库同步源码和部署说明。
+
+### 当前阻塞项
+
+1. 远程安全攻防与风控工作台目前没有公开的外部 Handoff 接收接口，因此线上页面已接通 Core Agent，但尚未把结果自动写入对方内部任务系统。
+2. Risk Owner 需要提供正式接收/回写 Contract 后，才能完成独立 Risk Consumer 的闭环。
+
+### 安全边界
+
+- 不重新计算 Quant：是。
+- 不修改 Memory 规则：是。
+- 不绕过 Risk：是，`execution_allowed=false` 固定保留。
+- 当前只使用虚构持仓和固定演示数据，不接收真实账户。
+
+### 下一步
+
+- Risk Owner 提供正式 Handoff 接收地址和 `review_status` 回写字段。
+- 线上公网服务补充认证、限流、日志脱敏后，再考虑真实团队环境使用。
+
 ## 2026-10-10
 
 ### 22:00 自动化收尾核验（本轮新增记录）
