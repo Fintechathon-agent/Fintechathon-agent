@@ -151,3 +151,6 @@ footer p { text-align:center; }
 .arrow-ne { display:inline-block; width:.78em; height:.78em; vertical-align:-.04em; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; overflow:visible; }
 /* The gradient-clipped K logo never showed its corner arrow; keep the approved look. */
 .brand-mark .arrow-ne { display:none; }
+
+/* User-approved transparent derivative; keep full artwork proportional. */
+.lab-brand .team-logo-cutout,.landing-brand .team-logo-cutout{display:block;width:80px;height:80px;object-fit:contain;object-position:center;background:transparent;filter:none;mask:none;clip-path:none;opacity:1;transform:none;border:0;border-radius:0;padding:0;box-shadow:none}.landing-brand .team-logo-cutout{width:64px;height:64px}@media(max-width:700px){.lab-brand .team-logo-cutout,.landing-brand .team-logo-cutout{width:56px;height:56px}}

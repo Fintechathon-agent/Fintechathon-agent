@@ -66,6 +66,7 @@ ${helpers}
 async function parseBody(request){const text=request.bodyText||'';if(text.length>1024*1024)throw Object.assign(new Error('request body exceeds 1 MB'),{statusCode:413});if(!text)return {};try{return JSON.parse(text);}catch(error){error.statusCode=400;error.code='INVALID_JSON';throw error;}}
 ${routes}\n(${browserAdapter.toString()})();\n})();\n`;
   fs.writeFileSync(path.join(versions,'api.js'),runtime);
+  fs.copyFileSync(path.join(base,'versions/team-logo-transparent.png'),path.join(versions,'team-logo-transparent.png'));
   for(const name of fs.readdirSync(path.join(base,'versions'))){if(!/\.(css|js|mjs|svg)$/.test(name))continue;let text=fs.readFileSync(path.join(base,'versions',name),'utf8');if(name.endsWith('.css'))text=text.replace(/(['"])\/versions\//g,'$1./');fs.writeFileSync(path.join(versions,name),text);}
   const pages={landing:'landing',investment:'investment',merchant:'merchant',home:'catalog','not-found':'not-found'};
   const linkMap={'/':'landing.html','/index.html':'landing.html','/investment':'investment.html','/merchant':'merchant.html','/catalog':'catalog.html'};
