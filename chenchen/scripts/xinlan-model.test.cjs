@@ -38,7 +38,7 @@ test("preview serves only static assets and never financial APIs or repository f
   assert.equal(response.status, 200);
   assert.match(response.url, /xinlan\/index.html$/);
   assert.match(response.headers.get("content-security-policy"), /connect-src 'none'/);
-  for (const file of ["workspace.js", "workspace.css", "model.mjs", "mark.svg"]) assert.equal((await fetch(base + "/xinlan/" + file)).status, 200);
+  for (const file of ["workspace.js", "workspace.css", "model.mjs", "team-logo.png"]) assert.equal((await fetch(base + "/xinlan/" + file)).status, 200);
   for (const file of ["/api/identity/me", "/api/safety/confirm", "/server.js", "/.git/config", "/%2e%2e/AGENTS.md"]) assert.equal((await fetch(base + file)).status, 404);
   assert.equal((await fetch(base + "/xinlan/index.html", { method: "POST" })).status, 405);
 });

@@ -113,7 +113,7 @@ function render() {
   document.querySelector("#navigation").innerHTML = links[expected].map(([page, title], index) => '<a class="nav-link" href="#' + expected + "/" + page + '"' + (route.workspace === expected && (route.page === page || (route.page === "event" && page === "alerts")) ? ' aria-current="page"' : "") + '><span class="nav-icon" aria-hidden="true">0' + (index + 1) + "</span>" + title + "</a>").join("");
   const title = links[expected].find(([page]) => page === route.page)?.[1] || (route.page === "event" ? "风险事件详情" : "页面预览");
   document.querySelector("#breadcrumb").textContent = (expected === "personal" ? "个人工作台" : expected === "console" ? "内部风控工作台" : "系统管理") + " / " + title;
-  document.title = "昕澜金融 · " + title;
+  document.title = title + " · 金融工作台";
   if (denied) content.innerHTML = heading("PREVIEW BOUNDARY", "此页面不属于当前预览身份", "请选择顶部对应身份查看演示。这里的页面限制不是服务端权限保护。") + '<a class="primary-link" href="#' + expected + "/" + links[expected][0][0] + '">返回当前工作台</a>';
   else if (expected === "admin") content.innerHTML = heading("SYSTEM ADMIN", "系统管理与业务审批分离", "系统管理员不默认拥有金融业务审批权限。") + '<section class="panel"><h2>技术权限不等于金融授权</h2><p>本阶段不提供账号授权或业务审核操作。真实登录、能力授予与审计接口需要技术 Owner 批准后接入。</p><p class="note">当前选择仅用于预览界面，不代表已登录管理员账户。</p></section>';
   else if (route.page === "dashboard") content.innerHTML = dashboard();
