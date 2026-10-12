@@ -392,11 +392,11 @@ Core Agent 已完成架构图、模块调用时序和统一 Contract 的第一�
 
 ### 今日结论
 
-主链路完成一次可验证的 Contract 语义校验与失败追踪增强：个人仓库工作区新增跨对象引用、Risk evidence、execution_allowed 和 ErrorTrace 检查；团队仓库今日无业务代码变更。两边均通过现有检查，主链路仍停在 Risk Handoff / PENDING_REVIEW，不能宣称独立 Risk 审核闭环完成。
+主链路完成一次可验证的 Contract 语义校验与失败追踪增强：个人仓库工作区新增跨对象引用、Risk evidence、execution_allowed 和 ErrorTrace 检查；团队 main 的 chenchen Core 今日无业务代码变更。两边均通过现有检查，主链路仍停在 Risk Handoff / PENDING_REVIEW，不能宣称独立 Risk 审核闭环完成。
 
 ### 今日真实产出
 
-- 今日无团队仓库业务代码变更；个人仓库存在未提交的 Core Agent 工作区改动，已作为只读证据检查，未由本日报代提交。
+- 今日无团队 main 的 chenchen Core 业务代码变更；个人仓库存在未提交的 Core Agent 工作区改动，已作为只读证据检查，未由本日报代提交。
 - 统一 Contract：`investment-agent.v1` 增加 ErrorTrace 可选结构，错误可保留 contract_version、request_id、task_id、session_id、audit_id；跨对象语义检查覆盖 trace/TaskState/AuditEvidence 追踪键、checkpoint.completed→ToolResult、result_refs→trace_id、Risk evidence→artifacts，以及 `execution_allowed=false`。
 - Harness / Backend：工具失败先绑定 request_id 到 TaskState，失败信封可携带 task/session/audit trace；审计事件保留各次 request_id。公网 Worker 文档补充 API key、best-effort 限流和错误详情脱敏边界。
 - 维护资料：架构图 `docs/core-agent-architecture.md`、时序图 `docs/core-agent-sequence.md`、统一 Contract `contracts/investment-agent.v1.schema.json` 与 `contracts/README.md` 继续作为联调源文件；本次未改 Quant 逻辑、Memory consent/范围/生命周期/清理规则或 Risk 实现。
@@ -437,3 +437,12 @@ Core Agent 已完成架构图、模块调用时序和统一 Contract 的第一�
 - Risk Owner 冻结独立 Consumer 与回写 Contract 后，补充可复现接收/拒绝/重试测试。
 - Backend Owner 决定统一错误追踪与持久化审计版本，避免把演示级 Worker 保护当成生产安全闭环。
 - UI Owner 对齐 pending/error/recovery 字段；Data Owner 提供可审计的真实市场数据协议后，再替换固定夹具。
+
+
+### 远程最新状态补充核对
+
+- 团队 main 已安全 rebase 到 `838b9b2`，该分支今日有 qiqi 场景、数据与 Contract 接入提案提交；“今日无业务代码变更”仅指 main 的 chenchen Core 实现及本日报自动化。个人业务增强仍未提交，文档描述不是发布证明。
+- Risk `f232a0f` 位于 `origin/codex/team-risk-online-demo`，UI `6dc3759` 位于 `origin/codex/risk-ui-integration-recovery`，均未合入当前 main。Risk 分支已实现只读远程接收和来源回执；其 `docs/safety-risk-eval/online-demo/remote-core-v8-public.json` 记录伪造字段 400、CSRF 403、execution_status=NOT_STARTED。此为 Owner 留存报告，本次未复跑公网浏览器。
+- 因此 Risk 阻塞应准确理解为正式审核回写 Contract、main 合入与跨模块验收；不是所有分支均无接收器。尝试在 main 执行 `node --test modules/safety-risk-eval/test/remote-core.test.cjs` 得到文件不存在（exit 1），未计为通过。主分支 Core 复跑 `npm run check` / `npm test` 仍通过 52/52。
+- 金融数据测试：两边固定 2026-10-08/09 市场夹具回放、重复观察拒绝、REVIEW_REQUIRED 冲突与 Quant 无漂移用例通过；不代表 2026-10-12 实时市场数据验证。
+- DOCX 验收：render_docx.py 因未安装 LibreOffice 失败；使用本机 WPS/Word 导出 PDF、pypdfium2 渲染逐页检查，两份各 3 页。修正标题继承边框与标题颜色后再次逐页检查；无需把 QA PDF 提交仓库。
