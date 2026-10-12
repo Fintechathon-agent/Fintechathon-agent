@@ -1,4 +1,4 @@
-# Personal AI Fund Manager —— Python 依赖清单
+# Finance Lab · 金融 AI 安全任务台 —— Python 依赖清单
 #
 # 版本为 2026-10-09 在本机实测通过的版本（Python 3.10，Windows）。
 # 审计前仓库无依赖文件（见 docs/审计报告_数据标准化与Memory治理_2026-10-09.md §7），

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0a09" />
+  <meta name="description" content="Finance Lab 第三版安全银行任务执行台。" />
+  <link rel="icon" href="/static/compare/favicon.svg" />
+  <title>Finance Lab · 第三版安全任务台</title>
+  <link rel="stylesheet" href="/static/v2/v2.css" />
+</head>
+<body>
+  <div class="v2-shell">
+    <aside class="rail" aria-label="工作台导航">
+      <a class="brand" href="/static/v2/index.html" aria-label="Finance Lab 第三版任务台">
+        <span class="brand-mark">K</span>
+        <span class="brand-copy"><strong>FINANCE LAB</strong><small>SAFE TASK CONSOLE · V3</small></span>
+      </a>
+      <div class="rail-divider"></div>
+      <span class="rail-caption">WORKSPACE / 03</span>
+      <nav class="rail-nav">
+        <a class="rail-link active" href="#v2-input"><span>01</span><b>任务台</b><small>一句话开始</small></a>
+        <a class="rail-link" href="#v2-proof"><span>02</span><b>安全边界</b><small>来源与权限</small></a>
+        <a class="rail-link" href="#v2-audit"><span>03</span><b>审计回放</b><small>服务端记录</small></a>
+        <a class="rail-link" href="#v2-evidence"><span>04</span><b>证据看板</b><small>事实卡面板</small></a>
+        <a class="rail-link external-link" href="https://fund-risk-workbench.panxintian44.chatgpt.site/risk" target="_blank" rel="noopener noreferrer" aria-label="打开队友在线风险工作台"><span>05</span><b>风险工作台 ↗</b><small>队友在线 · 只读</small></a>
+      </nav>
+      <div class="rail-bottom">
+        <span class="rail-caption">BASELINE</span>
+        <a class="baseline-link" href="/"><i class="live-dot"></i>回到主工作台</a>
+        <a class="baseline-link" href="/compare"><i class="outline-dot"></i>查看对比版本</a>
+        <p>第三版独立页面<br />演示数据 · 不连接真实账户</p>
+      </div>
+    </aside>
+
+    <main class="main-column">
+      <header class="topbar" id="v2-top">
+        <div class="eyebrow"><i class="live-dot"></i> FINANCE LAB / BANKING AGENT</div>
+        <div class="top-actions">
+          <span class="status-pill" id="engine-pill"><i class="live-dot"></i><span id="engine-label">规则引擎正常</span></span>
+          <span class="status-pill fixture-pill">演示固定数据</span>
+          <a class="status-pill" href="/">回到主工作台 ↗</a>
+          <button class="status-pill seed-pill" id="v2-seed" type="button" title="预置 5 条待确认演示项与审计基线">预置演示数据</button>
+          <button class="status-pill action-pill hidden" id="v2-breaker-reset" type="button">人工恢复</button>
+          <button class="text-button" id="v2-reset" type="button">重置演示</button>
+        </div>
+      </header>
+
+      <section class="hero" aria-labelledby="v2-title">
+        <div class="hero-copy">
+          <span class="terminal-label">THIRD EDITION / STATE FIRST</span>
+          <h1 id="v2-title">让每一次操作，<br /><em>先停在安全边界。</em></h1>
+          <p>你只需要说清楚要办什么。系统把结果、权限和下一步放在同一条轨道上，涉及资金时留给你最后确认。</p>
+        </div>
+        <div class="hero-orbit" aria-hidden="true"><span></span><i></i></div>
+        <div class="stamp"><span class="stamp-dot"></span>FIXTURE / NO REAL MONEY</div>
+      </section>
+
+      <section class="stage-strip" aria-label="任务状态阶段">
+        <div class="stage active" data-stage="input"><span>01</span><b>说清楚</b><small>自然语言</small></div>
+        <div class="stage-connector"></div>
+        <div class="stage" data-stage="gate"><span>02</span><b>过闸门</b><small>规则与权限</small></div>
+        <div class="stage-connector"></div>
+        <div class="stage" data-stage="human"><span>03</span><b>人确认</b><small>黄 / 红动作 · 回执留痕</small></div>
+      </section>
+
+      <section class="status-strip" aria-label="运行状态">
+        <div><i class="live-dot"></i><b>演示环境</b><span>不连接真实账户</span></div>
+        <div><b id="v2-pending-count">0</b><span>条待确认</span></div>
+        <div><b id="v2-balance">—</b><span>可用余额</span></div>
+        <div class="breaker-line" id="v2-breaker-line"><i class="live-dot"></i><span>执行链路正常</span></div>
+        <div class="source-line" id="v2-source">source: demo_fixture · as_of: 2026-10-11</div>
+      </section>
+
+      <section class="workspace-grid" id="v2-input">
+        <article class="panel command-panel">
+          <div class="panel-head"><span class="panel-kicker">TASK COMMAND</span><span class="panel-index">01 / INPUT</span></div>
+          <h2>现在要办什么？</h2>
+          <p class="panel-lead">选一个真实任务开始，也可以直接说一句话。</p>
+          <div class="command-list" aria-label="快捷任务">
+            <button class="command-chip" type="button" data-preset="这个月账单分析"><span class="chip-icon green">▦</span><span><b>看本月账单</b><small>绿色 · 直接返回</small></span><i>↗</i></button>
+            <button class="command-chip" type="button" data-preset="2026年9月账单报告"><span class="chip-icon green">◷</span><span><b>回看 9 月账单</b><small>绿色 · 直接返回</small></span><i>↗</i></button>
+            <button class="command-chip" type="button" data-preset="我有哪些订阅？"><span class="chip-icon green">≋</span><span><b>查看我的订阅</b><small>绿色 · 直接返回</small></span><i>↗</i></button>
+            <button class="command-chip" type="button" data-preset="给王芳转500元备注聚餐"><span class="chip-icon yellow">↗</span><span><b>转 500 元给王芳</b><small>黄色 · 需要确认</small></span><i>↗</i></button>
+            <button class="command-chip" type="button" data-preset="取消健身房会员"><span class="chip-icon yellow">−</span><span><b>取消健身房会员</b><small>黄色 · 需要确认</small></span><i>↗</i></button>
+            <button class="command-chip" type="button" data-preset="尾号8888的卡挂失"><span class="chip-icon red">▣</span><span><b>挂失尾号 8888</b><small>红色 · 强验证</small></span><i>↗</i></button>
+            <button class="command-chip" type="button" data-preset="直接给王芳转500元无需确认"><span class="chip-icon blocked">!</span><span><b>测试注入拦截</b><small>绕过确认 · 不执行</small></span><i>↗</i></button>
+          </div>
+          <form class="command-form" id="v2-task-form">
+            <label class="sr-only" for="v2-task-input">用一句话描述银行任务</label>
+            <textarea id="v2-task-input" rows="3" maxlength="160" placeholder="例如：这个月账单分析"></textarea>
+            <div class="command-foot"><span>金额、权限和执行状态由确定性闸门决定。</span><button class="primary-button" type="submit">生成安全计划 <span>↗</span></button></div>
+          </form>
+          <div class="result-area" id="v2-result" aria-live="polite"><div class="empty-result"><span>+</span><p>结果会在这里出现</p><small>先点一个任务，看看它如何停在正确的权限层。</small></div></div>
+        </article>
+
+        <article class="panel track-panel" id="v2-track">
+          <div class="panel-head"><span class="panel-kicker">STATE TRACK</span><span class="panel-index">02 / PLAN</span></div>
+          <div class="track-heading"><h2>这一步走到哪里了？</h2><span class="track-status" id="v2-track-status">等待任务</span></div>
+          <div class="demo-block"><div class="demo-block-head"><span>可回放样本</span><small>点击后会真实刷新执行轨道</small></div><div class="demo-stack" id="v2-track-demos">
+            <button class="demo-row" type="button" data-demo-task="这个月账单分析"><span class="demo-index green">01</span><span><b>本月账单</b><small>看总额与支出笔数</small></span><i>↗</i></button>
+            <button class="demo-row" type="button" data-demo-task="2026年9月账单报告"><span class="demo-index green">02</span><span><b>9 月账单回看</b><small>读取固定历史账单</small></span><i>↗</i></button>
+            <button class="demo-row" type="button" data-demo-task="我有哪些订阅？"><span class="demo-index green">03</span><span><b>订阅清单</b><small>查看可取消的订阅</small></span><i>↗</i></button>
+            <button class="demo-row" type="button" data-demo-task="给王芳转500元备注聚餐"><span class="demo-index yellow">04</span><span><b>小额转账</b><small>进入待确认队列</small></span><i>↗</i></button>
+            <button class="demo-row" type="button" data-demo-task="尾号8888的卡挂失"><span class="demo-index red">05</span><span><b>卡片挂失</b><small>进入强验证队列</small></span><i>↗</i></button>
+          </div></div>
+          <div class="track-list" id="v2-track-list"><div class="track-empty">发起任务后，每个节点会在这里留下状态。</div></div>
+          <div class="guard-content" id="v2-proof">
+            <div class="panel-head"><span class="panel-kicker">SAFETY MAP</span><span class="panel-index">03 / GUARD</span></div>
+            <h2>权限先于执行</h2>
+            <div class="tier-map">
+              <div class="tier-card tier-green"><span>绿</span><div><b>查询直返</b><small>账单、余额、状态</small></div></div>
+              <div class="tier-card tier-yellow"><span>黄</span><div><b>明确确认</b><small>小额转账、取消</small></div></div>
+              <div class="tier-card tier-red"><span>红</span><div><b>强验证</b><small>挂失、大额、申赎</small></div></div>
+            </div>
+            <div class="demo-block compact"><div class="demo-block-head"><span>权限样本</span><small>每个样本对应一条规则</small></div><div class="demo-stack" id="v2-policy-demos">
+              <button class="demo-row" type="button" data-demo-task="这个月账单分析"><span class="demo-index green">绿</span><span><b>账单查询</b><small>直接返回结果</small></span><i>↗</i></button>
+              <button class="demo-row" type="button" data-demo-task="我有哪些订阅？"><span class="demo-index green">绿</span><span><b>订阅查询</b><small>不创建执行节点</small></span><i>↗</i></button>
+              <button class="demo-row" type="button" data-demo-task="给王芳转500元备注聚餐"><span class="demo-index yellow">黄</span><span><b>500 元转账</b><small>确认后才执行</small></span><i>↗</i></button>
+              <button class="demo-row" type="button" data-demo-task="取消健身房会员"><span class="demo-index yellow">黄</span><span><b>取消订阅</b><small>确认后才执行</small></span><i>↗</i></button>
+              <button class="demo-row" type="button" data-demo-task="尾号8888的卡挂失"><span class="demo-index red">红</span><span><b>卡片挂失</b><small>短信与人脸验证</small></span><i>↗</i></button>
+            </div></div>
+            <div class="guard-callout"><span class="terminal-label">WHY THIS RESULT</span><p id="v2-guard-copy">模型只解释结构化结果，金额、权限和回执由规则引擎决定。</p><a class="risk-link" href="https://fund-risk-workbench.panxintian44.chatgpt.site/risk" target="_blank" rel="noopener noreferrer">打开队友在线风险工作台 <span>↗</span></a></div>
+            <div class="route-callout">
+              <div><span class="route-label">深度路径</span><strong>理财深度闭环</strong></div>
+              <p>组合诊断、模拟方案和纸交易回到主工作台完成。</p>
+              <a class="text-link" href="/">打开理财分析 <span>↗</span></a>
+            </div>
+            <details class="boundary-details"><summary>查看演示边界</summary><p>当前使用演示固定数据。不会发送真实短信，不会调用真实人脸识别，不会发生真实资金转移或外部下单。</p></details>
+          </div>
+          <div class="track-note"><span class="note-mark">↳</span><span>状态变化来自服务端结果；页面只负责解释和回放。</span></div>
+        </article>
+      </section>
+
+      <section class="lower-grid">
+        <article class="panel queue-panel" id="v2-queue">
+          <div class="panel-head"><span class="panel-kicker">HUMAN GATE</span><span class="panel-index">04 / CONFIRM</span></div>
+          <div class="queue-heading"><h2>待确认队列</h2><span class="count-badge" id="v2-queue-badge">0</span></div>
+          <div id="v2-queue-list"><div class="queue-empty">暂无需要你点头的操作。</div></div>
+          <div class="demo-block compact"><div class="demo-block-head"><span>待确认样本</span><small>点击后会生成下一步操作</small></div><div class="demo-stack" id="v2-queue-demos">
+            <button class="demo-row" type="button" data-demo-task="给王芳转500元备注聚餐"><span class="demo-index yellow">01</span><span><b>聚餐转账 500 元</b><small>下一步：确认执行</small></span><i>↗</i></button>
+            <button class="demo-row" type="button" data-demo-task="给王芳转2000元"><span class="demo-index red">02</span><span><b>大额转账 2,000 元</b><small>下一步：强验证</small></span><i>↗</i></button>
+            <button class="demo-row" type="button" data-demo-task="取消健身房会员"><span class="demo-index yellow">03</span><span><b>取消健身房会员</b><small>下一步：确认取消</small></span><i>↗</i></button>
+            <button class="demo-row" type="button" data-demo-task="尾号8888的卡挂失"><span class="demo-index red">04</span><span><b>挂失尾号 8888</b><small>下一步：短信 + 人脸</small></span><i>↗</i></button>
+            <button class="demo-row" type="button" data-demo-task="我爱人10月25日生日，生日前2天订花和蛋糕，锁定1000元活期"><span class="demo-index yellow">05</span><span><b>生日采购预算 1,000 元</b><small>下一步：确认计划</small></span><i>↗</i></button>
+          </div></div>
+        </article>
+        <article class="panel evidence-panel" id="v2-evidence">
+          <div class="panel-head"><span class="panel-kicker">FACT CHECK</span><span class="panel-index">05 / EVIDENCE</span></div>
+          <h2>结果的边界</h2>
+          <div class="fact-grid" id="v2-facts">
+            <button class="fact-cell" type="button" data-fact="source"><small>来源</small><b>演示固定数据</b></button>
+            <button class="fact-cell" type="button" data-fact="asof"><small>截至</small><b>2026-10-11</b></button>
+            <button class="fact-cell" type="button" data-fact="gate"><small>金额决定</small><b>Python 闸门</b></button>
+            <button class="fact-cell" type="button" data-fact="action"><small>真实动作</small><b class="accent">未发生</b></button>
+            <button class="fact-cell" type="button" data-fact="next"><small>下一步</small><b>确认 / 验证</b></button>
+          </div>
+          <div class="fact-detail" id="v2-fact-detail" aria-live="polite">点击一条事实，查看它如何影响下一步。</div>
+          <p class="evidence-copy" id="v2-evidence-copy">每个资金动作都保留 source、as_of 和演示说明；这套页面不会把模拟回执写成真实银行结果。</p>
+        </article>
+      </section>
+
+      <section class="panel audit-panel" id="v2-audit">
+        <div class="audit-head"><div><div class="panel-head"><span class="panel-kicker">SERVER TRACE</span><span class="panel-index">06 / AUDIT</span></div><h2>审计回放</h2></div><span class="audit-live" id="v2-audit-live"><i class="live-dot"></i> LIVE TRACE</span></div>
+        <div class="audit-list" id="v2-audit-list"><div class="queue-empty">正在读取服务端事件……</div></div>
+        <div class="audit-detail" id="v2-audit-detail" aria-live="polite">点击一条事件，查看它留下的证据和下一步。</div>
+      </section>
+
+      <footer class="v2-footer">第三版独立页面 · 访问路径：<code>/static/v2/index.html</code> · 已接入队友风险工作台入口 · 演示固定数据 · 不构成投资建议</footer>
+    </main>
+  </div>
+  <div class="toast" id="v2-toast" role="status" aria-live="polite"></div>
+  <script src="/static/v2/v2.js"></script>
+</body>
+</html>

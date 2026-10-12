@@ -1,6 +1,6 @@
 /* 银行 AI 智能体 · 六场景统一入口（2026-10-11）
    依赖 app.js 的全局工具：api / esc / money / num / toast / tierBadge。
-   只负责场景板块自身，不触碰理财旗舰链路 UI。 */
+   只负责场景板块自身，不触碰理财深度分析链路 UI。 */
 (function () {
   'use strict';
 
@@ -10,6 +10,29 @@
     transfer: '💸', bill: '📊', wealth: '🏦',
     card: '💳', subscription: '🔁', cross_scene: '🎂',
   };
+  let activeSource = 'bank';
+  const SOURCE_GUIDES = {
+    bank: {
+      name: '手机银行',
+      steps: ['打开你平时使用的银行 App。', '进入「账单」「交易明细」或「流水」。', '选择要看的月份，找到「导出」「下载」或「分享账单」。', '回到这里，点「选择账单文件」，选刚才导出的 CSV / TXT。'],
+      tip: '不同银行的按钮名字会有一点不同，看到“账单”或“交易明细”就对了。',
+    },
+    wechat: {
+      name: '微信支付',
+      steps: ['打开微信，进入「我」→「服务」→「钱包」。', '打开「账单」，先筛选要看的月份。', '在账单页找到「下载账单」或「导出」并保存文件。', '回到这里，点「选择账单文件」，选刚才的 CSV / TXT。'],
+      tip: '微信可能会要求验证身份；只下载账单，不需要把密码告诉任何人。',
+    },
+    alipay: {
+      name: '支付宝',
+      steps: ['打开支付宝，进入「我的」→「账单」。', '选择月份，确认看的是「支出」记录。', '在账单页找到「下载」「导出」或「账单下载」。', '回到这里，点「选择账单文件」，选刚才的 CSV / TXT。'],
+      tip: '如果导出的是 Excel，请先另存为 CSV，再上传到这里。',
+    },
+    file: {
+      name: '本地文件',
+      steps: ['找到你已经导出的账单文件。', '最好是 CSV 或 TXT；如果是 Excel，请先另存为 CSV。', '点击下面的「选择账单文件」。', '文件只在当前浏览器里读取，不会自动发给外部服务。'],
+      tip: '至少需要一列金额；有日期、商户和分类时，分析会更准确。',
+    },
+  };
 
   /* ---------------- 场景卡片与概览 ---------------- */
 
@@ -18,7 +41,6 @@
       const data = await api('/api/scenarios/boot');
       renderChips(data.scenarios);
       renderBankingTierMatrix(data.tier_matrix);
-      renderQuickState(data);
       renderBankingPending(data);
     } catch (err) {
       $('#banking-result').innerHTML = `<div class="assistant-line">场景入口加载失败：${esc(err.message)}</div>`;
@@ -36,14 +58,136 @@
         <span class="scenario-tier">${esc(s.tier_note)}</span>
       </button>`).join('');
     box.querySelectorAll('.scenario-chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
+      chip.addEventListener('click', async () => {
         const key = chip.dataset.key;
         const meta = scenarios.find((s) => s.key === key);
         if (!meta) return;
         $('#banking-question').value = meta.examples[0] || '';
-        $('#banking-question').focus();
+        box.querySelectorAll('.scenario-chip').forEach((item) => item.classList.remove('is-running'));
+        chip.classList.add('is-running');
+        await runBanking(meta.examples[0] || '');
       });
     });
+  }
+
+  function feedback(message, kind = 'info') {
+    const box = $('#banking-feedback');
+    if (!box) return;
+    box.className = `banking-feedback ${kind}`;
+    box.textContent = message || '';
+  }
+
+  function renderSourceGuide(source = activeSource) {
+    activeSource = SOURCE_GUIDES[source] ? source : 'bank';
+    const guide = SOURCE_GUIDES[activeSource];
+    const steps = $('#source-steps');
+    if (!steps) return;
+    document.querySelectorAll('.source-option').forEach((button) => {
+      button.classList.toggle('active', button.dataset.source === activeSource);
+    });
+    steps.innerHTML = `
+      <div class="source-title">${esc(guide.name)}怎么找到账单</div>
+      <ol>${guide.steps.map((step) => `<li>${esc(step)}</li>`).join('')}</ol>
+      <div class="source-tip">${esc(guide.tip)}</div>`;
+    const choose = $('#choose-bill-file');
+    if (choose) choose.textContent = activeSource === 'file' ? '选择 CSV / TXT 文件' : '我已经导出了，选择文件';
+  }
+
+  function openStatementGuide() {
+    const guide = $('#statement-guide');
+    if (!guide) return;
+    guide.classList.remove('hidden');
+    renderSourceGuide(activeSource);
+    guide.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    feedback('先选账单来源，我会一步一步带你找到流水。');
+  }
+
+  function closeStatementGuide() {
+    const guide = $('#statement-guide');
+    if (guide) guide.classList.add('hidden');
+  }
+
+  function parseCsvRows(text) {
+    const rows = [];
+    let row = [], cell = '', quoted = false;
+    const source = String(text || '').replace(/^\uFEFF/, '');
+    for (let i = 0; i < source.length; i += 1) {
+      const char = source[i];
+      const next = source[i + 1];
+      if (char === '"' && quoted && next === '"') { cell += '"'; i += 1; continue; }
+      if (char === '"') { quoted = !quoted; continue; }
+      if (!quoted && (char === ',' || char === '\t')) { row.push(cell.trim()); cell = ''; continue; }
+      if (!quoted && (char === '\n' || char === '\r')) {
+        if (char === '\r' && next === '\n') i += 1;
+        row.push(cell.trim());
+        if (row.some((value) => value)) rows.push(row);
+        row = []; cell = ''; continue;
+      }
+      cell += char;
+    }
+    if (cell || row.length) { row.push(cell.trim()); if (row.some((value) => value)) rows.push(row); }
+    if (rows.length < 2) return [];
+    const normalize = (value) => String(value || '').replace(/[\s:：()（）【】\[\]]/g, '').toLowerCase();
+    const headers = rows.shift().map(normalize);
+    const find = (names) => headers.findIndex((header) => names.some((name) => header.includes(name)));
+    const amountIndex = find(['金额', '交易金额', '支出', '消费金额', '付款金额', 'amount', 'expense']);
+    if (amountIndex < 0) return [];
+    const merchantIndex = find(['商户', '交易对方', '对方户名', '交易描述', '摘要', '商品', '名称', '备注', 'merchant', 'description']);
+    const dateIndex = find(['日期', '交易时间', '时间', '账单时间', 'date', 'time']);
+    const categoryIndex = find(['分类', '交易分类', '消费分类', 'category']);
+    return rows.map((values) => {
+      const rawAmount = String(values[amountIndex] || '').replace(/[,¥￥元\s]/g, '');
+      const amount = Math.abs(Number(rawAmount.replace(/[^\d.-]/g, '')));
+      if (!Number.isFinite(amount) || amount <= 0) return null;
+      return {
+        amount,
+        merchant: values[merchantIndex] || '未填写商户',
+        date: values[dateIndex] || '日期未填写',
+        category: values[categoryIndex] || '未分类',
+      };
+    }).filter(Boolean);
+  }
+
+  function renderLocalBillSummary(rows, filename) {
+    const box = $('#local-bill-result');
+    if (!box) return;
+    if (!rows.length) {
+      box.innerHTML = '<div class="local-bill-error">我没有读懂这个文件。请确认它是 CSV / TXT，并且至少有一列“金额”。</div>';
+      feedback('文件没有读懂，你可以换一个账单文件再试。', 'error');
+      return;
+    }
+    const total = rows.reduce((sum, row) => sum + row.amount, 0);
+    const categories = rows.reduce((map, row) => {
+      map[row.category] = (map[row.category] || 0) + row.amount;
+      return map;
+    }, {});
+    const topCategory = Object.entries(categories).sort((a, b) => b[1] - a[1])[0];
+    const topMerchant = rows.reduce((map, row) => {
+      map[row.merchant] = (map[row.merchant] || 0) + row.amount;
+      return map;
+    }, {});
+    const topSpend = Object.entries(topMerchant).sort((a, b) => b[1] - a[1])[0];
+    box.innerHTML = `
+      <div class="local-bill-card">
+        <div class="local-bill-head"><b>已读懂这份账单</b><span>${esc(filename)}</span></div>
+        <div class="local-bill-stats">
+          <div><small>读取流水</small><strong>${num(rows.length)} 笔</strong></div>
+          <div><small>合计支出</small><strong>¥${money(total)}</strong></div>
+          <div><small>最多花在</small><strong>${esc(topCategory ? topCategory[0] : '未分类')}</strong></div>
+        </div>
+        <div class="local-bill-note">最高频商户：${esc(topSpend ? topSpend[0] : '未填写')} · 这份文件只在当前浏览器里处理。</div>
+      </div>`;
+    feedback(`已读懂 ${num(rows.length)} 笔流水，可以继续看异常扣款。`, 'success');
+  }
+
+  async function handleBillFile(file) {
+    if (!file) return;
+    try {
+      const text = await file.text();
+      renderLocalBillSummary(parseCsvRows(text), file.name);
+    } catch (err) {
+      feedback(`读取失败：${err.message}`, 'error');
+    }
   }
 
   function renderBankingTierMatrix(rows) {
@@ -95,26 +239,43 @@
 
   /* ---------------- 发起请求 ---------------- */
 
-  async function runBanking() {
+  async function runBanking(questionOverride = '') {
     const input = $('#banking-question');
-    const question = (input.value || '').trim();
-    if (!question) { toast('请先输入一句话请求'); return; }
+    // 作为 click 监听器直接传入时，浏览器会把 PointerEvent 传进来；
+    // 事件对象不是用户问题，必须回退到输入框或默认账单入口。
+    const explicitQuestion = typeof questionOverride === 'string' ? questionOverride : '';
+    const question = String(explicitQuestion || input.value || '').trim() || '这个月账单分析';
+    if (input && !input.value.trim()) input.value = question;
     const btn = $('#btn-banking-run');
+    feedback('正在整理信息，请稍等……');
+    const resultBox = $('#banking-result');
+    if (resultBox) {
+      resultBox.dataset.filled = '1';
+      resultBox.innerHTML = '<div class="banking-loading"><span class="loading-dot"></span>正在帮你整理，不需要再点一次。</div>';
+    }
     btn.disabled = true;
+    const originalLabel = btn.textContent;
+    btn.textContent = '正在处理…';
     try {
       const res = await api('/api/scenarios/run', { method: 'POST', body: { question } });
       if (res.delegated) {
         $('#banking-result').innerHTML = `
-          <div class="assistant-line">🏦 这是理财请求，已交给右侧「组合体检」旗舰闭环处理。
+          <div class="assistant-line">🏦 这是理财请求，已交给右侧「理财深度分析」闭环处理。
           请到右侧输入框发起（例如「平安银行卖出 30%」）。</div>`;
       } else {
         renderScenarioResult(res.result);
+        if (res.deduplicated) toast('相同待确认请求已合并，仍需完成一次确认');
       }
       renderBankingPending(res);
+      feedback(res.delegated ? '理财请求已转到右侧深度分析。' : '这一步已经完成，下面是结果。', 'success');
+      if (resultBox) window.requestAnimationFrame(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     } catch (err) {
       toast(`发起失败：${err.message}`);
+      feedback(`没有完成：${err.message}`, 'error');
+      if (resultBox) resultBox.innerHTML = '<div class="local-bill-error">这次没有完成，请再点一次“开始处理”。</div>';
     } finally {
       btn.disabled = false;
+      btn.textContent = originalLabel;
     }
   }
 
@@ -139,9 +300,17 @@
           <span class="chip chip-dim">状态：${esc(result.status)}</span>
         </div>
         <div class="assistant-line">${esc(result.message || '')}</div>
+        ${renderProvenance(result.provenance)}
         ${body}
       </div>`;
     box.dataset.filled = '1';
+  }
+
+  function renderProvenance(meta) {
+    if (!meta) return '';
+    const source = meta.source_label || meta.source || '未知';
+    const asOf = meta.as_of ? ` · 截至 ${esc(meta.as_of)}` : '';
+    return `<div class="muted result-provenance" aria-label="数据来源与演示边界">数据来源：${esc(source)}${asOf} · ${esc(meta.simulation_notice || '')}</div>`;
   }
 
   function renderPlanSteps(plan) {
@@ -305,7 +474,7 @@
           <div class="pend-main">
             ${tierBadge(p.tier, p.tier === 'red' ? '红色权限' : '黄色权限')}
             <span class="pend-msg">${esc(p.message || '')}</span>
-            <span class="muted">${esc(tShort(p.created_at))}</span>
+            <span class="muted">${esc(tShort(p.created_at))} · 有效至 ${esc(tShort(p.expires_at))}</span>
           </div>
           <div class="pend-actions">
             ${p.tier === 'red' ? renderVerifyForm(p.id) : `
@@ -344,11 +513,13 @@
         method: 'POST', body: { id, verification },
       });
       toast(res.message || '已确认');
+      feedback(res.message || '已确认，操作完成。', 'success');
       renderBankingPending(res);
       if (res.breaker) renderBreaker(res.breaker);
       if (typeof reloadData === 'function') reloadData();
     } catch (err) {
       toast(`确认失败：${err.message}`);
+      feedback(`确认没有完成：${err.message}`, 'error');
     }
   }
 
@@ -356,9 +527,11 @@
     try {
       const res = await api('/api/scenarios/cancel', { method: 'POST', body: { id } });
       toast(res.message || '已拒绝');
+      feedback(res.message || '已取消这项操作。', 'success');
       renderBankingPending(res);
     } catch (err) {
       toast(`操作失败：${err.message}`);
+      feedback(`操作没有完成：${err.message}`, 'error');
     }
   }
 
@@ -374,6 +547,24 @@
     if (input) input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') runBanking();
     });
+    const quickBill = $('#quick-bill');
+    if (quickBill) quickBill.addEventListener('click', () => runBanking('这个月账单分析'));
+    const quickAnomaly = $('#quick-anomaly');
+    if (quickAnomaly) quickAnomaly.addEventListener('click', () => runBanking('帮我看看有没有异常交易'));
+    const quickGuide = $('#quick-guide');
+    if (quickGuide) quickGuide.addEventListener('click', openStatementGuide);
+    const closeGuide = $('#close-statement-guide');
+    if (closeGuide) closeGuide.addEventListener('click', closeStatementGuide);
+    document.querySelectorAll('.source-option').forEach((button) => {
+      button.addEventListener('click', () => renderSourceGuide(button.dataset.source));
+    });
+    const chooseFile = $('#choose-bill-file');
+    const fileInput = $('#bill-file');
+    if (chooseFile && fileInput) {
+      chooseFile.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => handleBillFile(fileInput.files[0]));
+    }
+    renderSourceGuide('bank');
     bootBanking();
   });
 })();

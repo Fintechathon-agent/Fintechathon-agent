@@ -23,28 +23,32 @@ echo ============================================
 echo  Daily Market Brief pipeline  ^|  %TODAY%
 echo ============================================
 echo.
-echo [1/5] Collecting market data...
+echo [1/6] Collecting market data...
 python collect_market_data.py || goto :err
 echo.
-echo [2/5] Building drafts...
+echo [2/6] Collecting flagship fund data...
+python collect_fund_data.py || goto :err
+echo.
+echo [3/6] Building drafts...
 python make_brief_draft.py || goto :err
 echo.
-echo [3/5] Building web pages (issue + index + latest + share + PDF)...
+echo [4/6] Building web pages (issue + index + latest + share + PDF)...
 python make_brief_page.py || goto :err
 echo.
-echo [4/5] Building Feishu section + clipboard...
+echo [5/6] Building Feishu section + clipboard...
 python make_feishu_section.py || goto :err
 powershell -NoProfile -ExecutionPolicy Bypass -File push_brief_section.ps1 -Path out/feishu_section_%TODAY%.md
 echo.
-echo [5/5] Publishing (API channel auto-skips without credentials)...
+echo [6/6] Publishing (API auto-skips) + private DB ingest...
 python upload_feishu.py --file out/brief_%TODAY%.md --from-heading "### %TODAY%" --webhook-file out/group_%TODAY%.txt
+python ingest_to_db.py --date %TODAY%
 echo.
 echo --------------------------------------------
 echo  Outputs:
 echo    Issue  %~dp0out\brief_%TODAY%.html
 echo    Index  %~dp0out\index.html   (all issues, newest first)
 echo    Stable %~dp0out\latest.html  (always the newest issue)
-echo    Share  %~dp0out\share\       (paths printed by step 3 above)
+echo    Share  %~dp0out\share\       (paths printed by step 4 above)
 echo           .html  = send this one file, double-click opens it
 echo           .pdf   = best for phones / WeChat / printing
 echo --------------------------------------------

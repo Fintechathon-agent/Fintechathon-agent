@@ -1,4 +1,4 @@
-"""Personal AI Fund Manager — 持仓哨兵 Agent 包
+"""Finance Lab — 金融 AI 安全任务台 Agent 包
 """
 from .core import (
     Session,

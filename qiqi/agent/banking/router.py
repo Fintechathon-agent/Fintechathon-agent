@@ -5,7 +5,7 @@
   2. 闭集场景路由：wealth / transfer / bill / subscription / card / cross_scene / 越界；
   3. 统一产出 ScenarioResult（含场景 DAG、权限级别、审计动作），Web 层直接渲染。
 
-理财（wealth）不在本路由内执行——它走既有 Orchestrator 闭环（深度旗舰，
+理财（wealth）不在本路由内执行——它走既有 Orchestrator 闭环（深度路径，
 任何改动都可能破坏 14 项回归测试与答辩叙事），本路由只负责把理财请求
 原样交回。其余五个场景在本模块内确定性执行。
 """
@@ -33,8 +33,9 @@ SCENARIO_LABELS = {
 }
 
 _PRIVILEGE_BYPASS_RE = re.compile(
-    r"(绕过|跳过|不要|无需|免去).{0,8}(验证|确认|审批|风控|权限)|"
-    r"(直接|立刻).{0,8}(转账|挂失|取消|解挂).{0,8}(别问|不用确认|无需确认)",
+    r"(绕过|跳过|不要|无需|免去|忽略|无视|不必).{0,8}(验证|确认|审批|风控|权限)|"
+    r"(直接|立刻|马上).{0,8}(清仓|转账|挂失|取消|解挂).{0,8}"
+    r"(别问|不用确认|无需确认|不需要确认|不验证|跳过验证|免验证)",
     re.I,
 )
 _OUT_OF_SCOPE_RE = re.compile(
@@ -46,7 +47,7 @@ def detect_scenario(text: str) -> str:
     """闭集场景路由：按关键词判定场景。
 
     优先级：跨场景联动（生日+订花/锁定）> 转账 > 卡片 > 订阅 > 账单 > 理财。
-    理财放最后兜底，保证「理财旗舰」路径的既有语义不变。
+    理财放最后兜底，保证「理财深度分析」路径的既有语义不变。
     """
     if re.search(r"(生日|纪念日|周年)", text) and re.search(
         r"(订|买|送|准备|锁定|存|预留)", text
@@ -81,7 +82,7 @@ def route(
             intent={"name": "insufficient", "label": "需要澄清"},
             plan={"intent": "insufficient", "nodes": []},
             tier="green", status="done",
-            message="请说一句话描述你要办的事，例如「这个月账单分析」或「给陈大黄转 500 元」。",
+            message="请说一句话描述你要办的事，例如「这个月账单分析」或「给王芳转 500 元」。",
         )
 
     # 1. 注入与权限绕过检测（所有场景同一道防线）
@@ -155,7 +156,7 @@ def route(
             scenario="wealth", scenario_label=label,
             intent={"name": "wealth", "label": "理财操作", "question": question},
             plan=plan, tier="green", status="delegated",
-            message="已转交理财旗舰闭环处理（组合体检 → 风控闸门 → 情景推演 → 确认执行）。",
+            message="已转交理财深度分析闭环处理（组合诊断 → 风控闸门 → 情景推演 → 确认执行）。",
         )
 
     # 3. 审计（所有场景统一留痕）

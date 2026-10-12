@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>持仓哨兵 · Personal AI Fund Manager</title>
+<title>Finance Lab · 金融 AI 安全任务台</title>
 <link rel="stylesheet" href="/static/style.css">
 <link rel="icon" href="data:,">
 </head>
@@ -13,15 +13,16 @@
 
 <header class="topbar">
   <div class="brand">
-    <div class="logo">哨</div>
+    <div class="logo">K</div>
     <div class="brand-text">
-      <h1>持仓哨兵</h1>
-      <p>银行 AI 智能体 · 六场景全覆盖（理财旗舰 + 转账 / 账单 / 卡片 / 订阅 / 跨场景联动）</p>
+      <h1>金融 AI 安全任务台</h1>
+      <p>Finance Lab · 自然语言银行任务 · 安全编排 · 人在回路</p>
     </div>
   </div>
   <div class="topbar-right">
     <span class="pill" id="engine-pill">决策引擎加载中…</span>
     <span class="pill pill-warn">演示环境 · 不构成投资建议</span>
+    <a class="pill pill-link" href="/evidence">验收证据看板 ↗</a>
     <div class="user-chip" id="user-chip"></div>
   </div>
 </header>
@@ -29,20 +30,66 @@
 <section class="banking" id="banking-section">
   <div class="card">
     <div class="card-head">
-      <h2>银行 AI 智能体 · 六场景统一入口</h2>
+      <h2>金融 AI 安全任务台 · 六场景统一入口</h2>
       <span class="tag">对齐赛题：至少 3 个核心场景（鼓励全覆盖）</span>
     </div>
     <p class="agent-desc">
-      用一句话办业务。智能转账、账单分析、理财操作、卡片管理、订阅代扣、跨场景联动——
-      每个场景都经过确定性闸门与三级权限分级，全程可审计。
+      点一下，直接看结果。
     </p>
-    <div class="scenario-chips" id="scenario-chips"></div>
+    <div class="first-steps" aria-label="新手快捷入口">
+      <div class="shortcut-grid">
+        <button class="shortcut-card" id="quick-bill" type="button">
+          <span class="shortcut-icon">📊</span>
+          <span><b>看本月账单</b></span>
+          <span class="shortcut-arrow">→</span>
+        </button>
+        <button class="shortcut-card" id="quick-anomaly" type="button">
+          <span class="shortcut-icon">🔎</span>
+          <span><b>找异常扣款</b></span>
+          <span class="shortcut-arrow">→</span>
+        </button>
+        <button class="shortcut-card shortcut-card-guide" id="quick-guide" type="button">
+          <span class="shortcut-icon">🧭</span>
+          <span><b>告诉我去哪里看流水</b></span>
+          <span class="shortcut-arrow">→</span>
+        </button>
+      </div>
+    </div>
+    <details class="more-actions">
+      <summary>其他操作</summary>
+      <div class="scenario-chips" id="scenario-chips"></div>
+    </details>
+    <div class="statement-guide hidden" id="statement-guide" aria-live="polite">
+      <div class="statement-guide-head">
+        <div>
+          <span class="eyebrow">账单读取助手</span>
+          <h3>先选你平时用的 App</h3>
+          <p>按下面路径打开账单，导出后在这里选择文件。</p>
+        </div>
+        <button class="icon-button" id="close-statement-guide" type="button" aria-label="关闭账单读取助手">×</button>
+      </div>
+      <div class="source-picker" role="group" aria-label="选择账单来源">
+        <button class="source-option active" type="button" data-source="bank">手机银行</button>
+        <button class="source-option" type="button" data-source="wechat">微信支付</button>
+        <button class="source-option" type="button" data-source="alipay">支付宝</button>
+        <button class="source-option" type="button" data-source="file">我已有文件</button>
+      </div>
+      <div class="source-steps" id="source-steps"></div>
+      <div class="statement-import">
+        <input id="bill-file" type="file" accept=".csv,.txt,text/csv,text/plain" hidden>
+        <button class="btn btn-outline" id="choose-bill-file" type="button">选择账单文件</button>
+        <span class="file-hint">支持银行或支付 App 导出的 CSV / TXT</span>
+      </div>
+      <div id="local-bill-result"></div>
+    </div>
     <div class="nl-box">
       <input id="banking-question" type="text" maxlength="120"
-             placeholder="试试：给陈大黄转500元备注聚餐 ｜ 这个月账单分析 ｜ 取消健身房会员 ｜ 尾号8888挂失 ｜ 我爱人10月25日生日，锁定1000元活期" />
+             aria-label="用一句话告诉我你要办理什么"
+             placeholder="也可以直接说：帮我看看这个月花了多少" />
     </div>
-    <button class="btn btn-primary btn-block" id="btn-banking-run">发起（六场景统一入口）</button>
+    <button class="btn btn-primary btn-block" id="btn-banking-run">开始处理</button>
     <div id="banking-result"></div>
+    <div id="banking-feedback" class="banking-feedback" aria-live="polite"></div>
     <div id="banking-pending"></div>
   </div>
 </section>
@@ -54,7 +101,7 @@
 
     <div class="card">
       <div class="card-head">
-        <h2>资产总览</h2>
+        <h2>理财深度模块 · 资产总览</h2>
         <span class="tag" id="assets-date">—</span>
       </div>
       <div class="stats" id="stat-tiles"></div>
@@ -63,7 +110,7 @@
 
     <div class="card">
       <div class="card-head">
-        <h2>持仓明细</h2>
+        <h2>理财深度模块 · 持仓明细</h2>
         <span class="tag">浮动盈亏按成本口径计算</span>
       </div>
       <div class="table-wrap">
@@ -109,7 +156,7 @@
 
     <div class="card agent-card">
       <div class="card-head">
-        <h2>组合体检</h2>
+        <h2>理财深度分析</h2>
         <span class="tag tag-live" id="agent-status">待发起</span>
       </div>
       <p class="agent-desc">

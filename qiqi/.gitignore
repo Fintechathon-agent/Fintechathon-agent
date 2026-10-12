@@ -30,5 +30,12 @@ data/contest/*
 brief/out/feishu_backup_*
 brief/out/*.png
 
+# Daily Market Brief 私有数据层（数据源核心资产，只留本机，勿提交/勿外发）
+# 对外只分享「五件套」成品文档（brief_*.html/md、share/、飞书章节）
+brief/db/
+brief/out/market_*.json
+brief/out/fund_*.json
+brief/out/fund_all_*.json
+
 # 微信群分析报告：仅保留本地，不同步 GitHub
 docs/KOSX三队微信群状态分析_*.md

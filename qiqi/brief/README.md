@@ -6,16 +6,20 @@
 
 ```
 brief/
-├─ collect_market_data.py          # 采集：行情/利率/快讯/业绩预告 → out/market_日期.json
+├─ collect_market_data.py          # 采集：行情/利率/快讯/业绩预告/产品投资池 → out/market_日期.json
+├─ collect_fund_data.py            # 采集：旗舰基金池净值 + 全市场快照 → out/fund_日期.json、fund_all_日期.json
 ├─ make_brief_draft.py             # 起草：JSON → 群聊版 txt + 飞书版 md（【待填】占位待人补）
 ├─ upload_feishu.py                # 发布：文档追加 + 群消息（需凭证，见下）
 ├─ make_brief_page.py              # 网页版：brief_日期.md → out/brief_日期.html（编辑式版式）
 │                                  #   同时重建 out/index.html（全部期数入口页）+ out/latest.html（固定链接）
 ├─ make_feishu_section.py          # 章节提取：brief_日期.md → out/feishu_section_日期.md
 ├─ push_brief_section.ps1          # 剪贴板推送：把章节文件放进剪贴板（飞书文档粘贴同步用）
+├─ db.py                           # 私有数据库（SQLite）schema + 幂等写入 + 产品侧读取
+├─ ingest_to_db.py                 # 回填：采集 JSON/数据集/成稿 → db/market.db（幂等）
 ├─ plan_Daily_Market_Brief_21天计划书.md
 ├─ sample/brief_2026-10-07.md      # 样板间：人工打磨过的完整示例
 ├─ dataset/                        # 21 天数据集（briefs_21d.jsonl）
+├─ db/                             # 私有数据库 market.db（本机，.gitignore 排除）
 └─ out/                            # 每日产出：market_*.json、brief_*.md、group_*.txt
 ```
 
@@ -91,7 +95,7 @@ python brief/upload_feishu.py --file out/brief_2026-10-08.md --from-heading "###
 
 ## 自动化状态
 
-- **已配置定时任务**：「每天18:00发布 Daily Market Brief（21天）」，2026-10-08 起每天 18:00 自动执行采集→草稿→补齐→入库→飞书文档同步，共 21 次（末次 10/28）。
+- **已配置定时任务**：「每天17:35市场日报自动生成」，2026-10-08 起每天 17:35 自动执行采集（行情+基金）→草稿→补齐→网页/飞书章节→**私有库入库**→飞书文档同步。
 - **文档同步目标（已接通）**：`https://rcntz7sdyswd.feishu.cn/wiki/LB0Xw98WniMV6okz9HqcGMDCnW7`（知识库「Personal AI Fund Manager｜TeamOS」）。当前走浏览器粘贴通道，无需凭证；配置应用凭证后自动切换为 API 通道。
 - 群消息需先配好 webhook，否则该通道跳过并在汇报中说明。
 - 手动补跑：`python brief/collect_market_data.py && python brief/make_brief_draft.py`，或双击 `一键发布.cmd`。
@@ -152,6 +156,37 @@ python brief/upload_feishu.py --file out/brief_2026-10-08.md --from-heading "###
 | 东财快讯 | 新闻流（100 条/次） | 自动按关键词打标：earnings/macro/policy/company/commodity/geopolitics |
 | **东财数据中心** `RPT_PUBLIC_OP_NEWPREDICT` | A 股业绩预告（官方分类） | 按 PREDICT_TYPE 统计：预喜=预增+略增+续盈+扭亏（不含"减亏"） |
 | FRED `fredgraph.csv` | 美债全历史（核验用） | 用来验证"XX 年以来最高"这类历史比较；官网值有 1-2 日滞后 |
+| **东财 F10 净值 API** `api.fund.eastmoney.com/f10/lsjz` | 旗舰基金池净值历史（10 只，股票/混合/指数/债券/货币） | 需 Referer `fundf10.eastmoney.com`；货币型基金该接口净值实为「万份收益」，使用前留意 |
+| akshare `fund_open_fund_daily_em` | 全市场基金每日净值快照（约 2.4 万只） | 失败自动跳过，不影响主线 |
+
+## 私有数据库（本机数据底座，勿外发）
+
+`brief/db/market.db`（SQLite）是日报与「理财旗舰」的**本地数据底座**，按用户要求
+**只留本机、不进 GitHub、不发给任何人**（已 .gitignore；`out/market_*.json` 等
+原始采集 JSON 同样已移出 git 跟踪）。对外只分享「五件套」成品文档。
+
+| 表 | 内容 | 主键 |
+|---|---|---|
+| quotes | 每日行情快照（指数/产品投资池个股+ETF/港股/美股/商品/汇率） | (date, market, code) |
+| rates | 美债 10Y/30Y（财政部官方 + FRED 双源并存） | (date, series, source) |
+| news | 快讯 | (date, title) |
+| earnings | 业绩预告汇总 | (date, report_date) |
+| fund_nav | 旗舰基金池净值历史 | (code, date) |
+| fund_all | 全市场基金每日净值快照 | (code, date) |
+| brief_events | 事件→解释→风险→决策 标注数据集（briefs_21d.jsonl） | id |
+| briefs | 成稿留档（群聊版 + 飞书版正文） | date |
+
+命令：
+
+```bash
+python brief/collect_fund_data.py            # 采集旗舰基金池 + 全市场快照（定时任务已含）
+python brief/ingest_to_db.py --all           # 全量回填（幂等，可反复跑）
+python brief/ingest_to_db.py --date 2026-10-12   # 只回填某一天
+```
+
+产品侧读取示例：`brief/db.py` 提供 `latest_quotes()`（最新行情快照，可补全持仓价格）
+与 `series_history()`（利率序列）。定时任务每天 17:35 采集后自动入库，行情类数据
+当日更新、基金净值 17:35 时可能尚未出当日净值（基金公司晚间发布，次日入库补齐）。
 
 **核验纪律**（每次简报发布前）：
 1. 快讯里的转述数字（"升破 X%""2002 年以来最高"）→ 用官方源/全历史数据回溯后再生效；

@@ -1,4 +1,4 @@
-"""用户端 Web 服务——持仓哨兵（模块5：Launcher / Demo）。
+"""Finance Lab 用户端 Web 服务——金融 AI 安全任务台。
 
 只依赖 Python 标准库 http.server，不引入 FastAPI/Flask/pydantic，
 保证比赛演示机器零安装即可启动：
@@ -56,7 +56,7 @@ logger = logging.getLogger("web")
 USER_ID = "demo_user"
 
 ACTION_LABELS = {
-    "portfolio_review": "发起组合体检",
+    "portfolio_review": "发起理财深度分析",
     "paper_trade_execution": "纸交易执行回执",
     "strong_verification": "红色权限 · 强验证（演示 Mock）",
     "user_confirmation": "用户确认执行",
@@ -84,6 +84,8 @@ ACTION_LABELS = {
     "banking_cross_scene_plan": "跨场景联动 · 计划生成",
     "banking_strong_verification": "六场景 · 红色权限强验证（演示 Mock）",
     "banking_pending_rejected": "六场景 · 用户拒绝待确认操作",
+    "banking_demo_seeded": "六场景 · 演示数据预置",
+    "banking_balance_query": "六场景 · 余额查询（自动执行）",
 }
 
 
@@ -765,7 +767,7 @@ class DemoApp:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "PortfolioSentinelWeb/0.1"
+    server_version = "FinanceLabSafetyConsole/1.0"
     protocol_version = "HTTP/1.1"
 
     def handle(self) -> None:
@@ -839,6 +841,10 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path in ("/", "/index.html"):
                 return self._file("index.html")
+            if path in ("/compare", "/compare/"):
+                return self._file("compare/index.html")
+            if path in ("/evidence", "/evidence/"):
+                return self._file("evidence/index.html")
             if path.startswith("/static/"):
                 return self._file(path[len("/static/"):])
             if path == "/api/bootstrap":
@@ -884,6 +890,9 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/scenarios/cancel":
                 from web.banking_service import cancel_pending
                 return self._json(cancel_pending(str(body.get("id", ""))))
+            if path == "/api/scenarios/seed-demo":
+                from web.banking_service import seed_demo_queue
+                return self._json(seed_demo_queue())
         except Exception as exc:      # noqa: BLE001
             return self._error(exc)
         self._send(404, "404".encode(), "text/plain; charset=utf-8")
@@ -909,7 +918,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     except Exception:      # noqa: BLE001
         pass
 
-    parser = argparse.ArgumentParser(description="持仓哨兵 · 用户端 Web 服务")
+    parser = argparse.ArgumentParser(description="Finance Lab · 金融 AI 安全任务台")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765, help="起始端口，被占用则自动顺延")
     parser.add_argument("--config", default="", help="config.fund.yaml 路径")
@@ -939,7 +948,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     engine = app.engine_info()
 
     print("=" * 62)
-    print("  持仓哨兵 Personal AI Fund Manager · 用户端")
+    print("  Finance Lab · 金融 AI 安全任务台")
     print("=" * 62)
     print(f"  地址：{url}")
     print(f"  决策引擎：{engine['label']}")

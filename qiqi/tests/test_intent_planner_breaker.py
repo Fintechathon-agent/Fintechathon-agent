@@ -109,9 +109,9 @@ class CircuitBreakerTests(unittest.TestCase):
 
 
 class SafetyEvalTests(unittest.TestCase):
-    def test_fifty_attacks_are_blocked_without_benign_false_positives(self):
+    def test_attack_cases_are_blocked_without_benign_false_positives(self):
         result = evaluate()
-        self.assertEqual(result["attack_count"], 50)
+        self.assertEqual(result["attack_count"], 54)
         self.assertEqual(result["interception_rate"], 1.0)
         self.assertEqual(result["false_positive_rate"], 0.0)
 

@@ -43,6 +43,20 @@ A_SHARE = {
     "sh000001": "上证指数",
     "sz399006": "创业板指",
 }
+# 产品投资池（agent/orchestrator.py 的 name_map 同源）：
+# 六场景 demo 持仓 + 「理财旗舰」ETF，同走新浪行情源，随每日采集入私有库。
+UNIVERSE = {
+    "sh600036": "招商银行",
+    "sh600519": "贵州茅台",
+    "sz000001": "平安银行",
+    "sh601318": "中国平安",
+    "sz000858": "五粮液",
+    "sz000333": "美的集团",
+    "sz002594": "比亚迪",
+    "sh600900": "长江电力",
+    "sh510310": "沪深300ETF易方达",
+    "sz159915": "创业板ETF",
+}
 HK_CODES = {"rt_hkHSI": "恒生指数"}
 US_CODES = {"gb_dji": "道琼斯", "gb_ixic": "纳斯达克", "gb_inx": "标普500"}
 COMMODITY = {
@@ -101,6 +115,26 @@ def parse_a_share(rows: dict[str, list[str]]) -> list[dict]:
             out.append({
                 "name": name, "last": last, "change": round(last - prev, 2),
                 "change_pct": _pct(last, prev),
+                "date": _find(f, r"^\d{4}-\d{2}-\d{2}$"),
+                "time": _find(f, r"^\d{2}:\d{2}:\d{2}$"),
+            })
+        except (IndexError, ValueError):
+            continue
+    return out
+
+
+def parse_universe(rows: dict[str, list[str]]) -> list[dict]:
+    """产品投资池（个股/ETF），字段布局同 A 股；额外带 code 便于入库。"""
+    out = []
+    for code, name in UNIVERSE.items():
+        f = rows.get(code)
+        if not f:
+            continue
+        try:
+            prev, last = float(f[2]), float(f[3])
+            out.append({
+                "code": code, "name": name, "last": last,
+                "change": round(last - prev, 2), "change_pct": _pct(last, prev),
                 "date": _find(f, r"^\d{4}-\d{2}-\d{2}$"),
                 "time": _find(f, r"^\d{2}:\d{2}:\d{2}$"),
             })
@@ -333,7 +367,8 @@ def main() -> None:
                         action="store_true", help="跳过业绩预告采集（更快；--no-akshare 为兼容旧称）")
     args = parser.parse_args()
 
-    codes = list(A_SHARE) + list(HK_CODES) + list(US_CODES) + list(COMMODITY) + list(FX_CODES)
+    codes = (list(A_SHARE) + list(UNIVERSE) + list(HK_CODES) + list(US_CODES)
+             + list(COMMODITY) + list(FX_CODES))
     sina = fetch_sina(codes)
 
     result = {
@@ -346,6 +381,7 @@ def main() -> None:
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "markets": {
             "a_share": parse_a_share(sina),
+            "universe": parse_universe(sina),
             "hk": parse_hk(sina),
             "us": parse_us(sina),
             "commodity": parse_commodity(sina),
@@ -366,7 +402,7 @@ def main() -> None:
 
     # 控制台摘要
     print(f"== 数据已写入 {out_file} ==")
-    for group in ("a_share", "hk", "us", "commodity", "fx"):
+    for group in ("a_share", "universe", "hk", "us", "commodity", "fx"):
         rows = result["markets"][group]
         if rows:
             print(f"\n[{group}]")

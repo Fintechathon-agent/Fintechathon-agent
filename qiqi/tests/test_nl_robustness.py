@@ -84,7 +84,7 @@ class CardTests(unittest.TestCase):
         self.assertEqual(r.scenario, "card")
         self.assertEqual(r.tier, "green")
         self.assertEqual(r.status, "executed")
-        self.assertEqual(len(r.data.get("cards", [])), 3)
+        self.assertEqual(len(r.data.get("cards", [])), 5)
 
     def test_card_action_without_identifier_clarifies(self):
         r = _route("信用卡额度调到2万")
@@ -141,7 +141,7 @@ class CrossSceneTests(unittest.TestCase):
 
 
 class WealthVerbTests(unittest.TestCase):
-    """理财旗舰动词对齐赛题：申购/赎回/推荐/风险评估。"""
+    """理财深度分析动词对齐赛题：申购/赎回/推荐/风险评估。"""
 
     def test_shengou_is_buy(self):
         intent = parse_intent("申购平安银行 5000元", _portfolio())

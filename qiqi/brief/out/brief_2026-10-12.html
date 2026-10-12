@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>每日市场简报 · 2026-10-12</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --bg: #FBFAF8;
+  --card: #FFFFFF;
+  --hero-bg: #F1EDE4;
+  --hero-tab: #F7F3EA;
+  --ink: #141413;
+  --text: #333331;
+  --text-2: #7A7A76;
+  --border: #E7E4DD;
+  --hair: #EFEDE8;
+  --primary: #2563EB;
+  --accent: #1E3A5F;
+  --up: #B4453A;
+  --down: #2D6A4F;
+  --code-bg: #F0EEE7;
+  --note-bg: #F7F5EF;
+  --serif: "Source Han Serif SC", "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --sans: "PingFang SC", "MiSans", "HarmonyOS Sans SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151514;
+    --card: #1D1D1B;
+    --hero-bg: #221F1A;
+    --hero-tab: #2A2620;
+    --ink: #ECEAE4;
+    --text: #CFCDC7;
+    --text-2: #8E8C86;
+    --border: #2E2D2A;
+    --hair: #262522;
+    --primary: #8AB0FF;
+    --accent: #A9C3E8;
+    --up: #DE857C;
+    --down: #7FBF9E;
+    --code-bg: #262623;
+    --note-bg: #201F1C;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 16px/1.75 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 56px 28px 88px;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 64px;
+  align-items: start;
+}
+/* ---------- 左侧目录 ---------- */
+.rail { position: sticky; top: 48px; }
+.rail-title {
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--text-2); margin: 0 0 12px 14px;
+}
+.rail a {
+  display: flex; gap: 10px; align-items: baseline;
+  padding: 7px 0 7px 14px;
+  border-left: 2px solid transparent;
+  color: var(--text-2); text-decoration: none;
+  font-size: 13.5px; line-height: 1.5;
+  transition: color .15s ease, border-color .15s ease;
+}
+.rail a .n { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.rail a:hover,
+.rail a.on { color: var(--ink); border-left-color: var(--primary); }
+.rail a.on .n { color: var(--primary); }
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  background: var(--hero-bg);
+  border-radius: 20px;
+  padding: 30px 34px 26px;
+  box-shadow: 0 1px 2px rgba(20,20,19,.04), 0 10px 32px rgba(20,20,19,.05);
+}
+.hero::before {
+  content: "";
+  position: absolute; top: -9px; left: -9px; width: 150px; height: 46px;
+  background: var(--hero-tab); border-radius: 14px; z-index: 0;
+}
+.hero > * { position: relative; z-index: 1; }
+.hero-bar {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  margin-bottom: 12px;
+}
+.kicker {
+  font-size: 11px; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--primary);
+}
+.hero-read { font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
+.hero h1 {
+  margin: 4px 0 10px;
+  font-family: var(--serif); font-weight: 800;
+  font-size: clamp(34px, 5vw, 46px); line-height: 1.15; letter-spacing: .01em;
+  color: var(--ink);
+}
+.hero-sub { margin: 0; font-size: 14px; color: var(--text-2); }
+.hero-foot {
+  margin-top: 18px; padding-top: 14px;
+  border-top: 1px solid rgba(20,20,19,.08);
+  font-size: 12.5px; color: var(--text-2);
+}
+.hero-foot a { color: var(--primary); text-decoration: none; }
+.hero-foot a:hover { text-decoration: underline; }
+@media (prefers-color-scheme: dark) {
+  .hero-foot { border-top-color: rgba(236,234,228,.1); }
+}
+/* ---------- 区块 ---------- */
+.sec { margin-top: 64px; }
+.sec h2 {
+  margin: 8px 0 22px;
+  font-family: var(--serif); font-weight: 700;
+  font-size: 27px; line-height: 1.3; letter-spacing: .01em; color: var(--ink);
+}
+/* ---------- 表格 ---------- */
+.tbl-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 6px 8px;
+  overflow-x: auto;
+}
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th {
+  text-align: left; font-weight: 500; font-size: 12.5px; color: var(--text-2);
+  padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.tbl td { padding: 11px 12px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl .asset { font-weight: 600; color: var(--ink); white-space: nowrap; }
+.tbl .val { color: var(--text); white-space: nowrap; }
+.tbl .chg { font-weight: 600; white-space: nowrap; }
+.tbl .up { color: var(--up); }
+.tbl .dn { color: var(--down); }
+.tbl .fl { color: var(--text-2); font-weight: 400; }
+.tbl .when { color: var(--text-2); font-size: 13px; }
+.mapping .l2 { white-space: nowrap; }
+.mapping .l2 code, .mapping .l3 code { white-space: nowrap; }
+/* ---------- 提示块 ---------- */
+.note {
+  margin: 16px 0 0;
+  background: var(--note-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px; line-height: 1.8; color: var(--text);
+}
+.note strong { color: var(--accent); font-weight: 600; }
+/* ---------- 异常波动 ---------- */
+.moves { list-style: none; margin: 0; padding: 0; }
+.moves li { padding: 18px 0; border-bottom: 1px solid var(--hair); }
+.moves li:last-child { border-bottom: 0; }
+.mv-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.mv-name { font-size: 15px; font-weight: 600; color: var(--ink); }
+.mv-pct { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.mv-pct.up { color: var(--up); }
+.mv-pct.dn { color: var(--down); }
+.mv-note { margin-top: 5px; font-size: 13.5px; line-height: 1.7; color: var(--text-2); }
+/* ---------- 财报 ---------- */
+.earn { margin: 0; padding: 0; }
+.earn-item { padding: 16px 0; border-bottom: 1px solid var(--hair); }
+.earn-item:last-child { border-bottom: 0; }
+.earn-item > p {
+  margin: 0; font-family: var(--serif);
+  font-size: 15.5px; line-height: 1.85; color: var(--text);
+}
+.earn-item > p::before {
+  content: ""; display: inline-block;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--primary); margin: 0 12px 3px 2px;
+}
+.earn .sub { list-style: none; margin: 10px 0 0; padding: 0 0 0 19px; }
+.earn .sub li {
+  position: relative; padding: 4px 0 4px 14px;
+  font-size: 13.5px; line-height: 1.8; color: var(--text-2);
+}
+.earn .sub li::before {
+  content: ""; position: absolute; left: 0; top: 15px;
+  width: 7px; height: 1px; background: var(--text-2);
+}
+/* ---------- 新闻 ---------- */
+.news { list-style: none; margin: 0; padding: 0; }
+.news li { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--hair); }
+.news li:last-child { border-bottom: 0; }
+.news .num {
+  flex: none; width: 24px; padding-top: 5px;
+  font-size: 12px; font-variant-numeric: tabular-nums; color: var(--text-2);
+}
+.news .txt { margin: 0; font-family: var(--serif); font-size: 15.5px; line-height: 1.85; }
+/* ---------- 一句解释 ---------- */
+.explain p {
+  margin: 0 0 20px; font-family: var(--serif);
+  font-size: 16px; line-height: 1.95; color: var(--text);
+}
+.explain p:last-child { margin-bottom: 0; }
+.explain strong, .news strong, .earn strong, .q-lead strong { color: var(--accent); font-weight: 600; }
+/* ---------- 今日问题 ---------- */
+.q-lead { margin: 0 0 10px; font-family: var(--serif); font-size: 16px; line-height: 1.95; }
+.q-lead:last-of-type { margin-bottom: 20px; }
+.opts { display: grid; gap: 12px; margin: 0 0 20px; }
+.opt {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 13px 16px;
+}
+.opt .k {
+  flex: none; width: 26px; height: 26px; margin-top: 1px;
+  display: grid; place-items: center;
+  background: var(--note-bg); border-radius: 8px;
+  font-size: 13px; font-weight: 700; color: var(--accent);
+}
+.opt p { margin: 0; font-size: 14.5px; line-height: 1.7; }
+.why {
+  background: var(--note-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 18px; font-size: 14px; line-height: 1.8;
+}
+.why b { color: var(--accent); font-weight: 600; }
+.why code, code {
+  font-family: var(--mono); font-size: 12.5px;
+  background: var(--code-bg); border-radius: 6px; padding: 1px 6px; color: #3A3A38;
+}
+@media (prefers-color-scheme: dark) { .why code, code { color: #C9C7C2; } }
+/* ---------- 页脚 ---------- */
+.foot {
+  margin-top: 72px; padding-top: 22px;
+  border-top: 1px solid var(--border);
+  font-size: 12.5px; line-height: 1.8; color: var(--text-2);
+}
+.foot p { margin: 0 0 6px; }
+/* ---------- 响应式 ---------- */
+@media (max-width: 1023px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); max-width: 720px; padding: 36px 20px 64px; }
+  .rail { display: none; }
+  .sec { margin-top: 52px; }
+  .hero { padding: 24px 22px 22px; }
+  .tbl { min-width: 560px; }
+}
+@page { size: A4; margin: 14mm 12mm; }
+@media print {
+  /* 打印/导出 PDF 一律锁定浅色：深色模式偏好会把变量染成浅字，落纸即不可读 */
+  :root {
+    --bg: #FBFAF8; --card: #FFFFFF; --hero-bg: #F1EDE4; --hero-tab: #F7F3EA;
+    --ink: #141413; --text: #333331; --text-2: #7A7A76;
+    --border: #E7E4DD; --hair: #EFEDE8;
+    --primary: #2563EB; --accent: #1E3A5F;
+    --up: #B4453A; --down: #2D6A4F;
+    --code-bg: #F0EEE7; --note-bg: #F7F5EF;
+  }
+  .rail { display: none; }
+  .wrap { display: block; max-width: none; padding: 0; }
+  body { background: #fff; }
+  .hero { box-shadow: none; border: 1px solid var(--border); }
+  .moves li, .news li, .earn-item, .opt { break-inside: avoid; }
+  /* 模块标题不单独落在页脚：标题+首个内容块至少同页可见 */
+  .sec { break-inside: auto; }
+  .sec > .kicker, .sec > h2 { break-after: avoid; }
+  /* 今日问题：题干与 A/B/C 选项必须同页，避免拆读 */
+  #s7 { break-inside: avoid; }
+  h2 { break-after: avoid; }
+  .tbl-card { break-inside: auto; }
+  .tbl thead { display: table-header-group; }
+  .tbl tr { break-inside: avoid; }
+  .note, .why, .opts { break-inside: avoid; }
+  .sec { margin-top: 40px; }
+  .foot { margin-top: 40px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="rail" aria-label="目录">
+    <p class="rail-title">目录 · Contents</p>
+    <a href="#s1"><span class="n">01</span><span>市场行情</span></a><a href="#s2"><span class="n">02</span><span>异常波动</span></a><a href="#s3"><span class="n">03</span><span>重要财报</span></a><a href="#s4"><span class="n">04</span><span>重大新闻</span></a><a href="#s5"><span class="n">05</span><span>一句解释</span></a><a href="#s6"><span class="n">06</span><span>Agent 映射</span></a><a href="#s7"><span class="n">07</span><span>今日问题</span></a>
+  </aside>
+  <main>
+    <header class="hero">
+      <div class="hero-bar">
+        <span class="kicker">Daily Briefing · 2026/10/12</span>
+        <span class="hero-read">约 8 分钟阅读 · 14 项行情</span>
+      </div>
+      <h1>每日市场简报</h1>
+      <p class="hero-sub">2026-10-12（周一）</p>
+      <p class="hero-foot">Personal AI Fund Manager · 每日 18:00 发布 · 数据经双源核验</p>
+    </header>
+<section class="sec" id="s1"><div class="kicker">01 · MARKET</div><h2>市场行情</h2><div class="tbl-card"><table class="tbl market"><thead><tr><th>资产</th><th>最新</th><th>涨跌</th><th>数据时间</th></tr></thead><tbody><tr><td class="asset">沪深300</td><td class="val">4287.98</td><td class="chg dn">-0.68%</td><td class="when">10-12 收盘</td></tr><tr><td class="asset">上证指数</td><td class="val">3797.24</td><td class="chg dn">-0.43%</td><td class="when">10-12 收盘</td></tr><tr><td class="asset">创业板指</td><td class="val">2963.82</td><td class="chg fl"><strong>-2.61%</strong></td><td class="when">10-12 收盘</td></tr><tr><td class="asset">恒生指数</td><td class="val">24271.20</td><td class="chg up">+0.25%</td><td class="when">10-12 16:09</td></tr><tr><td class="asset">道琼斯</td><td class="val">51654.95</td><td class="chg up">+0.83%</td><td class="when">10-10 收盘（上周五）</td></tr><tr><td class="asset">纳斯达克</td><td class="val">27366.17</td><td class="chg up">+0.64%</td><td class="when">10-10 收盘（上周五）</td></tr><tr><td class="asset">标普500</td><td class="val">7811.54</td><td class="chg up">+0.59%</td><td class="when">10-10 收盘（上周五）</td></tr><tr><td class="asset">COMEX黄金</td><td class="val">4197.04</td><td class="chg dn">-0.46%</td><td class="when">10-12 18:00（盘中）</td></tr><tr><td class="asset">NYMEX原油</td><td class="val">92.75</td><td class="chg up">+0.98%</td><td class="when">10-12 18:00（盘中）</td></tr><tr><td class="asset">COMEX白银</td><td class="val">60.97</td><td class="chg dn">-0.14%</td><td class="when">10-12 18:00（盘中）</td></tr><tr><td class="asset">NYMEX天然气</td><td class="val">3.136</td><td class="chg dn">-2.61%</td><td class="when">10-12 18:00（盘中）</td></tr><tr><td class="asset">离岸人民币</td><td class="val">6.6941</td><td class="chg fl">0.00%</td><td class="when">10-12 18:00</td></tr><tr><td class="asset">美债10Y</td><td class="val">5.24%</td><td class="chg fl">—</td><td class="when">10-09（美国财政部官方）</td></tr><tr><td class="asset">美债30Y</td><td class="val">5.60%</td><td class="chg fl">—</td><td class="when">10-09（美国财政部官方）</td></tr></tbody></table></div></section><section class="sec" id="s2"><div class="kicker">02 · MOVERS</div><h2>异常波动</h2><ul class="moves"><li><div class="mv-note"><strong>创业板指 -2.61%</strong>（最新 2963.82）——为 10/08 节后首日（-3.15%）以来最大单日跌幅，跌幅近沪深300 的四倍</div></li><li><div class="mv-note"><strong>NYMEX天然气 -2.61%</strong>（最新 3.136）——与俄气设施遇袭消息同日，方向与"供给受扰"直觉相反（推断：或受需求端与库存数据主导）</div></li><li><div class="mv-note">布伦特原油盘中一度跌超 2%、后反弹收涨约 1%——日内振幅明显</div></li></ul></section><section class="sec" id="s3"><div class="kicker">03 · EARNINGS</div><h2>重要财报</h2><div class="earn"><div class="earn-item"><p>A 股三季报预告进入<strong>密集披露期</strong>：单日新增 35 家至 <strong>201 家</strong> —— 预喜 <strong>161 家（80%）</strong>、报忧 32 家、减亏 6 家、不确定 2 家（东财 PREDICT_TYPE 官方分类）</p><ul class="sub"><li>明细：略增 77、<strong>预增 66</strong>（前一日 37）、续盈 12、扭亏 6 ｜ 略减 13、首亏 7、预减 7、续亏 5</li><li><strong>北方稀土</strong>：预计前三季度净利润同比增长 +135%~139%（主要稀土产品价格高位震荡）</li><li><strong>ST凯利</strong>：预增约 +167%~209% ｜ <strong>纳微科技</strong>：+102% ｜ <strong>捷捷微电</strong>：+60%~80%（半导体链）</li><li>国机精工：预降 -53.91%~63.62%（工业链分化）</li></ul></div></div></section><section class="sec" id="s4"><div class="kicker">04 · NEWS</div><h2>重大新闻</h2><ol class="news"><li><span class="num">01</span><p class="txt"><strong>【重要政策】新能源汽车出口退税下调</strong>：两部门宣布自 2027 年 4 月 1 日起，增值税出口退税率由 13% 下调至 9%（17:10）</p></li><li><span class="num">02</span><p class="txt"><strong>原油信号矛盾</strong>：布伦特 +1%（地缘支撑）；同时<strong>欧佩克大幅下调 2026 年全球石油需求增长预期</strong>（17:52）；沙特阿美称正研究"额外原油出口路线"（17:44）</p></li><li><span class="num">03</span><p class="txt"><strong>机构信号</strong>：里昂称"美联储模型 25 年来首次偏好债券胜过股票"，机构与散户情绪分化扩大（17:30）</p></li><li><span class="num">04</span><p class="txt"><strong>地缘</strong>：欧盟通过对俄军工产业近 1600 项制裁名单（16:31）；乌称俄袭击哈尔科夫州天然气开采设施（17:40）</p></li><li><span class="num">05</span><p class="txt">香港证监会：加强具针对性的工具打击 IPO 失当行为（17:37）；证监会：探索更适配创新型中小企业的制度（16:49）</p></li></ol></section><section class="sec" id="s5"><div class="kicker">05 · EXPLAIN</div><h2>一句解释</h2><div class="explain"><p>创业板跌幅近沪深300 四倍，但今日美债持平、无外部利率冲击：这轮下跌或由 A 股内部因素驱动（推断），如出口退税下调类政策的预期发酵。成长股的高敏感特征（10/08 已现）再次验证。</p><p>新能源车出口退税 13%→9% 是实质性现金流影响（推断），但设 2027/4 生效的过渡期，政策意图偏向"引导有序竞争"而非急刹车（推断）。</p><p>原油呈现"价格涨、需求预期降"的经典背离：短端地缘溢价（俄气设施遇袭、沙特研究出口路线）与中端基本面（欧佩克下调需求）方向相反（推断）——同一资产在不同时间尺度下结论不同。</p><p>天然气 -2.61% 与"俄气设施遇袭"同日出现、方向相反：说明商品定价的主导变量未必是新闻叙事（推断），需以库存与需求数据交叉验证。</p><p>预告披露进入高峰（201 家、预增翻倍至 66 家），行业分化明显：稀土/半导体预增强劲，工业/精密制造部分预降。</p></div></section><section class="sec" id="s6"><div class="kicker">06 · MAPPING</div><h2>Agent 映射</h2><div class="tbl-card"><table class="tbl mapping"><thead><tr><th>信息</th><th>进入哪一层</th><th>未来怎么用</th></tr></thead><tbody><tr><td class="asset l1">创业板连续大幅波动（-2.61%）</td><td class="l2">Risk + Data</td><td class="l3"><code>agent/tools/market.py</code> 异常检测；「成长股相对大盘跌幅倍数」作为新风险指标候选（<code>agent/risk/engine.py</code>）</td></tr><tr><td class="asset l1">新能源车出口退税下调</td><td class="l2">Research + Memory</td><td class="l3"><code>agent/tools/news.py</code> 按「影响行业 + 生效时间 + 幅度」结构化；入 World Facts（政策类，长期验证）</td></tr><tr><td class="asset l1">预告密集期（201 家/预增 66）</td><td class="l2">Memory（World Facts）</td><td class="l3"><code>agent/core/memory.py</code> 时序更新，供行业景气度分析</td></tr><tr><td class="asset l1">原油「价格 vs 需求预期」背离</td><td class="l2">Research（归因）</td><td class="l3"><code>agent/tools/financial_llm.py</code> 归因矛盾新样本；按时间尺度分别标注</td></tr><tr><td class="asset l1">「债优于股」机构观点</td><td class="l2">Research（标注属性）</td><td class="l3">按「预测」属性入库，与官方数据分开（延续 10-09 分层原则）</td></tr><tr><td class="asset l1">俄乌地缘（制裁/袭击）</td><td class="l2">Memory（时间链）</td><td class="l3">更新地缘事件链：10/09 缓和 → 10/11 中东升级 → 10/12 俄气遇袭</td></tr></tbody></table></div><div class="note">本期映射的设计启示：<strong>同一条信息在不同时间尺度下可以给出不同结论</strong>——原油的"地缘溢价（短期）"与"需求走弱（中期）"应该分别标注时效，这正是 Hindsight 记忆需要"时效性"字段的现实理由。</div></section><section class="sec" id="s7"><div class="kicker">07 · QUESTION</div><h2>今日问题</h2><p class="q-lead">今日出现"价格与基本面背离"：布伦特原油 +1%（地缘推动）vs 欧佩克下调 2026 需求增长预期（基本面走弱）。如果 Agent 面对"短期价格信号"与"中期基本面信号"方向相反，它应该：</p><div class="opts"><div class="opt"><span class="k">A</span><p>按短期价格行事（地缘溢价会持续）</p></div><div class="opt"><span class="k">B</span><p>按中期基本面行事（需求走弱终会定价）</p></div><div class="opt"><span class="k">C</span><p>分时间尺度标注（短期=地缘溢价、中期=需求压制），让用户按自己的持仓周期选择</p></div></div><div class="why"><b>为什么？</b> （提示：Hindsight 四层的"时效性"字段正是为这种场景设计的——同一条信息在不同时间尺度下结论可以不同）</div></section>
+    <footer class="foot">
+      <p>数据留档：<code>brief/out/market_2026-10-12.json</code>（18:00 采集）｜核验：美债=财政部官网（10-09 官方值）；业绩预告=东财官方分类（密集期开启，单日 +35 家）｜生成时间：2026-10-12 18:05</p>
+      <p>仅为信息整理，不构成投资建议。</p>
+    </footer>
+  </main>
+</div>
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.rail a'));
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var byHref = {};
+  links.forEach(function (a) { byHref[a.getAttribute('href')] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove('on'); });
+      var a = byHref['#' + e.target.id];
+      if (a) a.classList.add('on');
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  document.querySelectorAll('main .sec').forEach(function (s) { io.observe(s); });
+})();
+</script>
+</body>
+</html>

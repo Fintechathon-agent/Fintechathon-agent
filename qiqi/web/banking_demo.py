@@ -33,10 +33,13 @@ def _months_ago(n: int, day: int = 10, hour: int = 12) -> str:
 
 def demo_contacts() -> list[Contact]:
     return [
-        Contact(contact_id="c1", name="陈大黄", phone="13800001111", relation="朋友"),
-        Contact(contact_id="c2", name="林粹", phone="13900002222", relation="队友"),
-        Contact(contact_id="c3", name="邹昕成", phone="13700003333", relation="队长"),
-        Contact(contact_id="c4", name="陆小果", phone="13600004444", relation="队友"),
+        Contact(contact_id="c1", name="王芳", phone="13800001111", relation="家人"),
+        Contact(contact_id="c2", name="李明", phone="13900002222", relation="同事"),
+        Contact(contact_id="c3", name="张伟", phone="13700003333", relation="朋友"),
+        Contact(contact_id="c4", name="刘洋", phone="13600004444", relation="同学"),
+        Contact(contact_id="c5", name="陈静", phone="13500005555", relation="朋友"),
+        Contact(contact_id="c6", name="周涛", phone="13400006666", relation="同事"),
+        Contact(contact_id="c7", name="吴霞", phone="13300007777", relation="家人"),
     ]
 
 
@@ -48,6 +51,10 @@ def demo_cards() -> list[BankCard]:
                  status="normal", credit_limit=0.0, daily_txn_limit=50_000.0),
         BankCard(card_id="card3", last4="1234", card_type="信用卡", bank="工商银行",
                  status="locked", credit_limit=30_000.0, daily_txn_limit=10_000.0),
+        BankCard(card_id="card4", last4="5555", card_type="借记卡", bank="建设银行",
+                 status="normal", credit_limit=0.0, daily_txn_limit=20_000.0),
+        BankCard(card_id="card5", last4="0000", card_type="信用卡", bank="交通银行",
+                 status="normal", credit_limit=80_000.0, daily_txn_limit=30_000.0),
     ]
 
 
@@ -71,6 +78,8 @@ def demo_bills() -> list[BillRecord]:
         add(m, 1, 9, "超燃健身", "娱乐", 199.0, note="健身房月卡")
         add(m, 3, 10, "云音乐VIP", "娱乐", 15.0, note="音乐会员")
         add(m, 5, 8, "云盘Pro", "其他", 68.0, note="网盘年费" if m % 12 == 0 else "网盘月费")
+        add(m, 6, 9, "咖啡月卡", "餐饮", 88.0, note="精品咖啡会员")
+        add(m, 8, 11, "杂志订阅", "阅读", 30.0, note="电子杂志月订")
 
     # 日常消费（本月）
     add(0, 3, 12, "陈记面馆", "餐饮", 32.0)
@@ -81,6 +90,21 @@ def demo_bills() -> list[BillRecord]:
     add(0, 14, 19, "海底捞", "餐饮", 486.0)
     add(0, 16, 11, "国家电网", "居住", 210.0)
     add(0, 18, 20, "京东商城", "购物", 1299.0)
+    # 本月补充：更多分类与真实感流水
+    add(0, 2, 8, "星巴克咖啡", "餐饮", 36.0)
+    add(0, 4, 12, "美团外卖", "餐饮", 52.6)
+    add(0, 6, 10, "药房购药", "医疗", 96.5)
+    add(0, 7, 15, "高铁出行", "交通", 289.0)
+    add(0, 9, 9, "话费充值", "通讯", 100.0)
+    add(0, 10, 13, "优衣库门店", "购物", 399.0)
+    add(0, 11, 18, "燃气缴费", "居住", 87.3)
+    add(0, 13, 12, "在线课程", "教育", 199.0)
+    add(0, 14, 20, "山姆会员店", "购物", 458.5)
+    add(0, 15, 16, "体检中心", "医疗", 480.0)
+    add(0, 17, 11, "宽带续费", "居住", 129.0)
+    add(0, 18, 21, "电影院", "娱乐", 98.0)
+    add(0, 19, 12, "书店购书", "教育", 78.0)
+    add(0, 20, 13, "加油站", "交通", 300.0)
     # 异常样本：大额
     add(0, 6, 15, "名表专柜", "购物", 8600.0, note="大额样本")
     # 异常样本：境外
@@ -129,6 +153,9 @@ class BankingState:
         self.transfer_day: str = datetime.now().strftime("%Y-%m-%d")
         self.daily_cumulative: float = 0.0
         self.pending: list[dict] = []
+        # 演示数据预置开关：全新环境首次打开第三版任务台时自动预置一次，
+        # 之后（含用户重置）保持用户操作后的真实状态，不再自动重灌。
+        self.demo_seeded: bool = False
         self._load()
 
     def _path(self) -> Path:
@@ -150,6 +177,7 @@ class BankingState:
         if self.transfer_day == datetime.now().strftime("%Y-%m-%d"):
             self.daily_cumulative = float(raw.get("daily_cumulative", 0.0))
         self.pending = raw.get("pending", [])
+        self.demo_seeded = bool(raw.get("demo_seeded", False))
 
     def save(self) -> None:
         STATE_DIR.mkdir(parents=True, exist_ok=True)
@@ -162,16 +190,22 @@ class BankingState:
             "transfer_day": self.transfer_day,
             "daily_cumulative": self.daily_cumulative,
             "pending": self.pending,
+            "demo_seeded": self.demo_seeded,
         }, ensure_ascii=False, indent=2), encoding="utf-8")
 
     def reset(self) -> None:
-        """重置演示状态：卡片/订阅回到 fixture，清空待办与当日累计。"""
+        """重置演示状态：卡片/订阅回到 fixture，清空待办与当日累计。
+
+        同时把 demo_seeded 置 True——用户主动重置后保持空队列，
+        不再在下次启动时自动重灌演示数据（可手动点「预置演示数据」）。
+        """
         with self._lock:
             self.cards = demo_cards()
             self.cancelled_subs = set()
             self.transfer_day = datetime.now().strftime("%Y-%m-%d")
             self.daily_cumulative = 0.0
             self.pending = []
+            self.demo_seeded = True
             self.save()
 
     # ---- 操作 ----
