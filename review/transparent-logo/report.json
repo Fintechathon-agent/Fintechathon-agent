@@ -1,0 +1,74 @@
+[
+  {
+    "name": "landing",
+    "width": 64,
+    "url": "http://127.0.0.1:49499/versions/team-logo-transparent.png?v=fba7a4e1b36b",
+    "transparent": 1083092,
+    "opaque": 428542,
+    "corner": 0,
+    "height": 64,
+    "fit": "contain",
+    "filter": "none",
+    "clip": "none"
+  },
+  {
+    "name": "investment",
+    "width": 80,
+    "url": "http://127.0.0.1:49499/versions/team-logo-transparent.png?v=fba7a4e1b36b",
+    "transparent": 1083092,
+    "opaque": 428542,
+    "corner": 0,
+    "height": 80,
+    "fit": "contain",
+    "filter": "none",
+    "clip": "none"
+  },
+  {
+    "name": "merchant",
+    "width": 80,
+    "url": "http://127.0.0.1:49499/versions/team-logo-transparent.png?v=fba7a4e1b36b",
+    "transparent": 1083092,
+    "opaque": 428542,
+    "corner": 0,
+    "height": 80,
+    "fit": "contain",
+    "filter": "none",
+    "clip": "none"
+  },
+  {
+    "name": "landing",
+    "width": 56,
+    "url": "http://127.0.0.1:49499/versions/team-logo-transparent.png?v=fba7a4e1b36b",
+    "transparent": 1083092,
+    "opaque": 428542,
+    "corner": 0,
+    "height": 56,
+    "fit": "contain",
+    "filter": "none",
+    "clip": "none"
+  },
+  {
+    "name": "investment",
+    "width": 56,
+    "url": "http://127.0.0.1:49499/versions/team-logo-transparent.png?v=fba7a4e1b36b",
+    "transparent": 1083092,
+    "opaque": 428542,
+    "corner": 0,
+    "height": 56,
+    "fit": "contain",
+    "filter": "none",
+    "clip": "none"
+  },
+  {
+    "name": "merchant",
+    "width": 56,
+    "url": "http://127.0.0.1:49499/versions/team-logo-transparent.png?v=fba7a4e1b36b",
+    "transparent": 1083092,
+    "opaque": 428542,
+    "corner": 0,
+    "height": 56,
+    "fit": "contain",
+    "filter": "none",
+    "clip": "none"
+  }
+]
