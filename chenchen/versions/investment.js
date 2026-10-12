@@ -1,17 +1,22 @@
 import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip, healthCheckRequest } from "./common.js";
 import { dateStatus, planComparison } from "./presentation.mjs";
-let result, inputVersion = 0;
+let result, inputVersion = 0, running = false;
+function progress(message) { $("#demo-progress").textContent = message; }
 const names = { CURRENT:"当前组合", A:"A 保持或最小动作", B:"B 温和调整", C:"C 风险优先" };
 const planCopy = { A:"保留当前配置", B:"适度降低集中度", C:"降低高波动资产权重" };
 function invalidate() {
   inputVersion++;
-  if (result) { result=null; $("#results").hidden=true; $("#input-changed").hidden=false; }
+  if (result) { result=null; $("#results").hidden=true; $("#input-changed").hidden=false; progress("输入已变化，旧结果已隐藏，请重新检查。"); }
 }
 async function init() {
   const data=await api("/api/demo/portfolio"), p=data.output.snapshot;
   const raw={portfolio_id:p.portfolio_id,as_of:p.as_of,cash:p.cash,positions:p.positions.map(({instrument_id,type,quantity,price,name,sector})=>({instrument_id,type,quantity,price,name,sector}))};
   $("#portfolio-json").value=JSON.stringify(raw,null,2);
-  renderHoldings(p); $("#run").disabled=false;
+  renderHoldings(p);
+  $("#horizon").value=365; $("#drawdown").value=10; $("#liquidity").value="medium";
+  $("#run").disabled=false;
+  progress("样例持仓已读取，正在向 Core 服务提交只读诊断…");
+  $("#check-form").requestSubmit();
 }
 function renderHoldings(p) {
   const dated=dateStatus(p.as_of,today());
@@ -49,15 +54,21 @@ function renderNextSteps(profile, snapshot, report, metrics) {
   $("#next-steps-intro").textContent = "这不是买卖建议，而是根据这次输入整理出的核对顺序；先看懂，再决定是否需要交给团队风控。";
 }
 $("#check-form").addEventListener("input",invalidate);
+$("#portfolio-json").addEventListener("input",invalidate);
 $("#demo-profile").onclick=()=>{ invalidate(); $("#horizon").value=365;$("#drawdown").value=10;$("#liquidity").value="medium";toast("已填入虚构偏好，可修改。"); };
 $("#check-form").onsubmit=async event=>{
-  event.preventDefault();const version=inputVersion;$("#run").disabled=true;$("#results").hidden=true;$("#input-changed").hidden=true;$("#run").textContent="正在诊断…";
+  event.preventDefault();
+  if(running)return;
+  running=true;
+  const version=inputVersion;$("#run").disabled=true;$("#results").hidden=true;$("#input-changed").hidden=true;$("#run").textContent="正在诊断…";
+  $("#load-error").hidden=true;
+  progress("Core 服务诊断中：持仓分析、候选方案与历史模拟。尚未取得本次结果。");
   try {
     const next=await api("/api/health-check/run",healthCheckRequest({
       riskProfile:{investment_horizon_days:Number($("#horizon").value),max_drawdown:Number($("#drawdown").value)/100,liquidity_need:$("#liquidity").value},
       portfolio:JSON.parse($("#portfolio-json").value)
     }));
-    if(version!==inputVersion) { $("#input-changed").hidden=false; return toast("输入已改变，请重新检查。"); }
+    if(version!==inputVersion) { $("#input-changed").hidden=false; progress("输入已变化，本次响应已弃用，请重新检查。"); return toast("输入已改变，请重新检查。"); }
     if(next.task_state.status!=="HANDOFF_REQUIRED")throw new Error(next.task_state.error_state?.reasons?.join("；")||"请补齐有效的持仓与风险信息。");
     result=next; const a=result.artifacts,m=a.health_report.metrics,s=a.simulation,view=planComparison(s.comparisons);
     if(!view.best||!view.baseline)throw new Error("模拟缺少有效结果，暂不展示结论。");
@@ -85,15 +96,26 @@ $("#check-form").onsubmit=async event=>{
     $("#assumptions").textContent=s.comparisons[0].curve.length+" 个价格观测。统一起始资金 "+money(s.assumptions.initial_capital*100)+"；单向换手 × "+pct(s.transaction_cost_rate)+" 扣费；2,000 条联合收益区块重采样路径、固定种子、20 个交易日情景。年化系数 252、无风险利率 2%。";
     $("#task-status").textContent=result.task_state.stage+" · 等待团队风控接入";
     $("#evidence").textContent=JSON.stringify({task_state:result.task_state,tool_results:result.tool_results},null,2);
+    progress("Core 服务已返回诊断与三种方案，正在读取本次审计记录。");
     // Audit loading must not hide a valid result or overwrite a newer run.
     api("/api/audit/"+encodeURIComponent(next.task_state.task_id)).then(audit=>{
-      if(result===next&&version===inputVersion)$("#evidence").textContent=JSON.stringify({task_state:next.task_state,tool_results:next.tool_results,audit},null,2);
+      if(result===next&&version===inputVersion) {
+        $("#evidence").textContent=JSON.stringify({task_state:next.task_state,tool_results:next.tool_results,audit},null,2);
+        progress("诊断、三种方案与审计记录已返回 · 当前停在风控交接点，未执行交易。");
+      }
     }).catch(()=>{
-      if(result===next&&version===inputVersion)$("#evidence").textContent+="\n完整运行记录暂未读取成功，可重新检查后再试。";
+      if(result===next&&version===inputVersion) {
+        $("#evidence").textContent+="\n完整运行记录暂未读取成功，可重新检查后再试。";
+        progress("诊断与方案已返回；审计读取失败，请重试，不能视作完整闭环。");
+      }
     });
-    $("#results").hidden=false;$("#input-panel").open=false;$("#result-summary").scrollIntoView({behavior:"smooth",block:"start"});toast("分析完成。展开方案可查看细节。");
-  }catch(error){ result=null;toast(error.message); }
-  finally{$("#run").disabled=false;$("#run").textContent="开始健康检查 →";}
+    $("#results").hidden=false;$("#input-panel").open=false;
+  }catch(error){
+    result=null; $("#results").hidden=true; $("#input-panel").open=true;
+    $("#load-error").hidden=false; $("#load-error").textContent="检查未完成："+error.message;
+    progress("本次检查未完成，未生成可用结果。请核对输入或稍后重新检查。");
+  }
+  finally{running=false;$("#run").disabled=false;$("#run").textContent="重新检查";}
 };
 $("#export").onclick=()=>{if(result)downloadLink("/api/task/"+encodeURIComponent(result.task_state.task_id)+"/export");};
-init().catch(error=>{$("#load-error").hidden=false;$("#load-error").textContent="数据读取失败："+error.message+"。请确认服务已启动，再刷新页面。";});
+init().catch(error=>{$("#input-panel").open=true;$("#load-error").hidden=false;$("#load-error").textContent="数据读取失败："+error.message+"。请确认服务已启动，再刷新页面。";progress("样例数据读取失败，请刷新重试；未生成诊断。");});

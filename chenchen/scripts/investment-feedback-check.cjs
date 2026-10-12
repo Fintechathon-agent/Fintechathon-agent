@@ -1,0 +1,65 @@
+"use strict";
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
+const { server } = require("../server");
+(async () => {
+  await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+  let browser;
+  try {
+    browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) });
+    const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+    const page = await context.newPage(), errors = [], posts = [];
+    page.on("pageerror", error => errors.push(error.message));
+    page.on("request", request => { if(request.method() === "POST") posts.push(new URL(request.url()).pathname); });
+    const base = "http://127.0.0.1:" + server.address().port;
+    await page.goto(base + "/investment");
+    await page.locator("#results").waitFor({ state: "visible" });
+    await page.waitForFunction(() => document.querySelector("#demo-progress").textContent.includes("审计记录已返回"));
+    assert.deepEqual(posts, ["/api/health-check/run"]);
+    assert.equal(await page.locator(".plan-card").count(), 3);
+    assert.equal(await page.locator("#input-panel").getAttribute("open"), null);
+    assert.equal(await page.locator("#technical-details").getAttribute("open"), null);
+    assert.equal(await page.locator("#technical-details #portfolio-json").count(), 1);
+    assert.equal(await page.locator("#export").isVisible(), false);
+    assert.equal(await page.locator("#evidence").textContent().then(text => text.includes("tool_results") && text.includes("audit")), true);
+    const out = process.env.XINLAN_SCREENSHOTS;
+    if(out) fs.mkdirSync(out, { recursive:true });
+    for(const width of [1440, 375]) {
+      await page.setViewportSize({width,height:1000});
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true);
+      if(width===1440) assert.equal((await page.locator(".plan-card").first().boundingBox()).y < 850,true);
+      if(out) await page.screenshot({path:path.join(out,"investment-result-"+width+".png"),fullPage:true});
+    }
+    await page.locator("#input-panel summary").first().click();
+    await page.locator("#horizon").fill("90");
+    assert.equal(await page.locator("#results").isVisible(), false);
+    await page.getByRole("button",{name:"重新检查",exact:true}).click();
+    await page.locator("#results").waitFor({state:"visible"});
+    assert.equal(posts.length,2);
+    await page.locator("#technical-details summary").first().click();
+    await page.getByText("替换组合 JSON",{exact:true}).click();
+    await page.locator("#portfolio-json").fill("{ invalid");
+    assert.equal(await page.locator("#results").isVisible(),false);
+    await page.locator("#input-panel summary").first().click();
+    await page.getByRole("button",{name:"重新检查",exact:true}).click();
+    await page.locator("#load-error").waitFor({state:"visible"});
+    assert.equal(posts.length,2);
+    assert.equal(await page.locator("#run").isEnabled(),true);
+    const unavailable = await context.newPage();
+    await unavailable.route("**/api/demo/portfolio", route => route.fulfill({status:503,contentType:"application/json",body:'{"error":{"message":"service unavailable"}}'}));
+    await unavailable.goto(base+"/investment");
+    await unavailable.locator("#load-error").waitFor({state:"visible"});
+    assert.equal(await unavailable.locator("#results").isVisible(),false);
+    const noAudit = await context.newPage();
+    await noAudit.route("**/api/audit/**", route => route.fulfill({status:503,contentType:"application/json",body:'{"error":{"message":"audit unavailable"}}'}));
+    await noAudit.goto(base+"/investment");
+    await noAudit.waitForFunction(() => document.querySelector("#demo-progress").textContent.includes("审计读取失败"));
+    assert.equal(await noAudit.locator("#results").isVisible(),true);
+    assert.deepEqual(errors,[]);
+    const report={passed:true,backend:"Actual local chenchen/server.js; existing APIs unchanged",checks:["automatic one-time diagnosis","three server-computed plans","server audit read","collapsed technical controls","desktop first-screen plans","375/1440 overflow","edited inputs invalidate prior results","malformed JSON does not submit","portfolio failure shows retry guidance","audit failure does not fake closure"],remoteAgent:"Not verified: provided private host returned HTTP 502"};
+    if(out) fs.writeFileSync(path.join(out,"investment-feedback-report.json"),JSON.stringify(report,null,2)+"\n");
+    console.log(JSON.stringify(report,null,2));
+  } finally { if(browser)await browser.close(); await new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}); }
+})().catch(error=>{console.error(error);process.exitCode=1;});

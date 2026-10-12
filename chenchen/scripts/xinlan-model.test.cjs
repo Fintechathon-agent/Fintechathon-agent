@@ -1,0 +1,44 @@
+"use strict";
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const { createPreviewServer } = require("./xinlan-preview.cjs");
+const load = () => import("../versions/xinlan/model.mjs");
+test("public labels keep unknown and error states fail-closed", async () => {
+  const { decisionLabel } = await load();
+  assert.equal(decisionLabel("ALLOW"), "风险检查通过");
+  assert.equal(decisionLabel("REVIEW"), "需要进一步核实");
+  assert.equal(decisionLabel("BLOCK"), "操作已拦截");
+  assert.equal(decisionLabel("ERROR"), "风险检查暂不可用");
+  assert.equal(decisionLabel("unexpected"), "风险状态待确认");
+});
+test("local review never changes risk decisions or grants admin business review", async () => {
+  const { createDemo, recordReview, acknowledge } = await load();
+  const state = createDemo();
+  for (const role of ["personal", "admin", "unknown"]) assert.equal(recordReview(state, "DEMO-002", role, "完整的模拟复核说明"), false);
+  assert.equal(recordReview(state, "DEMO-002", "analyst", "    "), false);
+  assert.equal(recordReview(state, "DEMO-002", "analyst", "x".repeat(501)), false);
+  assert.equal(recordReview(state, "DEMO-002", "analyst", "已核对原操作记录，等待主管核实"), true);
+  assert.equal(state.events[1].review, "IN_REVIEW");
+  assert.equal(recordReview(state, "DEMO-002", "supervisor", "已记录核实结论，仍须重新风险检查"), true);
+  assert.equal(state.events[1].decision, "BLOCK");
+  assert.equal(state.events[1].review, "RESOLVED");
+  assert.equal(recordReview(state, "DEMO-002", "supervisor", "重复提交不会创建第二条结论"), false);
+  assert.equal(acknowledge(state, "DEMO-002"), true);
+  assert.equal(acknowledge(state, "DEMO-002"), false);
+  assert.equal(state.audit.length, 3);
+  assert.equal(state.events[1].decision, "BLOCK");
+  assert.equal(createDemo().audit.length, 0);
+});
+test("preview serves only static assets and never financial APIs or repository files", async t => {
+  const server = createPreviewServer();
+  await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+  t.after(() => new Promise(resolve => { server.closeAllConnections(); server.close(resolve); }));
+  const base = "http://127.0.0.1:" + server.address().port;
+  const response = await fetch(base);
+  assert.equal(response.status, 200);
+  assert.match(response.url, /xinlan\/index.html$/);
+  assert.match(response.headers.get("content-security-policy"), /connect-src 'none'/);
+  for (const file of ["workspace.js", "workspace.css", "model.mjs", "team-logo.png"]) assert.equal((await fetch(base + "/xinlan/" + file)).status, 200);
+  for (const file of ["/api/identity/me", "/api/safety/confirm", "/server.js", "/.git/config", "/%2e%2e/AGENTS.md"]) assert.equal((await fetch(base + file)).status, 404);
+  assert.equal((await fetch(base + "/xinlan/index.html", { method: "POST" })).status, 405);
+});

@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "backend": "Actual local chenchen/server.js; existing APIs unchanged",
+  "checks": [
+    "automatic one-time diagnosis",
+    "three server-computed plans",
+    "server audit read",
+    "collapsed technical controls",
+    "desktop first-screen plans",
+    "375/1440 overflow",
+    "edited inputs invalidate prior results",
+    "malformed JSON does not submit",
+    "portfolio failure shows retry guidance",
+    "audit failure does not fake closure"
+  ],
+  "remoteAgent": "Not verified: provided private host returned HTTP 502"
+}
