@@ -1,0 +1,21 @@
+'use strict';
+const path = require('node:path');
+const os = require('node:os');
+const fs = require('node:fs');
+const { assetsFrom } = require('./risk-site-assets.cjs');
+const source = path.resolve(process.argv[2] || '../output/risk-integration/source');
+const { createApplication } = require(path.join(source, 'modules/safety-risk-eval/server.cjs'));
+const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'finance-risk-preview-'));
+const app = createApplication({ directory });
+const service = app.server.listeners('request')[0];
+app.server.removeAllListeners('request');
+app.server.on('request', (req, res) => {
+  const route = new URL(req.url, 'http://localhost').pathname;
+  if (route.startsWith('/api/')) return service(req, res);
+  const assets = assetsFrom(path.resolve(__dirname, '..'));
+  const asset = assets[route] || assets['/404'];
+  res.writeHead(assets[route] ? 200 : 404, { 'Content-Type':asset.type, 'Cache-Control':'no-store' });
+  res.end(asset.body);
+});
+app.server.listen(Number(process.env.RISK_UI_PORT || 8790), '127.0.0.1', () => console.log('Finance Lab integrated: http://127.0.0.1:' + app.server.address().port));
+for (const signal of ['SIGINT','SIGTERM']) process.once(signal, () => { app.close(); process.exit(); });

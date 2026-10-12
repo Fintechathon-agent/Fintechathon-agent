@@ -1,0 +1,16 @@
+{
+  "base": "http://127.0.0.1:8791",
+  "checks": [
+    "Same task: investment report hands off to risk",
+    "Normal plan requires explicit confirmation and returns actual receipt",
+    "Edited numeric input immediately disables old execution",
+    "REVIEW retains individual acceptance before plan confirmation",
+    "BLOCK and incomplete plans cannot be confirmed",
+    "Attack is displayed as text and causes zero simulated tool calls",
+    "Unknown task fails visibly without confirmation",
+    "Responsive shell at 1440, 1024, 375 pixels",
+    "Accessible labels, landmarks and contrast",
+    "Home entry and original visual assets preserved"
+  ],
+  "errors": []
+}
