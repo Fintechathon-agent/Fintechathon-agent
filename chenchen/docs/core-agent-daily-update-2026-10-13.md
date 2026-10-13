@@ -41,6 +41,8 @@
 2. Approval Owner：确认审批人身份、权限和是否需要多人审批；当前 Demo 只做单审批人接口。
 3. Execution Owner：确认正式 Safety Action Gateway 的接收协议；在此之前继续保留真实执行阻断。
 4. 产品与合规 Owner：确认 Workers AI 模型版本、额度和正式环境数据处理边界。
+5. 团队模型服务 Owner：旧 `/api/review` 仍以 `question` 和 `recommendation/gate` 为主，需确认是否由 Backend 适配到 `model-review.v1`；当前不能把两套字段直接当成同一 Contract。
+6. 统一 Risk Owner：提供正式 Handoff 接收和决策回写 API 地址、鉴权和验收环境；目前只能证明公网 Core Agent 自己的 Risk/审批/模拟链路。
 
 ## 范围边界
 
