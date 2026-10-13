@@ -156,6 +156,7 @@ class RiskReport:
     forbidden_violations: list[Position] = field(default_factory=list)    # 违规持仓
     exceeded_limits: list[str] = field(default_factory=list)              # 超限项目
     warnings: list[str] = field(default_factory=list)                    # 风险提示
+    avg_correlation: Optional[float] = None   # 持仓两两日收益 Pearson 相关系数的等权平均（有历史行情时计算）
 
 
 # ============================================================

@@ -66,6 +66,9 @@ class RiskEngine:
         if not price_history:
             warnings.append("VaR/最大回撤为简化估算（缺少历史行情），接入真实数据后自动切换为历史法计算")
 
+        # 7. 持仓相关性：两两日收益 Pearson 系数的等权平均（有历史行情时计算）
+        avg_corr = self._avg_correlation(portfolio, price_history)
+
         return RiskReport(
             portfolio_id=f"{portfolio.user_id}_{portfolio.date}",
             generated_at=datetime.now().isoformat(),
@@ -76,6 +79,7 @@ class RiskEngine:
             forbidden_violations=violations,
             exceeded_limits=exceeded,
             warnings=warnings,
+            avg_correlation=avg_corr,
         )
 
     @staticmethod
@@ -143,6 +147,42 @@ class RiskEngine:
         min_len = min(len(s) for _, s in pairs)
         aligned = [s[-min_len:] for _, s in pairs]
         return [p for p, _ in pairs], aligned, min_len
+
+    @classmethod
+    def _avg_correlation(
+        cls,
+        portfolio: Portfolio,
+        price_history: Optional[dict[str, list[float]]],
+    ) -> Optional[float]:
+        """持仓两两日收益 Pearson 相关系数的等权平均。
+
+        标准定义：对每对持仓，取同一窗口的日收益率序列求 Pearson 系数，
+        再对所有两两组合取简单平均。至少 2 只持仓且窗口 ≥ 10 个收益样本才计算。
+        """
+        positions, aligned, min_len = cls._align_history(portfolio, price_history)
+        if len(positions) < 2 or min_len < 11:
+            return None
+        returns = []
+        for s in aligned:
+            returns.append([(s[i] - s[i - 1]) / s[i - 1] for i in range(1, min_len)])
+        n = len(returns)
+        corrs: list[float] = []
+        for i in range(n):
+            for j in range(i + 1, n):
+                x, y = returns[i], returns[j]
+                mean_x = sum(x) / len(x)
+                mean_y = sum(y) / len(y)
+                cov = sum((a - mean_x) * (b - mean_y) for a, b in zip(x, y))
+                var_x = sum((a - mean_x) ** 2 for a in x)
+                var_y = sum((b - mean_y) ** 2 for b in y)
+                denom = (var_x * var_y) ** 0.5
+                if denom > 1e-15:
+                    corrs.append(cov / denom)
+                else:
+                    corrs.append(0.0)
+        if not corrs:
+            return None
+        return round(sum(corrs) / len(corrs), 4)
 
     @classmethod
     def _estimate_var(

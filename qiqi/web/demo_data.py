@@ -171,6 +171,7 @@ def risk_dict(rr: Optional[RiskReport]) -> Optional[dict]:
         "exceeded_limits": list(rr.exceeded_limits),
         "warnings": list(rr.warnings),
         "forbidden_violations": [p.name for p in rr.forbidden_violations],
+        "avg_correlation": rr.avg_correlation,
         "generated_at": rr.generated_at,
     }
 

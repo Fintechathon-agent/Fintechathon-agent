@@ -46,10 +46,15 @@ class BacktestEngine:
         historical_data: {symbol: [MarketData, ...]} 历史行情
         """
         cash = self.initial_cash
-        holdings: dict[str, float] = {}  # symbol -> quantity
+        holdings: dict[str, float] = {}       # symbol -> quantity
+        cost_basis: dict[str, float] = {}     # symbol -> 持仓总成本（含买入手续费）
         trades: list[dict] = []
         daily_values: list[float] = [cash]
         daily_returns: list[float] = [0.0]
+
+        # 费用模型：买入佣金万三（含在成本法成本里）；卖出佣金万三 + 印花税万五（2023-08 后单边卖出 0.05%）
+        BUY_FEE = 0.0003
+        SELL_FEE = 0.0003 + 0.0005
 
         # 按时间线合并所有行情
         all_dates: set[str] = set()
@@ -57,34 +62,56 @@ class BacktestEngine:
             for md in series:
                 all_dates.add(md.timestamp[:10])
         sorted_dates = sorted(all_dates)
+        date_set = set(sorted_dates)
+
+        # 撮合语义：推荐按输入顺序视为时间序列，每笔排在"上一笔撮合日之后、
+        # 该标的下一个可得交易日"；无行情或资金/持仓不足则跳过该笔（不重复撮合）。
+        last_date = ""
+        scheduled: dict[str, list[tuple[Recommendation, float]]] = {}
+        for rec in recommendations:
+            price_data = historical_data.get(rec.symbol, [])
+            if not price_data:
+                continue
+            entry = next(
+                (md for md in price_data
+                 if md.timestamp[:10] > last_date and md.timestamp[:10] in date_set),
+                None,
+            )
+            if entry is None:
+                continue
+            date_str = entry.timestamp[:10]
+            last_date = date_str
+            scheduled.setdefault(date_str, []).append((rec, entry.price))
 
         for date_str in sorted_dates:
-            # 当日交易信号
-            day_recs = [r for r in recommendations if r.symbol in historical_data
-                        and any(md.timestamp[:10] == date_str for md in historical_data[r.symbol])]
-            for rec in day_recs:
-                price_data = historical_data.get(rec.symbol, [])
-                price = next((md.price for md in price_data if md.timestamp[:10] == date_str), None)
-                if price is None:
-                    continue
-
-                if rec.action == ActionType.BUY and cash >= price * rec.quantity:
-                    cost = price * rec.quantity * 1.0003  # 假设万三手续费
+            # 当日撮合
+            for rec, price in scheduled.get(date_str, []):
+                if rec.action == ActionType.BUY and cash >= price * rec.quantity * (1 + BUY_FEE):
+                    amount = price * rec.quantity
+                    cost = amount * (1 + BUY_FEE)
                     cash -= cost
                     holdings[rec.symbol] = holdings.get(rec.symbol, 0) + rec.quantity
+                    cost_basis[rec.symbol] = cost_basis.get(rec.symbol, 0.0) + cost
                     trades.append({"date": date_str, "action": "BUY", "symbol": rec.symbol,
-                                   "price": price, "quantity": rec.quantity})
+                                   "price": price, "quantity": rec.quantity, "realized_pnl": 0.0})
 
                 elif rec.action == ActionType.SELL and holdings.get(rec.symbol, 0) >= rec.quantity:
-                    revenue = price * rec.quantity * (1 - 0.0003 - 0.001)  # 手续费+印花税
+                    qty = rec.quantity
+                    amount = price * qty
+                    revenue = amount * (1 - SELL_FEE)
+                    # 已实现盈亏 = 卖出净收入 - 对应数量份额的持仓成本（成本法）
+                    avg_cost_per_share = cost_basis.get(rec.symbol, 0.0) / holdings[rec.symbol]
+                    realized = revenue - avg_cost_per_share * qty
                     cash += revenue
-                    holdings[rec.symbol] -= rec.quantity
+                    holdings[rec.symbol] -= qty
+                    cost_basis[rec.symbol] = max(cost_basis.get(rec.symbol, 0.0) - avg_cost_per_share * qty, 0.0)
                     if holdings[rec.symbol] <= 0:
                         del holdings[rec.symbol]
+                        cost_basis.pop(rec.symbol, None)
                     trades.append({"date": date_str, "action": "SELL", "symbol": rec.symbol,
-                                   "price": price, "quantity": rec.quantity})
+                                   "price": price, "quantity": qty, "realized_pnl": realized})
 
-            # 计算当日总资产
+            # 当日总资产（现金 + 持仓按当日收盘价计）
             portfolio_value = sum(
                 holdings.get(sym, 0) * next(
                     (md.price for md in historical_data.get(sym, [])
@@ -94,18 +121,23 @@ class BacktestEngine:
             )
             total_value = cash + portfolio_value
             daily_values.append(total_value)
+            prev = daily_values[-2]
+            daily_returns.append(total_value / prev - 1.0 if prev > 0 else 0.0)
 
-        # 计算指标
+        # ---- 指标计算（市场标准口径）----
+        # 总收益率（%）与年化收益率（复利口径，(1+R)^(250/n)-1）
         total_return = (daily_values[-1] - self.initial_cash) / self.initial_cash * 100
-        n_days = len(daily_values)
-        annualized_return = total_return * 250 / max(n_days, 1)
+        n_days = max(len(daily_values) - 1, 1)
+        r_total = daily_values[-1] / self.initial_cash - 1.0
+        annualized_return = ((1 + r_total) ** (250 / n_days) - 1.0) * 100
 
-        # 简单夏普比率
-        if len(daily_returns) > 1:
+        # 夏普比率：日收益序列的年化（均值/标准差 × √250，无风险利率按 0 计）
+        rets = daily_returns[1:]
+        if len(rets) > 1:
             import statistics
-            mean_ret = statistics.mean(daily_returns[1:])
-            std_ret = statistics.stdev(daily_returns[1:]) if len(daily_returns) > 2 else 0.01
-            sharpe = (mean_ret / std_ret * (250 ** 0.5)) if std_ret > 0 else 0.0
+            mean_ret = statistics.mean(rets)
+            std_ret = statistics.stdev(rets) if len(rets) > 1 else 0.0
+            sharpe = (mean_ret / std_ret * (250 ** 0.5)) if std_ret > 1e-12 else 0.0
         else:
             sharpe = 0.0
 
@@ -119,19 +151,18 @@ class BacktestEngine:
             if dd > max_dd:
                 max_dd = dd
 
-        # 胜率
-        buy_trades = [t for t in trades if t["action"] == "BUY"]
+        # 胜率 / 盈利因子：按每笔卖出的已实现盈亏（卖出净收入 - 成本法持仓成本）
         sell_trades = [t for t in trades if t["action"] == "SELL"]
-        wins = sum(1 for i, s in enumerate(sell_trades) if i < len(buy_trades)
-                   and s["price"] > buy_trades[i]["price"])
-        win_rate = wins / max(len(sell_trades), 1)
-
-        # 盈利因子
-        gross_profit = sum(s["price"] * s["quantity"] for s in sell_trades
-                          if s["price"] > 0)
-        gross_loss = sum(s["price"] * s["quantity"] for s in sell_trades
-                        if s["price"] < 0)
-        profit_factor = gross_profit / max(gross_loss, 1)
+        wins = sum(1 for t in sell_trades if t["realized_pnl"] > 0)
+        win_rate = wins / len(sell_trades) if sell_trades else 0.0
+        gross_profit = sum(t["realized_pnl"] for t in sell_trades if t["realized_pnl"] > 0)
+        gross_loss = abs(sum(t["realized_pnl"] for t in sell_trades if t["realized_pnl"] < 0))
+        if gross_loss > 1e-12:
+            profit_factor = gross_profit / gross_loss
+        elif gross_profit > 0:
+            profit_factor = 99.99   # 无亏损交易：盈利因子按上限表示
+        else:
+            profit_factor = 0.0
 
         return BacktestResult(
             total_return=round(total_return, 2),
@@ -142,7 +173,7 @@ class BacktestEngine:
             total_trades=len(trades),
             profit_factor=round(profit_factor, 2),
             daily_returns=[round(r, 4) for r in daily_returns],
-            reason=f"初始资金{self.initial_cash:.0f}元，回测{dates}天，交易{len(trades)}次",
+            reason=f"初始资金{self.initial_cash:.0f}元，回测{n_days}个交易日，交易{len(trades)}次",
         )
 
 

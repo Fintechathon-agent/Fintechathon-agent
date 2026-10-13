@@ -227,7 +227,8 @@ class WhatIfEngine:
                 f"卖出数量 {rec.quantity:g} 股超过持仓 {pos.quantity:g} 股"
             )
 
-        proceeds = rec.quantity * rec.price
+        # 卖出净回款 = 金额 - 佣金万三 - 印花税万五（与回测/纸交易同口径）
+        proceeds = rec.quantity * rec.price * (1 - 0.0003 - 0.0005)
         remaining = pos.quantity - rec.quantity
 
         if remaining <= 1e-9:
@@ -246,7 +247,8 @@ class WhatIfEngine:
         rec: Recommendation,
         market: Optional[MarketSnapshot],
     ) -> tuple[Optional[Portfolio], str]:
-        cost = rec.quantity * rec.price
+        # 买入总成本含佣金万三（与回测/纸交易同口径）
+        cost = rec.quantity * rec.price * (1 + 0.0003)
         if cost > sim.cash + 1e-6:
             return None, (
                 f"买入需 {cost:,.0f} 元，可用现金仅 {sim.cash:,.0f} 元"
@@ -255,7 +257,7 @@ class WhatIfEngine:
         pos = next((p for p in sim.positions if p.symbol == rec.symbol), None)
         if pos is not None:
             total_qty = pos.quantity + rec.quantity
-            # 加权平均成本
+            # 加权平均成本（含佣金）
             pos.avg_cost = round(
                 (pos.avg_cost * pos.quantity + cost) / total_qty, 4
             )
@@ -266,13 +268,14 @@ class WhatIfEngine:
             ) if pos.avg_cost else 0.0
         else:
             md = market.data.get(rec.symbol) if market else None
+            cur_price = md.price if md and md.price > 0 else rec.price
             sim.positions.append(Position(
                 symbol=rec.symbol,
                 name=md.name if md else rec.symbol,
                 quantity=rec.quantity,
-                avg_cost=rec.price,
-                current_price=md.price if md and md.price > 0 else rec.price,
-                market_value=round(rec.quantity * rec.price, 2),
+                avg_cost=round(rec.price * (1 + 0.0003), 4),
+                current_price=cur_price,
+                market_value=round(rec.quantity * cur_price, 2),
                 return_pct=0.0,
                 sector=md.sector if md and hasattr(md, "sector") else "",
                 asset_type="stock",

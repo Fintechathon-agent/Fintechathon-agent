@@ -63,13 +63,20 @@ class PaperTradingTool:
             return PaperTradingResult(success=False, message=str(exc))
 
     def _do_trade(self, rec: Recommendation, session_id: str) -> TradeRecord:
-        """执行交易逻辑"""
+        """执行交易逻辑
+
+        费用模型（与回测引擎一致）：
+        - 买入：佣金万三；
+        - 卖出：佣金万三 + 印花税万五（2023-08 后单边卖出 0.05%）。
+        滑点：成交价偏移 ±0.5% 均匀随机（演示用估算）。
+        """
         # 模拟滑点（成交价偏移 ±0.5%）
         import random
         slippage = 1.0 + random.uniform(-0.005, 0.005)
         exec_price = rec.price * slippage
         amount = exec_price * rec.quantity
-        commission = amount * 0.0003  # 万三手续费
+        commission = amount * 0.0003  # 万三佣金
+        stamp_duty = amount * 0.0005 if rec.action == ActionType.SELL else 0.0  # 卖出印花税万五
 
         record = TradeRecord(
             id=f"PT-{uuid.uuid4().hex[:12]}",
@@ -81,37 +88,45 @@ class PaperTradingTool:
             price=round(exec_price, 2),
             quantity=rec.quantity,
             amount=round(amount, 2),
-            commission=round(commission, 2),
+            commission=round(commission + stamp_duty, 2),  # 佣金+印花税合并入费用字段
         )
         return record
 
     def _update_positions(self, rec: Recommendation, session_id: str) -> None:
-        """更新内存中的持仓快照"""
+        """更新内存中的持仓快照
+
+        买入：成本法摊入成交价（含佣金）；卖出：按份额减仓，成本法剩余成本同步扣减。
+        """
         if session_id not in self._positions:
             self._positions[session_id] = {}
 
         positions = self._positions[session_id]
         sym = rec.symbol
+        # 与 _do_trade 同口径：以滑点后成交价计（此处用 rec.price 的近似成交价，
+        # 记录层的精确成交价以 _do_trade 为准；价差在演示级误差内）。
+        exec_price = rec.price
 
         if rec.action == ActionType.BUY:
+            commission = exec_price * rec.quantity * 0.0003
+            total_cost_with_fee = exec_price * rec.quantity + commission
             if sym in positions:
                 old = positions[sym]
-                total_cost = old["avg_cost"] * old["quantity"] + rec.price * rec.quantity
+                total_cost = old["avg_cost"] * old["quantity"] + total_cost_with_fee
                 total_qty = old["quantity"] + rec.quantity
                 positions[sym] = {
                     "symbol": sym,
                     "name": old.get("name", sym),
                     "quantity": total_qty,
                     "avg_cost": total_cost / total_qty,
-                    "current_price": rec.price,
+                    "current_price": exec_price,
                 }
             else:
                 positions[sym] = {
                     "symbol": sym,
                     "name": sym,
                     "quantity": rec.quantity,
-                    "avg_cost": rec.price,
-                    "current_price": rec.price,
+                    "avg_cost": total_cost_with_fee / rec.quantity,
+                    "current_price": exec_price,
                 }
         elif rec.action == ActionType.SELL:
             if sym in positions:

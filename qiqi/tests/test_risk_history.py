@@ -114,6 +114,26 @@ class RiskHistoryTests(unittest.TestCase):
         self.assertTrue(any("简化估算" in w for w in report.warnings))
         self.assertGreaterEqual(report.max_drawdown, 0.0)
 
+    def test_avg_correlation_matches_numpy(self):
+        report = RiskEngine().check(
+            self.portfolio, self.user, self.market, price_history=REAL_CLOSES,
+        )
+        self.assertIsNotNone(report.avg_correlation)
+        try:
+            import numpy as np
+        except ImportError:      # pragma: no cover
+            return
+        series = [np.array(REAL_CLOSES[p.symbol][-120:]) for p in self.portfolio.positions]
+        min_len = min(len(s) for s in series)
+        rets = [np.diff(s[-min_len:]) / s[-min_len:-1] for s in series]
+        corrs = [float(np.corrcoef(rets[i], rets[j])[0, 1]) for i in range(3) for j in range(i + 1, 3)]
+        expected = sum(corrs) / len(corrs)
+        self.assertAlmostEqual(report.avg_correlation, expected, places=4)
+
+    def test_correlation_none_without_history(self):
+        report = RiskEngine().check(self.portfolio, self.user, self.market)
+        self.assertIsNone(report.avg_correlation)
+
     def test_avg_return_is_market_value_weighted(self):
         analyzer = PortfolioAnalyzer()
         report = analyzer.analyze(self.portfolio, self.market)
