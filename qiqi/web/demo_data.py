@@ -301,6 +301,11 @@ def response_dict(resp, pf: Portfolio, health: dict, engine: str) -> dict:
         "health": health,
         "engine": engine,
         "data_tag": DEMO_TAG,
+        # 模型调用透明度（演示/联调模式通用）
+        "run_id": getattr(resp, "run_id", ""),
+        "decision_source": getattr(resp, "decision_source", ""),
+        "model_status": getattr(resp, "model_status", ""),
+        "model_raw": dict(getattr(resp, "model_raw", {}) or {}),
     }
 
 
