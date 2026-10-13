@@ -109,3 +109,35 @@ test("unsupported model actions are rejected before gateway output", async () =>
     error => error.code === "MODEL_UNSAFE_ACTION"
   );
 });
+
+test("Workers AI invokes the bound model without an API key and retains provider output", async () => {
+  let invocation;
+  const result = await runReview({ kind: "bill", text: "虚构账单" }, {
+    MODEL_PROVIDER: "workers_ai",
+    AI: { run: async (model, input) => {
+      invocation = { model, input };
+      return { response: proposal, usage: { prompt_tokens: 100, completion_tokens: 60 } };
+    } }
+  });
+  assert.equal(invocation.model, "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
+  assert.equal(invocation.input.response_format.json_schema.type, "object");
+  assert.equal(invocation.input.max_tokens, 1200);
+  assert.equal(result.source, "model");
+  assert.equal(result.model_response.call_succeeded, true);
+  assert.equal(result.model_response.raw_text, JSON.stringify(proposal));
+  assert.equal(result.model_response.raw_text_format, "provider_json_serialized");
+  assert.equal(result.model_response.provider_response_id, null);
+  assert.equal(result.model_response.usage.prompt_tokens, 100);
+});
+
+test("public configuration disallows requested fallback when real inference fails", async () => {
+  await assert.rejects(runReview({ text: "虚构新闻", allow_rule_fallback: true }, {
+    MODEL_PROVIDER: "workers_ai", MODEL_DISABLE_RULE_FALLBACK: "true",
+    AI: { run: async () => { throw new Error("upstream unavailable"); } }
+  }), error => error.code === "MODEL_PROVIDER_UNAVAILABLE" && error.reviewRecord.status === "FAILED");
+});
+
+test("combined input preserves both bill and news", () => {
+  const input = normalizeReviewInput({ bill: { amount: 1280 }, news: "供应商变更账户" });
+  assert.deepEqual(JSON.parse(input.text), { bill: { amount: 1280 }, news: "供应商变更账户" });
+});

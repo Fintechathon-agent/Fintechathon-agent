@@ -1,0 +1,24 @@
+{
+  "deployment": "a760c2b9-3ead-46cc-8e2e-ef4e8d67f5d0",
+  "task_id": "review-task-f0e0246a-00c8-4e92-a16b-db2023fac16f",
+  "request_id": "req-recheck-20261013-002",
+  "run_id": "review-3e1ab4c7-7782-4b31-8c3d-8292ba371017",
+  "audit_id": "audit-c7e18b3b-01ee-4bf6-bdd0-0b22e23de29d",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "provider": "cloudflare_workers_ai",
+  "provider_response_id": "chatcmpl-e87cc1c3-1185-4968-a2b2-1f4882cd9cab",
+  "model_call_succeeded": true,
+  "proposed_action": "HOLD_FOR_REVIEW",
+  "proposal_sha256": "21a6afb37c49617357e4f79587976dcbe911393529bb90181ae42be99adfa103",
+  "risk": { "http_status": 200, "status": "PENDING_APPROVAL", "decision": "APPROVE" },
+  "approval": { "http_status": 200, "status": "APPROVED", "decision": "APPROVE" },
+  "execution": { "http_status": 200, "status": "SIMULATED", "side_effects": false, "execution_allowed": false },
+  "terminal_guard": {
+    "repeat_risk_http_status": 409,
+    "repeat_risk_code": "WORKFLOW_TERMINAL",
+    "repeat_approval_http_status": 409,
+    "repeat_approval_code": "WORKFLOW_TERMINAL"
+  },
+  "queried_status": "SIMULATED",
+  "evidence": "虚构账单；未提交真实账户、付款或交易数据。"
+}

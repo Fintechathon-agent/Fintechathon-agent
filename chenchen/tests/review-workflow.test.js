@@ -98,3 +98,19 @@ test("model failure creates an auditable blocked workflow", async () => {
     return true;
   });
 });
+
+test("terminal workflow states cannot be mutated by repeated Risk or approval calls", async () => {
+  const store = new ReviewWorkflowStore({ modelRunner: fakeReview });
+  const created = await store.start({ kind: "bill", text: "演示账单" });
+  const base = { task_id: created.task_id, proposal_sha256: created.proposed_action.proposal_sha256 };
+  await store.decideRisk({ ...base, decision: "APPROVE", reviewer: "risk-owner", reason: "通过" });
+  await store.decideApproval({ ...base, decision: "APPROVE", approver: "approver", reason: "通过" });
+  const simulated = await store.simulate(base);
+  assert.equal(simulated.status, "SIMULATED");
+  await assert.rejects(store.decideRisk({ ...base, decision: "APPROVE", reviewer: "risk-owner", reason: "重复提交" }), error => error.code === "WORKFLOW_TERMINAL");
+  await assert.rejects(store.decideApproval({ ...base, decision: "APPROVE", approver: "approver", reason: "重复提交" }), error => error.code === "WORKFLOW_TERMINAL");
+  const current = store.getByTaskId(created.task_id);
+  assert.equal(current.status, "SIMULATED");
+  assert.equal(current.execution.status, "SIMULATED");
+  assert.equal(current.execution.execution_allowed, false);
+});

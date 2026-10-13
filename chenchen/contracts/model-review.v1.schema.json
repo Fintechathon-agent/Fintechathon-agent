@@ -37,7 +37,7 @@
         "run_id": { "type": "string" },
         "status": { "type": "string", "enum": ["PENDING_RISK", "PENDING_APPROVAL", "READY_FOR_SIMULATION", "SIMULATED", "REJECTED", "MODEL_FAILED"] },
         "model": { "type": "object" },
-        "proposed_action": { "$ref": "#/$defs/ProposedAction" },
+        "proposed_action": { "anyOf": [{ "$ref": "#/$defs/ProposedAction" }, { "type": "null" }] },
         "risk_handoff": { "$ref": "#/$defs/RiskHandoff" },
         "risk_decision": { "type": ["object", "null"] },
         "approval": { "$ref": "#/$defs/ApprovalState" },

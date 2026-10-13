@@ -33,7 +33,7 @@
 | 执行保护 | `/api/paper-trade/execute` 原来固定阻断 | 保留；新增的模拟执行只生成回执，不调用真实网关 |
 | 审计 | 投资链路已有 audit_evidence | 模型工作流增加阶段事件，完整记录可按 task 或 run 查询 |
 
-当前 Cloudflare Worker 的 Secret 列表为空。因此公网 `/api/review` 的代码已经可以实际调用配置的模型，但在配置 `MODEL_API_KEY` 之前会返回 `MODEL_NOT_CONFIGURED`，这被视为明确阻断，不会伪装成模型成功。
+当前公网 Worker 已切换到 Cloudflare Workers AI，模型绑定为 `@cf/meta/llama-3.3-70b-instruct-fp8-fast`，并使用 Durable Object `ReviewService` 持久化 workflow 记录。公网回放已拿到真实模型响应；当前线上不需要 `MODEL_API_KEY`。
 
 ## 公网运行地址与部署责任
 
@@ -78,7 +78,7 @@ Risk 决策：
 
 ## 模型配置要求
 
-密钥只能放在 Cloudflare Worker Secret 或本地后端环境变量，不能放到 GitHub Pages、前端代码或仓库文件中。
+如果改用 OpenAI 兼容的 HTTP 模型，密钥只能放在 Cloudflare Worker Secret 或本地后端环境变量，不能放到 GitHub Pages、前端代码或仓库文件中。当前线上使用 Workers AI，不需要模型密钥。
 
 Cloudflare 配置命令：
 
@@ -87,14 +87,16 @@ npx wrangler secret put MODEL_API_KEY
 npx wrangler deploy
 ```
 
-当前变量配置：
+当前线上变量配置：
 
 ```toml
-MODEL_API_URL = "https://api.openai.com/v1/responses"
-MODEL_API_STYLE = "responses"
-MODEL_NAME = "gpt-5.6-terra"
+MODEL_PROVIDER = "workers_ai"
+MODEL_NAME = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
 MODEL_RESPONSE_FORMAT = "json_schema"
 MODEL_FALLBACK_TO_RULES = "false"
+MODEL_DISABLE_RULE_FALLBACK = "true"
+MODEL_TIMEOUT_MS = "45000"
+MODEL_REQUESTS_PER_MINUTE = "6"
 ```
 
 要求：
@@ -104,7 +106,8 @@ MODEL_FALLBACK_TO_RULES = "false"
 - 返回内容必须是指定 JSON Schema 的对象。
 - `proposed_action` 只能是 `NO_ACTION`、`REQUEST_MORE_INFO`、`HOLD_FOR_REVIEW`、`FLAG_FOR_RISK`。
 - 模型调用失败默认返回错误并阻断；规则降级只有显式 `allow_rule_fallback=true` 或配置开启时才允许，并且会标记 `source=rule_fallback`。
-- 当前部署未设置模型 Secret，不能把公网结果标记为“真实模型已验收”。配置 Secret 后需要重新跑公网 Smoke，并保存响应和运行日志。
+- 当前部署使用 Workers AI binding；`GET /health` 已返回 `model.configured=true`。
+- 公网回放已验证 `model.source=model` 与 `model.model_response.call_succeeded=true`，并保存了脱敏运行日志。
 
 ## `/api/review` 请求样例
 
@@ -210,22 +213,23 @@ Risk 决策请求：
 
 ```text
 npm run check  -> JavaScript syntax checks passed.
-npm test       -> 63 tests passed, 0 failed.
+npm test       -> 73 tests passed, 0 failed.
+node --test tests/cloudflare-review.test.mjs -> 6 tests passed, 0 failed.
 ```
 
-运行日志样例保存在：`logs/core-agent-e2e-2026-10-13.jsonl`。其中 `provider_mode=synthetic-test-adapter` 的记录属于本地链路验收；它不能替代配置真实模型后的公网响应日志。
+运行日志保存在：`logs/core-agent-e2e-2026-10-13.jsonl`（本地链路验收）和 `logs/core-agent-e2e-public-2026-10-13.jsonl`（公网 Workers AI 回放）。日志只保留脱敏 ID、状态和证据，不保存任何密钥。
 
-## 线上验收还差什么
+## 线上验收结果
 
-代码和路由已完成，公网 `/health` 已可访问。要满足“统一后端实际调用模型”的线上证据标准，部署 Owner 还需要在 Cloudflare Worker 配置 `MODEL_API_KEY`，然后执行一次：
+代码、路由、真实模型调用和公网审计回放已完成。线上回放使用虚构账单完成了以下步骤：
 
 1. 用 `contracts/examples/model-review.request.json` 调用公网 `/api/review`。
 2. 保存返回的 `task_id`、`run_id`、`model_response.provider_response_id`、`model_response.raw_text` 和 `audit.events`。
 3. 用同一个 `task_id` 依次调用 Risk、审批和模拟接口。
 4. 调用 `/api/review/task/{task_id}`，核对五个关联键和最终 `execution.receipt`。
-5. 将脱敏后的响应和运行日志追加到本目录的日报，不提交 API Key、真实账单或真实账户信息。
+5. 将脱敏后的响应和运行日志追加到本目录的日报，不提交 API Key、真实账单或真实账户信息。最新线上回放证据见 `docs/public-review-recheck-response-2026-10-13.json`。
 
-这一步必须由拥有 Cloudflare Secret 配置权限的部署 Owner 完成；模型密钥不通过聊天或 Git 提供。
+当前回放已经由 Workers AI 完成；如以后更换为外部模型，仍必须由拥有 Cloudflare Secret 配置权限的部署 Owner 配置密钥，模型密钥不通过聊天或 Git 提供。
 
 ## 版本与回溯
 

@@ -92,7 +92,6 @@ function isApprovalRequired(proposal) {
 }
 
 function completeErrorRecord(error, input, taskId, runId, auditId) {
-  const timestamp = now();
   const record = {
     workflow_version: WORKFLOW_VERSION,
     task_id: taskId,
@@ -102,16 +101,20 @@ function completeErrorRecord(error, input, taskId, runId, auditId) {
     model: { status: "FAILED", response: null },
     proposed_action: null,
     risk_handoff: {
+      contract_version: modelReview.REVIEW_VERSION,
       handoff_id: id("handoff-"),
       task_id: taskId,
+      run_id: runId,
+      owner: "Unified Risk",
+      evidence: { audit_id: auditId, model_response_id: null, proposal_sha256: null },
       status: "BLOCKED",
       decision: "MODEL_FAILED",
       execution_allowed: false,
       reason: "模型调用失败，不能交给 Risk 或执行端。"
     },
     risk_decision: null,
-    approval: { approval_id: id("approval-"), required: true, status: "BLOCKED", decision: null },
-    execution: { execution_id: null, status: "BLOCKED", simulation_allowed: false, execution_allowed: false, receipt: null },
+    approval: { approval_id: id("approval-"), task_id: taskId, proposal_sha256: null, required: true, status: "BLOCKED", decision: null },
+    execution: { execution_id: null, task_id: taskId, status: "BLOCKED", simulation_allowed: false, execution_allowed: false, receipt: null },
     audit: {
       audit_id: auditId,
       workflow_version: WORKFLOW_VERSION,
@@ -134,6 +137,7 @@ class ReviewWorkflowStore {
     this.modelRunner = modelRunner;
     this.records = new Map();
     this.byTask = new Map();
+    this.startingTasks = new Set();
   }
 
   save(record) {
@@ -154,7 +158,20 @@ class ReviewWorkflowStore {
   }
 
   async start(input = {}, env = {}, options = {}) {
+    input = modelReview.normalizeReviewInput(input);
     const taskId = input.task_id || id("review-task-");
+    if (this.byTask.has(taskId) || this.startingTasks.has(taskId)) {
+      throw new WorkflowError("TASK_ALREADY_EXISTS", "task_id already exists; load its record or create a new task", { stage: "VALIDATION", record: this.getByTaskId(taskId) });
+    }
+    this.startingTasks.add(taskId);
+    try {
+      return await this.startNew(input, taskId, env, options);
+    } finally {
+      this.startingTasks.delete(taskId);
+    }
+  }
+
+  async startNew(input, taskId, env, options) {
     const requestId = input.request_id || id("req-");
     const modelInput = { ...input, task_id: taskId, request_id: requestId };
     const runId = id("review-");
@@ -213,7 +230,7 @@ class ReviewWorkflowStore {
         approval_id: id("approval-"),
         task_id: taskId,
         required: approvalRequired,
-        status: approvalRequired ? "PENDING" : "NOT_REQUIRED",
+        status: approvalRequired ? "BLOCKED" : "NOT_REQUIRED",
         decision: null,
         proposal_sha256: proposalSha256,
         approver: null,
@@ -233,11 +250,16 @@ class ReviewWorkflowStore {
         task_id: taskId,
         request_id: requestId,
         run_id: review.run_id,
-        events: clone(review.audit.events)
+        events: []
       }
     };
+    for (const prior of review.audit.events || []) {
+      const { event_type, at, timestamp, ...payload } = prior;
+      event(record, event_type, payload, "model-service");
+      record.audit.events.at(-1).timestamp = timestamp || at || now();
+    }
     event(record, "workflow.created", { stage: "MODEL" });
-    event(record, "model.completed", { source: review.source, proposal_sha256: proposalSha256 });
+    event(record, "proposal.bound", { source: review.source, proposal_sha256: proposalSha256 });
     event(record, "risk.handoff.created", { handoff_id: record.risk_handoff.handoff_id }, "risk-gateway");
     event(record, "execution.blocked", { reason: "risk_pending", execution_allowed: false }, "execution-gateway");
     return this.save(record);
@@ -249,16 +271,33 @@ class ReviewWorkflowStore {
     return record;
   }
 
+  deny(record, code, message, stage, recovery) {
+    event(record, "workflow.operation_blocked", { code, stage, execution_allowed: false }, "execution-gateway");
+    const saved = this.save(record);
+    throw new WorkflowError(code, message, { stage, recovery, record: saved });
+  }
+
+  checkInput(record, input, allowed, stage) {
+    if (Object.keys(input).some(key => !allowed.includes(key))) {
+      this.deny(record, "UNEXPECTED_ACTION_FIELDS", "decision and execution endpoints cannot change action parameters", stage, "Create a new task for changed parameters.");
+    }
+    if (input.proposal_sha256 !== record.proposed_action.proposal_sha256) {
+      this.deny(record, "PROPOSAL_CHANGED", "proposal hash does not match the task", stage, "Reload and review the current proposal.");
+    }
+  }
+
   async decideRisk(input = {}) {
     const taskId = requiredString(input.task_id, "task_id");
     const record = this.requireRecord(taskId);
+    if (!record.proposed_action) throw new WorkflowError("RISK_BLOCKED", "model failure cannot be approved", { stage: "RISK", record });
     const decision = decisionValue(input.decision, RISK_DECISIONS, "decision");
     const reviewer = requiredString(input.reviewer, "reviewer");
-    if (input.proposal_sha256 !== record.proposed_action.proposal_sha256) {
-      throw new WorkflowError("PROPOSAL_CHANGED", "proposal hash does not match the task", { stage: "RISK", recovery: "Reload the task and review the current proposal before deciding.", record });
+    this.checkInput(record, input, ["task_id", "proposal_sha256", "decision", "reviewer", "reason"], "RISK");
+    if (["SIMULATED", "REJECTED", "MODEL_FAILED"].includes(record.status)) {
+      this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot receive another Risk decision", "RISK", "Create a new task for a new proposal.");
     }
-    if (record.status === "MODEL_FAILED") throw new WorkflowError("RISK_BLOCKED", "model failure cannot be approved", { stage: "RISK", record });
-    if (record.risk_decision?.decision && record.risk_decision.decision !== decision) {
+    if (record.risk_decision?.decision) {
+      if (record.risk_decision.decision === decision) return this.save(record);
       throw new WorkflowError("RISK_DECISION_IMMUTABLE", "risk decision is already recorded", { stage: "RISK", record });
     }
     record.risk_decision = {
@@ -267,7 +306,7 @@ class ReviewWorkflowStore {
       decision,
       status: decision === "APPROVE" ? "APPROVED" : decision === "REJECT" ? "REJECTED" : "PENDING_REVIEW",
       reviewer,
-      reason: requiredString(input.reason || "Risk decision recorded against the model proposal.", "reason"),
+      reason: requiredString(input.reason, "reason"),
       proposal_sha256: record.proposed_action.proposal_sha256,
       decided_at: now()
     };
@@ -287,6 +326,8 @@ class ReviewWorkflowStore {
       event(record, "execution.blocked", { reason: "risk_more_info" }, "execution-gateway");
     } else {
       record.status = record.approval.required ? "PENDING_APPROVAL" : "READY_FOR_SIMULATION";
+      record.approval.status = record.approval.required ? "PENDING" : "NOT_REQUIRED";
+      record.execution.status = record.approval.required ? "BLOCKED" : "READY";
       record.execution.simulation_allowed = !record.approval.required;
       event(record, "risk.approved", { approval_required: record.approval.required }, "risk");
       if (record.approval.required) event(record, "approval.pending", { approval_id: record.approval.approval_id }, "approval-gateway");
@@ -298,16 +339,23 @@ class ReviewWorkflowStore {
   async decideApproval(input = {}) {
     const taskId = requiredString(input.task_id, "task_id");
     const record = this.requireRecord(taskId);
+    if (!record.proposed_action) throw new WorkflowError("APPROVAL_BLOCKED", "model failure cannot be approved", { stage: "APPROVAL", record });
     const decision = decisionValue(input.decision, APPROVAL_DECISIONS, "decision");
     const approver = requiredString(input.approver, "approver");
-    if (input.proposal_sha256 !== record.proposed_action.proposal_sha256) {
-      throw new WorkflowError("PROPOSAL_CHANGED", "proposal hash does not match the task", { stage: "APPROVAL", recovery: "Reload the task and approve the current proposal only.", record });
+    this.checkInput(record, input, ["task_id", "proposal_sha256", "decision", "approver", "reason"], "APPROVAL");
+    if (["SIMULATED", "REJECTED", "MODEL_FAILED"].includes(record.status)) {
+      this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot receive another approval", "APPROVAL", "Create a new task for a new proposal.");
     }
     if (record.risk_decision?.decision !== "APPROVE" || record.risk_decision.status !== "APPROVED") {
       throw new WorkflowError("APPROVAL_BLOCKED", "approval requires an approved Risk decision", { stage: "APPROVAL", recovery: "Wait for Risk APPROVE before recording approval.", record });
     }
     if (!record.approval.required) throw new WorkflowError("APPROVAL_NOT_REQUIRED", "this task does not require approval", { stage: "APPROVAL", record });
+    if (record.approval.status !== "PENDING") {
+      if (record.approval.decision === decision) return this.save(record);
+      throw new WorkflowError("APPROVAL_IMMUTABLE", "approval decision is already recorded", { stage: "APPROVAL", record });
+    }
     record.approval.decision = decision;
+    record.approval.reason = requiredString(input.reason, "reason");
     record.approval.approver = approver;
     record.approval.decided_at = now();
     record.approval.status = decision === "APPROVE" ? "APPROVED" : "REJECTED";
@@ -330,8 +378,14 @@ class ReviewWorkflowStore {
   async simulate(input = {}) {
     const taskId = requiredString(input.task_id, "task_id");
     const record = this.requireRecord(taskId);
-    if (input.proposal_sha256 !== record.proposed_action.proposal_sha256) {
-      throw new WorkflowError("PROPOSAL_CHANGED", "proposal hash does not match the task", { stage: "EXECUTION", recovery: "Reload the task and simulate the current approved proposal only.", record });
+    if (!record.proposed_action) throw new WorkflowError("EXECUTION_BLOCKED", "model failure cannot be simulated", { stage: "EXECUTION", record });
+    this.checkInput(record, input, ["task_id", "proposal_sha256"], "EXECUTION");
+    const { proposal_sha256, ...boundProposal } = record.proposed_action;
+    if (await hash(boundProposal) !== proposal_sha256) this.deny(record, "PROPOSAL_CHANGED", "stored proposal integrity check failed", "EXECUTION", "Create a new task and repeat Risk and approval.");
+    if (record.status === "SIMULATED") return record;
+    if (record.risk_decision?.decision !== "APPROVE" || record.risk_decision?.proposal_sha256 !== proposal_sha256 ||
+        (record.approval.required && (record.approval.status !== "APPROVED" || record.approval.proposal_sha256 !== proposal_sha256))) {
+      this.deny(record, "EXECUTION_BLOCKED", "Risk and required approval must refer to this exact proposal", "EXECUTION", "Complete Risk and approval first.");
     }
     if (record.status !== "READY_FOR_SIMULATION" || !record.execution.simulation_allowed) {
       event(record, "execution.blocked", { reason: record.status.toLowerCase(), execution_allowed: false }, "execution-gateway");
@@ -363,6 +417,7 @@ class ReviewWorkflowStore {
   reset() {
     this.records.clear();
     this.byTask.clear();
+    this.startingTasks.clear();
   }
 }
 

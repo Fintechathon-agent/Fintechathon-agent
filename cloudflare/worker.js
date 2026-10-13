@@ -4,21 +4,20 @@ import contractModule from "../chenchen/contracts/investment-contract.js";
 import adapterModule from "../chenchen/integrations/risk-workbench-adapter.js";
 import modelReviewModule from "../chenchen/integrations/model-review.js";
 import reviewWorkflowModule from "../chenchen/integrations/review-workflow.js";
+import { reviewDocs } from "./review-docs.js";
 
 const { Harness } = harnessModule;
 const tools = toolsModule;
 const contract = contractModule;
 const { buildRiskWorkbenchHandoff } = adapterModule;
 const modelReview = modelReviewModule;
-const { ReviewWorkflowStore } = reviewWorkflowModule;
+const { ReviewWorkflowStore, WorkflowError } = reviewWorkflowModule;
 const harness = new Harness({ toolset: tools });
 const DEFAULT_ORIGINS = [
   "https://fund-risk-workbench.panxintian44.chatgpt.site",
   "https://realchenchenluo.github.io"
 ];
 const rateBuckets = new Map();
-const reviewRuns = new Map();
-const reviewWorkflow = new ReviewWorkflowStore();
 
 function originFor(request, env) {
   const origin = request.headers.get("Origin");
@@ -53,8 +52,26 @@ function errorPayload(error, requestId = null) {
 }
 
 async function readJson(request) {
+  const reader = request.body?.getReader();
+  const chunks = [];
+  let size = 0;
+  if (reader) {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > 100000) {
+        await reader.cancel();
+        throw new modelReview.ReviewError("REQUEST_TOO_LARGE", "请求正文不能超过 100KB。", { statusCode: 413, stage: "VALIDATION" });
+      }
+      chunks.push(value);
+    }
+  }
   try {
-    return await request.json();
+    const bytes = new Uint8Array(size);
+    let offset = 0;
+    for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+    return JSON.parse(new TextDecoder().decode(bytes));
   } catch {
     const error = new Error("request body must be valid JSON");
     error.code = "INVALID_JSON";
@@ -104,11 +121,6 @@ function requiresApiKey(request, env) {
   return !expected || request.headers.get("X-Core-Agent-Key") === expected;
 }
 
-function storeReviewRun(result) {
-  if (reviewRuns.size >= 500) reviewRuns.delete(reviewRuns.keys().next().value);
-  reviewRuns.set(result.run_id, result);
-}
-
 function workflowErrorPayload(error) {
   const record = error.workflowRecord || error.record || null;
   return {
@@ -132,6 +144,93 @@ function workflowErrorPayload(error) {
   };
 }
 
+// One durable coordinator keeps demo workflow updates ordered and audit reads
+// consistent across edge locations and Worker restarts.
+export class ReviewService {
+  constructor(state, env) {
+    this.storage = state.storage;
+    this.env = env;
+    this.queue = Promise.resolve();
+    this.modelBuckets = new Map();
+  }
+
+  fetch(request) {
+    const pending = this.queue.then(() => this.handle(request));
+    this.queue = pending.catch(() => {});
+    return pending;
+  }
+
+  async persist(record) {
+    if (!record?.run_id) return;
+    await this.storage.put({
+      ["run:" + record.run_id]: record,
+      ["task:" + record.task_id]: record.run_id
+    });
+  }
+
+  async lookupTask(taskId) {
+    const runId = await this.storage.get("task:" + taskId);
+    return runId ? this.storage.get("run:" + runId) : null;
+  }
+
+  async handle(request) {
+    const env = this.env;
+    const url = new URL(request.url);
+    try {
+      if (request.method === "GET") {
+        const key = decodeURIComponent(url.pathname.slice("/api/review/".length));
+        const result = key.startsWith("task/") ? await this.lookupTask(key.slice(5)) : await this.storage.get("run:" + key);
+        return json(request, env, result ? 200 : 404, result || { error: { code: "REVIEW_NOT_FOUND", message: "没有找到这个运行编号。" } });
+      }
+      const body = await readJson(request);
+      if (!body || typeof body !== "object" || Array.isArray(body)) {
+        throw new modelReview.ReviewError("INVALID_REVIEW_INPUT", "请求正文必须是 JSON 对象。", { statusCode: 422, stage: "VALIDATION" });
+      }
+      const workflow = new ReviewWorkflowStore();
+      let result;
+      if (url.pathname === "/api/review") {
+        const input = modelReview.normalizeReviewInput(body);
+        if (input.task_id && await this.lookupTask(input.task_id)) {
+          throw new WorkflowError("TASK_ALREADY_EXISTS", "task_id already exists; load its record or create a new task", {
+            statusCode: 409,
+            stage: "VALIDATION",
+            recovery: "Use the existing task record or create a new task_id."
+          });
+        }
+        const minute = Math.floor(Date.now() / 60000);
+        for (const [ip, bucket] of this.modelBuckets) if (bucket.minute !== minute) this.modelBuckets.delete(ip);
+        const ip = requestIdentity(request);
+        const bucket = this.modelBuckets.get(ip) || { minute, count: 0 };
+        if (bucket.count >= Number(env.MODEL_REQUESTS_PER_MINUTE || 6)) {
+          return json(request, env, 429, errorPayload(rateLimitFailure()), { "Retry-After": "60" });
+        }
+        bucket.count++;
+        this.modelBuckets.set(ip, bucket);
+        result = await workflow.start(input, env);
+      } else {
+        const record = await this.lookupTask(body.task_id);
+        if (record) workflow.save(record);
+        const method = {
+          "/api/review/risk-decision": "decideRisk",
+          "/api/review/approval": "decideApproval",
+          "/api/review/simulate": "simulate"
+        }[url.pathname];
+        if (!method) return json(request, env, 404, { error: { code: "NOT_FOUND" } });
+        result = await workflow[method](body);
+      }
+      await this.persist(result);
+      return json(request, env, 200, result);
+    } catch (error) {
+      if (error.name === "ReviewError" || error.name === "WorkflowError") {
+        await this.persist(error.workflowRecord || error.record);
+        return json(request, env, error.statusCode || 502, workflowErrorPayload(error));
+      }
+      if (error.code === "INVALID_JSON") return json(request, env, 400, errorPayload(error));
+      return json(request, env, 503, { error: { code: "REVIEW_SERVICE_UNAVAILABLE", message: "复核服务暂时不可用，请稍后重试。", retryable: true } });
+    }
+  }
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -140,13 +239,28 @@ export default {
       return new Response(null, { status: 204, headers: headers(request, env) });
     }
     if (request.method === "GET" && url.pathname === "/health") {
-      return json(request, env, 200, { status: "ok", service: "core-agent", contract_version: contract.CONTRACT_VERSION });
+      const config = modelReview.resolveModelConfig(env);
+      return json(request, env, 200, {
+        status: "ok", service: "core-agent", contract_version: contract.CONTRACT_VERSION,
+        review_endpoint: "/api/review", docs: "/docs",
+        model: { provider: config.provider, name: config.model, configured: config.style === "workers_ai" ? Boolean(env.AI) : Boolean(config.apiKey) },
+        audit_storage: env.REVIEW_SERVICE ? "durable_object" : "unconfigured"
+      });
+    }
+    if (request.method === "GET" && ["/docs", "/api/review"].includes(url.pathname)) {
+      return new Response(reviewDocs, { headers: {
+        ...headers(request, env, "text/html; charset=utf-8"),
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+      } });
     }
     if (request.method === "GET" && url.pathname === "/") {
       return json(request, env, 200, {
         service: "Personal AI Fund Manager Core Agent",
         contract_version: contract.CONTRACT_VERSION,
         endpoint: "/api/risk-workbench/handoff",
+        review_endpoint: "/api/review",
+        docs: "/docs",
         execution_allowed: false
       });
     }
@@ -160,24 +274,17 @@ export default {
     }
     if (!requiresApiKey(request, env)) return json(request, env, 401, errorPayload(authFailure()), { "WWW-Authenticate": "X-Core-Agent-Key" });
     if (!allowedByRateLimit(request, env)) return json(request, env, 429, errorPayload(rateLimitFailure()), { "Retry-After": "60" });
-    if (isReviewRead) {
-      const key = decodeURIComponent(url.pathname.slice("/api/review/".length));
-      const result = key.startsWith("task/")
-        ? reviewWorkflow.getByTaskId(key.slice("task/".length))
-        : reviewWorkflow.getByRunId(key) || reviewRuns.get(key);
-      return json(request, env, result ? 200 : 404, result || { error: { code: "REVIEW_NOT_FOUND", message: "review run not found" } });
+    if (url.pathname === "/api/review" || url.pathname.startsWith("/api/review/")) {
+      try {
+        const service = env.REVIEW_SERVICE.get(env.REVIEW_SERVICE.idFromName("team-review-v1"));
+        return await service.fetch(request);
+      } catch {
+        return json(request, env, 503, { error: { code: "REVIEW_SERVICE_UNAVAILABLE", message: "复核服务暂时不可用，请稍后重试。", retryable: true } });
+      }
     }
     let body;
     try {
       body = await readJson(request);
-      if (url.pathname === "/api/review") {
-        const result = await reviewWorkflow.start(body, env);
-        storeReviewRun(result);
-        return json(request, env, 200, result);
-      }
-      if (url.pathname === "/api/review/risk-decision") return json(request, env, 200, await reviewWorkflow.decideRisk(body));
-      if (url.pathname === "/api/review/approval") return json(request, env, 200, await reviewWorkflow.decideApproval(body));
-      if (url.pathname === "/api/review/simulate") return json(request, env, 200, await reviewWorkflow.simulate(body));
       const input = url.pathname === "/api/risk-workbench/handoff" ? (body.request || body) : body;
       const agentResponse = harness.runHealthCheckContract(input);
       if (url.pathname === "/api/health-check/run") return json(request, env, 200, agentResponse);
@@ -188,7 +295,6 @@ export default {
       });
     } catch (error) {
       if (error?.name === "ReviewError") {
-        if (error.reviewRecord) storeReviewRun(error.reviewRecord);
         return json(request, env, error.statusCode || 502, error.workflowRecord ? workflowErrorPayload(error) : modelReview.buildReviewError(error));
       }
       if (error?.name === "WorkflowError") return json(request, env, error.statusCode || 409, workflowErrorPayload(error));
