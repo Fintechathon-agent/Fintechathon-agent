@@ -227,8 +227,10 @@ class WhatIfEngine:
                 f"卖出数量 {rec.quantity:g} 股超过持仓 {pos.quantity:g} 股"
             )
 
-        # 卖出净回款 = 金额 - 佣金万三 - 印花税万五（与回测/纸交易同口径）
-        proceeds = rec.quantity * rec.price * (1 - 0.0003 - 0.0005)
+        # 卖出净回款 = 金额 - 佣金万三 - 印花税万五（ETF/LOF 免印花税，与回测/纸交易同口径）
+        from .fund_ops import is_exchange_fund
+        stamp = 0.0 if is_exchange_fund(rec.symbol) else 0.0005
+        proceeds = rec.quantity * rec.price * (1 - 0.0003 - stamp)
         remaining = pos.quantity - rec.quantity
 
         if remaining <= 1e-9:

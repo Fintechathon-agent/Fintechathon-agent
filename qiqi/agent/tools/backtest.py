@@ -52,9 +52,15 @@ class BacktestEngine:
         daily_values: list[float] = [cash]
         daily_returns: list[float] = [0.0]
 
-        # 费用模型：买入佣金万三（含在成本法成本里）；卖出佣金万三 + 印花税万五（2023-08 后单边卖出 0.05%）
+        # 费用模型：买入佣金万三（含在成本法成本里）；
+        # 卖出佣金万三 + 股票印花税万五（2023-08 后单边卖出 0.05%），场内 ETF/LOF 免印花税。
+        # 场外基金（.OF）申赎不走日线撮合，本引擎跳过。
+        from .fund_ops import is_exchange_fund, is_otc_fund
+
         BUY_FEE = 0.0003
-        SELL_FEE = 0.0003 + 0.0005
+
+        def sell_fee(symbol: str) -> float:
+            return 0.0003 + (0.0 if is_exchange_fund(symbol) else 0.0005)
 
         # 按时间线合并所有行情
         all_dates: set[str] = set()
@@ -69,6 +75,8 @@ class BacktestEngine:
         last_date = ""
         scheduled: dict[str, list[tuple[Recommendation, float]]] = {}
         for rec in recommendations:
+            if is_otc_fund(rec.symbol):
+                continue   # 场外基金申赎按净值确认，不走日线撮合
             price_data = historical_data.get(rec.symbol, [])
             if not price_data:
                 continue
@@ -98,7 +106,7 @@ class BacktestEngine:
                 elif rec.action == ActionType.SELL and holdings.get(rec.symbol, 0) >= rec.quantity:
                     qty = rec.quantity
                     amount = price * qty
-                    revenue = amount * (1 - SELL_FEE)
+                    revenue = amount * (1 - sell_fee(rec.symbol))
                     # 已实现盈亏 = 卖出净收入 - 对应数量份额的持仓成本（成本法）
                     avg_cost_per_share = cost_basis.get(rec.symbol, 0.0) / holdings[rec.symbol]
                     realized = revenue - avg_cost_per_share * qty

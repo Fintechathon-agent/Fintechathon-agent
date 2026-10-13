@@ -66,46 +66,116 @@ class PaperTradingTool:
         """执行交易逻辑
 
         费用模型（与回测引擎一致）：
-        - 买入：佣金万三；
-        - 卖出：佣金万三 + 印花税万五（2023-08 后单边卖出 0.05%）。
-        滑点：成交价偏移 ±0.5% 均匀随机（演示用估算）。
+        - 股票：买入佣金万三；卖出佣金万三 + 印花税万五（2023-08 后单边卖出 0.05%）。
+        - 场内 ETF/LOF：佣金万三，卖出免印花税（交易所规则）。
+        - 场外基金（symbol 带 .OF）：申购按金额/赎回按份额，无滑点按净值成交，
+          申购费 0.15%、赎回费按持有天数分档，计算见 fund_ops（演示同速确认，真实 T+1）。
         """
-        # 模拟滑点（成交价偏移 ±0.5%）
         import random
-        slippage = 1.0 + random.uniform(-0.005, 0.005)
-        exec_price = rec.price * slippage
-        amount = exec_price * rec.quantity
-        commission = amount * 0.0003  # 万三佣金
-        stamp_duty = amount * 0.0005 if rec.action == ActionType.SELL else 0.0  # 卖出印花税万五
+
+        from .fund_ops import is_exchange_fund, is_otc_fund, otc_redeem, otc_subscribe
+
+        is_otc = is_otc_fund(rec.symbol)
+        is_etf = is_exchange_fund(rec.symbol)
+        action_label = rec.action.value
+
+        if is_otc:
+            # 场外基金：按净值成交，无滑点；quantity 语义：买入=申购金额，卖出=赎回份额
+            nav = rec.price
+            if rec.action == ActionType.BUY:
+                res = otc_subscribe(rec.quantity, nav)
+                amount = res.amount
+                fee = res.fee
+                exec_price = nav
+                action_label = "申购"
+            else:
+                hold_days = self._otc_hold_days(session_id, rec.symbol)
+                res = otc_redeem(rec.quantity, nav, hold_days)
+                amount = res.net_amount
+                fee = res.fee
+                exec_price = nav
+                action_label = "赎回"
+            commission = fee
+        else:
+            # 交易所证券（股票/场内 ETF）：滑点 ±0.5% 均匀随机（演示估算）
+            slippage = 1.0 + random.uniform(-0.005, 0.005)
+            exec_price = rec.price * slippage
+            amount = exec_price * rec.quantity
+            commission = amount * 0.0003  # 万三佣金
+            if rec.action == ActionType.SELL and not is_etf:
+                commission += amount * 0.0005  # 股票卖出印花税万五；ETF/LOF 免
 
         record = TradeRecord(
             id=f"PT-{uuid.uuid4().hex[:12]}",
             session_id=session_id,
             timestamp=datetime.now().isoformat(),
-            action=rec.action.value,
+            action=action_label,
             symbol=rec.symbol,
             name=rec.symbol,  # 实际应从行情获取
             price=round(exec_price, 2),
             quantity=rec.quantity,
             amount=round(amount, 2),
-            commission=round(commission + stamp_duty, 2),  # 佣金+印花税合并入费用字段
+            commission=round(commission, 2),
         )
         return record
+
+    def _otc_hold_days(self, session_id: str, symbol: str) -> int:
+        """场外基金持有天数：自首笔申购至今（分档费率的演示简化口径）。"""
+        pos = self._positions.get(session_id, {}).get(symbol)
+        first_buy = pos.get("first_buy") if pos else None
+        if not first_buy:
+            return 0
+        days = (date.today() - date.fromisoformat(first_buy)).days
+        return max(days, 0)
 
     def _update_positions(self, rec: Recommendation, session_id: str) -> None:
         """更新内存中的持仓快照
 
-        买入：成本法摊入成交价（含佣金）；卖出：按份额减仓，成本法剩余成本同步扣减。
+        - 股票/场内 ETF：成本法摊入成交价（含佣金）。
+        - 场外基金：申购按金额换算份额（含申购费），赎回按份额扣减；净值估值。
         """
+        from .fund_ops import is_otc_fund, otc_subscribe
+
         if session_id not in self._positions:
             self._positions[session_id] = {}
 
         positions = self._positions[session_id]
         sym = rec.symbol
-        # 与 _do_trade 同口径：以滑点后成交价计（此处用 rec.price 的近似成交价，
-        # 记录层的精确成交价以 _do_trade 为准；价差在演示级误差内）。
-        exec_price = rec.price
 
+        if is_otc_fund(sym):
+            today = date.today().isoformat()
+            nav = rec.price
+            if rec.action == ActionType.BUY:
+                res = otc_subscribe(rec.quantity, nav)
+                if sym in positions:
+                    old = positions[sym]
+                    total_shares = old["quantity"] + res.shares
+                    positions[sym] = {
+                        "symbol": sym,
+                        "name": old.get("name", sym),
+                        "quantity": total_shares,
+                        "avg_cost": nav,
+                        "current_price": nav,
+                        "first_buy": old.get("first_buy", today),
+                    }
+                else:
+                    positions[sym] = {
+                        "symbol": sym,
+                        "name": sym,
+                        "quantity": res.shares,
+                        "avg_cost": nav,
+                        "current_price": nav,
+                        "first_buy": today,
+                    }
+            elif rec.action == ActionType.SELL:
+                if sym in positions:
+                    positions[sym]["quantity"] -= rec.quantity  # 赎回份额
+                    if positions[sym]["quantity"] <= 0:
+                        del positions[sym]
+            return
+
+        # 股票 / 场内 ETF：成本法（佣金入成本）
+        exec_price = rec.price
         if rec.action == ActionType.BUY:
             commission = exec_price * rec.quantity * 0.0003
             total_cost_with_fee = exec_price * rec.quantity + commission
@@ -152,6 +222,7 @@ class PaperTradingTool:
                 current_price=info["current_price"],
                 market_value=info["current_price"] * info["quantity"],
                 return_pct=(info["current_price"] - info["avg_cost"]) / info["avg_cost"] * 100,
+                asset_type="fund" if "first_buy" in info else "stock",
             )
             for sym, info in data.items()
         ]
