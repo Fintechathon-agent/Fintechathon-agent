@@ -58,7 +58,7 @@ GET /api/review/task/{task_id}
 
 结果和审计保存在 Cloudflare SQLite Durable Object，跨请求和边缘节点可查，不再只存在 Worker 内存中。公开演示记录按不可预测的编号查询；没有用户身份隔离，勿提交真实个人或财务资料。
 
-已有的 /api/review/risk-decision、/api/review/approval、/api/review/simulate 也使用同一持久化记录，用于演示 Risk、审批、模拟回执，不能作为正式业务身份授权或实际交易接口。继续演示流程时传同一 task_id 与 proposal_sha256。
+已有的 /api/review/risk-decision、/api/review/approval、/api/review/simulate 也使用同一持久化记录，用于演示 Risk、审批、模拟回执，不能作为正式业务身份授权或实际交易接口。继续演示流程时传同一 task_id 与 proposal_sha256。旧版工作台若仍发送 `{"question":"..."}`，可调用 `POST /api/review/legacy`；它只做字段适配，内部仍回到同一条 Risk Handoff 链路。
 
 ## 失败与限制
 
@@ -76,12 +76,14 @@ GET /api/review/task/{task_id}
 1. 公网 POST：HTTP 200；任务 `review-task-f0e0246a-00c8-4e92-a16b-db2023fac16f`，运行 `review-3e1ab4c7-7782-4b31-8c3d-8292ba371017`，审计 `audit-c7e18b3b-01ee-4bf6-bdd0-0b22e23de29d`。模型真实返回 `HOLD_FOR_REVIEW`，响应编号为 `chatcmpl-e87cc1c3-1185-4968-a2b2-1f4882cd9cab`。
 2. 同一任务依次通过 Risk APPROVE、人工审批 APPROVE 和模拟执行；最终查询仍为 `SIMULATED`，`side_effects=false`，`execution_allowed=false`。完整脱敏证据见同目录 `public-review-recheck-response-2026-10-13.json`。
 3. 对已完成任务重复提交 Risk 和审批都返回 HTTP 409、`WORKFLOW_TERMINAL`，最终记录没有被改回等待状态。
-4. 按任务查询：200；OPTIONS 预检：204；空正文对象：422；重复 task_id：409；模型失败记录可查询且执行阻断。
-5. 核心自动测试 72 项通过，Cloudflare Worker 专项 6 项通过，JavaScript 语法检查通过。单元测试使用替身模型，以上任务编号才是公网真实推理和链路证据。
+4. 旧版 `question` 兼容入口真实调用成功，返回 `legacy-review.v0`，内部任务仍为 `review-workflow.v1`，执行继续阻断。
+5. Risk REJECT 后查询为 `REJECTED`，模拟执行返回 409；Risk REQUEST_MORE_INFO 后查询为 `PENDING_RISK`，模拟执行同样返回 409。证据见 `public-review-guards-2026-10-13.json`。
+6. 按任务查询：200；OPTIONS 预检：204；空正文对象：422；重复 task_id：409；模型失败记录可查询且执行阻断。
+7. 核心自动测试 75 项通过，Cloudflare Worker 专项 7 项通过，JavaScript 语法检查通过。单元测试使用替身模型，以上任务编号才是公网真实推理和链路证据。
 
 网络范围：终端验收使用本机现有 HTTP 代理；Codex 内置浏览器也实际打开页面并调用成功。未验证所有国内网络直连 workers.dev 的可达性。
 
-部署版本：`a760c2b9-3ead-46cc-8e2e-ef4e8d67f5d0`。
+部署版本：`a16ebd63-090f-402d-93ec-4f20aa4d917a`。
 
 ## 维护部署
 

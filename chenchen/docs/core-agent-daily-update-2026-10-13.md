@@ -22,8 +22,10 @@
 - `task_id`、`request_id`、`run_id`、`audit_id`、`proposal_sha256` 在全链路保持关联。
 - 模型失败、等待 Risk、等待审批、Risk 拒绝、审批拒绝和参数变化都会阻断执行。
 - `execution_allowed` 固定为 `false`；模拟回执带 `side_effects=false`。
-- 本地 `npm run check` 通过；`npm test` 通过 73 项测试；Cloudflare Worker 专项测试 6 项通过。
+- 本地 `npm run check` 通过；`npm test` 通过 75 项测试；Cloudflare Worker 专项测试 7 项通过。
 - 新增终态保护和重复 `task_id` 保护；线上重复 Risk/审批请求均返回 `WORKFLOW_TERMINAL`，不会把已模拟任务改回等待状态。
+- 新增 `/api/review/legacy` 兼容入口：旧版 `question` 输入只映射到统一 Contract，不会绕过 Risk。
+- 公网真实验证了 Risk REJECT 和 REQUEST_MORE_INFO：前者进入 `REJECTED`，后者保持 `PENDING_RISK`；两者模拟执行均返回 `EXECUTION_BLOCKED`。
 - Cloudflare 公网 `/health` 已返回 `model.configured=true`；Workers AI 公网真实回放已成功，拿到模型原文、模型响应 ID 和完整审计链。
 
 ## 证据位置
@@ -33,6 +35,7 @@
 - 样例：`contracts/examples/model-review.request.json`、`model-review.response.json`、`risk-decision.request.json`、`approval.request.json`、`simulation.request.json`
 - 运行日志：`logs/core-agent-e2e-2026-10-13.jsonl`（本地）与 `logs/core-agent-e2e-public-2026-10-13.jsonl`（公网真实模型）
 - 公网复核证据：`docs/public-review-recheck-response-2026-10-13.json`，部署版本 `a760c2b9-3ead-46cc-8e2e-ef4e8d67f5d0`。
+- 兼容与阻断证据：`docs/public-review-guards-2026-10-13.json`，最新部署版本 `a16ebd63-090f-402d-93ec-4f20aa4d917a`。
 - 工作台页面：`versions/risk-workbench.html`、`versions/risk-workbench.js`
 
 ## 需要其他 Owner 配合的阻塞项

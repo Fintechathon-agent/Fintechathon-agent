@@ -3,6 +3,7 @@ import toolsModule from "../chenchen/tools/financial-tools.js";
 import contractModule from "../chenchen/contracts/investment-contract.js";
 import adapterModule from "../chenchen/integrations/risk-workbench-adapter.js";
 import modelReviewModule from "../chenchen/integrations/model-review.js";
+import legacyReviewAdapterModule from "../chenchen/integrations/legacy-review-adapter.js";
 import reviewWorkflowModule from "../chenchen/integrations/review-workflow.js";
 import { reviewDocs } from "./review-docs.js";
 
@@ -11,6 +12,7 @@ const tools = toolsModule;
 const contract = contractModule;
 const { buildRiskWorkbenchHandoff } = adapterModule;
 const modelReview = modelReviewModule;
+const legacyReviewAdapter = legacyReviewAdapterModule;
 const { ReviewWorkflowStore, WorkflowError } = reviewWorkflowModule;
 const harness = new Harness({ toolset: tools });
 const DEFAULT_ORIGINS = [
@@ -188,8 +190,10 @@ export class ReviewService {
       }
       const workflow = new ReviewWorkflowStore();
       let result;
-      if (url.pathname === "/api/review") {
-        const input = modelReview.normalizeReviewInput(body);
+      if (["/api/review", "/api/review/legacy"].includes(url.pathname)) {
+        const input = url.pathname === "/api/review/legacy"
+          ? legacyReviewAdapter.normalizeLegacyReviewInput(body)
+          : modelReview.normalizeReviewInput(body);
         if (input.task_id && await this.lookupTask(input.task_id)) {
           throw new WorkflowError("TASK_ALREADY_EXISTS", "task_id already exists; load its record or create a new task", {
             statusCode: 409,
@@ -219,7 +223,9 @@ export class ReviewService {
         result = await workflow[method](body);
       }
       await this.persist(result);
-      return json(request, env, 200, result);
+      return json(request, env, 200, url.pathname === "/api/review/legacy"
+        ? legacyReviewAdapter.mapWorkflowToLegacyResponse(result)
+        : result);
     } catch (error) {
       if (error.name === "ReviewError" || error.name === "WorkflowError") {
         await this.persist(error.workflowRecord || error.record);
@@ -266,7 +272,7 @@ export default {
     }
     const isReviewRead = request.method === "GET" && url.pathname.startsWith("/api/review/");
     const isKnownPost = request.method === "POST" && [
-      "/api/health-check/run", "/api/risk-workbench/handoff", "/api/review",
+      "/api/health-check/run", "/api/risk-workbench/handoff", "/api/review", "/api/review/legacy",
       "/api/review/risk-decision", "/api/review/approval", "/api/review/simulate"
     ].includes(url.pathname);
     if (!isKnownPost && !isReviewRead) {

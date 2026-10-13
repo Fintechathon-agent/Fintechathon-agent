@@ -113,7 +113,7 @@ MODEL_REQUESTS_PER_MINUTE = "6"
 
 团队 `qiqi/` 当前交接文档中的旧接口以 `{"question":"..."}` 为主要输入，并返回 `recommendation/gate/execution_state`；本 Core Agent 统一工作流使用 `model-review.v1`，以 `kind/text/request_id/task_id` 为输入，并返回模型原文、`proposed_action`、`risk_handoff`、`approval`、`execution` 和 `audit`。两者不能直接把响应当成同一份 Contract。
 
-对接时应由 Backend 适配一次：`question` 映射为 `text`，保留来源和原请求编号；Core Agent 返回的 `proposed_action` 只能映射为对方的待审核建议，`risk_handoff.execution_allowed=false` 必须保留；Risk 和审批结果仍以本工作流的 `task_id/proposal_sha256` 回写。当前公网 Core Agent 已完成自己的统一模型到模拟执行链；团队旧服务和远程风控工作台尚未提供可核验的回写地址，所以这部分暂列为跨 Owner 联合验收阻塞。
+现在已提供 `POST /api/review/legacy` 适配入口：`question` 映射为 `text`，返回 `legacy-review.v0` 的兼容字段，但内部仍保存 `review-workflow.v1` 原记录。`proposed_action` 只能作为待审核建议，`risk_handoff.execution_allowed=false` 必须保留；Risk 和审批结果仍以本工作流的 `task_id/proposal_sha256` 回写。当前公网 Core Agent 已完成自己的统一模型到模拟执行链；团队旧服务和远程风控工作台尚未提供可核验的回写地址，所以这部分暂列为跨 Owner 联合验收阻塞。
 
 ## `/api/review` 请求样例
 
@@ -219,8 +219,8 @@ Risk 决策请求：
 
 ```text
 npm run check  -> JavaScript syntax checks passed.
-npm test       -> 73 tests passed, 0 failed.
-node --test tests/cloudflare-review.test.mjs -> 6 tests passed, 0 failed.
+npm test       -> 75 tests passed, 0 failed.
+node --test tests/cloudflare-review.test.mjs -> 7 tests passed, 0 failed.
 ```
 
 运行日志保存在：`logs/core-agent-e2e-2026-10-13.jsonl`（本地链路验收）和 `logs/core-agent-e2e-public-2026-10-13.jsonl`（公网 Workers AI 回放）。日志只保留脱敏 ID、状态和证据，不保存任何密钥。

@@ -108,6 +108,23 @@ test("explicit task ids cannot create a second workflow record", async () => {
   assert.equal((await duplicate.json()).error.code, "TASK_ALREADY_EXISTS");
 });
 
+test("legacy question endpoint returns an adapter response without bypassing Risk", async () => {
+  const { env } = setup();
+  const response = await worker.fetch(req("/api/review/legacy", {
+    question: "我想追加投资，但下个月要交房租，是否冲突？",
+    run_id: "legacy-cloudflare-001"
+  }), env);
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(payload.contract_version, "legacy-review.v0");
+  assert.equal(payload.source_contract, "review-workflow.v1");
+  assert.equal(payload.execution_state, "awaiting_risk");
+  assert.equal(payload.gate.execution_allowed, false);
+  assert.equal(payload.auto_executed, false);
+  const query = await worker.fetch(req("/api/review/" + payload.run_id), env);
+  assert.equal((await query.json()).task_id, payload.task_id);
+});
+
 test("test page is reachable even when opening the POST URL in a browser", async () => {
   const { env } = setup();
   const response = await worker.fetch(req("/api/review"), env);

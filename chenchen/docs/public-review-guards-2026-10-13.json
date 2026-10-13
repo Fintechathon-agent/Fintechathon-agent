@@ -1,0 +1,34 @@
+{
+  "deployment": "a16ebd63-090f-402d-93ec-4f20aa4d917a",
+  "legacy_adapter": {
+    "http_status": 200,
+    "adapter_version": "legacy-review-adapter.v1",
+    "contract_version": "legacy-review.v0",
+    "source_contract": "review-workflow.v1",
+    "task_id": "review-task-6c90a8bf-59c1-4c59-840b-01ecb0e3d489",
+    "run_id": "review-b73525a3-2a15-473b-90cc-e62d7fbf20c6",
+    "request_id": "legacy-public-recheck-20261013-001",
+    "model_call_succeeded": true,
+    "execution_state": "awaiting_risk",
+    "execution_allowed": false
+  },
+  "risk_reject": {
+    "task_id": "review-task-dfafede4-e994-466a-a466-86737c1a5fe3",
+    "run_id": "review-59ec0d42-aa45-4169-8dc5-21054aa0758e",
+    "risk_decision": "REJECT",
+    "final_status": "REJECTED",
+    "simulation_http_status": 409,
+    "simulation_code": "EXECUTION_BLOCKED",
+    "execution_allowed": false
+  },
+  "risk_more_info": {
+    "task_id": "review-task-d57575d5-21f9-46a2-b23d-64cc4885f9d8",
+    "run_id": "review-d7e6fcb0-3bf2-4898-af65-1e6814ec6266",
+    "risk_decision": "REQUEST_MORE_INFO",
+    "final_status": "PENDING_RISK",
+    "simulation_http_status": 409,
+    "simulation_code": "EXECUTION_BLOCKED",
+    "execution_allowed": false
+  },
+  "evidence": "全部使用虚构账单和测试编号，不包含真实账户或交易数据。"
+}

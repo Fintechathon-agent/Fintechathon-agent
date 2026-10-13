@@ -64,4 +64,14 @@ test("HTTP model-to-Risk-to-approval-to-simulation chain is queryable", async t 
   const run = await fetch(base + "/api/review/" + encodeURIComponent(created.run_id));
   assert.equal(run.status, 200);
   assert.equal((await run.json()).task_id, created.task_id);
+
+  const legacy = await fetch(base + "/api/review/legacy", {
+    method: "POST", headers, body: JSON.stringify({ question: "我想追加投资，但下个月要交房租，是否冲突？", run_id: "legacy-http-001" })
+  });
+  assert.equal(legacy.status, 200);
+  const legacyPayload = await legacy.json();
+  assert.equal(legacyPayload.contract_version, "legacy-review.v0");
+  assert.equal(legacyPayload.source_contract, "review-workflow.v1");
+  assert.equal(legacyPayload.execution_state, "awaiting_risk");
+  assert.equal(legacyPayload.gate.execution_allowed, false);
 });

@@ -8,6 +8,7 @@ const tools = require("./tools/financial-tools");
 const contract = require("./contracts/investment-contract");
 const { buildRiskWorkbenchHandoff } = require("./integrations/risk-workbench-adapter");
 const modelReview = require("./integrations/model-review");
+const legacyReviewAdapter = require("./integrations/legacy-review-adapter");
 const { ReviewWorkflowStore, WorkflowError } = require("./integrations/review-workflow");
 const { randomUUID } = require("node:crypto");
 const { MerchantSession, demo: merchantDemo } = require("./merchant/ledger");
@@ -163,11 +164,16 @@ async function handleApi(request, response, pathname, url) {
   let body = {};
   if (method === "POST") body = await parseBody(request);
   if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("JSON body must be an object");
-  if (method === "POST" && pathname === "/api/review") {
+  if (method === "POST" && ["/api/review", "/api/review/legacy"].includes(pathname)) {
     requireReviewApiKey(request);
-    const result = await reviewWorkflow.start(body, process.env);
+    const input = pathname === "/api/review/legacy"
+      ? legacyReviewAdapter.normalizeLegacyReviewInput(body)
+      : body;
+    const result = await reviewWorkflow.start(input, process.env);
     storeReviewRun(result);
-    sendJson(response, 200, result);
+    sendJson(response, 200, pathname === "/api/review/legacy"
+      ? legacyReviewAdapter.mapWorkflowToLegacyResponse(result)
+      : result);
     return true;
   }
   if (method === "POST" && pathname === "/api/review/risk-decision") {
