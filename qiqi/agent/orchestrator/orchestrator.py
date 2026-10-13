@@ -40,13 +40,31 @@ logger = logging.getLogger(__name__)
 # ============================================================
 
 
-class DecisionMaker:
-    """决策生成器——有 LLM 时用 FinancialLLM，无 LLM 时用规则降级"""
+class ModelDecisionError(RuntimeError):
+    """真实模型联调模式下：模型调用失败，且不允许回退规则决策。"""
 
-    def __init__(self, llm_client: Any = None, approval_threshold: float = 0.70):
+
+class DecisionMaker:
+    """决策生成器——有 LLM 时用 FinancialLLM，无 LLM 时用规则降级。
+
+    strict_live=True（真实模型联调模式）：模型失败直接抛 ModelDecisionError，
+    绝不回退规则决策、绝不把失败包装成成功结果。
+    """
+
+    def __init__(
+        self,
+        llm_client: Any = None,
+        approval_threshold: float = 0.70,
+        strict_live: bool = False,
+    ):
         self._llm = llm_client
         self._threshold = approval_threshold
         self._financial_llm = None
+        self.strict_live = strict_live
+        # 决策透明度：供上层把决策来源写进响应与审计
+        self.last_source = ""          # "llm" | "rules"
+        self.last_raw: dict = {}       # 模型实际返回内容
+        self.last_model_error = ""     # 最近一次模型错误（空 = 无错误）
 
         if self._llm is not None:
             try:
@@ -54,6 +72,9 @@ class DecisionMaker:
                 self._financial_llm = FinancialLLM(self._llm)
                 logger.info("FinancialLLM 已接入，决策使用 LLM")
             except Exception as exc:
+                self.last_model_error = str(exc)
+                if self.strict_live:
+                    raise ModelDecisionError(f"FinancialLLM 初始化失败: {exc}")
                 logger.warning("FinancialLLM 初始化失败: %s，降级为规则决策", exc)
 
     def decide(self, ctx: Context, risk_report: RiskReport) -> Recommendation:
@@ -61,11 +82,20 @@ class DecisionMaker:
         # 优先用 LLM
         if self._financial_llm is not None:
             try:
-                return self._llm_decide(ctx, risk_report)
+                rec = self._llm_decide(ctx, risk_report)
+                self.last_source = "llm"
+                self.last_model_error = ""
+                return rec
             except Exception as exc:
+                self.last_model_error = str(exc)
+                if self.strict_live:
+                    self.last_source = ""
+                    logger.error("真实模型调用失败（不回退）: %s", exc)
+                    raise ModelDecisionError(f"模型调用失败: {exc}") from exc
                 logger.warning("LLM 决策失败: %s，尝试降级", exc)
 
-        # 降级：基于规则生成建议
+        # 降级：基于规则生成建议（仅演示模式允许）
+        self.last_source = "rules"
         return self._rule_based_decide(ctx, risk_report)
 
     def _llm_decide(self, ctx: Context, risk_report: RiskReport) -> Recommendation:
@@ -81,6 +111,7 @@ class DecisionMaker:
             context=ctx.build_llm_context(),
             risk_report=risk_report_text,
         )
+        self.last_raw = result if isinstance(result, dict) else {}
 
         action_map = {
             "买入": ActionType.BUY,
@@ -311,6 +342,19 @@ class Orchestrator:
                 response.session_id,
             )
 
+        # 决策透明度：把决策来源/模型状态/原始返回写进统一响应
+        dm = self.decision_maker
+        response.decision_source = dm.last_source or ""
+        response.model_raw = dict(dm.last_raw or {})
+        if dm.last_source == "llm":
+            response.model_status = "ok"
+        elif dm.last_source == "rules":
+            response.model_status = (
+                "unavailable" if dm.last_model_error else "not_configured"
+            )
+        else:
+            response.model_status = "unavailable"
+
         return response
 
     def handle_approval_response(
@@ -394,12 +438,14 @@ class Orchestrator:
 def build_orchestrator(
     llm_client: Any = None,
     config_path: str | None = None,
+    strict_live: bool = False,
 ) -> Orchestrator:
     """构建完整的 Orchestrator
 
     Args:
         llm_client: LLM 客户端（支持 DeepSeek/OpenAI 兼容格式）。
                    传 None 则使用规则降级决策。
+        strict_live: True = 真实模型联调模式：模型失败抛错、不回退规则决策。
         config_path: config.fund.yaml 路径，默认使用项目根目录下的
     """
     from ..config_fund import load_fund_config
@@ -422,7 +468,11 @@ def build_orchestrator(
     risk_engine = RiskEngine()
     risk_gate = RiskGate()
     whatif_engine = WhatIfEngine(risk_engine)
-    decision_maker = DecisionMaker(llm_client, approval_threshold=cfg.risk.approval_threshold)
+    decision_maker = DecisionMaker(
+        llm_client,
+        approval_threshold=cfg.risk.approval_threshold,
+        strict_live=strict_live,
+    )
 
     # ---- 填充持仓实时行情 ----
     def market_fetcher(symbols: list[str]) -> MarketSnapshot:

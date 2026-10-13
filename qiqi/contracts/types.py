@@ -231,6 +231,11 @@ class AgentResponse:
     plan: dict = field(default_factory=dict)     # 本轮实际任务 DAG
     circuit_breaker: dict = field(default_factory=dict)  # 熔断状态
     circuit_locked: bool = False                # 系统熔断锁定中（连续安全事件超阈值）
+    # ---- 模型调用透明度（演示模式 vs 真实模型联调模式）----
+    run_id: str = ""                   # 运行编号（API 层生成，贯穿响应与审计）
+    decision_source: str = ""          # 决策来源："llm" | "rules" | ""（模型失败且不回退）
+    model_status: str = ""             # 模型状态："ok" | "unavailable" | "not_configured"
+    model_raw: dict = field(default_factory=dict)  # 模型实际返回内容（联调模式透传，用于界面展示）
 
 
 # ============================================================

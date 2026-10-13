@@ -19,6 +19,7 @@ import logging
 import sys
 import threading
 import time
+import uuid
 import webbrowser
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -95,24 +96,40 @@ ACTION_LABELS = {
 
 
 class DemoApp:
-    """单用户演示应用：持有 Orchestrator、演示组合与审批补充信息"""
+    """单用户演示应用：持有 Orchestrator、演示组合与审批补充信息
 
-    def __init__(self, config_path: Optional[str] = None):
+    mode="demo"（默认）：无 LLM 或调用失败时降级为规则决策，响应标注决策来源；
+    mode="live"：真实模型联调模式——模型调用失败即返回错误，绝不回退、绝不假装成功。
+    """
+
+    def __init__(self, config_path: Optional[str] = None, mode: str = "demo"):
+        self.mode = mode if mode in ("demo", "live") else "demo"
         self.cfg = load_fund_config(config_path or None)
-        # 演示场景：LLM 不可用时快速失败并降级为规则决策，避免界面长时间等待
-        self.cfg.llm.timeout = min(self.cfg.llm.timeout, 60)
-        self.cfg.llm.max_retries = min(self.cfg.llm.max_retries, 2)
+        # 演示模式：LLM 不可用时快速失败并降级为规则决策，避免界面长时间等待；
+        # 联调模式：超时按配置原值（默认 180s），保证模型有足够时间返回完整结果。
+        if self.mode == "demo":
+            self.cfg.llm.timeout = min(self.cfg.llm.timeout, 60)
+            self.cfg.llm.max_retries = min(self.cfg.llm.max_retries, 2)
 
         self.llm = None
+        self.llm_init_error = ""
         if self.cfg.llm.has_api_key:
             try:
                 from agent.llm import LLMClient
                 self.llm = LLMClient(self.cfg.llm)
                 logger.info("LLM 已接入：%s @ %s", self.cfg.llm.model, self.cfg.llm.base_url)
             except Exception as exc:      # noqa: BLE001
-                logger.warning("LLM 初始化失败，降级为规则决策：%s", exc)
+                self.llm_init_error = str(exc)
+                if self.mode == "live":
+                    logger.error("联调模式：LLM 初始化失败，/api/review 将直接返回错误（不回退）")
+                else:
+                    logger.warning("LLM 初始化失败，降级为规则决策：%s", exc)
 
-        self.orch = build_orchestrator(llm_client=self.llm, config_path=config_path or None)
+        self.orch = build_orchestrator(
+            llm_client=self.llm,
+            config_path=config_path or None,
+            strict_live=(self.mode == "live"),
+        )
         # 权限闸门：置信度上限为 1.0，阈值取 1.01 表示「所有建议先进入确认流程」，
         # 由 Web 层按 PRD 权限分级决定执行——资金操作必须用户明确确认，
         # 后端不再自行执行纸交易。
@@ -247,15 +264,31 @@ class DemoApp:
     # ---- 基础 ----
 
     def engine_info(self) -> dict:
+        if self.mode == "live":
+            if self.llm is not None:
+                return {
+                    "kind": "llm",
+                    "mode": "live",
+                    "label": f"FinancialLLM · {self.cfg.llm.model}（真实模型联调模式）",
+                    "note": "模型调用失败即返回错误，不回退规则决策",
+                }
+            return {
+                "kind": "error",
+                "mode": "live",
+                "label": "真实模型联调模式（模型不可用）",
+                "note": f"LLM 初始化失败：{self.llm_init_error}",
+            }
         if self.llm is not None:
             return {
                 "kind": "llm",
-                "label": f"FinancialLLM · {self.cfg.llm.model}",
-                "note": "调用失败时自动降级为规则决策",
+                "mode": "demo",
+                "label": f"FinancialLLM · {self.cfg.llm.model}（演示模式）",
+                "note": "调用失败时降级为规则决策，响应会标注 decision_source",
             }
         return {
             "kind": "rules",
-            "label": "规则引擎（未配置 LLM Key）",
+            "mode": "demo",
+            "label": "规则引擎（未配置 LLM Key · 演示模式）",
             "note": "设置 DEEPSEEK_API_KEY 后自动切换为 LLM 决策",
         }
 
@@ -387,6 +420,7 @@ class DemoApp:
             recompute_portfolio(pf)
             snapshot = demo_market(pf)
             health = self._refresh_health()
+            run_id = uuid.uuid4().hex[:12]   # 运行编号：本轮体检的唯一标识
 
             # Golden Path：Portfolio 快照写入 fact 层长期记忆
             try:
@@ -399,6 +433,25 @@ class DemoApp:
                 user, pf, question=question or DEFAULT_QUESTION
             )
             elapsed_ms = int((time.time() - started) * 1000)
+
+            # 真实模型联调模式：只要决策不是真实模型产出的（未配置 / 调用失败），
+            # 本轮即失败，直接返回错误信封——不回退规则、不假装成功。
+            if self.mode == "live" and resp.decision_source != "llm":
+                if resp.model_status == "not_configured":
+                    message = "未配置模型（DEEPSEEK_API_KEY），无法进行真实模型联调"
+                else:
+                    message = (
+                        "模型调用失败，本轮体检未完成（不回退规则决策）："
+                        f"{self.orch.decision_maker.last_model_error}"
+                    )
+                error_payload = {
+                    "status": "error",
+                    "run_id": run_id,
+                    "request": {"question": question or DEFAULT_QUESTION},
+                    "error": {"code": "MODEL_UNAVAILABLE", "message": message},
+                }
+                self.state.last_review = error_payload
+                return error_payload
 
             # 权限闸门：只有「通过风控闸门」且「确实是资金操作」的建议才进入确认队列。
             # 持有类建议与闸门拦截的建议都不占用审批队列。
@@ -427,6 +480,17 @@ class DemoApp:
             data["elapsed_ms"] = elapsed_ms
             data["data_tag"] = DEMO_TAG
             data["breaker"] = getattr(resp, "circuit_breaker", None) or get_breaker().state()
+            # 模型调用透明度：运行编号 / 决策来源 / 模型状态 / 模型原始返回
+            data["run_id"] = run_id
+            data["mode"] = self.mode
+            data["decision_source"] = resp.decision_source
+            data["model_status"] = resp.model_status
+            data["model_raw"] = dict(resp.model_raw or {})
+            # 审批/执行状态显式区分：等待审批绝不等于交易完成
+            data["execution_state"] = (
+                "awaiting_approval" if queued
+                else ("executed_paper" if getattr(resp, "executed", False) else "not_executed")
+            )
             self.state.last_review = data
             return data
 
@@ -922,6 +986,12 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765, help="起始端口，被占用则自动顺延")
     parser.add_argument("--config", default="", help="config.fund.yaml 路径")
+    parser.add_argument(
+        "--mode",
+        choices=["demo", "live"],
+        default="demo",
+        help="demo=演示模式（模型失败降级规则决策并标注来源）；live=真实模型联调模式（模型失败即报错，不回退）",
+    )
     parser.add_argument("--open", action="store_true", help="启动后自动打开浏览器")
     args = parser.parse_args(argv)
 
@@ -931,7 +1001,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         datefmt="%H:%M:%S",
     )
 
-    app = DemoApp(args.config or None)
+    app = DemoApp(args.config or None, mode=args.mode)
 
     httpd: Optional[Server] = None
     for port in range(args.port, args.port + 20):
@@ -951,6 +1021,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     print("  Finance Lab · 金融 AI 安全任务台")
     print("=" * 62)
     print(f"  地址：{url}")
+    print(f"  运行模式：{app.mode}（{'真实模型联调：失败即报错' if app.mode == 'live' else '演示：失败降级规则决策并标注来源'}）")
     print(f"  决策引擎：{engine['label']}")
     if engine["kind"] == "rules":
         print("  提示：未检测到 LLM Key，本次为规则降级决策（功能完整可演示）。")

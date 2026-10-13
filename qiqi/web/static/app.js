@@ -321,7 +321,7 @@ async function runReview() {
   const btn = $('#btn-review');
   btn.disabled = true;
   $('#agent-status').textContent = '体检中…';
-  $('#rec-area').innerHTML = '<div class="muted" style="margin-top:14px">Agent 正在分析，请稍候…（LLM 不可用时会自动降级为规则决策）</div>';
+  $('#rec-area').innerHTML = '<div class="muted" style="margin-top:14px">Agent 正在分析，请稍候…</div>';
   resetSteps();
   $('#agent-steps').innerHTML = '<li class="doing"><span class="dot"></span>正在解析意图并生成 DAG…</li>';
 
@@ -353,10 +353,12 @@ async function runReview() {
 
     renderApprovals((await api('/api/approvals')).approvals);
     await reloadData();
+    // 状态措辞：等待审批 ≠ 完成；规则决策必须标注来源（演示模式透明度）
+    const sourceNote = data.decision_source === 'rules' ? ' · 规则决策（演示）' : '';
     $('#agent-status').textContent = data.queued
-      ? '待用户确认'
+      ? '等待审批'
       : data.recommendation
-        ? `已完成 · ${(data.elapsed_ms / 1000).toFixed(1)}s`
+        ? `已完成${sourceNote} · ${(data.elapsed_ms / 1000).toFixed(1)}s`
         : '等待补充';
   } catch (err) {
     clearInterval(S.stepTimer);
@@ -817,7 +819,7 @@ async function submitDecision(a, payload) {
     toast(res.message || '已处理');
     if (S.review) renderRecommendation(S.review);
     await reloadData();
-    $('#agent-status').textContent = res.executed ? '已执行' : '已处理';
+    $('#agent-status').textContent = res.executed ? '已执行（纸交易）' : '已确认（未执行）';
     for (let i = 1; i <= 9; i += 1) markStep(i, 'done');
   } catch (err) {
     toast(`提交失败：${err.message}`);
