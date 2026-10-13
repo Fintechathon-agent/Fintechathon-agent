@@ -439,6 +439,7 @@ def build_orchestrator(
     llm_client: Any = None,
     config_path: str | None = None,
     strict_live: bool = False,
+    price_history_provider: Any = None,
 ) -> Orchestrator:
     """构建完整的 Orchestrator
 
@@ -446,6 +447,8 @@ def build_orchestrator(
         llm_client: LLM 客户端（支持 DeepSeek/OpenAI 兼容格式）。
                    传 None 则使用规则降级决策。
         strict_live: True = 真实模型联调模式：模型失败抛错、不回退规则决策。
+        price_history_provider: 可调用对象，入参 Portfolio、返回
+                   {symbol: [前复权收盘价]}；提供后 VaR/最大回撤用历史法精确计算。
         config_path: config.fund.yaml 路径，默认使用项目根目录下的
     """
     from ..config_fund import load_fund_config
@@ -499,7 +502,8 @@ def build_orchestrator(
         }
 
     def risk_engine_fn(portfolio: Portfolio, user: UserProfile, market: MarketSnapshot) -> RiskReport:
-        return risk_engine.check(portfolio, user, market)
+        history = price_history_provider(portfolio) if price_history_provider else None
+        return risk_engine.check(portfolio, user, market, price_history=history)
 
     def decision_maker_fn(ctx: Context, risk_report: RiskReport) -> Recommendation:
         return decision_maker.decide(ctx, risk_report)

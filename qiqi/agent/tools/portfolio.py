@@ -20,7 +20,7 @@ class PortfolioHealthReport:
     top_gain: tuple[str, float]     # 涨幅最大 (symbol, return_pct)
     top_loss: tuple[str, float]     # 跌幅最大 (symbol, return_pct)
     sector_concentration: dict[str, float]   # 行业分布 {行业: 占比}
-    avg_return: float               # 平均收益率 %
+    avg_return: float               # 持仓加权平均收益率 %（市值加权）
     total_return_pct: float         # 组合总收益率 %
     risk_warnings: list[str]        # 风险提示
     reasoning: str                  # 分析推理过程
@@ -85,7 +85,12 @@ class PortfolioAnalyzer:
             top_gain=top_gain,
             top_loss=top_loss,
             sector_concentration=sector_alloc,
-            avg_return=sum(p.return_pct for p in updated) / len(updated) if updated else 0.0,
+            avg_return=(
+                sum(p.market_value * p.return_pct for p in updated)
+                / sum(p.market_value for p in updated)
+                if updated and sum(p.market_value for p in updated) > 0
+                else 0.0
+            ),
             total_return_pct=portfolio.total_return,
             risk_warnings=warnings,
             reasoning=reasoning,

@@ -125,10 +125,38 @@ class DemoApp:
                 else:
                     logger.warning("LLM 初始化失败，降级为规则决策：%s", exc)
 
+        # 真实行情历史：market_source=akshare 时按持仓批量拉取前复权收盘价，
+        # 供 Risk 引擎用历史法精确计算 VaR / 最大回撤；按 (组合, 日期) 缓存。
+        from agent.tools.market import MarketDataTool
+
+        self.market_tool = MarketDataTool(
+            use_mock=(self.cfg.financial.market_source == "mock")
+        )
+        self._hist_cache: dict[str, tuple[str, dict[str, list[float]]]] = {}
+
+        def hist_provider(pf: Portfolio) -> dict[str, list[float]]:
+            # 演示模式固定用演示数据，不拉真实历史（保证可复现）；
+            # 联调模式按持仓批量拉取前复权收盘价，供历史法精确计算 VaR/最大回撤。
+            if self.mode == "demo":
+                return {}
+            key = ",".join(sorted(p.symbol for p in pf.positions))
+            day = datetime.now().strftime("%Y%m%d")
+            cached = self._hist_cache.get(key)
+            if cached and cached[0] == day:
+                return cached[1]
+            hist = self.market_tool.get_history_batch(
+                [p.symbol for p in pf.positions], days=120
+            )
+            self._hist_cache[key] = (day, hist)
+            if hist:
+                logger.info("真实历史行情已加载：%d 只标的", len(hist))
+            return hist
+
         self.orch = build_orchestrator(
             llm_client=self.llm,
             config_path=config_path or None,
             strict_live=(self.mode == "live"),
+            price_history_provider=hist_provider,
         )
         # 权限闸门：置信度上限为 1.0，阈值取 1.01 表示「所有建议先进入确认流程」，
         # 由 Web 层按 PRD 权限分级决定执行——资金操作必须用户明确确认，
@@ -143,12 +171,11 @@ class DemoApp:
             lock=threading.RLock(),
         )
 
-        # 行情来源改用「与演示组合同源自洽」的快照。
-        # 工厂默认接的是 mock 行情（价格由代码哈希派生、与持仓成本无关），
-        # 会让体检结果在多次运行之间漂移：同一份组合两次体检读出不同盈亏，
-        # 演示不可复现，且建议价与组合现价不一致。这里换成组合自身现价，
-        # 数字自洽、结果可复现。接入真实行情源时撤掉这行即可。
-        self.orch.loop.market_fetcher = lambda symbols: demo_market(self.state.portfolio)
+        # 演示模式：行情用「与演示组合同源自洽」的快照（数字自洽、结果可复现）。
+        # 真实联调模式（live）：放行真实行情源，由配置 market_source 决定数据层行为，
+        # 真实价格与真实历史行情（VaR/最大回撤历史法）同口径。
+        if self.mode == "demo":
+            self.orch.loop.market_fetcher = lambda symbols: demo_market(self.state.portfolio)
 
         # 重启后把磁盘上的审批补回内存元数据，否则待确认卡片会变成孤儿：
         # 点「确认执行」只写纸交易、不更新组合，用户看不出哪里出了问题。

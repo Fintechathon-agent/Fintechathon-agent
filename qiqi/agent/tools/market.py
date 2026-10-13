@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from contracts.types import MarketData, MarketSnapshot
@@ -48,35 +48,86 @@ class MarketDataTool:
         """批量获取行情"""
         return {sym: self.get_price(sym) for sym in symbols}
 
+    def get_history(self, symbol: str, days: int = 120) -> Optional[list[float]]:
+        """获取近 N 个交易日的前复权收盘价序列（真实数据）。
+
+        用于真实 VaR / 最大回撤计算；mock 模式或抓取失败时返回 None，
+        调用方应回退到简化估算并在结果中标注。
+        """
+        if self._use_mock:
+            return None
+        try:
+            import akshare as ak
+
+            end = datetime.now().strftime("%Y%m%d")
+            sym = symbol.strip()
+            df = ak.stock_zh_a_hist(
+                symbol=sym,
+                period="daily",
+                start_date="20200101",
+                end_date=end,
+                adjust="qfq",
+            )
+            # ETF/LOF 走东财基金接口（列名相同，但股票接口对部分 ETF 无数据）
+            if df is None or df.empty or "收盘" not in df.columns:
+                df = ak.fund_etf_hist_em(
+                    symbol=sym,
+                    period="daily",
+                    start_date="20200101",
+                    end_date=end,
+                    adjust="qfq",
+                )
+            if df is None or df.empty or "收盘" not in df.columns:
+                return None
+            closes = [float(v) for v in df["收盘"].tolist()[-days:]]
+            return closes if closes else None
+        except Exception as exc:      # noqa: BLE001
+            logger.warning("akshare 历史行情 %s 获取失败: %s", symbol, exc)
+            return None
+
+    def get_history_batch(self, symbols: list[str], days: int = 120) -> dict[str, list[float]]:
+        """批量历史收盘价：{symbol: [closes]}，缺失的 symbol 不出现。"""
+        out: dict[str, list[float]] = {}
+        for sym in symbols:
+            hist = self.get_history(sym, days)
+            if hist:
+                out[sym] = hist
+        return out
+
     # ---- akshare 实现 ----
 
     def _akshare_price(self, symbol: str) -> MarketData:
+        """真实行情：取最近一个交易日的日线末行（收盘价口径）。
+
+        用日线而非全市场快照：速度快、稳定，且与历史法风险计算同口径。
+        股票走 stock_zh_a_hist，ETF/LOF 走 fund_etf_hist_em。
+        """
         import akshare as ak
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         sym = symbol.strip()
+        end = now[:10].replace("-", "")
+        start = (datetime.now() - timedelta(days=30)).strftime("%Y%m%d")
 
-        # 判断市场：上证主板 600/601/688开头 → 上交所；深证 000/001/002/003/300 → 深交所
-        if sym.startswith(("600", "601", "688", "605")):
-            market = "sh"
-            code = sym
-        elif sym.startswith(("000", "001", "002", "003", "300")):
-            market = "sz"
-            code = sym
-        elif sym.startswith(("4", "8")):  # 北交所
-            market = "bj"
-            code = sym
-        else:
-            # 尝试通用股票实时行情
-            df = ak.stock_zh_a_spot_em()
-            row = df[df["代码"] == sym]
-            if not row.empty:
-                row = row.iloc[0]
+        try:
+            if sym.startswith(("51", "56", "58", "15", "16", "18", "50")):
+                # ETF/LOF：股票接口对部分 ETF 无数据或返回错误标的
+                df = ak.fund_etf_hist_em(
+                    symbol=sym, period="daily",
+                    start_date=start, end_date=end, adjust="",
+                )
+            else:
+                df = ak.stock_zh_a_hist(
+                    symbol=sym, period="daily",
+                    start_date=start, end_date=end, adjust="",
+                )
+            if df is not None and not df.empty and "收盘" in df.columns:
+                row = df.iloc[-1]
                 return MarketData(
                     timestamp=now,
                     symbol=sym,
-                    name=str(row.get("名称", sym)),
-                    price=float(row.get("最新价", 0) or 0),
+                    name="",
+                    price=float(row.get("收盘", 0) or 0),
                     change_pct=float(row.get("涨跌幅", 0) or 0),
                     volume=float(row.get("成交量", 0) or 0),
                     amount=float(row.get("成交额", 0) or 0),
@@ -84,25 +135,8 @@ class MarketDataTool:
                     low=float(row.get("最低", 0) or 0),
                     source="akshare",
                 )
-            return self._mock_price(symbol)
-
-        # 实时行情
-        df = ak.stock_zh_a_spot_em()
-        row = df[df["代码"] == sym]
-        if not row.empty:
-            row = row.iloc[0]
-            return MarketData(
-                timestamp=now,
-                symbol=sym,
-                name=str(row.get("名称", sym)),
-                price=float(row.get("最新价", 0) or 0),
-                change_pct=float(row.get("涨跌幅", 0) or 0),
-                volume=float(row.get("成交量", 0) or 0),
-                amount=float(row.get("成交额", 0) or 0),
-                high=float(row.get("最高", 0) or 0),
-                low=float(row.get("最低", 0) or 0),
-                source="akshare",
-            )
+        except Exception as exc:      # noqa: BLE001
+            logger.warning("akshare 获取 %s 失败: %s，降级为模拟数据", sym, exc)
 
         return self._mock_price(symbol)
 
