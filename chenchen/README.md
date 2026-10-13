@@ -126,7 +126,7 @@ npm test
 npm run smoke
 ```
 
-50 项测试覆盖基础工具、成本口径、相关性、输入失效与恢复、边界组合、账单去重、确认门槛、现金情景、提醒状态与处理备注、单笔到账试算、会话隔离、公共 Contract、市场简报上下文、页面资源及展示口径。浏览器实测记录见 Word 文档。测试通过不代表不存在其他缺陷。
+63 项测试覆盖基础工具、成本口径、相关性、输入失效与恢复、边界组合、账单去重、确认门槛、现金情景、提醒状态与处理备注、单笔到账试算、会话隔离、公共 Contract、市场简报上下文、页面资源、模型复核接口、模型→Risk→审批→模拟执行链路及展示口径。浏览器实测记录见 Word 文档。测试通过不代表不存在其他缺陷。
 
 | API | 用途 |
 | --- | --- |
@@ -141,6 +141,48 @@ npm run smoke
 | POST /api/merchant/notice | 更新提醒状态，也可保存不超过 240 字的处理备注 |
 | GET /api/merchant/scenario?bill=渠道:账单号&delay=3 | 只试算一笔收入延迟，不修改原账单 |
 | POST /api/merchant/import 与 /api/merchant/reset | 替换账本 / 恢复演示，并清除旧确认 |
+| POST /api/review | 调用配置的真实模型，建立模型→Risk→审批→模拟执行任务 |
+| POST /api/review/risk-decision | 记录统一 Risk 的 APPROVE、REJECT 或 REQUEST_MORE_INFO |
+| POST /api/review/approval | Risk 通过后记录人工审批 |
+| POST /api/review/simulate | 仅在 Risk 和审批通过后生成无副作用模拟回执 |
+| GET /api/review/{run_id} 与 /api/review/task/{task_id} | 按 run 或 task 读取完整模型响应、Risk、审批、执行和审计记录 |
+
+### 模型复核接口
+
+`POST /api/review` 接收账单、新闻或组合内容。模型密钥只放在后端环境变量，不放进前端；返回中的 `model.source=model` 才代表实际调用了模型。所有拟议动作都会经过统一 Risk 和审批，`risk_handoff.execution_allowed` 与 `execution.execution_allowed` 永远为 `false`；模拟回执也不执行付款、交易或账户变更。
+
+启动本地服务前配置模型：
+
+```powershell
+$env:MODEL_API_KEY = '在后端环境中配置，不要提交到仓库'
+$env:MODEL_API_URL = 'https://api.openai.com/v1/responses'
+$env:MODEL_API_STYLE = 'responses'
+$env:MODEL_NAME = 'gpt-5.6-terra'
+npm start
+```
+
+请求示例：
+
+```powershell
+$body = @{
+  kind = 'bill'
+  source = 'synthetic-bill'
+  text = '供应商账单 1280 元，付款截止日为 2026-10-20。'
+  context = @{ currency = 'CNY'; synthetic = $true }
+} | ConvertTo-Json -Depth 8
+
+Invoke-RestMethod `
+  -Uri 'http://127.0.0.1:4175/api/review' `
+  -Method Post `
+  -ContentType 'application/json' `
+  -Body $body
+```
+
+接口成功时会返回 `workflow_version`、`task_id`、`run_id`、`model.model_response.raw_text`、`proposed_action`、`risk_handoff`、`approval`、`execution` 和 `audit`。模型未配置或调用失败时默认返回明确的 503/502 错误，并把 Risk 与执行端保持阻断；只有请求显式传入 `allow_rule_fallback: true`，或后端配置 `MODEL_FALLBACK_TO_RULES=true`，才会返回 `source=rule_fallback`，不会把规则结果冒充成模型结果。
+
+模型服务交接、Risk Handoff、审批、模拟执行和本轮验收记录见 [docs/model-service-risk-e2e-2026-10-13.md](docs/model-service-risk-e2e-2026-10-13.md)。公共 Schema 在 `contracts/model-review.v1.schema.json`，请求和响应样例在 `contracts/examples/`，运行日志样例在 `logs/core-agent-e2e-2026-10-13.jsonl`。
+
+Cloudflare Worker 需要额外配置 `MODEL_API_KEY` Secret；`MODEL_API_URL`、`MODEL_API_STYLE` 和 `MODEL_NAME` 可以作为 Worker Variables 配置。若设置了 `CORE_AGENT_API_KEY`，调用方还必须携带 `X-Core-Agent-Key`。
 
 投资健康检查使用 contracts/investment-agent.v1.schema.json 定义的统一信封；请求示例和响应示例分别在 contracts/examples/health-check.request.json、contracts/examples/health-check.response.json。Agent 只发送 contract_version、request_id、operation、context、input；Backend 校验后返回 task_state、artifacts、tool_results 和 risk_handoff。请求可以附带 data/market-brief-2026-10-08.json 这类市场上下文，Core Agent 只传递和标记异常，不重新计算 Quant。Risk 只消费 risk_handoff.evidence，且 execution_allowed 固定为 false。缺少版本或使用旧的裸字段请求会返回 422 INVALID_CONTRACT。完整字段说明见 contracts/README.md。
 

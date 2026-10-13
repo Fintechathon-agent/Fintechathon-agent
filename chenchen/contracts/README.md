@@ -24,6 +24,8 @@ Backend 会在请求进入时校验一次，并在 Agent 交给 Risk 前再校�
 - audit_evidence：记录会话创建、阶段开始/完成、重试、交接和错误事件；它与 Risk Handoff 共用 audit_id。
 - risk_handoff：仅在 HANDOFF_REQUIRED 时生成，包含 Risk 所需的证据 ID；execution_allowed 永远为 false，不能把 Agent 输出当作交易授权。
 
+运行时还会执行跨对象语义校验：trace、TaskState 和 AuditEvidence 的四个追踪键必须一致；checkpoint.completed 必须有对应 ToolResult；result_refs 必须能解析到相同 trace_id；Risk Handoff 的证据 ID 必须指向当前 artifacts，且 execution_allowed 必须为 false。示例响应文件只用于字段形状校验，不代表完整运行结果。
+
 请求可以附带可选的 `market_context`。它只表示一份有来源和数据日期的市场简报上下文，用于异常标记和 Risk 复核，不会覆盖或重新计算 Quant 的组合收益、回撤、相关性和模拟结果。价格与消息方向冲突时只生成 `REVIEW_REQUIRED`，不自动转换为交易动作。
 
 Risk 只消费 risk_handoff.evidence 指向的结果，并按 contract_version、task_id、session_id 和 request_id 关联记录。前端传来的 approval 字段不是 Risk 决策，也不能绕过 Safety Action Gateway。
@@ -44,7 +46,7 @@ PowerShell 调用示例：
     $body = Get-Content .\contracts\examples\health-check.request.json -Raw
     Invoke-RestMethod -Method Post -Uri http://127.0.0.1:4175/api/health-check/run -ContentType 'application/json' -Body $body
 
-错误响应的 error 固定包含 code、message、retryable、stage 和 recovery；需要人工修复时由 recovery 给出恢复方向。缺少 contract_version、request_id、context 或 input 时，Backend 返回 422 INVALID_CONTRACT。不要在生产代码中拼接旧的裸字段请求。
+错误响应的 error 固定包含 code、message、retryable、stage 和 recovery；需要人工修复时由 recovery 给出恢复方向。错误响应另外包含可选的 trace，保留 contract_version、request_id、task_id、session_id 和 audit_id；任务执行失败时可以据此读取 `/api/audit/{task_id}`。缺少 contract_version、request_id、context 或 input 时，尚未创建任务，trace 中的 task/session/audit 会为空。不要在生产代码中拼接旧的裸字段请求。
 
 风控工作台适配接口当前只生成 READ_ONLY_HANDOFF_PREVIEW，不伪造远程写入，不提交确认，不触发执行。远程工作台没有公开外部 Handoff 导入接口前，Core Agent 只能通过适配层把证据整理给人工复核。
 
@@ -68,7 +70,7 @@ PowerShell 调用示例：
 | audit_evidence.events[] | event_id/task_id/actor/event_type/payload/timestamp 全必填 | Harness → 审计读取/UI/Risk | 下游不得伪造事件；AuditEvent |
 | risk_handoff | 顶层必填但允许 null；仅 HANDOFF_REQUIRED 生成 | Core Agent → Risk/UI | status=PENDING_REVIEW，decision=REQUIRED，execution_allowed=false 固定；RiskHandoff |
 | risk_handoff.evidence | snapshot/report/proposal_ids/simulation 必填；market_context_id/audit_id Schema 可选，联调条件必填 | Core Agent → Risk | 引用必须对应 artifacts/audit；Risk/UI 不改 Quant 证据 |
-| Error envelope | version/request_id/operation/error 必填；request_id 可 null；error.code/message/retryable/stage/recovery 必填，details 可选 | Backend → Caller/UI | 不把错误转成成功或授权；HealthCheckErrorResponse |
+| Error envelope | version/request_id/operation/error 必填；request_id 可 null；trace 可选；error.code/message/retryable/stage/recovery 必填，details 可选且会截断/脱敏 | Backend → Caller/UI | 不把错误转成成功或授权；HealthCheckErrorResponse |
 | TaskState 异常 | READY/RUNNING/WAITING_INPUT/HANDOFF_REQUIRED/BLOCKED/FAILED/CIRCUIT_OPEN；error_state 可 null，非空需 code/message/stage/retryable/recovery | Harness → Backend/UI | UI 展示澄清/修复入口，不自行解锁熔断 |
 | Risk Workbench bridge | bridge_version=risk-workbench.bridge@0.1.0；外层 integration_version=core-agent-to-risk-workbench.demo@0.1.0 | Adapter → UI/人工复核 | 当前只有 JS 生产器与测试，无独立公共 JSON Schema；不可声称正式 Risk 接收 |
 
@@ -76,8 +78,8 @@ PowerShell 调用示例：
 
 - RiskHandoff 内无 request_id，消费必须保留父 Response.trace/audit_evidence 或 bridge.source；Risk Owner 需确认接收及 review_status/rejection_reason/decision 回写 Contract，当前回写未冻结。
 - Schema 未强制跨对象 ID 相等、checkpoint 引用有效及条件 evidence 完整；本轮检查验证成功路径，不代表所有输入均由 Schema 保护。Backend Owner 需确定语义校验层。
-- 工具失败在 request_id 写入 TaskState 前抛出；失败信封无 task_id/session_id/audit_id，且部分 404/503 路由仍为简化错误。Backend Owner 需设计兼容错误追踪和升版，不由日报修改代码。
-- 同 task 续跑 audit_id 保持不变，审计信封 request_id 更新为最新请求；历史编号在 contract.accepted.payload 中保留，阶段事件不逐条携带 request_id。跨重试完整请求归因仍待 Backend 确认。
+- Contract 任务的工具失败现在会先把 request_id 绑定到 TaskState；失败信封带 task/session/audit trace，审计事件 payload 逐条保留当次 request_id。Schema 校验尚未创建任务，部分 404/503 非 Contract 路由仍使用简化错误。
+- 同 task 续跑 audit_id 保持不变，审计信封 request_id 更新为最新请求；历史事件仍保留各自的 request_id。跨请求的顶层审计读取仍表示最近一次请求，这是读取语义，不覆盖历史事件归因。
 - Session、TaskState、AuditEvidence 目前驻留内存。长期 checkpoint/audit 存储和跨进程恢复尚未实现；不得混用 Memory 生命周期规则。
 
 证据：investment-agent.v1.schema.json、investment-contract.js、../core/harness.js、../integrations/risk-workbench-adapter.js、../tests/contracts.test.js、../tests/http.test.js、../docs/core-agent-verification-2026-10-10.md。

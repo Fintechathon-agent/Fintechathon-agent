@@ -25,6 +25,18 @@ Cloudflare Workers 官方支持用 `wrangler login` 授权和 `wrangler deploy` 
 
 也可以在 Cloudflare Dashboard 的 Workers & Pages 中导入仓库，构建配置以仓库根目录的 `wrangler.toml` 为准。
 
+## 公网访问控制
+
+当前演示默认不要求 API Key，以保持 GitHub Pages 的公开联调按钮可用。需要保护 POST 接口时，在 Cloudflare 配置 Secret：
+
+```powershell
+npx wrangler secret put CORE_AGENT_API_KEY
+```
+
+配置后，`/api/health-check/run` 和 `/api/risk-workbench/handoff` 必须携带 `X-Core-Agent-Key`；GitHub Pages 浏览器不应嵌入这个 Secret，正式接入应通过服务端代理或 Risk Consumer 调用。Worker 同时按客户端 IP 做默认每分钟 60 次的 best-effort 限流，超过后返回 429；Worker 实例之间的限流状态不共享，正式环境需要 Durable Object 或平台级 WAF 限流。
+
+Worker 不记录请求正文；错误详情在返回前会限制深度/长度并脱敏敏感字段。以上是演示级保护，仍不能替代正式认证、审计日志、密钥轮换和隐私评审。
+
 ## 目前保留的其他部署配置
 
 `render.yaml` 仍保留作为备用方案，但不需要使用 Render。GitHub Pages 的前端演示也继续保留，不会被 Worker 覆盖。
@@ -54,6 +66,48 @@ const handoff = await response.json();
 - Core Agent 不重新计算 Quant，不修改 Memory 规则
 - 不接收真实账户或真实交易数据
 
+## 模型复核接口
+
+如果需要让后端实际调用模型，对 Worker 配置以下变量或 Secret：
+
+```powershell
+npx wrangler secret put MODEL_API_KEY
+npx wrangler secret put CORE_AGENT_API_KEY
+```
+
+可配置变量：
+
+```toml
+[vars]
+MODEL_API_URL = "https://api.openai.com/v1/responses"
+MODEL_API_STYLE = "responses"
+MODEL_NAME = "gpt-5.6-terra"
+MODEL_RESPONSE_FORMAT = "json_schema"
+MODEL_FALLBACK_TO_RULES = "false"
+```
+
+然后调用：
+
+```powershell
+$body = @{
+  kind = 'bill'
+  source = 'synthetic-bill'
+  text = '供应商账单 1280 元，付款截止日为 2026-10-20。'
+  context = @{ currency = 'CNY'; synthetic = $true }
+} | ConvertTo-Json -Depth 8
+
+Invoke-RestMethod `
+  -Uri 'https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/api/review' `
+  -Method Post `
+  -Headers @{ 'X-Core-Agent-Key' = $env:CORE_AGENT_API_KEY } `
+  -ContentType 'application/json' `
+  -Body $body
+```
+
+返回结果包含 `workflow_version`、`task_id`、`run_id`、模型原文 `model.model_response.raw_text`、结构化 `proposed_action`、`risk_handoff`、`approval`、`execution` 和 `audit`。Risk Handoff 初始为 `PENDING_REVIEW`，`execution_allowed=false` 固定不变；这个接口不会把模型建议直接变成付款、交易或账户操作。Risk 决策、审批和模拟执行分别调用 `/api/review/risk-decision`、`/api/review/approval` 和 `/api/review/simulate`，每一步都必须传同一 `task_id` 与 `proposal_sha256`。`GET /api/review/{run_id}` 和 `GET /api/review/task/{task_id}` 可读取当前 Worker 实例内暂存的完整结果，但它不是持久化审计库，生产环境仍需接入正式存储。
+
+模型没有配置或调用失败时，接口默认返回明确的错误，并生成 `MODEL_FAILED` 的阻断记录；只有请求显式传入 `allow_rule_fallback=true`，或配置 `MODEL_FALLBACK_TO_RULES=true`，才会返回带有 `source=rule_fallback` 和 `status=DEGRADED_RULE_FALLBACK` 的规则降级结果。完整字段、Owner 分工和验收结果见 `docs/model-service-risk-e2e-2026-10-13.md`。
+
 ## 先验证公网服务
 
 部署完成后，在浏览器打开：
@@ -75,7 +129,7 @@ const handoff = await response.json();
 ```powershell
 $body = Get-Content .\chenchen\contracts\examples\health-check.request.json -Raw
 Invoke-RestMethod `
-  -Uri "https://你的服务地址.onrender.com/api/risk-workbench/handoff" `
+  -Uri "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/api/risk-workbench/handoff" `
   -Method Post `
   -ContentType "application/json" `
   -Body (ConvertTo-Json @{ request = (ConvertFrom-Json $body) } -Depth 30)

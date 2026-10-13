@@ -1,0 +1,17 @@
+{
+  "request_id": "req-example-20261013-001",
+  "kind": "bill",
+  "source": "risk-workbench-demo",
+  "text": "供应商账单 1280 元，付款截止日为 2026-10-20。请判断是否需要人工核对。",
+  "requested_action": "判断这笔账单是否可以进入付款准备",
+  "action_parameters": {
+    "amount": 1280,
+    "currency": "CNY",
+    "due_date": "2026-10-20",
+    "synthetic": true
+  },
+  "context": {
+    "user_goal": "看清钱的用途并确认不会影响后续安排",
+    "synthetic": true
+  }
+}

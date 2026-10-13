@@ -1,0 +1,7 @@
+{
+  "task_id": "review-task-example-001",
+  "proposal_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "decision": "APPROVE",
+  "approver": "approver-example",
+  "reason": "已核对付款用途和当前资金安排"
+}

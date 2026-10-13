@@ -14,6 +14,22 @@
     <div class="bridge-flow" aria-label="联调流程"><article><span>01</span><h3>Agent 分析</h3><p>生成健康报告、候选方案和模拟结果。</p></article><i aria-hidden="true">→</i><article><span>02</span><h3>统一交接</h3><p>保留 request、task、session、audit 关联。</p></article><i aria-hidden="true">→</i><article><span>03</span><h3>Risk 复核</h3><p>固定不允许执行，等待独立风控决定。</p></article></div>
     <button id="run-bridge" type="button">运行一次联调 Demo →</button><p id="bridge-message" class="small muted" role="status">使用固定演示持仓，不连接真实账户。</p>
   </section>
+  <section class="panel workflow-panel">
+    <div class="row"><div><p class="section-kicker">Golden Path · 模型到 Risk</p><h2>把一件需要处理的事走完</h2></div><span class="tag" id="workflow-status">尚未发起</span></div>
+    <p class="small muted">下面这条链路会实际调用后端配置的模型。模型只能提出建议，Risk 和审批通过后才允许模拟执行；任何等待、拒绝或异常都会停在执行前。</p>
+    <div class="workflow-inputs">
+      <label>待处理内容<textarea id="workflow-text" rows="3">供应商账单 1280 元，付款截止日为 2026-10-20。请判断是否需要人工核对。</textarea></label>
+      <label>请求动作<input id="workflow-action" value="判断这笔账单是否可以进入付款准备" /></label>
+    </div>
+    <button id="run-workflow" type="button">发起模型复核 →</button>
+    <p id="workflow-message" class="small muted" role="status">只使用演示账单；不会连接真实付款或交易系统。</p>
+    <div id="workflow-result" class="workflow-result" hidden>
+      <div class="workflow-metrics" id="workflow-metrics"></div>
+      <div class="workflow-proposal"><span class="section-kicker">模型拟议动作</span><h3 id="workflow-proposal-title">等待模型</h3><p id="workflow-proposal-reason"></p><small id="workflow-proposal-source"></small></div>
+      <div class="workflow-actions" id="workflow-actions"></div>
+      <details class="compact-detail"><summary>查看完整模型响应和运行记录</summary><pre id="workflow-json"></pre></details>
+    </div>
+  </section>
   <section id="bridge-result" class="bridge-result" hidden>
     <section class="snapshot-card">
       <div class="row"><div><p class="section-kicker">交接结果</p><h2 id="handoff-title">等待结果</h2></div><span class="verdict-tag" id="handoff-decision">待复核</span></div>

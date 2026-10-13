@@ -10,7 +10,7 @@ function clone(value) {
 }
 
 function buildRiskWorkbenchHandoff(response, { workbenchUrl = DEFAULT_WORKBENCH_URL } = {}) {
-  contract.assertHealthCheckResponse(response);
+  contract.assertHealthCheckResponseSemantics(response);
   const state = response.task_state;
   const handoff = response.risk_handoff;
   const market = response.artifacts.market_context;

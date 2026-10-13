@@ -177,7 +177,7 @@ function buildResponse(request, result) {
     audit_evidence: auditEvidence,
     risk_handoff: buildRiskHandoff(result)
   };
-  return assertAgainst("HealthCheckResponse", response);
+  return assertHealthCheckResponseSemantics(response);
 }
 
 function assertHealthCheckRequest(request) {
@@ -188,8 +188,113 @@ function assertHealthCheckResponse(response) {
   return assertAgainst("HealthCheckResponse", response);
 }
 
+function assertHealthCheckResponseSemantics(response) {
+  assertHealthCheckResponse(response);
+  const issues = [];
+  const issue = (path, message) => issues.push({ path, message });
+  const state = response.task_state;
+  const audit = response.audit_evidence;
+  const trace = response.trace;
+  const checkpoint = state.checkpoint;
+  const artifacts = response.artifacts || {};
+  const toolResults = response.tool_results || {};
+
+  if (trace.contract_version !== response.contract_version) issue("$.trace.contract_version", "must match $.contract_version");
+  if (trace.request_id !== response.request_id) issue("$.trace.request_id", "must match $.request_id");
+  if (trace.task_id !== state.task_id) issue("$.trace.task_id", "must match $.task_state.task_id");
+  if (trace.session_id !== state.session_id) issue("$.trace.session_id", "must match $.task_state.session_id");
+  if (state.contract_version !== undefined && state.contract_version !== response.contract_version)
+    issue("$.task_state.contract_version", "must match $.contract_version");
+  if (state.request_id !== undefined && state.request_id !== response.request_id)
+    issue("$.task_state.request_id", "must match $.request_id");
+  if (audit.contract_version !== response.contract_version) issue("$.audit_evidence.contract_version", "must match $.contract_version");
+  if (audit.request_id !== response.request_id) issue("$.audit_evidence.request_id", "must match $.request_id");
+  if (audit.task_id !== state.task_id) issue("$.audit_evidence.task_id", "must match $.task_state.task_id");
+  if (audit.session_id !== state.session_id) issue("$.audit_evidence.session_id", "must match $.task_state.session_id");
+
+  for (const [stage, resultRef] of Object.entries(checkpoint.result_refs || {})) {
+    if (resultRef !== null && (!toolResults[resultRef] || toolResults[resultRef].trace_id !== resultRef))
+      issue("$.task_state.checkpoint.result_refs." + stage, "must reference a matching tool_results.trace_id");
+  }
+  for (const stage of checkpoint.completed || []) {
+    if (!checkpoint.result_refs || !checkpoint.result_refs[stage]) issue("$.task_state.checkpoint.completed", "completed stage " + stage + " must have a result reference");
+  }
+  for (const [key, result] of Object.entries(toolResults)) {
+    if (result.trace_id !== key) issue("$.tool_results." + key + ".trace_id", "must match its map key");
+  }
+  for (const event of audit.events || []) {
+    if (event.task_id !== state.task_id) issue("$.audit_evidence.events", "every event must belong to task_state.task_id");
+    if (!Object.hasOwn(event.payload || {}, "request_id")) issue("$.audit_evidence.events", "every event payload must contain request_id");
+  }
+
+  const handoff = response.risk_handoff;
+  if (state.status === "HANDOFF_REQUIRED") {
+    if (!handoff) issue("$.risk_handoff", "is required when task_state.status is HANDOFF_REQUIRED");
+    else {
+      if (handoff.task_id !== state.task_id) issue("$.risk_handoff.task_id", "must match $.task_state.task_id");
+      if (handoff.session_id !== state.session_id) issue("$.risk_handoff.session_id", "must match $.task_state.session_id");
+      if (handoff.execution_allowed !== false) issue("$.risk_handoff.execution_allowed", "must remain false");
+      const evidence = handoff.evidence || {};
+      if (artifacts.portfolio_snapshot && evidence.portfolio_snapshot_id !== artifacts.portfolio_snapshot.snapshot_id)
+        issue("$.risk_handoff.evidence.portfolio_snapshot_id", "must reference artifacts.portfolio_snapshot.snapshot_id");
+      if (artifacts.health_report && evidence.health_report_id !== artifacts.health_report.report_id)
+        issue("$.risk_handoff.evidence.health_report_id", "must reference artifacts.health_report.report_id");
+      if (artifacts.simulation && evidence.simulation_id !== artifacts.simulation.simulation_id)
+        issue("$.risk_handoff.evidence.simulation_id", "must reference artifacts.simulation.simulation_id");
+      const proposalIds = (artifacts.candidates || []).map(candidate => candidate.proposal_id);
+      if (JSON.stringify(evidence.proposal_ids) !== JSON.stringify(proposalIds)) issue("$.risk_handoff.evidence.proposal_ids", "must match artifacts.candidates proposal IDs");
+      if (artifacts.market_context && evidence.market_context_id !== artifacts.market_context.context_id)
+        issue("$.risk_handoff.evidence.market_context_id", "must reference artifacts.market_context.context_id");
+      if (evidence.audit_id !== audit.audit_id) issue("$.risk_handoff.evidence.audit_id", "must match $.audit_evidence.audit_id");
+    }
+  } else if (handoff !== null) {
+    issue("$.risk_handoff", "must be null before HANDOFF_REQUIRED");
+  }
+
+  if (issues.length) throw new ContractError("HealthCheckResponse semantic validation failed", { shape: "HealthCheckResponse", issues: issues.slice(0, 20) });
+  return response;
+}
+
 function assertHealthCheckError(response) {
   return assertAgainst("HealthCheckErrorResponse", response);
+}
+
+const SENSITIVE_DETAIL_KEY = /token|secret|authorization|cookie|password|account|bank|portfolio|position|quantity|price|cash|body|input/i;
+
+function sanitizeErrorDetails(value, depth = 0, key = "") {
+  if (SENSITIVE_DETAIL_KEY.test(key)) return "[redacted]";
+  if (depth >= 4) return "[truncated]";
+  if (typeof value === "string") return value.length > 500 ? value.slice(0, 500) + "..." : value;
+  if (Array.isArray(value)) return value.slice(0, 30).map(item => sanitizeErrorDetails(item, depth + 1));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).slice(0, 30).map(([childKey, childValue]) => [childKey, sanitizeErrorDetails(childValue, depth + 1, childKey)]));
+  }
+  return value;
+}
+
+function buildErrorResponse(error, { requestId = null, taskId = null, sessionId = null, auditId = null } = {}) {
+  const resolvedRequestId = error.requestId ?? requestId;
+  const response = {
+    contract_version: CONTRACT_VERSION,
+    request_id: resolvedRequestId,
+    operation: OPERATION,
+    trace: {
+      contract_version: CONTRACT_VERSION,
+      request_id: resolvedRequestId,
+      task_id: error.taskId ?? taskId,
+      session_id: error.sessionId ?? sessionId,
+      audit_id: error.auditId ?? auditId
+    },
+    error: {
+      code: error.code || "REQUEST_FAILED",
+      message: error.message || "request failed",
+      retryable: Boolean(error.retryable),
+      stage: error.stage || "BACKEND",
+      recovery: error.recovery || "Review the request and retry after correcting the reported issue.",
+      details: error.details ? sanitizeErrorDetails(error.details) : null
+    }
+  };
+  return assertHealthCheckError(response);
 }
 
 module.exports = {
@@ -201,5 +306,8 @@ module.exports = {
   assertHealthCheckRequest,
   buildResponse,
   assertHealthCheckResponse,
-  assertHealthCheckError
+  assertHealthCheckResponseSemantics,
+  assertHealthCheckError,
+  buildErrorResponse,
+  sanitizeErrorDetails
 };

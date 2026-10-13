@@ -106,13 +106,35 @@ class Harness {
     };
   }
 
+  bindRequest(task, requestId) {
+    if (!requestId) return;
+    task.state.request_id = requestId;
+    this.addEvent(task, "contract.received", { contract_version: task.state.contract_version });
+  }
+
+  decorateError(error, task, stage = error.stage || task.state.stage || "BACKEND") {
+    error.requestId = error.requestId ?? task.state.request_id ?? null;
+    error.taskId = error.taskId ?? task.state.task_id;
+    error.sessionId = error.sessionId ?? task.state.session_id;
+    error.auditId = error.auditId ?? "audit-" + task.state.task_id;
+    error.stage = error.stage || stage;
+    error.trace = {
+      contract_version: task.state.contract_version || contract.CONTRACT_VERSION,
+      request_id: error.requestId,
+      task_id: error.taskId,
+      session_id: error.sessionId,
+      audit_id: error.auditId
+    };
+    return error;
+  }
+
   addEvent(task, eventType, payload = {}) {
     task.events.push({
       event_id: id("event"),
       task_id: task.state.task_id,
       actor: "harness",
       event_type: eventType,
-      payload: clone(payload),
+      payload: { ...clone(payload), request_id: task.state.request_id || null },
       timestamp: new Date().toISOString()
     });
   }
@@ -173,10 +195,10 @@ class Harness {
       recovery: "Fix the input or data source and resume from the latest checkpoint."
     };
     this.addEvent(task, "task.failed", task.state.error_state);
-    throw lastError;
+    throw this.decorateError(lastError, task, stage);
   }
 
-  runHealthCheck({ task_id: taskId, session_id: sessionId, risk_profile: riskProfile, portfolio } = {}) {
+  runHealthCheck({ task_id: taskId, session_id: sessionId, request_id: requestId, risk_profile: riskProfile, portfolio } = {}) {
     this.validateProfile(riskProfile);
     let task = taskId ? this.tasks.get(taskId) : null;
     if (taskId && !task) throw Object.assign(new Error("task not found"), { statusCode: 404 });
@@ -184,8 +206,13 @@ class Harness {
       const created = this.createSession({ risk_profile: riskProfile });
       task = this.tasks.get(created.task_state.task_id);
     }
-    if (sessionId && task.state.session_id !== sessionId) throw new Error("session_id does not match task");
-    if (task.state.status === "CIRCUIT_OPEN") throw new Error("circuit is open; create a new task after repairing the tool");
+    this.bindRequest(task, requestId);
+    if (sessionId && task.state.session_id !== sessionId) {
+      throw this.decorateError(new Error("session_id does not match task"), task, "SESSION_BINDING");
+    }
+    if (task.state.status === "CIRCUIT_OPEN") {
+      throw this.decorateError(new Error("circuit is open; create a new task after repairing the tool"), task, "CIRCUIT_BREAKER");
+    }
     const changed = (portfolio !== undefined && JSON.stringify(portfolio) !== JSON.stringify(task.inputPortfolio)) ||
       (riskProfile !== undefined && JSON.stringify(riskProfile) !== JSON.stringify(task.state.risk_profile));
     if (changed) {
@@ -278,19 +305,27 @@ class Harness {
         error.code = "INVALID_MARKET_CONTEXT";
         error.statusCode = 422;
         error.details = marketContextResult;
+        const task = canonicalRequest.context.task_id ? this.tasks.get(canonicalRequest.context.task_id) : null;
+        if (task) {
+          this.bindRequest(task, canonicalRequest.request_id);
+          this.addEvent(task, "contract.rejected", { code: error.code, stage: "MARKET_CONTEXT" });
+          this.decorateError(error, task, "MARKET_CONTEXT");
+        } else {
+          error.requestId = canonicalRequest.request_id;
+        }
         throw error;
       }
     }
     let result = this.runHealthCheck({
       task_id: canonicalRequest.context.task_id || undefined,
       session_id: canonicalRequest.context.session_id || undefined,
+      request_id: canonicalRequest.request_id,
       risk_profile: canonicalRequest.input.risk_profile,
       portfolio: canonicalRequest.input.portfolio || undefined
     });
     const task = this.tasks.get(result.task_state.task_id);
     if (task) {
       task.state.contract_version = canonicalRequest.contract_version;
-      task.state.request_id = canonicalRequest.request_id;
     }
     if (marketContextResult) {
       result.artifacts.market_context = marketContextResult.output;

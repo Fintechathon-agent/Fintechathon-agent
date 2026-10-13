@@ -1,0 +1,6 @@
+{"provider_mode":"synthetic-test-adapter","stage":"model","status":"PROPOSED","task_id":"review-task-log-001","request_id":"req-log-20261013-001","run_id":"review-log-001","model":"fake-model","provider_response_id":"resp-log-001","proposed_action":"HOLD_FOR_REVIEW","execution_allowed":false}
+{"provider_mode":"synthetic-test-adapter","stage":"risk","status":"PENDING_REVIEW","task_id":"review-task-log-001","risk_decision":"REQUIRED","proposal_sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","execution_allowed":false}
+{"provider_mode":"synthetic-test-adapter","stage":"risk","status":"APPROVED","task_id":"review-task-log-001","reviewer":"risk-owner","execution_allowed":false}
+{"provider_mode":"synthetic-test-adapter","stage":"approval","status":"APPROVED","task_id":"review-task-log-001","approver":"approver","execution_allowed":false}
+{"provider_mode":"synthetic-test-adapter","stage":"execution","status":"SIMULATED","task_id":"review-task-log-001","mode":"SIMULATED","side_effects":false,"execution_allowed":false}
+{"provider_mode":"synthetic-test-adapter","stage":"audit","status":"COMPLETE","task_id":"review-task-log-001","audit_id":"audit-log-001","events":["workflow.created","model.completed","risk.handoff.created","risk.approved","approval.approved","execution.simulated"]}

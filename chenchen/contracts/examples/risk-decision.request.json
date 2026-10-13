@@ -1,0 +1,7 @@
+{
+  "task_id": "review-task-example-001",
+  "proposal_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "decision": "APPROVE",
+  "reviewer": "risk-owner-example",
+  "reason": "证据足够，进入人工审批"
+}

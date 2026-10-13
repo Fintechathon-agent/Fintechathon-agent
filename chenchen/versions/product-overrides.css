@@ -233,8 +233,23 @@ dialog dl{font-size:13px}
 .bridge-controls ul{display:grid;gap:8px;margin:14px 0 0;padding:0;list-style:none}
 .bridge-controls li{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted)}
 .bridge-controls li strong{flex:0 0 auto;color:var(--green)}
+.workflow-panel{border-top:4px solid var(--green)!important;background:linear-gradient(130deg,#f8fbff,#fff 65%)}
+.workflow-inputs{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr);gap:12px;margin:15px 0}
+.workflow-inputs label{display:grid;gap:6px;color:var(--muted);font-size:12px}
+.workflow-inputs textarea,.workflow-inputs input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;color:var(--ink);font:inherit;line-height:1.55}
+.workflow-result{margin-top:18px;display:grid;gap:12px}
+.workflow-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.workflow-metric{border:1px solid var(--line);border-radius:11px;background:#fff;padding:11px;min-width:0}
+.workflow-metric small{display:block;color:var(--muted);font-size:11px}.workflow-metric strong{display:block;margin-top:5px;overflow-wrap:anywhere;font-size:13px}
+.workflow-proposal{border:1px solid var(--line);border-radius:13px;background:#fff;padding:15px}
+.workflow-proposal h3{margin:6px 0;font-size:18px}.workflow-proposal p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}.workflow-proposal small{display:block;margin-top:8px;color:var(--muted)}
+.workflow-actions{display:flex;gap:8px;flex-wrap:wrap;padding:12px;border:1px dashed var(--line);border-radius:12px;background:#fff}
+.workflow-actions button{margin:0}.workflow-actions .danger{background:#fff;border-color:var(--red);color:var(--red)}
+.workflow-result pre{max-height:420px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:800px){.bridge-flow{grid-template-columns:1fr}.bridge-flow i{transform:rotate(90deg);height:18px}.bridge-metrics,.bridge-evidence{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.bridge-metrics,.bridge-evidence{grid-template-columns:1fr}.bridge-evidence b{max-width:62%}}
+@media(max-width:800px){.workflow-inputs,.workflow-metrics{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.workflow-inputs,.workflow-metrics{grid-template-columns:1fr}}
 @media(max-width:800px){
   .home-main{padding:30px 16px 54px}
   .home-hero{align-items:flex-start}

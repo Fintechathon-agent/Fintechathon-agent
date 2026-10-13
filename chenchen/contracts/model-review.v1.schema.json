@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/model-review.v1.schema.json",
+  "title": "Personal AI Fund Manager model review and Risk workflow",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/ReviewRequest" },
+    { "$ref": "#/$defs/WorkflowRecord" },
+    { "$ref": "#/$defs/RiskDecisionRequest" },
+    { "$ref": "#/$defs/ApprovalRequest" },
+    { "$ref": "#/$defs/SimulationRequest" }
+  ],
+  "$defs": {
+    "ReviewRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "text"],
+      "properties": {
+        "request_id": { "type": ["string", "null"] },
+        "task_id": { "type": ["string", "null"] },
+        "kind": { "type": "string", "enum": ["bill", "news", "combined"] },
+        "source": { "type": ["string", "null"] },
+        "text": { "type": "string", "minLength": 1, "maxLength": 20000 },
+        "requested_action": { "type": ["string", "null"] },
+        "action_parameters": { "type": "object" },
+        "context": { "type": "object" },
+        "allow_rule_fallback": { "type": "boolean" }
+      }
+    },
+    "WorkflowRecord": {
+      "type": "object",
+      "required": ["workflow_version", "task_id", "request_id", "run_id", "status", "model", "proposed_action", "risk_handoff", "risk_decision", "approval", "execution", "audit"],
+      "properties": {
+        "workflow_version": { "const": "review-workflow.v1" },
+        "task_id": { "type": "string" },
+        "request_id": { "type": "string" },
+        "run_id": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDING_RISK", "PENDING_APPROVAL", "READY_FOR_SIMULATION", "SIMULATED", "REJECTED", "MODEL_FAILED"] },
+        "model": { "type": "object" },
+        "proposed_action": { "$ref": "#/$defs/ProposedAction" },
+        "risk_handoff": { "$ref": "#/$defs/RiskHandoff" },
+        "risk_decision": { "type": ["object", "null"] },
+        "approval": { "$ref": "#/$defs/ApprovalState" },
+        "execution": { "$ref": "#/$defs/ExecutionState" },
+        "audit": { "$ref": "#/$defs/Audit" },
+        "error": { "type": "object" }
+      }
+    },
+    "ProposedAction": {
+      "type": "object",
+      "required": ["proposed_action", "action_reason", "risk_level", "action_parameters", "proposal_sha256"],
+      "properties": {
+        "proposed_action": { "type": ["string", "null"], "enum": ["NO_ACTION", "REQUEST_MORE_INFO", "HOLD_FOR_REVIEW", "FLAG_FOR_RISK", null] },
+        "action_reason": { "type": ["string", "null"] },
+        "risk_level": { "type": "string", "enum": ["low", "medium", "high", "unknown"] },
+        "requested_action": { "type": ["string", "null"] },
+        "action_parameters": { "type": "object" },
+        "model_response_id": { "type": ["string", "null"] },
+        "proposal_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "RiskHandoff": {
+      "type": "object",
+      "required": ["contract_version", "handoff_id", "task_id", "run_id", "status", "decision", "owner", "evidence", "execution_allowed"],
+      "properties": {
+        "contract_version": { "const": "model-review.v1" },
+        "handoff_id": { "type": "string" },
+        "task_id": { "type": "string" },
+        "run_id": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDING_REVIEW", "APPROVED", "REJECTED", "BLOCKED"] },
+        "decision": { "type": "string" },
+        "owner": { "type": "string" },
+        "reason": { "type": "string" },
+        "evidence": { "type": "object" },
+        "execution_allowed": { "const": false }
+      }
+    },
+    "ApprovalState": {
+      "type": "object",
+      "required": ["approval_id", "task_id", "required", "status", "proposal_sha256"],
+      "properties": {
+        "approval_id": { "type": "string" },
+        "task_id": { "type": "string" },
+        "required": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED", "BLOCKED", "NOT_REQUIRED"] },
+        "decision": { "type": ["string", "null"] },
+        "proposal_sha256": { "type": "string" },
+        "approver": { "type": ["string", "null"] },
+        "decided_at": { "type": ["string", "null"] }
+      }
+    },
+    "ExecutionState": {
+      "type": "object",
+      "required": ["task_id", "status", "simulation_allowed", "execution_allowed"],
+      "properties": {
+        "execution_id": { "type": ["string", "null"] },
+        "task_id": { "type": "string" },
+        "status": { "type": "string", "enum": ["BLOCKED", "READY", "SIMULATED"] },
+        "simulation_allowed": { "type": "boolean" },
+        "execution_allowed": { "const": false },
+        "receipt": { "type": ["object", "null"] }
+      }
+    },
+    "Audit": {
+      "type": "object",
+      "required": ["audit_id", "workflow_version", "task_id", "request_id", "run_id", "events"],
+      "properties": {
+        "audit_id": { "type": "string" },
+        "workflow_version": { "const": "review-workflow.v1" },
+        "task_id": { "type": "string" },
+        "request_id": { "type": "string" },
+        "run_id": { "type": "string" },
+        "events": { "type": "array", "items": { "type": "object", "required": ["event_id", "task_id", "actor", "event_type", "payload", "timestamp"] } }
+      }
+    },
+    "RiskDecisionRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "proposal_sha256", "decision", "reviewer", "reason"],
+      "properties": {
+        "task_id": { "type": "string" },
+        "proposal_sha256": { "type": "string" },
+        "decision": { "type": "string", "enum": ["APPROVE", "REJECT", "REQUEST_MORE_INFO"] },
+        "reviewer": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "ApprovalRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "proposal_sha256", "decision", "approver", "reason"],
+      "properties": {
+        "task_id": { "type": "string" },
+        "proposal_sha256": { "type": "string" },
+        "decision": { "type": "string", "enum": ["APPROVE", "REJECT"] },
+        "approver": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "SimulationRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "proposal_sha256"],
+      "properties": {
+        "task_id": { "type": "string" },
+        "proposal_sha256": { "type": "string" }
+      }
+    }
+  }
+}

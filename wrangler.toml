@@ -6,3 +6,9 @@ workers_dev = true
 
 [vars]
 CORS_ORIGINS = "https://fund-risk-workbench.panxintian44.chatgpt.site,https://realchenchenluo.github.io"
+RATE_LIMIT_PER_MINUTE = "60"
+MODEL_API_URL = "https://api.openai.com/v1/responses"
+MODEL_API_STYLE = "responses"
+MODEL_NAME = "gpt-5.6-terra"
+MODEL_RESPONSE_FORMAT = "json_schema"
+MODEL_FALLBACK_TO_RULES = "false"

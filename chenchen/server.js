@@ -7,9 +7,13 @@ const { Harness } = require("./core/harness");
 const tools = require("./tools/financial-tools");
 const contract = require("./contracts/investment-contract");
 const { buildRiskWorkbenchHandoff } = require("./integrations/risk-workbench-adapter");
+const modelReview = require("./integrations/model-review");
+const { ReviewWorkflowStore, WorkflowError } = require("./integrations/review-workflow");
 const { randomUUID } = require("node:crypto");
 const { MerchantSession, demo: merchantDemo } = require("./merchant/ledger");
 const merchantSessions = new Map();
+const reviewRuns = new Map();
+const reviewWorkflow = new ReviewWorkflowStore();
 
 function merchantFor(request, response) {
   let id = /(?:^|;\s*)merchant_session=([a-z0-9-]+)/.exec(request.headers.cookie || "")?.[1];
@@ -55,17 +59,12 @@ function applyCors(request, response) {
 
 function sendError(response, error, fallbackStatus = 400) {
   const status = error.statusCode || (error.code === "INVALID_PORTFOLIO" ? 422 : fallbackStatus);
-  const payload = { error: {
-    code: error.code || "REQUEST_FAILED",
-    message: error.message,
-    retryable: Boolean(error.retryable),
-    stage: error.stage || "BACKEND",
-    recovery: error.recovery || "Review the request and retry after correcting the reported issue.",
-    details: error.details || null
-  }};
-  payload.contract_version = contract.CONTRACT_VERSION;
-  payload.operation = contract.OPERATION;
-  payload.request_id = error.requestId || null;
+  const payload = contract.buildErrorResponse(error, {
+    requestId: error.requestId || null,
+    taskId: error.trace?.task_id || null,
+    sessionId: error.trace?.session_id || null,
+    auditId: error.trace?.audit_id || null
+  });
   sendJson(response, status, payload);
 }
 
@@ -101,6 +100,45 @@ function parseBody(request) {
   });
 }
 
+function requireReviewApiKey(request) {
+  const expected = String(process.env.CORE_AGENT_API_KEY || "").trim();
+  if (!expected || request.headers["x-core-agent-key"] === expected) return;
+  throw new modelReview.ReviewError("AUTHENTICATION_REQUIRED", "API authentication is required", {
+    statusCode: 401,
+    stage: "AUTHENTICATION",
+    recovery: "Provide the configured X-Core-Agent-Key and retry."
+  });
+}
+
+function storeReviewRun(result) {
+  if (reviewRuns.size >= 500) reviewRuns.delete(reviewRuns.keys().next().value);
+  reviewRuns.set(result.run_id, result);
+}
+
+function buildWorkflowError(error) {
+  const trace = {
+    contract_version: modelReview.REVIEW_VERSION,
+    request_id: error.workflowRecord?.request_id || error.record?.request_id || null,
+    task_id: error.workflowRecord?.task_id || error.record?.task_id || error.taskId || null,
+    run_id: error.workflowRecord?.run_id || error.record?.run_id || error.runId || null,
+    audit_id: error.workflowRecord?.audit?.audit_id || error.record?.audit?.audit_id || error.auditId || null
+  };
+  const payload = {
+    review_version: modelReview.REVIEW_VERSION,
+    error: {
+      code: error.code || "WORKFLOW_FAILED",
+      message: error.message || "workflow failed",
+      retryable: Boolean(error.retryable),
+      stage: error.stage || "WORKFLOW",
+      recovery: error.recovery || "Review the task state and retry.",
+      details: error.details || null
+    },
+    trace,
+    workflow: error.workflowRecord || error.record || null
+  };
+  return payload;
+}
+
 function resolvePortfolio(body) {
   if (body && body.snapshot) return body.snapshot;
   if (body && body.portfolio) return body.portfolio;
@@ -125,6 +163,42 @@ async function handleApi(request, response, pathname, url) {
   let body = {};
   if (method === "POST") body = await parseBody(request);
   if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("JSON body must be an object");
+  if (method === "POST" && pathname === "/api/review") {
+    requireReviewApiKey(request);
+    const result = await reviewWorkflow.start(body, process.env);
+    storeReviewRun(result);
+    sendJson(response, 200, result);
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/review/risk-decision") {
+    requireReviewApiKey(request);
+    sendJson(response, 200, await reviewWorkflow.decideRisk(body));
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/review/approval") {
+    requireReviewApiKey(request);
+    sendJson(response, 200, await reviewWorkflow.decideApproval(body));
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/review/simulate") {
+    requireReviewApiKey(request);
+    sendJson(response, 200, await reviewWorkflow.simulate(body));
+    return true;
+  }
+  if (method === "GET" && pathname.startsWith("/api/review/task/")) {
+    requireReviewApiKey(request);
+    const taskId = decodeURIComponent(pathname.slice("/api/review/task/".length));
+    const result = reviewWorkflow.getByTaskId(taskId);
+    sendJson(response, result ? 200 : 404, result || { error: { code: "WORKFLOW_NOT_FOUND", message: "review task not found" } });
+    return true;
+  }
+  if (method === "GET" && pathname.startsWith("/api/review/")) {
+    requireReviewApiKey(request);
+    const runId = decodeURIComponent(pathname.slice("/api/review/".length));
+    const result = reviewWorkflow.getByRunId(runId) || reviewRuns.get(runId);
+    sendJson(response, result ? 200 : 404, result || { error: { code: "REVIEW_NOT_FOUND", message: "review run not found" } });
+    return true;
+  }
   if (pathname.startsWith("/api/merchant/")) {
     const session = merchantFor(request, response);
     let result;
@@ -261,7 +335,7 @@ function serveStatic(response, pathname) {
   const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
   const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html", "versions/risk-workbench.html",
     "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/risk-workbench.js", "versions/common.js",
-    "contracts/investment-agent.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json",
+    "contracts/investment-agent.v1.schema.json", "contracts/model-review.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json", "contracts/examples/model-review.request.json", "contracts/examples/model-review.response.json", "contracts/examples/risk-decision.request.json", "contracts/examples/approval.request.json", "contracts/examples/simulation.request.json",
     "data/market-brief-2026-10-08.json", "data/market-brief-2026-10-09.json", "data/risk-workbench-demo.json", "index.html", "app.js", "styles.css"]);
   if (!allowed.has(relativePath)) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "not found" } }); return; }
   const filePath = path.resolve(root, relativePath);
@@ -307,7 +381,14 @@ const server = http.createServer(async (request, response) => {
     }
     serveStatic(response, url.pathname);
   } catch (error) {
-    if (!response.headersSent) sendError(response, error);
+    if (!response.headersSent) {
+      if (error?.name === "ReviewError") {
+        if (error.reviewRecord) storeReviewRun(error.reviewRecord);
+        sendJson(response, error.statusCode || 502, error.workflowRecord ? buildWorkflowError(error) : modelReview.buildReviewError(error));
+      } else if (error?.name === "WorkflowError") {
+        sendJson(response, error.statusCode || 409, buildWorkflowError(error));
+      } else sendError(response, error);
+    }
   }
 });
 
@@ -317,4 +398,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { server, harness };
+module.exports = { server, harness, reviewRuns, reviewWorkflow };
