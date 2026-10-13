@@ -1,52 +1,46 @@
 # Core Agent Daily Update · 2026-10-13
 
-## 今日结论
+### 22:00 自动化收尾核验（2026-10-13）
 
-本日主线围绕一个 Golden Path 完成：工作台发起任务 → Backend 实际调用模型 → 模型提议交给统一 Risk → Risk 决策 → 必要审批 → 模拟执行或拒绝 → 查询完整审计记录。
+#### 今日真实产出
 
-## 已完成的核心接口
+- 今日有真实业务提交：统一 `model-review.v1` / `review-workflow.v1` Golden Path 完成模型调用、Risk 决策、审批、模拟执行和审计查询；新增 `/api/review/legacy` 兼容入口，并增加终态与重复 `task_id` 保护。
+- Cloudflare Workers AI 公网回放已保留模型原文、provider response ID、`task_id`、`request_id`、`run_id`、`audit_id`、`proposal_sha256` 和 `audit.events`；`execution_allowed=false`，模拟回执 `side_effects=false`。
+- 主链路资料继续以 `docs/core-agent-architecture.md`、`docs/core-agent-sequence.md`、`contracts/investment-agent.v1.schema.json` 和 `contracts/model-review.v1.schema.json` 为联调源；本次没有修改 Quant 逻辑或 Memory consent、范围、生命周期、清理规则。
 
-| 接口 | 状态 | 说明 |
-| --- | --- | --- |
-| `POST /api/review` | 已接通代码和本地 HTTP 验收 | 生成 `task_id/run_id/audit_id`，保留模型原文与结构化 proposal |
-| `POST /api/review/risk-decision` | 已接通代码和本地 HTTP 验收 | 支持 APPROVE、REJECT、REQUEST_MORE_INFO |
-| `POST /api/review/approval` | 已接通代码和本地 HTTP 验收 | 只有 Risk APPROVE 后才能记录审批 |
-| `POST /api/review/simulate` | 已接通代码和本地 HTTP 验收 | 只有 Risk 与审批通过后生成无副作用模拟回执 |
-| `GET /api/review/task/{task_id}` | 已接通代码和本地 HTTP 验收 | 查询模型、Risk、审批、执行和审计全记录 |
-| `GET /api/review/{run_id}` | 已接通代码和本地 HTTP 验收 | 按模型运行号查询同一 workflow |
+#### A. 已完成的核心接口
 
-## 可验证的集成进度
+| 接口 / Contract | 版本 | 生产方 | 消费方 | 当前字段状态与证据 |
+| --- | --- | --- | --- | --- |
+| 模型复核请求/响应 | `model-review.v1` | Core Agent / Backend | Harness、Risk、UI | `kind/text/request_id/task_id` 输入与模型原文、结构化 proposal、`risk_handoff`、`audit` 输出已验证；Schema 见 `contracts/model-review.v1.schema.json`。 |
+| Golden Path 工作流 | `review-workflow.v1` | Backend / Durable Object | Risk、Approval、UI、查询方 | Risk APPROVE/REJECT/REQUEST_MORE_INFO、审批、模拟执行和终态保护已实现；生产真实执行仍阻断。证据：`docs/model-service-risk-e2e-2026-10-13.md`。 |
+| Legacy 兼容入口 | `legacy-review.v0` → `review-workflow.v1` | Legacy adapter | 旧 UI / Backend | `question` 只映射为统一 `text`，保留父任务与 Risk Handoff，不绕过 Risk。证据：`integrations/legacy-review-adapter.js`、`docs/public-review-guards-2026-10-13.json`。 |
+| 公网 Worker | `core-agent-to-risk-workbench.demo@0.1.0` | Cloudflare Worker / Workers AI | Risk Workbench、UI | `/health` 报告 `model.configured=true`；公网回放与脱敏日志已保存。正式跨 Owner Risk 回写仍待确认。 |
 
-- 统一 Contract：`model-review.v1` 与 `review-workflow.v1` 已加入 `chenchen/contracts/`。
-- 模型请求示例、响应示例、Risk、审批和模拟执行示例已加入 `contracts/examples/`。
-- `task_id`、`request_id`、`run_id`、`audit_id`、`proposal_sha256` 在全链路保持关联。
-- 模型失败、等待 Risk、等待审批、Risk 拒绝、审批拒绝和参数变化都会阻断执行。
-- `execution_allowed` 固定为 `false`；模拟回执带 `side_effects=false`。
-- 本地 `npm run check` 通过；`npm test` 通过 75 项测试；Cloudflare Worker 专项测试 7 项通过。
-- 新增终态保护和重复 `task_id` 保护；线上重复 Risk/审批请求均返回 `WORKFLOW_TERMINAL`，不会把已模拟任务改回等待状态。
-- 新增 `/api/review/legacy` 兼容入口：旧版 `question` 输入只映射到统一 Contract，不会绕过 Risk。
-- 公网真实验证了 Risk REJECT 和 REQUEST_MORE_INFO：前者进入 `REJECTED`，后者保持 `PENDING_RISK`；两者模拟执行均返回 `EXECUTION_BLOCKED`。
-- Cloudflare 公网 `/health` 已返回 `model.configured=true`；Workers AI 公网真实回放已成功，拿到模型原文、模型响应 ID 和完整审计链。
+#### B. 可验证的集成进度
 
-## 证据位置
+- 团队仓库 `chenchen/`：`npm run check` 通过；`npm test` **75/75** 通过；`node --test tests/cloudflare-review.test.mjs` **7/7** 通过；`git diff --check` 通过。
+- 个人仓库 `chenchen/`：同样 `npm run check` 通过；`npm test` **75/75** 通过；Cloudflare 专项 **7/7** 通过；`git diff --check` 通过。
+- 可复现边界：模型失败、Risk 等待、审批等待、Risk 拒绝、参数哈希变化、重复 `task_id` 和终态重复调用均保持阻断；`/api/review/legacy` 只做字段适配。
+- 公网证据：Risk REJECT 进入 `REJECTED`，REQUEST_MORE_INFO 保持 `PENDING_RISK`，两者模拟执行均为 `EXECUTION_BLOCKED`；Workers AI 回放拿到真实模型响应。
+- 金融数据测试：固定 2026-10-08/09 市场夹具的重复观察拒绝、`REVIEW_REQUIRED` 冲突和 Quant 无漂移用例继续通过；没有宣称 2026-10-13 实时行情验证。
 
-- 交接说明：`docs/model-service-risk-e2e-2026-10-13.md`
-- 公共 Schema：`contracts/model-review.v1.schema.json`
-- 样例：`contracts/examples/model-review.request.json`、`model-review.response.json`、`risk-decision.request.json`、`approval.request.json`、`simulation.request.json`
-- 运行日志：`logs/core-agent-e2e-2026-10-13.jsonl`（本地）与 `logs/core-agent-e2e-public-2026-10-13.jsonl`（公网真实模型）
-- 公网复核证据：`docs/public-review-recheck-response-2026-10-13.json`，部署版本 `a760c2b9-3ead-46cc-8e2e-ef4e8d67f5d0`。
-- 兼容与阻断证据：`docs/public-review-guards-2026-10-13.json`，最新部署版本 `a16ebd63-090f-402d-93ec-4f20aa4d917a`。
-- 工作台页面：`versions/risk-workbench.html`、`versions/risk-workbench.js`
+#### C. 需要其他 Owner 配合的阻塞项
 
-## 需要其他 Owner 配合的阻塞项
+1. **Risk Owner**：确认正式 `model-review.v1` 接收方、`reviewer/reason/proposal_sha256` 留痕、决策回写 API、鉴权和重试语义；当前 Core Agent 自有 Risk/审批/模拟链路已验证，跨 Owner 正式回写未验收。
+2. **Approval Owner**：确认审批人身份、权限和是否需要多人审批；当前 Demo 只覆盖单审批人。
+3. **Execution Owner**：提供 Safety Action Gateway 接收协议；在此之前真实执行保持阻断。
+4. **团队模型服务 Owner**：确认旧 `question/recommendation/gate` 接口由谁适配到 `model-review.v1`，不能把两套字段直接当成同一 Contract。
+5. **Backend / UI / Data / Memory / Quant Owner**：分别确认生产认证与持久化审计、pending/error/recovery 展示、市场数据时效与冲突协议、audit evidence 不进入 Memory 长期规则、Quant 版本兼容。
 
-1. Risk Owner：确认正式接收方是否采用 `model-review.v1`，并确认 `reviewer/reason/proposal_sha256` 的审核留痕要求。
-2. Approval Owner：确认审批人身份、权限和是否需要多人审批；当前 Demo 只做单审批人接口。
-3. Execution Owner：确认正式 Safety Action Gateway 的接收协议；在此之前继续保留真实执行阻断。
-4. 产品与合规 Owner：确认 Workers AI 模型版本、额度和正式环境数据处理边界。
-5. 团队模型服务 Owner：旧 `/api/review` 仍以 `question` 和 `recommendation/gate` 为主，需确认是否由 Backend 适配到 `model-review.v1`；当前不能把两套字段直接当成同一 Contract。
-6. 统一 Risk Owner：提供正式 Handoff 接收和决策回写 API 地址、鉴权和验收环境；目前只能证明公网 Core Agent 自己的 Risk/审批/模拟链路。
+#### 主链路结论与追踪限制
 
-## 范围边界
+当前阶段已走到 Core Agent 自有 Risk Handoff、Risk 决策、审批和无副作用模拟；真实交易授权停止在 `execution_allowed=false`。Core Agent 只消费已有 Quant 结果，没有重新计算；没有改变 Memory 规则；前端 approval 不是交易授权。成功工作流可追踪 `request_id/task_id/session_id/contract_version/audit_evidence`，但跨 Owner 正式 Risk 回写、生产认证、跨请求持久化和实时市场数据协议仍待确认。
 
-本轮没有修改 Memory consent、范围、生命周期和清理规则；没有重新计算 Quant；没有把模型结果当作用户授权；没有删除旧版本。投资主链路与店主财务助手仍保持原有版本，可通过 Git 历史回溯。
+#### 下一步
+
+先冻结跨 Owner Risk 接收与回写 Contract，再补可复现接收/拒绝/重试联调；随后由 Backend、UI、Data、Memory、Quant Owner 完成各自字段确认。
+
+#### DOCX 验收
+
+- `render_docx.py` 因环境缺少 LibreOffice 未完成 PNG 渲染；Word/WPS COM 导出因桌面 RPC/E_FAIL 失败。本次只完成 DOCX 结构性检查，版式验收待可用渲染器后补。
