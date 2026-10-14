@@ -1,0 +1,375 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/risk-handoff.v1.schema.json",
+  "title": "Core Agent Risk handoff and callback contract",
+  "description": "Structural schema; server additionally verifies equality of task/request/run/audit/handoff identifiers and proposal hash against the stored record. No real execution authorization.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/HandoffPackage"
+    },
+    {
+      "$ref": "#/$defs/CallbackRequest"
+    },
+    {
+      "$ref": "#/$defs/CallbackResponse"
+    }
+  ],
+  "$defs": {
+    "HandoffPackage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "handoff_version",
+        "contract_version",
+        "workflow_version",
+        "handoff_id",
+        "task_id",
+        "request_id",
+        "run_id",
+        "audit_id",
+        "owner",
+        "record_endpoint",
+        "workflow_status",
+        "status",
+        "decision",
+        "execution_allowed",
+        "proposal",
+        "reviewed_input",
+        "input_authority",
+        "model",
+        "evidence",
+        "approval",
+        "audit",
+        "callback"
+      ],
+      "properties": {
+        "reviewed_input": { "type": ["object", "null"], "description": "Original normalized caller input. Legacy records may not contain it. Never treat external text or caller context as trusted Memory or authorization." },
+        "input_authority": { "const": "UNVERIFIED_CALLER_INPUT" },
+        "handoff_version": {
+          "const": "risk-handoff.v1"
+        },
+        "contract_version": {
+          "const": "model-review.v1"
+        },
+        "workflow_version": {
+          "const": "review-workflow.v1"
+        },
+        "handoff_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "audit_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "record_endpoint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "workflow_status": {
+          "enum": [
+            "PENDING_RISK",
+            "PENDING_APPROVAL",
+            "READY_FOR_SIMULATION",
+            "SIMULATED",
+            "REJECTED",
+            "MODEL_FAILED"
+          ]
+        },
+        "status": {
+          "enum": [
+            "PENDING_REVIEW",
+            "APPROVED",
+            "REJECTED",
+            "BLOCKED"
+          ]
+        },
+        "decision": {
+          "type": "string"
+        },
+        "execution_allowed": {
+          "const": false
+        },
+        "proposal": {
+          "anyOf": [
+            {
+              "$ref": "model-review.v1.schema.json#/$defs/ProposedAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model": {
+          "type": "object",
+          "required": [
+            "source",
+            "status",
+            "model",
+            "provider_response_id",
+            "call_succeeded"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "status": {
+              "type": "string"
+            },
+            "model": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "provider_response_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "call_succeeded": {
+              "type": "boolean"
+            }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "required": [
+            "audit_id",
+            "proposal_sha256",
+            "model_response_id"
+          ],
+          "properties": {
+            "audit_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500,
+              "pattern": "\\S"
+            },
+            "input_sha256": {
+              "type": "string"
+            },
+            "proposal_sha256": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "model_response_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "approval": {
+          "$ref": "model-review.v1.schema.json#/$defs/ApprovalState"
+        },
+        "audit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "audit_id",
+            "event_count",
+            "latest_event"
+          ],
+          "properties": {
+            "audit_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500,
+              "pattern": "\\S"
+            },
+            "event_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "latest_event": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          }
+        },
+        "callback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "callback_version",
+            "endpoint",
+            "method",
+            "required_fields",
+            "decisions",
+            "retry_policy"
+          ],
+          "properties": {
+            "callback_version": {
+              "const": "risk-callback.v1"
+            },
+            "endpoint": {
+              "const": "/api/review/risk-callback"
+            },
+            "method": {
+              "const": "POST"
+            },
+            "required_fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "decisions": {
+              "const": [
+                "APPROVE",
+                "REJECT",
+                "REQUEST_MORE_INFO"
+              ]
+            },
+            "retry_policy": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "CallbackRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "handoff_id",
+        "task_id",
+        "request_id",
+        "run_id",
+        "audit_id",
+        "reviewer",
+        "reason",
+        "callback_version",
+        "proposal_sha256",
+        "decision"
+      ],
+      "properties": {
+        "handoff_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "audit_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "reviewer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "pattern": "\\S"
+        },
+        "callback_version": {
+          "const": "risk-callback.v1"
+        },
+        "proposal_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "decision": {
+          "enum": [
+            "APPROVE",
+            "REJECT",
+            "REQUEST_MORE_INFO"
+          ]
+        }
+      }
+    },
+    "CallbackResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "callback_version",
+        "callback_status",
+        "handoff",
+        "workflow"
+      ],
+      "properties": {
+        "callback_version": {
+          "const": "risk-callback.v1"
+        },
+        "callback_status": {
+          "enum": [
+            "RECORDED",
+            "DUPLICATE"
+          ]
+        },
+        "handoff": {
+          "$ref": "#/$defs/HandoffPackage"
+        },
+        "workflow": {
+          "$ref": "model-review.v1.schema.json#/$defs/WorkflowRecord"
+        }
+      }
+    }
+  }
+}

@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import vm from "node:vm";
-import worker, { ReviewService } from "../../cloudflare/worker.js";
-import { reviewDocs } from "../../cloudflare/review-docs.js";
+import { createHash } from "node:crypto";
+import worker, { ReviewService } from "../deployment/worker.js";
+import { reviewDocs } from "../deployment/review-docs.js";
 
 const proposal = {
   summary: "虚构账单要求改付个人账户。", risk_level: "high",
@@ -132,4 +133,56 @@ test("test page is reachable even when opening the POST URL in a browser", async
   assert.match(response.headers.get("Content-Type"), /text\/html/);
   assert.match(await response.text(), /调用真实模型/);
   new vm.Script(reviewDocs.match(/<script>([\s\S]*?)<\/script>/)[1]);
+});
+
+test("handoff callback is persistent, idempotent, audit-bound and guarded against concurrent conflicts", async () => {
+  const app = setup();
+  const record = await worker.fetch(req("/api/review", { text: "Synthetic investment and rent conflict" }), app.env).then(r => r.json());
+  const handoff = await worker.fetch(req("/api/review/" + record.run_id + "/risk-handoff"), app.env).then(r => r.json());
+  assert.equal(handoff.audit_id, record.audit.audit_id);
+  assert.equal(handoff.handoff_version, "risk-handoff.v1");
+  assert.equal(createHash("sha256").update(JSON.stringify(handoff.reviewed_input)).digest("hex"), handoff.evidence.input_sha256);
+  assert.equal(handoff.input_authority, "UNVERIFIED_CALLER_INPUT");
+  const callback = {
+    callback_version: "risk-callback.v1", handoff_id: handoff.handoff_id,
+    task_id: handoff.task_id, request_id: handoff.request_id, run_id: handoff.run_id,
+    audit_id: handoff.audit_id, proposal_sha256: handoff.proposal.proposal_sha256,
+    decision: "REJECT", reviewer: "synthetic-risk-owner", reason: "Test rejection"
+  };
+  const mismatch = await worker.fetch(req("/api/review/risk-callback", { ...callback, run_id: "wrong" }), app.env);
+  assert.equal(mismatch.status, 409);
+  assert.equal((await mismatch.json()).error.code, "RISK_HANDOFF_MISMATCH");
+  app.restart();
+  const audited = await worker.fetch(req("/api/review/task/" + record.task_id), app.env).then(r => r.json());
+  assert.ok(audited.audit.events.some(e => e.event_type === "risk.callback.blocked"));
+  assert.equal(audited.risk_decision, null);
+  const responses = await Promise.all([
+    worker.fetch(req("/api/review/risk-callback", callback), app.env),
+    worker.fetch(req("/api/review/risk-callback", callback), app.env),
+    worker.fetch(req("/api/review/risk-callback", { ...callback, decision: "APPROVE" }), app.env)
+  ]);
+  assert.deepEqual(responses.map(r => r.status), [200, 200, 409]);
+  const recorded = await responses[0].json(), duplicate = await responses[1].json();
+  assert.equal(recorded.callback_status, "RECORDED");
+  assert.equal(duplicate.callback_status, "DUPLICATE");
+  assert.deepEqual(recorded.workflow, duplicate.workflow);
+  assert.equal((await responses[2].json()).error.code, "RISK_CALLBACK_CONFLICT");
+  app.restart();
+  const repeated = await worker.fetch(req("/api/review/risk-callback", callback), app.env).then(r => r.json());
+  assert.equal(repeated.callback_status, "DUPLICATE");
+  const final = await worker.fetch(req("/api/review/task/" + record.task_id + "/risk-handoff"), app.env).then(r => r.json());
+  assert.equal(final.workflow_status, "REJECTED");
+  assert.equal(final.execution_allowed, false);
+  const blocked = await worker.fetch(req("/api/review/simulate", { task_id: record.task_id, proposal_sha256: callback.proposal_sha256 }), app.env);
+  assert.equal(blocked.status, 409);
+});
+
+test("handoff reads and callbacks use the same configured API authentication", async () => {
+  const app = setup();
+  app.env.CORE_AGENT_API_KEY = "test-only-key";
+  for (const request of [req("/api/review/task/example/risk-handoff"), req("/api/review/risk-callback", {})]) {
+    assert.equal((await worker.fetch(request, app.env)).status, 401);
+    request.headers.set("X-Core-Agent-Key", "test-only-key");
+    assert.notEqual((await worker.fetch(request, app.env)).status, 401);
+  }
 });

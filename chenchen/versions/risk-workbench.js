@@ -145,11 +145,11 @@ function renderWorkflow(record) {
   $("#workflow-proposal-title").textContent = proposal ? workflowLabel(proposal.proposed_action) : "模型未形成拟议动作";
   $("#workflow-proposal-reason").textContent = proposal?.action_reason || record.error?.message || "等待模型结果";
   $("#workflow-proposal-source").textContent = record.model?.source ? "来源：" + record.model.source + "；拟议动作不等于授权。" : "模型调用失败；Risk 和执行端均已阻断。";
-  const hash = proposal?.proposal_sha256 || "";
+  $("#workflow-handoff-link").href = workflowUrl("/api/review/task/" + encodeURIComponent(record.task_id) + "/risk-handoff");
   const actions = [];
-  if (record.status === "PENDING_RISK") {
-    actions.push(['risk-approve', 'Risk 通过', '']);
-    actions.push(['risk-reject', 'Risk 拒绝', 'danger']);
+  if (record.status === "PENDING_RISK" && !record.risk_decision) {
+    actions.push(['risk-approve', '演示 Risk 通过', '']);
+    actions.push(['risk-reject', '演示 Risk 拒绝', 'danger']);
     actions.push(['risk-more', '要求补充信息', '']);
   } else if (record.status === "PENDING_APPROVAL") {
     actions.push(['approval-approve', '审批通过', '']);
@@ -159,7 +159,7 @@ function renderWorkflow(record) {
   }
   $("#workflow-actions").innerHTML = actions.length
     ? actions.map(([action, label, tone]) => '<button type="button" data-workflow-action="'+action+'" class="'+tone+'">'+label+' →</button>').join("")
-    : '<span class="small muted">当前阶段没有可继续的动作；完整记录已保留。</span>';
+    : '<span class="small muted">' + (record.risk_decision?.decision === "REQUEST_MORE_INFO" ? '请在上方补充材料，再发起新任务；原任务保持阻断。' : '当前阶段没有可继续的动作；完整记录已保留。') + '</span>';
   $("#workflow-json").textContent = JSON.stringify(record, null, 2);
 }
 
@@ -168,13 +168,15 @@ $("#run-workflow").addEventListener("click", async () => {
   button.disabled = true;
   button.textContent = "正在调用模型…";
   try {
+    const amountInput = $("#workflow-amount");
+    if (!amountInput.reportValidity() || !amountInput.value) throw new Error("请填写有效的拟议金额。");
     const result = await workflowRequest("/api/review", {
       request_id: "req-workbench-" + (globalThis.crypto?.randomUUID?.() || Date.now()),
       kind: "bill",
       source: "risk-workbench-demo",
       text: $("#workflow-text").value,
       requested_action: $("#workflow-action").value,
-      action_parameters: { amount: 1280, currency: "CNY", due_date: "2026-10-20", synthetic: true },
+      action_parameters: { amount: Number(amountInput.value), currency: "CNY", synthetic: true },
       context: { synthetic: true, user_goal: "看清钱的用途并确认不会影响后续安排" }
     });
     $("#workflow-message").textContent = "模型响应已记录，当前停在统一 Risk；请按顺序复核。";
@@ -197,7 +199,16 @@ $("#workflow-actions").addEventListener("click", async (event) => {
   const base = { task_id: workflowRecord.task_id, proposal_sha256: workflowRecord.proposed_action.proposal_sha256 };
   try {
     let next;
-    if (action.startsWith("risk-")) next = await workflowRequest("/api/review/risk-decision", { ...base, reviewer: "demo-risk-owner", decision: action === "risk-approve" ? "APPROVE" : action === "risk-reject" ? "REJECT" : "REQUEST_MORE_INFO", reason: "演示环境记录的统一 Risk 决策" });
+    if (action.startsWith("risk-")) {
+      const callback = await workflowRequest("/api/review/risk-callback", {
+        ...base, callback_version: "risk-callback.v1",
+        handoff_id: workflowRecord.risk_handoff.handoff_id, request_id: workflowRecord.request_id,
+        run_id: workflowRecord.run_id, audit_id: workflowRecord.audit.audit_id,
+        reviewer: "demo-risk-owner", decision: action === "risk-approve" ? "APPROVE" : action === "risk-reject" ? "REJECT" : "REQUEST_MORE_INFO",
+        reason: "演示环境人工模拟的 Risk 决策，尚非远程 Risk 系统回写"
+      });
+      next = callback.workflow;
+    }
     else if (action.startsWith("approval-")) next = await workflowRequest("/api/review/approval", { ...base, approver: "demo-approver", decision: action === "approval-approve" ? "APPROVE" : "REJECT", reason: "演示环境记录的人工审批" });
     else next = await workflowRequest("/api/review/simulate", base);
     $("#workflow-message").textContent = "状态已更新；执行端仍只允许模拟，不连接真实系统。";

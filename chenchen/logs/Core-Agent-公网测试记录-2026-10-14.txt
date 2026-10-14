@@ -1,0 +1,79 @@
+Core Agent 公网联调记录 · 2026-10-14
+范围：真实模型与公网后端已接通；Risk 和审批是脚本模拟的演示决定，未与外部 Risk Owner 联合验收。
+开始（UTC）：2026-10-14T07:20:33.4936914Z
+结束（UTC）：2026-10-14T07:21:24.9289042Z
+部署版本：756201ce-d043-4c0c-8f22-43bdf7c4e681
+HTTP检查：34 项，结果：通过
+所有输入虚构，真实执行始终关闭。原始输入属于未经验证的调用方材料，未写入 Memory。
+
+health | HTTP 200 | OK
+APPROVE/model | HTTP 200 | PENDING_RISK
+APPROVE/export | HTTP 200 | PENDING_REVIEW
+APPROVE/pending-risk-guard | HTTP 409 | EXECUTION_BLOCKED
+APPROVE/mismatch | HTTP 409 | RISK_HANDOFF_MISMATCH
+APPROVE/callback | HTTP 200 | RECORDED
+APPROVE/retry | HTTP 200 | DUPLICATE
+APPROVE/pending-approval-guard | HTTP 409 | EXECUTION_BLOCKED
+APPROVE/approval | HTTP 200 | READY_FOR_SIMULATION
+APPROVE/simulation | HTTP 200 | SIMULATED
+APPROVE/retry-after-terminal | HTTP 200 | DUPLICATE
+APPROVE/conflict | HTTP 409 | RISK_CALLBACK_CONFLICT
+APPROVE/final-record | HTTP 200 | SIMULATED
+APPROVE/final-export | HTTP 200 | APPROVED
+REJECT/model | HTTP 200 | PENDING_RISK
+REJECT/export | HTTP 200 | PENDING_REVIEW
+REJECT/pending-risk-guard | HTTP 409 | EXECUTION_BLOCKED
+REJECT/mismatch | HTTP 409 | RISK_HANDOFF_MISMATCH
+REJECT/callback | HTTP 200 | RECORDED
+REJECT/retry | HTTP 200 | DUPLICATE
+REJECT/execution-guard | HTTP 409 | EXECUTION_BLOCKED
+REJECT/conflict | HTTP 409 | RISK_CALLBACK_CONFLICT
+REJECT/final-record | HTTP 200 | REJECTED
+REJECT/final-export | HTTP 200 | REJECTED
+REQUEST_MORE_INFO/model | HTTP 200 | PENDING_RISK
+REQUEST_MORE_INFO/export | HTTP 200 | PENDING_REVIEW
+REQUEST_MORE_INFO/pending-risk-guard | HTTP 409 | EXECUTION_BLOCKED
+REQUEST_MORE_INFO/mismatch | HTTP 409 | RISK_HANDOFF_MISMATCH
+REQUEST_MORE_INFO/callback | HTTP 200 | RECORDED
+REQUEST_MORE_INFO/retry | HTTP 200 | DUPLICATE
+REQUEST_MORE_INFO/execution-guard | HTTP 409 | EXECUTION_BLOCKED
+REQUEST_MORE_INFO/conflict | HTTP 409 | RISK_CALLBACK_CONFLICT
+REQUEST_MORE_INFO/final-record | HTTP 200 | PENDING_RISK
+REQUEST_MORE_INFO/final-export | HTTP 200 | PENDING_REVIEW
+
+三条分支的最终记录与模型原文：
+任务：review-task-e1b5e14b-6033-4c53-85d3-19ca174a3cfa
+运行：review-9beae496-7236-4340-b847-15519b933799
+请求：req-handoff-20261014-9cc1996c-6628-4716-8de8-4e7991063d15
+审计：audit-4f087fc0-02ab-4f19-9f3e-a7971ec538ec
+Risk：APPROVE；最终状态：SIMULATED
+模型响应编号：chatcmpl-03a3bf29-078c-4a6c-ac5c-9e04fbc34dd5
+拟议动作指纹：898f23e895dd4deeccc3504c4f45425ca2976b69dc57d4743cc65f50b4e71603
+实际执行：false；审计事件：17
+查询：https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/api/review/task/review-task-e1b5e14b-6033-4c53-85d3-19ca174a3cfa
+模型原文：{"action_reason":"检查追加投资是否影响房租安排，需人工复核","evidence":["虚构案例：可用现金10000元，下个月房租4000元，拟再投入8000元买基金"],"missing_information":[],"proposed_action":"HOLD_FOR_REVIEW","risk_level":"low","summary":"追加投资可能影响房租安排，需人工复核"}
+
+任务：review-task-8d9437ba-72b6-4635-88fe-fe1f7be40325
+运行：review-1acad82c-88dd-4c8c-8602-beb43a510f87
+请求：req-handoff-20261014-bd475aa4-91d4-43e0-859b-ebe1ce975f70
+审计：audit-5cb9f9d6-2932-4f5f-a3c1-8990464fafef
+Risk：REJECT；最终状态：REJECTED
+模型响应编号：chatcmpl-77b7cc5a-3f51-4dcd-83d1-93609a8f3de3
+拟议动作指纹：7a21b6ec5b469d630eca230c739d7d1707158dfac20e047af77e14153df3ea93
+实际执行：false；审计事件：14
+查询：https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/api/review/task/review-task-8d9437ba-72b6-4635-88fe-fe1f7be40325
+模型原文：{"action_reason":"检查追加投资是否影响房租安排，需人工审查","evidence":["虚构案例：可用现金10000元，下个月房租4000元，拟再投入8000元买基金"],"missing_information":[],"proposed_action":"HOLD_FOR_REVIEW","risk_level":"low","summary":"追加投资可能影响房租安排，需审查"}
+
+任务：review-task-a574effe-4f2c-4e0f-9789-9bf56707fdfe
+运行：review-2f474e43-f412-4607-a71c-ad8c49f591c8
+请求：req-handoff-20261014-2afb7ea8-bca4-4003-866a-30f556c39853
+审计：audit-21848d64-1d1d-49dc-b18f-77b8d1bd5475
+Risk：REQUEST_MORE_INFO；最终状态：PENDING_RISK
+模型响应编号：chatcmpl-fd31a719-ecf2-4d8c-b9f2-2d33d4103035
+拟议动作指纹：6ba3c3217ffded92857e304fbd08863b2acfd1addf02bb9b573e6b69fdff896e
+实际执行：false；审计事件：14
+查询：https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/api/review/task/review-task-a574effe-4f2c-4e0f-9789-9bf56707fdfe
+模型原文：{"action_reason":"检查追加投资是否影响房租安排，需人工审查","evidence":["虚构案例：可用现金10000元，下个月房租4000元，拟再投入8000元买基金"],"missing_information":[],"proposed_action":"HOLD_FOR_REVIEW","risk_level":"low","summary":"追加投资可能影响房租安排，需人工审查"}
+
+业务质量问题：模型虽提示房租冲突，仍可能输出 low 风险等级。本测试只验证链路和拦截，不代表资金冲突规则验收通过。
+待联合验收：独立Risk身份与规则、真实审批权限、用户确认资金用途、跨任务占用约束和 Safety Action Gateway。

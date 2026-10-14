@@ -18,15 +18,17 @@
     <div class="row"><div><p class="section-kicker">Golden Path · 模型到 Risk</p><h2>把一件需要处理的事走完</h2></div><span class="tag" id="workflow-status">尚未发起</span></div>
     <p class="small muted">下面这条链路会实际调用后端配置的模型。模型只能提出建议，Risk 和审批通过后才允许模拟执行；任何等待、拒绝或异常都会停在执行前。</p>
     <div class="workflow-inputs">
-      <label>待处理内容<textarea id="workflow-text" rows="3">供应商账单 1280 元，付款截止日为 2026-10-20。请判断是否需要人工核对。</textarea></label>
-      <label>请求动作<input id="workflow-action" value="判断这笔账单是否可以进入付款准备" /></label>
+      <label>待处理内容<textarea id="workflow-text" rows="3">虚构案例：我现在有 10000 元可用现金，下个月需交 4000 元房租，想再投入 8000 元买基金。请检查投资计划会不会影响房租安排。以下金额仅供演示。</textarea></label>
+      <label>请求动作<input id="workflow-action" value="检查新增基金投资与房租安排是否冲突" /></label>
+      <label>本次拟议金额（元）<input id="workflow-amount" type="number" min="0.01" max="100000000" step="0.01" value="8000" /></label>
     </div>
     <button id="run-workflow" type="button">发起模型复核 →</button>
-    <p id="workflow-message" class="small muted" role="status">只使用演示账单；不会连接真实付款或交易系统。</p>
+    <p id="workflow-message" class="small muted" role="status">使用虚构资金安排；下方 Risk 和审批按钮由你模拟操作，不代表远程风控系统已接入。</p>
     <div id="workflow-result" class="workflow-result" hidden>
       <div class="workflow-metrics" id="workflow-metrics"></div>
       <div class="workflow-proposal"><span class="section-kicker">模型拟议动作</span><h3 id="workflow-proposal-title">等待模型</h3><p id="workflow-proposal-reason"></p><small id="workflow-proposal-source"></small></div>
       <div class="workflow-actions" id="workflow-actions"></div>
+      <details class="compact-detail"><summary>给联调同学的交接材料</summary><p class="small muted">交接包带有任务编号与参数指纹，可与 Risk 回调逐项核对。</p><a id="workflow-handoff-link" target="_blank" rel="noopener">打开 Risk 交接包 ↗</a></details>
       <details class="compact-detail"><summary>查看完整模型响应和运行记录</summary><pre id="workflow-json"></pre></details>
     </div>
   </section>

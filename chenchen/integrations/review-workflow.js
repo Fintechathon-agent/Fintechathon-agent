@@ -2,6 +2,7 @@
 
 const crypto = require("node:crypto");
 const modelReview = require("./model-review");
+const riskHandoff = require("./risk-handoff");
 
 const WORKFLOW_VERSION = "review-workflow.v1";
 const RISK_DECISIONS = ["APPROVE", "REJECT", "REQUEST_MORE_INFO"];
@@ -201,6 +202,7 @@ class ReviewWorkflowStore {
       request_id: requestId,
       run_id: review.run_id,
       status: "PENDING_RISK",
+      reviewed_input: clone(modelInput),
       model: {
         status: review.status,
         source: review.source,
@@ -284,6 +286,35 @@ class ReviewWorkflowStore {
     if (input.proposal_sha256 !== record.proposed_action.proposal_sha256) {
       this.deny(record, "PROPOSAL_CHANGED", "proposal hash does not match the task", stage, "Reload and review the current proposal.");
     }
+  }
+
+  async receiveRiskCallback(input = {}) {
+    const record = this.requireRecord(requiredString(input.task_id, "task_id"));
+    let callback;
+    try {
+      callback = riskHandoff.validateRiskCallback(input, record);
+    } catch (error) {
+      event(record, "risk.callback.blocked", { code: error.code, execution_allowed: false }, "risk-gateway");
+      error.workflowRecord = this.save(record);
+      throw error;
+    }
+    if (record.risk_callback) {
+      if (JSON.stringify(record.risk_callback.request) === JSON.stringify(callback)) {
+        return { callback_status: "DUPLICATE", workflow: record };
+      }
+      this.deny(record, "RISK_CALLBACK_CONFLICT", "A different callback is already recorded for this handoff", "RISK_CALLBACK", "Read the existing decision. Create a new task for a changed proposal.");
+    }
+    if (record.risk_decision) {
+      this.deny(record, "RISK_DECISION_IMMUTABLE", "A Risk decision already exists; callback cannot replace it", "RISK_CALLBACK", "Read the existing decision or create a new task.");
+    }
+    const { task_id, proposal_sha256, decision, reviewer, reason } = callback;
+    const result = await this.decideRisk({ task_id, proposal_sha256, decision, reviewer, reason });
+    result.risk_callback = { callback_version: riskHandoff.CALLBACK_VERSION, request: callback, received_at: now() };
+    event(result, "risk.callback.recorded", {
+      handoff_id: callback.handoff_id, audit_id: callback.audit_id,
+      proposal_sha256, decision, risk_decision_id: result.risk_decision.risk_decision_id
+    }, "risk-gateway");
+    return { callback_status: "RECORDED", workflow: this.save(result) };
   }
 
   async decideRisk(input = {}) {

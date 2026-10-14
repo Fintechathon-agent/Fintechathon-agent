@@ -1,0 +1,27 @@
+name = "personal-ai-fund-manager-core-agent"
+main = "deployment/worker.js"
+compatibility_date = "2026-10-11"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[vars]
+CORS_ORIGINS = "*"
+RATE_LIMIT_PER_MINUTE = "60"
+MODEL_PROVIDER = "workers_ai"
+MODEL_NAME = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+MODEL_RESPONSE_FORMAT = "json_schema"
+MODEL_FALLBACK_TO_RULES = "false"
+MODEL_DISABLE_RULE_FALLBACK = "true"
+MODEL_TIMEOUT_MS = "45000"
+MODEL_REQUESTS_PER_MINUTE = "6"
+
+[ai]
+binding = "AI"
+
+[[durable_objects.bindings]]
+name = "REVIEW_SERVICE"
+class_name = "ReviewService"
+
+[[migrations]]
+tag = "review-service-v1"
+new_sqlite_classes = ["ReviewService"]

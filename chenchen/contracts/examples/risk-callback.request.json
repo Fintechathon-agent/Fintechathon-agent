@@ -1,0 +1,12 @@
+{
+  "callback_version": "risk-callback.v1",
+  "handoff_id": "handoff-synthetic-example",
+  "task_id": "review-task-synthetic-example",
+  "request_id": "req-synthetic-example",
+  "run_id": "review-synthetic-example",
+  "audit_id": "audit-synthetic-example",
+  "proposal_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "decision": "REJECT",
+  "reviewer": "synthetic-risk-owner",
+  "reason": "Synthetic example: preserve rent funds. Copy real identifiers from the returned handoff."
+}

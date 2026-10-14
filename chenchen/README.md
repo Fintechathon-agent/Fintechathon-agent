@@ -1,5 +1,7 @@
 # 两版财务 Agent 演示 · v0.13.0
 
+2026-10-14 Core Agent 更新：新增 Risk 交接包、回调防串单与安全重试，工作台默认展示投资与房租冲突案例。查看 [最新联调手册](docs/risk-handoff-integration-2026-10-14.md)、[日报](docs/core-agent-daily-update-2026-10-14.md) 与 [在线工作台](https://realchenchenluo.github.io/agent/risk-workbench/)。最新部署配置是 `chenchen/wrangler.toml`，旧配置保留供回溯。
+
 本次交付是两个相互独立的产品；本地服务只负责分别提供运行入口：
 
 | 产品 | 入口 | 本次可运行内容 |
@@ -65,7 +67,7 @@ cloudflared tunnel --url http://127.0.0.1:4175
 
 ```powershell
 npx wrangler login
-npx wrangler deploy
+npx wrangler deploy --config chenchen/wrangler.toml
 ```
 
 Cloudflare 的 Worker 配置在仓库根目录的 `wrangler.toml`，入口是 `cloudflare/worker.js`。Render 配置仍保留作备用，但不需要使用 Render。当前项目仍是虚构数据演示，不应放入真实账单或账户信息。

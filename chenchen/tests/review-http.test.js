@@ -2,6 +2,7 @@
 
 const assert = require("node:assert/strict");
 const test = require("node:test");
+const { randomUUID } = require("node:crypto");
 const { server, reviewWorkflow } = require("../server");
 
 function fakeReview(input) {
@@ -14,7 +15,7 @@ function fakeReview(input) {
     evidence: ["账单金额"]
   };
   return Promise.resolve({
-    review_version: "model-review.v1", run_id: "review-http-fake-001", request_id: input.request_id, task_id: input.task_id,
+    review_version: "model-review.v1", run_id: "review-http-fake-" + randomUUID(), request_id: input.request_id, task_id: input.task_id,
     status: "PROPOSED", source: "model",
     input: { kind: input.kind, source: input.source, input_sha256: "b".repeat(64) },
     model_response: { model: "fake-model", provider_response_id: "resp-http-fake-001", raw_text: JSON.stringify(proposal), proposal, usage: { input_tokens: 1, output_tokens: 1 } },
@@ -74,4 +75,27 @@ test("HTTP model-to-Risk-to-approval-to-simulation chain is queryable", async t 
   assert.equal(legacyPayload.source_contract, "review-workflow.v1");
   assert.equal(legacyPayload.execution_state, "awaiting_risk");
   assert.equal(legacyPayload.gate.execution_allowed, false);
+  const handoffResponse = await fetch(base + "/api/review/" + legacyPayload.run_id + "/risk-handoff");
+  assert.equal(handoffResponse.status, 200);
+  const handoff = await handoffResponse.json();
+  assert.equal(handoff.handoff_version, "risk-handoff.v1");
+  const callback = {
+    callback_version: "risk-callback.v1", handoff_id: handoff.handoff_id,
+    task_id: handoff.task_id, request_id: handoff.request_id, run_id: handoff.run_id,
+    audit_id: handoff.audit_id, proposal_sha256: handoff.proposal.proposal_sha256,
+    decision: "REJECT", reviewer: "synthetic-risk-owner", reason: "Test rejection"
+  };
+  for (const expected of ["RECORDED", "DUPLICATE"]) {
+    const response = await fetch(base + "/api/review/risk-callback", { method: "POST", headers, body: JSON.stringify(callback) });
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).callback_status, expected);
+  }
+  const rejected = await fetch(base + "/api/review/task/" + handoff.task_id + "/risk-handoff").then(r => r.json());
+  assert.equal(rejected.workflow_status, "REJECTED");
+  assert.equal(rejected.execution_allowed, false);
+  const mismatch = await fetch(base + "/api/review/risk-callback", { method: "POST", headers, body: JSON.stringify({ ...callback, audit_id: "wrong" }) });
+  assert.equal(mismatch.status, 409);
+  assert.equal((await mismatch.json()).error.code, "RISK_HANDOFF_MISMATCH");
+  const unchanged = await fetch(base + "/api/review/" + created.run_id).then(r => r.json());
+  assert.equal(unchanged.status, "SIMULATED");
 });

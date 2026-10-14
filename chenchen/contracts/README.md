@@ -4,6 +4,8 @@ investment-agent.v1.schema.json 是投资 Agent、Backend 和 Risk 共用的公�
 
 ## 统一请求
 
+最新模型工作流交接（2026-10-14）：新增 [risk-handoff.v1.schema.json](risk-handoff.v1.schema.json)，覆盖交接包、回调请求、回调响应。调用顺序与 Owner 责任见 [联调手册](../docs/risk-handoff-integration-2026-10-14.md)。它面向 `review-workflow.v1`，不替换下述 `investment-agent.v1` 的旧接口。回调必须核对 handoff/task/request/run/audit/hash；原始调用材料不等于可信 Memory。
+
 POST /api/health-check/run 只能接收版本化信封：
 
 字段职责：

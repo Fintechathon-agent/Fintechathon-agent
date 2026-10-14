@@ -9,6 +9,7 @@ const contract = require("./contracts/investment-contract");
 const { buildRiskWorkbenchHandoff } = require("./integrations/risk-workbench-adapter");
 const modelReview = require("./integrations/model-review");
 const legacyReviewAdapter = require("./integrations/legacy-review-adapter");
+const riskHandoff = require("./integrations/risk-handoff");
 const { ReviewWorkflowStore, WorkflowError } = require("./integrations/review-workflow");
 const { randomUUID } = require("node:crypto");
 const { MerchantSession, demo: merchantDemo } = require("./merchant/ledger");
@@ -181,6 +182,12 @@ async function handleApi(request, response, pathname, url) {
     sendJson(response, 200, await reviewWorkflow.decideRisk(body));
     return true;
   }
+  if (method === "POST" && pathname === "/api/review/risk-callback") {
+    requireReviewApiKey(request);
+    const result = await reviewWorkflow.receiveRiskCallback(body);
+    sendJson(response, 200, { callback_version: riskHandoff.CALLBACK_VERSION, ...result, handoff: riskHandoff.buildRiskHandoffPackage(result.workflow) });
+    return true;
+  }
   if (method === "POST" && pathname === "/api/review/approval") {
     requireReviewApiKey(request);
     sendJson(response, 200, await reviewWorkflow.decideApproval(body));
@@ -193,16 +200,18 @@ async function handleApi(request, response, pathname, url) {
   }
   if (method === "GET" && pathname.startsWith("/api/review/task/")) {
     requireReviewApiKey(request);
-    const taskId = decodeURIComponent(pathname.slice("/api/review/task/".length));
+    const handoffRequested = pathname.endsWith("/risk-handoff");
+    const taskId = decodeURIComponent(pathname.slice("/api/review/task/".length, handoffRequested ? -"/risk-handoff".length : undefined));
     const result = reviewWorkflow.getByTaskId(taskId);
-    sendJson(response, result ? 200 : 404, result || { error: { code: "WORKFLOW_NOT_FOUND", message: "review task not found" } });
+    sendJson(response, result ? 200 : 404, result ? (handoffRequested ? riskHandoff.buildRiskHandoffPackage(result) : result) : { error: { code: "WORKFLOW_NOT_FOUND", message: "review task not found" } });
     return true;
   }
   if (method === "GET" && pathname.startsWith("/api/review/")) {
     requireReviewApiKey(request);
-    const runId = decodeURIComponent(pathname.slice("/api/review/".length));
+    const handoffRequested = pathname.endsWith("/risk-handoff");
+    const runId = decodeURIComponent(pathname.slice("/api/review/".length, handoffRequested ? -"/risk-handoff".length : undefined));
     const result = reviewWorkflow.getByRunId(runId) || reviewRuns.get(runId);
-    sendJson(response, result ? 200 : 404, result || { error: { code: "REVIEW_NOT_FOUND", message: "review run not found" } });
+    sendJson(response, result ? 200 : 404, result ? (handoffRequested ? riskHandoff.buildRiskHandoffPackage(result) : result) : { error: { code: "REVIEW_NOT_FOUND", message: "review run not found" } });
     return true;
   }
   if (pathname.startsWith("/api/merchant/")) {
@@ -340,6 +349,7 @@ function serveStatic(response, pathname) {
   const routes = { "/": "versions/investment.html", "/index.html": "versions/investment.html", "/catalog": "versions/home.html", "/investment": "versions/investment.html", "/investment-v0.10": "versions/investment-legacy.html", "/merchant": "versions/merchant.html", "/risk-workbench": "versions/risk-workbench.html" };
   const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
   const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html", "versions/risk-workbench.html",
+    "contracts/risk-handoff.v1.schema.json", "contracts/examples/risk-callback.request.json",
     "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/risk-workbench.js", "versions/common.js",
     "contracts/investment-agent.v1.schema.json", "contracts/model-review.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json", "contracts/examples/model-review.request.json", "contracts/examples/model-review.response.json", "contracts/examples/risk-decision.request.json", "contracts/examples/approval.request.json", "contracts/examples/simulation.request.json",
     "data/market-brief-2026-10-08.json", "data/market-brief-2026-10-09.json", "data/risk-workbench-demo.json", "index.html", "app.js", "styles.css"]);

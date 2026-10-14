@@ -1,4 +1,6 @@
-# 公网模型复核接口（2026-10-13 已上线实测）
+# 公网模型复核接口（2026-10-14 更新）
+
+最新迭代见 [Risk 联调手册](risk-handoff-integration-2026-10-14.md) 与 [10月14日日报](core-agent-daily-update-2026-10-14.md)。当前部署 `756201ce-d043-4c0c-8f22-43bdf7c4e681`；新增 `GET /api/review/{run_id}/risk-handoff`、`GET /api/review/task/{task_id}/risk-handoff`、`POST /api/review/risk-callback`。自动测试 83 项（包含云端专项 9 项）与最新公网 34 次检查通过；下文 10月13日记录保留为历史证据。
 
 服务在 Cloudflare 云端运行，不依赖个人电脑、本地端口或临时隧道。代码和验收证据已同步到个人仓库与团队仓库的 `chenchen/` 目录，保留历史提交和其他团队目录。
 
@@ -87,10 +89,10 @@ GET /api/review/task/{task_id}
 
 ## 维护部署
 
-仓库根目录 wrangler.toml 绑定 AI 和 REVIEW_SERVICE。模型通过 Cloudflare 内部绑定调用，无需另外配置模型密钥。
+当前入口为 chenchen/wrangler.toml，绑定 AI 和 REVIEW_SERVICE。根目录配置保留作历史参考；发布最新版请显式指定下方配置。模型通过 Cloudflare 内部绑定调用，无需另外配置模型密钥。
 
 ```powershell
-npx wrangler deploy
+npx wrangler deploy --config chenchen/wrangler.toml
 ```
 
 若当前终端直连 Cloudflare 超时，可在已运行本机代理时仅为当前进程设置：
@@ -98,7 +100,7 @@ npx wrangler deploy
 ```powershell
 $env:HTTPS_PROXY = 'http://127.0.0.1:7890'
 $env:HTTP_PROXY = 'http://127.0.0.1:7890'
-npx wrangler deploy
+npx wrangler deploy --config chenchen/wrangler.toml
 ```
 
 其他环境仍可使用原 HTTP 模型接入配置。若以后设置 CORE_AGENT_API_KEY Secret，调用方必须带 X-Core-Agent-Key；测试页有可选输入，当前无需填写。原有 /api/health-check/run 和 /api/risk-workbench/handoff 保留 investment-agent.v1 契约。远程风控工作台网页目前没有公开的 Handoff 接收 API，因此本服务已生成可核查的 Risk Handoff，但没有伪造“已写入远程工作台”。
