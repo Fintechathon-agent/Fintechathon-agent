@@ -1,0 +1,28 @@
+{
+  "checked_at": "2026-10-15",
+  "page_url": "https://realchenchenluo.github.io/agent/risk-workbench/?v=funding-20261015-1",
+  "pages_run": "https://github.com/realchenchenluo/agent/actions/runs/38602089383",
+  "asset_version": "funding-20261015-1",
+  "task_id": "review-task-a5f87cd9-a609-44a2-906c-816f57785eec",
+  "after_refresh": {
+    "task_history_visible": true,
+    "task_status": "PENDING_RISK",
+    "task_can_be_opened": true
+  },
+  "restored_view": {
+    "funding_plan_revision": 1,
+    "protected_minor": 400000,
+    "allocated_minor": 400000,
+    "available_minor": 200000,
+    "workflow_status": "FUNDING_BLOCKED",
+    "funding_code": "FUNDING_CONFLICT",
+    "risk_actions_visible": true,
+    "cancel_action_visible": true
+  },
+  "mobile_verification": {
+    "viewport_width": 390,
+    "document_width": 375,
+    "details_default_collapsed": true
+  },
+  "limitations": "Local browser storage tracks synthetic task IDs only; no cross-device or real-user task list."
+}

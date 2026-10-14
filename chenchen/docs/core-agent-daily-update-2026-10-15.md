@@ -38,3 +38,10 @@
 - 初始 `PENDING_RISK`，用户取消后 `CANCELLED`；重复取消 HTTP 409。
 - 最终 `execution_allowed=false`，共 11 个审计事件；Risk Handoff 包含取消原因。
 - [公网取消响应](public-cancel-verification-2026-10-15.json) · [记事本记录](../logs/Core-Agent-取消公网验证-2026-10-15.txt) · [复现脚本](../scripts/verify-public-cancellation.ps1)。
+
+## 6. 网页找回任务核验
+
+- [最新版网页](https://realchenchenluo.github.io/agent/risk-workbench/?v=funding-20261015-1) 发布成功，页面资源使用 funding-20261015-1。
+- 实际创建任务 `review-task-a5f87cd9-a609-44a2-906c-816f57785eec` 后刷新页面，展开“找回最近的任务”并点击“查看”，任务状态、资金冲突和 Risk 操作恢复显示。
+- 390px视口仍保持内容宽375px；任务找回记录只使用浏览器本地的虚构 task_id，不代表真实用户跨设备任务中心。
+- [网页验收证据](public-workbench-iteration-2026-10-15.json) · [Pages发布记录](https://github.com/realchenchenluo/agent/actions/runs/38602089383)。
