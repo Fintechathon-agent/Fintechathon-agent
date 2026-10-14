@@ -51,6 +51,7 @@ function executionState(record) {
     READY_FOR_SIMULATION: "ready_for_simulation",
     SIMULATED: "simulated",
     FUNDING_BLOCKED: "blocked",
+    CANCELLED: "cancelled",
     REJECTED: "rejected",
     MODEL_FAILED: "blocked"
   }[record.status] || "blocked";

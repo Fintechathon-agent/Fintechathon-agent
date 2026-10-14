@@ -8,7 +8,8 @@
     { "$ref": "#/$defs/WorkflowRecord" },
     { "$ref": "#/$defs/RiskDecisionRequest" },
     { "$ref": "#/$defs/ApprovalRequest" },
-    { "$ref": "#/$defs/SimulationRequest" }
+    { "$ref": "#/$defs/SimulationRequest" },
+    { "$ref": "#/$defs/CancellationRequest" }
   ],
   "$defs": {
     "ReviewRequest": {
@@ -35,7 +36,7 @@
         "task_id": { "type": "string" },
         "request_id": { "type": "string" },
         "run_id": { "type": "string" },
-        "status": { "type": "string", "enum": ["PENDING_RISK", "PENDING_APPROVAL", "READY_FOR_SIMULATION", "SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED"] },
+        "status": { "type": "string", "enum": ["PENDING_RISK", "PENDING_APPROVAL", "READY_FOR_SIMULATION", "SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"] },
         "model": { "type": "object" },
         "proposed_action": { "anyOf": [{ "$ref": "#/$defs/ProposedAction" }, { "type": "null" }] },
         "risk_handoff": { "$ref": "#/$defs/RiskHandoff" },
@@ -145,6 +146,17 @@
       "properties": {
         "task_id": { "type": "string" },
         "proposal_sha256": { "type": "string" }
+      }
+    },
+    "CancellationRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "proposal_sha256", "canceler", "reason"],
+      "properties": {
+        "task_id": { "type": "string" },
+        "proposal_sha256": { "type": "string" },
+        "canceler": { "type": "string" },
+        "reason": { "type": "string" }
       }
     }
   }

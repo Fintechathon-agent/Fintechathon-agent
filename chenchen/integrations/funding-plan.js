@@ -6,6 +6,10 @@ const VERSION = "funding-plan-demo.v1";
 const MAX_MINOR = 1000000000000;
 const copy = value => structuredClone(value);
 const timestamp = () => new Date().toISOString();
+const normalizedPurposes = purposes => purposes.map(item => ({ purpose_id: item.purpose_id, label: item.label, amount_minor: item.amount_minor }))
+  .sort((a, b) => a.purpose_id.localeCompare(b.purpose_id));
+const sameSnapshot = (plan, input) => plan.cash_minor === input.cash_minor &&
+  JSON.stringify(normalizedPurposes(plan.protected_purposes)) === JSON.stringify(normalizedPurposes(input.protected_purposes));
 
 function fail(code, message, details = null, statusCode = 409) {
   throw new ReviewError(code, message, { statusCode, stage: "FUNDING_GUARD", details,
@@ -58,6 +62,7 @@ class FundingPlanStore {
     validatePlan(input, true);
     const plan = this.require(input.plan_id);
     if (!Number.isSafeInteger(input.expected_revision) || input.expected_revision !== plan.revision) fail("FUNDING_PLAN_CHANGED", "资金计划已更新，请重新读取后确认。", { current_revision: plan.revision });
+    if (sameSnapshot(plan, input)) return this.summary(plan);
     if (plan.revisions.length >= 100) fail("FUNDING_DEMO_LIMIT", "当前演示计划已达到100次确认上限。请创建新的虚构计划。");
     plan.revision++;
     plan.cash_minor = input.cash_minor;

@@ -250,7 +250,8 @@ export class ReviewService {
         const method = {
           "/api/review/risk-decision": "decideRisk",
           "/api/review/approval": "decideApproval",
-          "/api/review/simulate": "simulate"
+          "/api/review/simulate": "simulate",
+          "/api/review/cancel": "cancel"
         }[url.pathname];
         if (!method) return json(request, env, 404, { error: { code: "NOT_FOUND" } });
         result = await workflow[method](body);
@@ -306,7 +307,7 @@ export default {
     const isReviewRead = request.method === "GET" && (url.pathname.startsWith("/api/review/") || url.pathname.startsWith("/api/funding-demo/plan/"));
     const isKnownPost = request.method === "POST" && [
       "/api/health-check/run", "/api/risk-workbench/handoff", "/api/review", "/api/review/legacy",
-      "/api/review/risk-decision", "/api/review/risk-callback", "/api/review/approval", "/api/review/simulate",
+      "/api/review/risk-decision", "/api/review/risk-callback", "/api/review/approval", "/api/review/simulate", "/api/review/cancel",
       "/api/funding-demo/plan", "/api/funding-demo/plan/revise"
     ].includes(url.pathname);
     if (!isKnownPost && !isReviewRead) {

@@ -335,7 +335,7 @@ class ReviewWorkflowStore {
     const decision = decisionValue(input.decision, RISK_DECISIONS, "decision");
     const reviewer = requiredString(input.reviewer, "reviewer");
     this.checkInput(record, input, ["task_id", "proposal_sha256", "decision", "reviewer", "reason"], "RISK");
-    if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED"].includes(record.status)) {
+    if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
       this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot receive another Risk decision", "RISK", "Create a new task for a new proposal.");
     }
     if (record.risk_decision?.decision) {
@@ -385,7 +385,7 @@ class ReviewWorkflowStore {
     const decision = decisionValue(input.decision, APPROVAL_DECISIONS, "decision");
     const approver = requiredString(input.approver, "approver");
     this.checkInput(record, input, ["task_id", "proposal_sha256", "decision", "approver", "reason"], "APPROVAL");
-    if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED"].includes(record.status)) {
+    if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
       this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot receive another approval", "APPROVAL", "Create a new task for a new proposal.");
     }
     if (record.risk_decision?.decision !== "APPROVE" || record.risk_decision.status !== "APPROVED") {
@@ -473,6 +473,30 @@ class ReviewWorkflowStore {
     };
     record.status = "SIMULATED";
     event(record, "execution.simulated", { execution_id: executionId, side_effects: false }, "execution-gateway");
+    return this.save(record);
+  }
+
+  async cancel(input = {}) {
+    const taskId = requiredString(input.task_id, "task_id");
+    const record = this.requireRecord(taskId);
+    if (!record.proposed_action) throw new WorkflowError("CANCELLATION_BLOCKED", "没有可取消的模型任务", { stage: "CANCELLATION", record });
+    const canceler = requiredString(input.canceler, "canceler");
+    const reason = requiredString(input.reason, "reason");
+    this.checkInput(record, input, ["task_id", "proposal_sha256", "canceler", "reason"], "CANCELLATION");
+    if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
+      this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot be cancelled again", "CANCELLATION", "Read the existing record. Create a new task if needed.");
+    }
+    record.status = "CANCELLED";
+    record.approval.status = "BLOCKED";
+    record.execution.status = "BLOCKED";
+    record.execution.simulation_allowed = false;
+    record.execution.execution_allowed = false;
+    record.risk_handoff.status = "BLOCKED";
+    record.risk_handoff.decision = "CANCELLED";
+    record.risk_handoff.execution_allowed = false;
+    record.cancellation = { canceler, reason, cancelled_at: now(), proposal_sha256: record.proposed_action.proposal_sha256 };
+    event(record, "task.cancelled", { canceler, reason, execution_allowed: false }, "user");
+    event(record, "execution.blocked", { reason: "task_cancelled" }, "execution-gateway");
     return this.save(record);
   }
 

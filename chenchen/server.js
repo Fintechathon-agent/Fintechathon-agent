@@ -208,6 +208,11 @@ async function handleApi(request, response, pathname, url) {
     sendJson(response, 200, await reviewWorkflow.simulate(body));
     return true;
   }
+  if (method === "POST" && pathname === "/api/review/cancel") {
+    requireReviewApiKey(request);
+    sendJson(response, 200, await reviewWorkflow.cancel(body));
+    return true;
+  }
   if (method === "GET" && pathname.startsWith("/api/review/task/")) {
     requireReviewApiKey(request);
     const handoffRequested = pathname.endsWith("/risk-handoff");

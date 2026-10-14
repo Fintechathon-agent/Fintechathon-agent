@@ -119,7 +119,7 @@ test("HTTP model-to-Risk-to-approval-to-simulation chain is queryable", async t 
     const revision = await post("/api/funding-demo/plan/revise", { ...definition, plan_id: plan.plan_id, expected_revision: 1 });
     assert.equal(revision.status, 200);
     const reloaded = await fetch(base + "/api/funding-demo/plan/" + plan.plan_id).then(r => r.json());
-    assert.equal(reloaded.revision, 2);
+    assert.equal(reloaded.revision, 1);
     assert.equal(reloaded.allocations.length, 0);
   });
 });

@@ -15,11 +15,9 @@ function workflowUrl(path) {
 }
 
 async function workflowRequest(path, body) {
-  const response = await fetch(workflowUrl(path), {
-    method: body === undefined ? "GET" : "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
+  const options = { method: body === undefined ? "GET" : "POST", headers: { "Content-Type": "application/json" } };
+  if (body !== undefined) options.body = JSON.stringify(body);
+  const response = await fetch(workflowUrl(path), options);
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(data.error?.message || "模型工作流请求失败");
@@ -115,6 +113,26 @@ let fundingPlan = null;
 let fundingDirty = true;
 const money = minor => new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY", maximumFractionDigits: 2 }).format(minor / 100);
 const fundingStorageKey = "core-agent-synthetic-plan-v1";
+const taskStorageKey = "core-agent-synthetic-tasks-v1";
+const readTrackedTasks = () => { try { return JSON.parse(localStorage.getItem(taskStorageKey) || "[]").filter(value => typeof value === "string").slice(0, 8); } catch { return []; } };
+const trackTask = taskId => { try { localStorage.setItem(taskStorageKey, JSON.stringify([taskId, ...readTrackedTasks().filter(id => id !== taskId)].slice(0, 8))); } catch { /* Optional browser convenience only. */ } };
+const taskStatus = status => ({ PENDING_RISK: "等待 Risk", PENDING_APPROVAL: "等待审批", READY_FOR_SIMULATION: "可模拟", SIMULATED: "已模拟", FUNDING_BLOCKED: "资金冲突", CANCELLED: "已取消", REJECTED: "已拒绝", MODEL_FAILED: "模型失败" }[status] || status);
+
+function renderTaskHistory(records = []) {
+  const box = $("#task-history");
+  const list = $("#task-history-list");
+  if (!records.length) { box.hidden = true; return; }
+  box.hidden = false;
+  list.innerHTML = records.map(record => '<div class="task-history-row"><span><strong>' + esc(taskStatus(record.status)) + '</strong><small>' + esc(record.task_id) + '</small></span><button type="button" class="secondary" data-restore-task="' + esc(record.task_id) + '">查看</button></div>').join("");
+}
+
+async function loadTrackedTasks() {
+  const records = [];
+  for (const taskId of readTrackedTasks()) {
+    try { records.push(await workflowRequest("/api/review/task/" + encodeURIComponent(taskId))); } catch { /* Keep stale ids out of the list. */ }
+  }
+  renderTaskHistory(records);
+}
 
 function renderFunding() {
   $("#funding-status").textContent = fundingDirty ? "待确认" : "已确认 · 版本 " + fundingPlan.revision;
@@ -225,6 +243,8 @@ function workflowStatusLabel(status) {
 
 function renderWorkflow(record) {
   workflowRecord = record;
+  trackTask(record.task_id);
+  void loadTrackedTasks();
   $("#workflow-result").hidden = false;
   const check = record.funding_check;
   const changed = Boolean(fundingPlan && record.proposed_action?.funding?.plan_id === fundingPlan.plan_id && record.proposed_action.funding.revision !== fundingPlan.revision && record.status !== "SIMULATED");
@@ -259,6 +279,7 @@ function renderWorkflow(record) {
   } else if (record.status === "READY_FOR_SIMULATION" && record.execution.simulation_allowed && !fundingBlocked) {
     actions.push(['simulate', '执行模拟', '']);
   }
+  if (!["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) actions.push(['cancel', '取消这项任务', 'danger']);
   $("#workflow-actions").innerHTML = actions.length
     ? actions.map(([action, label, tone]) => '<button type="button" data-workflow-action="'+action+'" class="'+tone+'">'+label+' →</button>').join("")
     : '<span class="small muted">' + (record.risk_decision?.decision === "REQUEST_MORE_INFO" ? '请在上方补充材料，再发起新任务；原任务保持阻断。' : '当前阶段没有可继续的动作；完整记录已保留。') + '</span>';
@@ -317,6 +338,7 @@ $("#workflow-actions").addEventListener("click", async (event) => {
       next = callback.workflow;
     }
     else if (action.startsWith("approval-")) next = await workflowRequest("/api/review/approval", { ...base, approver: "demo-approver", decision: action === "approval-approve" ? "APPROVE" : "REJECT", reason: "演示环境记录的人工审批" });
+    else if (action === "cancel") next = await workflowRequest("/api/review/cancel", { ...base, canceler: "demo-user", reason: "演示用户主动停止后续处理" });
     else next = await workflowRequest("/api/review/simulate", base);
     $("#workflow-message").textContent = "状态已更新；执行端仍只允许模拟，不连接真实系统。";
     renderWorkflow(next);
@@ -328,3 +350,27 @@ $("#workflow-actions").addEventListener("click", async (event) => {
     button.disabled = false;
   }
 });
+
+$("#task-history-list").addEventListener("click", async event => {
+  const button = event.target.closest("[data-restore-task]");
+  if (!button) return;
+  button.disabled = true;
+  try {
+    const record = await workflowRequest("/api/review/task/" + encodeURIComponent(button.dataset.restoreTask));
+    const planId = record.proposed_action?.funding?.plan_id;
+    if (planId) {
+      fundingPlan = await workflowRequest("/api/funding-demo/plan/" + encodeURIComponent(planId));
+      $("#funding-cash").value = fundingPlan.cash_minor / 100;
+      $("#funding-rent").value = (fundingPlan.protected_purposes.find(item => item.purpose_id === "rent")?.amount_minor || 0) / 100;
+      fundingDirty = true;
+      $("#funding-confirm").checked = false;
+      $("#funding-message").textContent = "已找回任务；请先核对当前资金安排，再决定是否发起新任务。";
+      renderFunding();
+    }
+    renderWorkflow(record);
+    $("#workflow-result").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (error) { $("#funding-message").textContent = error.message; }
+  finally { button.disabled = false; }
+});
+
+void loadTrackedTasks();

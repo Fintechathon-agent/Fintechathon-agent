@@ -1,0 +1,23 @@
+Core Agent 取消任务公网验收 · 2026-10-15
+
+说明：金额、文本、Risk身份均为虚构演示；模型为公网真实调用；未触发真实付款或交易。
+部署版本：c2580383-d2c2-4d7f-9266-bc0a5653426a
+检查时间（UTC原始记录）：2026-10-14T16:50:01.1392538Z
+公网地址：https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev
+
+流程：创建虚构资金计划 → 真实模型生成 PENDING_RISK → POST /api/review/cancel → 查询任务和 Risk Handoff → 重复取消。
+
+结果：
+- 初始状态：PENDING_RISK
+- 取消后：CANCELLED
+- 重复取消：HTTP 409
+- 最终状态：CANCELLED
+- execution_allowed：false
+- 审计事件数：11
+- task_id：review-task-49e241ef-73dc-4598-ae0c-221e23878813
+- run_id：review-d3f39730-8b61-4289-8334-85d2050e19b8
+- audit_id：audit-7259b235-ce2f-4c38-b6c0-787514b0af3b
+- 模型响应编号：chatcmpl-7d2d1887-c5d9-4f52-aea2-34f56da99ecc
+- cancellation.reason：停止本次演示
+
+结论：取消会保留记录并阻断后续执行；不能把同一任务再改回 Risk 审批流程。若要继续，必须新建任务。

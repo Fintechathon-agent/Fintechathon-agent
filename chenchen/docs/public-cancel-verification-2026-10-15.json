@@ -1,0 +1,21 @@
+{
+  "checked_at": "2026-10-14T16:50:01.1392538Z",
+  "deployment": "c2580383-d2c2-4d7f-9266-bc0a5653426a",
+  "plan_id": "funding-demo-55860d7a-bd92-4e4d-8b12-a7e49bd8dcab",
+  "task_id": "review-task-49e241ef-73dc-4598-ae0c-221e23878813",
+  "run_id": "review-d3f39730-8b61-4289-8334-85d2050e19b8",
+  "audit_id": "audit-7259b235-ce2f-4c38-b6c0-787514b0af3b",
+  "model_response_id": "chatcmpl-7d2d1887-c5d9-4f52-aea2-34f56da99ecc",
+  "initial_status": "PENDING_RISK",
+  "cancel_status": "CANCELLED",
+  "repeat_http": 409,
+  "final_status": "CANCELLED",
+  "execution_allowed": false,
+  "audit_events": 11,
+  "handoff_cancellation": {
+    "canceler": "synthetic-user",
+    "reason": "停止本次演示",
+    "cancelled_at": "2026-10-14T16:49:57.195Z",
+    "proposal_sha256": "c313bcbe1551b8ff3be5af70411dcfbac7369990e947e1cea2a796e74bf924e4"
+  }
+}

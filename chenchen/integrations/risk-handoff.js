@@ -29,6 +29,7 @@ function buildRiskHandoffPackage(record) {
     execution_allowed: false,
     proposal: record.proposed_action,
     ...(record.funding_check ? { funding_check: record.funding_check } : {}),
+    ...(record.cancellation ? { cancellation: record.cancellation } : {}),
     reviewed_input: record.reviewed_input || null,
     input_authority: "UNVERIFIED_CALLER_INPUT",
     model: {

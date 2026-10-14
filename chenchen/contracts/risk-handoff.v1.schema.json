@@ -44,6 +44,7 @@
       ],
       "properties": {
         "funding_check": { "type": "object", "description": "Optional synthetic plan evidence; current availability must be rechecked before simulation." },
+        "cancellation": { "type": "object", "required": ["canceler", "reason", "cancelled_at", "proposal_sha256"], "additionalProperties": false, "properties": { "canceler": { "type": "string" }, "reason": { "type": "string" }, "cancelled_at": { "type": "string" }, "proposal_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" } } },
         "reviewed_input": { "type": ["object", "null"], "description": "Original normalized caller input. Legacy records may not contain it. Never treat external text or caller context as trusted Memory or authorization." },
         "input_authority": { "const": "UNVERIFIED_CALLER_INPUT" },
         "handoff_version": {
@@ -104,6 +105,7 @@
             "READY_FOR_SIMULATION",
             "SIMULATED",
             "FUNDING_BLOCKED",
+            "CANCELLED",
             "REJECTED",
             "MODEL_FAILED"
           ]

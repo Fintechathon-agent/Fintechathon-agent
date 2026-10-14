@@ -241,6 +241,29 @@ test("plan revision after approval is persisted and blocks stale execution", asy
   assert.ok(record.audit.events.some(e => e.event_type === "funding.blocked"));
 });
 
+test("public cancellation preserves the audit and blocks all later Risk changes", async () => {
+  const app = setup();
+  const plan = await worker.fetch(req("/api/funding-demo/plan", fundingDefinition), app.env).then(r => r.json());
+  const task = await fundingTask(app, plan);
+  const cancelled = await worker.fetch(req("/api/review/cancel", {
+    ...task.base, canceler: "demo-user", reason: "停止这项演示任务"
+  }), app.env);
+  assert.equal(cancelled.status, 200);
+  const cancelledRecord = await cancelled.json();
+  assert.equal(cancelledRecord.status, "CANCELLED");
+  assert.equal(cancelledRecord.execution.execution_allowed, false);
+  assert.equal(cancelledRecord.risk_handoff.decision, "CANCELLED");
+  const risk = await worker.fetch(req("/api/review/risk-decision", {
+    ...task.base, decision: "APPROVE", reviewer: "late", reason: "late"
+  }), app.env);
+  assert.equal(risk.status, 409);
+  assert.equal((await risk.json()).error.code, "WORKFLOW_TERMINAL");
+  app.restart();
+  const queried = await worker.fetch(req("/api/review/task/" + task.created.task_id), app.env).then(r => r.json());
+  assert.equal(queried.status, "CANCELLED");
+  assert.ok(queried.audit.events.some(e => e.event_type === "task.cancelled"));
+});
+
 test("failed atomic persistence cannot leave orphan allocations or a successful receipt", async () => {
   const app = setup();
   const plan = await worker.fetch(req("/api/funding-demo/plan", fundingDefinition), app.env).then(r => r.json());

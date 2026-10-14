@@ -109,3 +109,21 @@ test("revising a plan preserves previous allocations and exposes any resulting d
   assert.equal(revised.deficit_minor, 100000);
   assert.equal(plans.check(plans.bind(params(revised, 1))).code, "FUNDING_CONFLICT");
 });
+
+test("reconfirming the same purposes keeps the revision and cancellation is terminal", async () => {
+  const plans = new FundingPlanStore();
+  const plan = plans.create(definition);
+  const same = plans.revise({ ...definition, plan_id: plan.plan_id, expected_revision: 1,
+    protected_purposes: [{ purpose_id: "rent", label: "房租", amount_minor: 400000 }] });
+  assert.equal(same.revision, 1);
+  const store = workflow(plans);
+  const created = await store.start({ text: "synthetic", action_parameters: params(same) });
+  const base = { task_id: created.task_id, proposal_sha256: created.proposed_action.proposal_sha256 };
+  const cancelled = await store.cancel({ ...base, canceler: "demo-user", reason: "不再继续这项演示任务" });
+  assert.equal(cancelled.status, "CANCELLED");
+  assert.equal(cancelled.execution.execution_allowed, false);
+  assert.equal(cancelled.risk_handoff.decision, "CANCELLED");
+  assert.ok(cancelled.audit.events.some(item => item.event_type === "task.cancelled"));
+  await assert.rejects(store.decideRisk({ ...base, decision: "APPROVE", reviewer: "demo-risk", reason: "late" }), e => e.code === "WORKFLOW_TERMINAL");
+  await assert.rejects(store.cancel({ ...base, canceler: "demo-user", reason: "retry" }), e => e.code === "WORKFLOW_TERMINAL");
+});
