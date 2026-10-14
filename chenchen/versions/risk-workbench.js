@@ -273,6 +273,9 @@ $("#run-workflow").addEventListener("click", async () => {
     if (!fundingPlan || fundingDirty) throw new Error("请先确认上方的虚构资金安排。");
     const amountInput = $("#workflow-amount");
     if (!amountInput.reportValidity() || !amountInput.value) throw new Error("请填写有效的拟议金额。");
+    workflowRecord = null;
+    $("#workflow-result").hidden = true;
+    $("#workflow-status").textContent = "正在分析";
     const result = await workflowRequest("/api/review", {
       request_id: "req-workbench-" + (globalThis.crypto?.randomUUID?.() || Date.now()),
       kind: "bill",

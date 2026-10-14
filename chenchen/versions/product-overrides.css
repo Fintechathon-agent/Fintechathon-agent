@@ -249,6 +249,8 @@ dialog dl{font-size:13px}
 .funding-confirm{display:flex;align-items:center;gap:9px;font-size:13px;margin:12px 0}.funding-confirm input{width:18px;height:18px;accent-color:var(--green)}
 .funding-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}.funding-metrics article{padding:14px;border:1px solid var(--line);border-radius:12px;min-width:0}.funding-metrics small{display:block;color:var(--muted);font-size:12px}.funding-metrics strong{display:block;font:750 clamp(16px,3vw,27px)/1.4 system-ui;overflow-wrap:anywhere}.funding-metrics article:last-child{background:var(--pale);color:var(--green)}
 .funding-verdict{padding:18px;border:1px solid var(--green);border-radius:13px;background:var(--pale)}.funding-verdict.is-blocked{border-color:var(--amber);background:#fff8eb}.funding-verdict h3{margin:0 0 7px;font-size:20px}.funding-verdict p{margin:0;font-size:13px;line-height:1.7}
+.workflow-inputs textarea{min-height:84px;resize:vertical}
+@media(max-width:520px){.funding-metrics{grid-template-columns:1fr 1fr}.funding-metrics article:last-child{grid-column:1/-1}.funding-metrics strong{font-size:20px;white-space:nowrap}}
 @media(max-width:800px){.bridge-flow{grid-template-columns:1fr}.bridge-flow i{transform:rotate(90deg);height:18px}.bridge-metrics,.bridge-evidence{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.bridge-metrics,.bridge-evidence{grid-template-columns:1fr}.bridge-evidence b{max-width:62%}}
 @media(max-width:800px){.workflow-inputs,.workflow-metrics{grid-template-columns:1fr 1fr}}

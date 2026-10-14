@@ -1,0 +1,52 @@
+{
+  "checked_at": "2026-10-14T08:02:40.7243760Z",
+  "task_id": "review-task-5e16901d-94a7-4371-82e8-b321058fa5b7",
+  "status": "SIMULATED",
+  "run_id": "review-8959ae34-292f-436d-889b-88eec3563bb9",
+  "audit_id": "audit-42050bcf-b3d7-4552-9558-6e273f47420a",
+  "provider_response_id": "chatcmpl-53e59369-5255-4d02-8d94-dae3df3e9134",
+  "execution": {
+    "execution_id": "sim-exec-e50b560a-c782-409b-9944-647880b027fe",
+    "task_id": "review-task-5e16901d-94a7-4371-82e8-b321058fa5b7",
+    "status": "SIMULATED",
+    "simulation_allowed": false,
+    "execution_allowed": false,
+    "receipt": {
+      "mode": "SIMULATED",
+      "execution_id": "sim-exec-e50b560a-c782-409b-9944-647880b027fe",
+      "task_id": "review-task-5e16901d-94a7-4371-82e8-b321058fa5b7",
+      "proposal_sha256": "febc7cca5c7affccf5e33af6e2864af5b00078a9fcdb3fde317de63424ab7668",
+      "side_effects": false,
+      "funding_allocation": {
+        "allocation_id": "allocation-618c2558-e104-4a95-8875-3483fd86b0e7",
+        "task_id": "review-task-5e16901d-94a7-4371-82e8-b321058fa5b7",
+        "proposal_sha256": "febc7cca5c7affccf5e33af6e2864af5b00078a9fcdb3fde317de63424ab7668",
+        "execution_id": "sim-exec-e50b560a-c782-409b-9944-647880b027fe",
+        "revision": 1,
+        "amount_minor": 400000,
+        "created_at": "2026-10-14T08:01:12.2Z",
+        "mode": "SIMULATED",
+        "side_effects": false
+      },
+      "message": "模拟执行完成；未调用真实交易、付款或账户网关。",
+      "completed_at": "2026-10-14T08:01:12.2Z"
+    }
+  },
+  "plan_id": "funding-demo-34386ea1-6ee1-4a4a-9a50-6b0d7f06e1c4",
+  "protected_minor": 400000,
+  "allocated_minor": 400000,
+  "available_minor": 200000,
+  "page_url": "https://realchenchenluo.github.io/agent/risk-workbench/",
+  "source": "Browser interaction, followed by independent backend GET verification",
+  "synthetic": true,
+  "risk_and_approval": "demo buttons; not authenticated external owners",
+  "conflict_task": "review-task-a98d2559-29b7-4c17-9813-19dc4afedb0a",
+  "conflict_result": "8000 requested / 6000 available; conflict displayed; no simulation",
+  "unconfirmed_guard": "UI refuses to start a task before confirmation",
+  "initial_mobile_check": {
+    "viewport_width": 390,
+    "document_width": 375,
+    "details_default_collapsed": true,
+    "note": "Initial check found currency wrapping; responsive layout adjusted in follow-up code."
+  }
+}
