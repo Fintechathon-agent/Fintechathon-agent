@@ -1,3 +1,4 @@
+import { responseError } from "./workspace-model.mjs";
 export const $ = (s) => document.querySelector(s);
 export const esc = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 export const money = cents => new Intl.NumberFormat("zh-CN", { style:"currency", currency:"CNY" }).format(cents / 100);
@@ -7,7 +8,8 @@ export const tip = (label, id, copy) => '<span class="term-label">'+esc(label)+'
 export async function api(path, body) {
   const response = await fetch(path, body === undefined ? {} : { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error?.message || "请求失败");
+  const error = responseError(data, response.ok);
+  if (error) throw error;
   return data;
 }
 export function healthCheckRequest({ riskProfile, portfolio, taskId = null, sessionId = null }) {

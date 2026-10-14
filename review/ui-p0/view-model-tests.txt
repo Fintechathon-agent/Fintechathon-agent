@@ -1,0 +1,19 @@
+✔ HTTP 200 business errors cannot become success (0.6995ms)
+✔ Core response retains identity and stops at read-only Risk (25.0283ms)
+✔ cross-task responses and malformed analysis are rejected (43.418ms)
+✔ approval alone does not claim execution (0.1079ms)
+✔ success without a bound receipt remains UNKNOWN (0.097ms)
+✔ simulation receipt explicitly says no ledger change (0.1833ms)
+✔ UNKNOWN requires reconciliation, never blind retry (0.0796ms)
+✔ transport success cannot prove LIVE provenance (0.0899ms)
+✔ audit events must belong to the selected task (0.5888ms)
+✔ waiting input is not waiting approval (12.0266ms)
+✔ unrecognized task status remains UNKNOWN (10.7521ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 285.726
