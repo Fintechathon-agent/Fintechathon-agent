@@ -28,6 +28,7 @@ function buildRiskHandoffPackage(record) {
     owner: record.risk_handoff.owner,
     execution_allowed: false,
     proposal: record.proposed_action,
+    ...(record.funding_check ? { funding_check: record.funding_check } : {}),
     reviewed_input: record.reviewed_input || null,
     input_authority: "UNVERIFIED_CALLER_INPUT",
     model: {

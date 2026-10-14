@@ -17,13 +17,13 @@ function setup() {
     async put(entries) { for (const [key, value] of Object.entries(entries)) records.set(key, structuredClone(value)); }
   };
   const env = {
-    MODEL_PROVIDER: "workers_ai", MODEL_DISABLE_RULE_FALLBACK: "true", CORS_ORIGINS: "*",
+    MODEL_PROVIDER: "workers_ai", MODEL_DISABLE_RULE_FALLBACK: "true", CORS_ORIGINS: "*", RATE_LIMIT_PER_MINUTE: "0",
     AI: { run: async () => ({ response: proposal, usage: { prompt_tokens: 60, completion_tokens: 90 } }) }
   };
   const create = () => new ReviewService({ storage }, env);
   let service = create();
   env.REVIEW_SERVICE = { idFromName: name => name, get: () => service };
-  return { env, restart() { service = create(); } };
+  return { env, storage, restart() { service = create(); } };
 }
 function req(path, body) {
   return new Request("https://test.example" + path, body === undefined ? {} : {
@@ -185,4 +185,81 @@ test("handoff reads and callbacks use the same configured API authentication", a
     request.headers.set("X-Core-Agent-Key", "test-only-key");
     assert.notEqual((await worker.fetch(request, app.env)).status, 401);
   }
+});
+
+const fundingDefinition = { confirmed: true, synthetic: true, currency: "CNY", cash_minor: 1000000,
+  protected_purposes: [{ purpose_id: "rent", label: "房租", amount_minor: 400000 }] };
+async function fundingTask(app, plan, amount = 4000) {
+  const response = await worker.fetch(req("/api/review", { text: "Synthetic investment conflicts with rent", action_parameters: {
+    amount, currency: "CNY", synthetic: true, funding_plan_id: plan.plan_id, funding_plan_revision: plan.revision
+  } }), app.env);
+  assert.equal(response.status, 200);
+  const created = await response.json();
+  const base = { task_id: created.task_id, proposal_sha256: created.proposed_action.proposal_sha256 };
+  const callback = await worker.fetch(req("/api/review/risk-callback", { ...base,
+    callback_version: "risk-callback.v1", handoff_id: created.risk_handoff.handoff_id,
+    request_id: created.request_id, run_id: created.run_id, audit_id: created.audit.audit_id,
+    decision: "APPROVE", reviewer: "demo-risk", reason: "Synthetic guard test"
+  }), app.env);
+  assert.equal(callback.status, 200);
+  const approved = await worker.fetch(req("/api/review/approval", { ...base, decision: "APPROVE", approver: "demo-user", reason: "Synthetic guard test" }), app.env);
+  assert.equal(approved.status, 200);
+  return { created, base };
+}
+
+test("public funding ledger serializes concurrent tasks and survives restart with matching receipts", async () => {
+  const app = setup();
+  const plan = await worker.fetch(req("/api/funding-demo/plan", fundingDefinition), app.env).then(r => r.json());
+  const a = await fundingTask(app, plan), b = await fundingTask(app, plan);
+  app.restart();
+  const responses = await Promise.all([a, b].map(({ base }) => worker.fetch(req("/api/review/simulate", base), app.env)));
+  assert.deepEqual(responses.map(r => r.status), [200, 409]);
+  const result = await responses[0].json();
+  assert.equal((await responses[1].json()).error.code, "FUNDING_CONFLICT");
+  app.restart();
+  const ledger = await worker.fetch(req("/api/funding-demo/plan/" + plan.plan_id), app.env).then(r => r.json());
+  assert.equal(ledger.available_minor, 200000);
+  assert.equal(ledger.allocations.length, 1);
+  assert.equal(ledger.allocations[0].execution_id, result.execution.execution_id);
+  const repeat = await worker.fetch(req("/api/review/simulate", a.base), app.env).then(r => r.json());
+  assert.deepEqual(repeat.execution.receipt, result.execution.receipt);
+});
+
+test("plan revision after approval is persisted and blocks stale execution", async () => {
+  const app = setup();
+  const plan = await worker.fetch(req("/api/funding-demo/plan", fundingDefinition), app.env).then(r => r.json());
+  const task = await fundingTask(app, plan);
+  const revised = await worker.fetch(req("/api/funding-demo/plan/revise", { ...fundingDefinition, plan_id: plan.plan_id, expected_revision: 1, cash_minor: 1100000 }), app.env);
+  assert.equal(revised.status, 200);
+  app.restart();
+  const simulated = await worker.fetch(req("/api/review/simulate", task.base), app.env);
+  assert.equal(simulated.status, 409);
+  assert.equal((await simulated.json()).error.code, "FUNDING_PLAN_CHANGED");
+  const record = await worker.fetch(req("/api/review/task/" + task.created.task_id), app.env).then(r => r.json());
+  assert.equal(record.execution.simulation_allowed, false);
+  assert.equal(record.status, "FUNDING_BLOCKED");
+  assert.ok(record.audit.events.some(e => e.event_type === "funding.blocked"));
+});
+
+test("failed atomic persistence cannot leave orphan allocations or a successful receipt", async () => {
+  const app = setup();
+  const plan = await worker.fetch(req("/api/funding-demo/plan", fundingDefinition), app.env).then(r => r.json());
+  const task = await fundingTask(app, plan);
+  const originalPut = app.storage.put;
+  app.storage.put = async entries => {
+    if (Object.values(entries).some(v => v?.status === "SIMULATED")) {
+      assert.ok(entries["funding:" + plan.plan_id]);
+      throw new Error("Injected atomic storage failure");
+    }
+    return originalPut(entries);
+  };
+  const failed = await worker.fetch(req("/api/review/simulate", task.base), app.env);
+  assert.equal(failed.status, 503);
+  app.restart();
+  const ledger = await worker.fetch(req("/api/funding-demo/plan/" + plan.plan_id), app.env).then(r => r.json());
+  assert.equal(ledger.allocations.length, 0);
+  const record = await worker.fetch(req("/api/review/task/" + task.created.task_id), app.env).then(r => r.json());
+  assert.equal(record.status, "READY_FOR_SIMULATION");
+  app.storage.put = originalPut;
+  assert.equal((await worker.fetch(req("/api/review/simulate", task.base), app.env)).status, 200);
 });

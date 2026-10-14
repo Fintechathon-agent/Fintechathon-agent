@@ -16,7 +16,7 @@ function workflowUrl(path) {
 
 async function workflowRequest(path, body) {
   const response = await fetch(workflowUrl(path), {
-    method: "POST",
+    method: body === undefined ? "GET" : "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
   });
@@ -111,6 +111,96 @@ $("#run-bridge").addEventListener("click", async () => {
 });
 
 let workflowRecord = null;
+let fundingPlan = null;
+let fundingDirty = true;
+const money = minor => new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY", maximumFractionDigits: 2 }).format(minor / 100);
+const fundingStorageKey = "core-agent-synthetic-plan-v1";
+
+function renderFunding() {
+  $("#funding-status").textContent = fundingDirty ? "待确认" : "已确认 · 版本 " + fundingPlan.revision;
+  $("#new-funding").hidden = !fundingPlan;
+  $("#funding-history").hidden = !fundingPlan?.allocations.length;
+  $("#funding-metrics").innerHTML = fundingPlan ? [
+    ["生活费预留", fundingPlan.protected_minor], ["已模拟占用", fundingPlan.allocated_minor], ["还能安排", fundingPlan.available_minor]
+  ].map(([label, amount]) => '<article><small>'+esc(label)+'</small><strong>'+esc(money(amount))+'</strong></article>').join("") : "";
+  $("#funding-allocations").innerHTML = (fundingPlan?.allocations || []).map(item =>
+    '<p class="small"><a target="_blank" rel="noopener" href="'+esc(workflowUrl('/api/review/task/'+encodeURIComponent(item.task_id)))+'">'+esc(money(item.amount_minor))+' · 查看任务记录 ↗</a></p>').join("");
+  if (workflowRecord) renderWorkflow(workflowRecord);
+}
+
+for (const selector of ["#funding-cash", "#funding-rent"]) $(selector).addEventListener("input", () => {
+  fundingDirty = true;
+  $("#funding-confirm").checked = false;
+  $("#funding-message").textContent = "修改尚未生效，请重新确认。下方数字仍是上一次确认的安排。";
+  renderFunding();
+});
+
+$("#save-funding").addEventListener("click", async () => {
+  const button = $("#save-funding");
+  button.disabled = true;
+  $("#new-funding").disabled = true;
+  try {
+    if (!$("#funding-confirm").checked) throw new Error("请先勾选确认；不会自动替你确认资金用途。");
+    const cents = selector => {
+      const input = $(selector), value = Number(input.value) * 100;
+      if (!input.value || !input.reportValidity() || Math.abs(value - Math.round(value)) > 0.00001) throw new Error("请填写有效金额，最多两位小数。");
+      return Math.round(value);
+    };
+    const body = { synthetic: true, confirmed: true, currency: "CNY", cash_minor: cents("#funding-cash"),
+      protected_purposes: [{ purpose_id: "rent", label: "房租", amount_minor: cents("#funding-rent") }, ...(fundingPlan?.protected_purposes || []).filter(item => item.purpose_id !== "rent")] };
+    const before = JSON.stringify([$("#funding-cash").value, $("#funding-rent").value]);
+    if (fundingPlan) Object.assign(body, { plan_id: fundingPlan.plan_id, expected_revision: fundingPlan.revision });
+    fundingPlan = await workflowRequest(fundingPlan ? "/api/funding-demo/plan/revise" : "/api/funding-demo/plan", body);
+    fundingDirty = before !== JSON.stringify([$("#funding-cash").value, $("#funding-rent").value]);
+    try { localStorage.setItem(fundingStorageKey, fundingPlan.plan_id); } catch { /* Optional browser convenience only. */ }
+    $("#funding-message").textContent = fundingDirty ? "提交期间又修改了金额，请再次确认。" : "已保存。接下来发起的任务共用这份安排；修改后需重新复核。";
+    renderFunding();
+  } catch (error) { $("#funding-message").textContent = error.message; }
+  finally { button.disabled = false; $("#new-funding").disabled = false; }
+});
+
+$("#new-funding").addEventListener("click", () => {
+  fundingPlan = null; fundingDirty = true;
+  workflowRecord = null;
+  $("#workflow-result").hidden = true;
+  $("#workflow-status").textContent = "尚未发起";
+  $("#funding-confirm").checked = false;
+  try { localStorage.removeItem(fundingStorageKey); } catch { /* Optional browser convenience only. */ }
+  $("#funding-message").textContent = "这是另一份独立虚构计划，需再次确认；旧计划与记录仍保留在后端。";
+  renderFunding();
+});
+
+async function refreshFunding() {
+  if (!fundingPlan) return;
+  const planId = fundingPlan.plan_id;
+  const latest = await workflowRequest("/api/funding-demo/plan/" + encodeURIComponent(planId));
+  if (fundingPlan?.plan_id !== planId) return;
+  if (latest.revision !== fundingPlan.revision) {
+    fundingDirty = true;
+    $("#funding-confirm").checked = false;
+    $("#funding-message").textContent = "这份计划在其他页面有更新，请核对金额并重新确认。";
+  }
+  fundingPlan = latest;
+  renderFunding();
+}
+
+// Restore only a reference to synthetic demo data, never an approval or user identity.
+async function restoreFunding() {
+  let planId;
+  try { planId = localStorage.getItem(fundingStorageKey); } catch { return; }
+  if (!planId) return;
+  $("#save-funding").disabled = true;
+  try {
+    fundingPlan = await workflowRequest("/api/funding-demo/plan/" + encodeURIComponent(planId));
+    $("#funding-cash").value = fundingPlan.cash_minor / 100;
+    $("#funding-rent").value = (fundingPlan.protected_purposes.find(item => item.purpose_id === "rent")?.amount_minor || 0) / 100;
+    fundingDirty = true;
+    $("#funding-message").textContent = "已找回上次演示额度；请核对并确认后再发起任务。";
+    renderFunding();
+  } catch { $("#funding-message").textContent = "上次计划暂时无法读取，请稍后刷新重试。"; }
+  finally { $("#save-funding").disabled = false; }
+}
+void restoreFunding();
 
 function workflowLabel(action) {
   return {
@@ -127,6 +217,7 @@ function workflowStatusLabel(status) {
     PENDING_APPROVAL: "等待审批",
     READY_FOR_SIMULATION: "可以模拟",
     SIMULATED: "已模拟",
+    FUNDING_BLOCKED: "资金检查未通过",
     REJECTED: "已拒绝",
     MODEL_FAILED: "模型失败"
   }[status] || status;
@@ -135,14 +226,25 @@ function workflowStatusLabel(status) {
 function renderWorkflow(record) {
   workflowRecord = record;
   $("#workflow-result").hidden = false;
-  $("#workflow-status").textContent = workflowStatusLabel(record.status);
+  const check = record.funding_check;
+  const changed = Boolean(fundingPlan && record.proposed_action?.funding?.plan_id === fundingPlan.plan_id && record.proposed_action.funding.revision !== fundingPlan.revision && record.status !== "SIMULATED");
+  const fundingBlocked = check?.status === "BLOCKED" || changed;
+  $("#workflow-status").textContent = fundingBlocked ? "资金检查未通过" : workflowStatusLabel(record.status);
+  $("#funding-verdict").hidden = !check;
+  if (check) {
+    const title = changed || check.code === "FUNDING_PLAN_CHANGED" ? "资金安排变了，需要重新确认" : check.status === "BLOCKED" ? "这笔计划会挤占预留的钱" : check.status === "ALLOCATED" ? "已完成模拟，额度已记账" : "当前额度足够，仍需复核";
+    const detail = changed || check.code === "FUNDING_PLAN_CHANGED" ? "请按最新安排发起新任务，旧审批不会继续使用。" : check.status === "BLOCKED" ? "本次 " + money(check.requested_minor || 0) + "，可安排 " + money(check.available_minor || 0) + "。请调整本次金额，或核对资金安排后重新复核。" : check.status === "ALLOCATED" ? "本次占用 " + money(check.requested_minor) + "，模拟后剩余 " + money(check.available_after_minor) + "。" : "本次 " + money(check.requested_minor) + "，可安排 " + money(check.available_minor) + "。模拟前还会再次检查。";
+    $("#funding-verdict").classList.toggle("is-blocked", fundingBlocked);
+    $("#funding-verdict").innerHTML = '<h3>'+esc(title)+'</h3><p>'+esc(detail)+'</p>';
+  }
   const proposal = record.proposed_action;
   $("#workflow-metrics").innerHTML = [
-    ["任务", record.task_id], ["模型", record.model?.model_response?.model || "已配置模型"],
-    ["Risk", record.risk_decision?.decision || record.risk_handoff?.decision || "等待"],
-    ["执行", record.execution?.status || "阻断"]
+    ["模型分析", record.model?.status === "FAILED" ? "失败" : "已返回"],
+    ["风控复核", ({ APPROVE: "演示通过", REJECT: "已拒绝", REQUEST_MORE_INFO: "待补材料" })[record.risk_decision?.decision] || "等待复核"],
+    ["人工确认", ({ APPROVED: "演示通过", REJECTED: "已拒绝" })[record.approval?.status] || "等待确认"],
+    ["模拟执行", fundingBlocked ? "已阻断" : ({ SIMULATED: "已完成", READY: "等待模拟" })[record.execution?.status] || "未放行"]
   ].map(([label, value]) => '<div class="workflow-metric"><small>'+esc(label)+'</small><strong>'+esc(value)+'</strong></div>').join("");
-  $("#workflow-proposal-title").textContent = proposal ? workflowLabel(proposal.proposed_action) : "模型未形成拟议动作";
+  $("#workflow-proposal-title").textContent = "查看模型解释 · " + (proposal ? workflowLabel(proposal.proposed_action) : "未形成建议");
   $("#workflow-proposal-reason").textContent = proposal?.action_reason || record.error?.message || "等待模型结果";
   $("#workflow-proposal-source").textContent = record.model?.source ? "来源：" + record.model.source + "；拟议动作不等于授权。" : "模型调用失败；Risk 和执行端均已阻断。";
   $("#workflow-handoff-link").href = workflowUrl("/api/review/task/" + encodeURIComponent(record.task_id) + "/risk-handoff");
@@ -154,7 +256,7 @@ function renderWorkflow(record) {
   } else if (record.status === "PENDING_APPROVAL") {
     actions.push(['approval-approve', '审批通过', '']);
     actions.push(['approval-reject', '审批拒绝', 'danger']);
-  } else if (record.status === "READY_FOR_SIMULATION") {
+  } else if (record.status === "READY_FOR_SIMULATION" && record.execution.simulation_allowed && !fundingBlocked) {
     actions.push(['simulate', '执行模拟', '']);
   }
   $("#workflow-actions").innerHTML = actions.length
@@ -168,6 +270,7 @@ $("#run-workflow").addEventListener("click", async () => {
   button.disabled = true;
   button.textContent = "正在调用模型…";
   try {
+    if (!fundingPlan || fundingDirty) throw new Error("请先确认上方的虚构资金安排。");
     const amountInput = $("#workflow-amount");
     if (!amountInput.reportValidity() || !amountInput.value) throw new Error("请填写有效的拟议金额。");
     const result = await workflowRequest("/api/review", {
@@ -176,7 +279,8 @@ $("#run-workflow").addEventListener("click", async () => {
       source: "risk-workbench-demo",
       text: $("#workflow-text").value,
       requested_action: $("#workflow-action").value,
-      action_parameters: { amount: Number(amountInput.value), currency: "CNY", synthetic: true },
+      action_parameters: { amount: Number(amountInput.value), currency: "CNY", synthetic: true,
+        funding_plan_id: fundingPlan.plan_id, funding_plan_revision: fundingPlan.revision },
       context: { synthetic: true, user_goal: "看清钱的用途并确认不会影响后续安排" }
     });
     $("#workflow-message").textContent = "模型响应已记录，当前停在统一 Risk；请按顺序复核。";
@@ -213,6 +317,7 @@ $("#workflow-actions").addEventListener("click", async (event) => {
     else next = await workflowRequest("/api/review/simulate", base);
     $("#workflow-message").textContent = "状态已更新；执行端仍只允许模拟，不连接真实系统。";
     renderWorkflow(next);
+    try { await refreshFunding(); } catch { $("#funding-message").textContent = "任务已记录，但最新额度暂时读不到，请刷新重试。"; }
   } catch (error) {
     $("#workflow-message").textContent = error.message;
     if (error.payload?.workflow) renderWorkflow(error.payload.workflow);

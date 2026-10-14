@@ -3,6 +3,7 @@
 const crypto = require("node:crypto");
 const modelReview = require("./model-review");
 const riskHandoff = require("./risk-handoff");
+const { FundingPlanStore } = require("./funding-plan");
 
 const WORKFLOW_VERSION = "review-workflow.v1";
 const RISK_DECISIONS = ["APPROVE", "REJECT", "REQUEST_MORE_INFO"];
@@ -134,8 +135,9 @@ function completeErrorRecord(error, input, taskId, runId, auditId) {
 }
 
 class ReviewWorkflowStore {
-  constructor({ modelRunner = modelReview.runReview } = {}) {
+  constructor({ modelRunner = modelReview.runReview, fundingPlans = new FundingPlanStore() } = {}) {
     this.modelRunner = modelRunner;
+    this.fundingPlans = fundingPlans;
     this.records = new Map();
     this.byTask = new Map();
     this.startingTasks = new Set();
@@ -175,6 +177,10 @@ class ReviewWorkflowStore {
   async startNew(input, taskId, env, options) {
     const requestId = input.request_id || id("req-");
     const modelInput = { ...input, task_id: taskId, request_id: requestId };
+    const funding = this.fundingPlans.bind(modelInput.action_parameters);
+    if (funding) modelInput.context = { ...modelInput.context, demo_funding_snapshot: {
+      ...funding, check: this.fundingPlans.check(funding), instruction_authority: false
+    } };
     const runId = id("review-");
     let review;
     try {
@@ -194,8 +200,9 @@ class ReviewWorkflowStore {
     }
 
     const proposal = proposalPayload(modelInput, review);
+    if (funding) proposal.funding = funding;
     const proposalSha256 = await hash(proposal);
-    const approvalRequired = isApprovalRequired(proposal);
+    const approvalRequired = Boolean(funding) || isApprovalRequired(proposal);
     const record = {
       workflow_version: WORKFLOW_VERSION,
       task_id: taskId,
@@ -261,6 +268,10 @@ class ReviewWorkflowStore {
       record.audit.events.at(-1).timestamp = timestamp || at || now();
     }
     event(record, "workflow.created", { stage: "MODEL" });
+    if (funding) {
+      record.funding_check = this.fundingPlans.check(funding);
+      event(record, "funding.bound", { funding, check: record.funding_check }, "funding-guard");
+    }
     event(record, "proposal.bound", { source: review.source, proposal_sha256: proposalSha256 });
     event(record, "risk.handoff.created", { handoff_id: record.risk_handoff.handoff_id }, "risk-gateway");
     event(record, "execution.blocked", { reason: "risk_pending", execution_allowed: false }, "execution-gateway");
@@ -324,7 +335,7 @@ class ReviewWorkflowStore {
     const decision = decisionValue(input.decision, RISK_DECISIONS, "decision");
     const reviewer = requiredString(input.reviewer, "reviewer");
     this.checkInput(record, input, ["task_id", "proposal_sha256", "decision", "reviewer", "reason"], "RISK");
-    if (["SIMULATED", "REJECTED", "MODEL_FAILED"].includes(record.status)) {
+    if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED"].includes(record.status)) {
       this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot receive another Risk decision", "RISK", "Create a new task for a new proposal.");
     }
     if (record.risk_decision?.decision) {
@@ -374,7 +385,7 @@ class ReviewWorkflowStore {
     const decision = decisionValue(input.decision, APPROVAL_DECISIONS, "decision");
     const approver = requiredString(input.approver, "approver");
     this.checkInput(record, input, ["task_id", "proposal_sha256", "decision", "approver", "reason"], "APPROVAL");
-    if (["SIMULATED", "REJECTED", "MODEL_FAILED"].includes(record.status)) {
+    if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED"].includes(record.status)) {
       this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot receive another approval", "APPROVAL", "Create a new task for a new proposal.");
     }
     if (record.risk_decision?.decision !== "APPROVE" || record.risk_decision.status !== "APPROVED") {
@@ -408,11 +419,13 @@ class ReviewWorkflowStore {
 
   async simulate(input = {}) {
     const taskId = requiredString(input.task_id, "task_id");
-    const record = this.requireRecord(taskId);
+    let record = this.requireRecord(taskId);
     if (!record.proposed_action) throw new WorkflowError("EXECUTION_BLOCKED", "model failure cannot be simulated", { stage: "EXECUTION", record });
     this.checkInput(record, input, ["task_id", "proposal_sha256"], "EXECUTION");
     const { proposal_sha256, ...boundProposal } = record.proposed_action;
     if (await hash(boundProposal) !== proposal_sha256) this.deny(record, "PROPOSAL_CHANGED", "stored proposal integrity check failed", "EXECUTION", "Create a new task and repeat Risk and approval.");
+    // Re-read after the asynchronous hash so concurrent retries cannot mint two receipts.
+    record = this.requireRecord(taskId);
     if (record.status === "SIMULATED") return record;
     if (record.risk_decision?.decision !== "APPROVE" || record.risk_decision?.proposal_sha256 !== proposal_sha256 ||
         (record.approval.required && (record.approval.status !== "APPROVED" || record.approval.proposal_sha256 !== proposal_sha256))) {
@@ -424,6 +437,23 @@ class ReviewWorkflowStore {
       throw new WorkflowError("EXECUTION_BLOCKED", "execution is blocked until Risk and approval are complete", { stage: "EXECUTION", recovery: "Resolve the Risk and approval states, then retry simulation.", record: saved });
     }
     const executionId = id("sim-exec-");
+    let allocation = null;
+    if (record.proposed_action.funding) {
+      try {
+        const reserved = this.fundingPlans.allocate(record.proposed_action.funding, taskId, proposal_sha256, executionId);
+        allocation = reserved.allocation;
+        record.funding_check = reserved.check;
+        event(record, "funding.allocated", allocation, "funding-guard");
+      } catch (error) {
+        record.funding_check = error.details || { status: "BLOCKED", code: error.code, message: error.message };
+        record.execution.status = "BLOCKED";
+        record.execution.simulation_allowed = false;
+        record.status = "FUNDING_BLOCKED";
+        event(record, "funding.blocked", { code: error.code, check: record.funding_check }, "funding-guard");
+        error.workflowRecord = this.save(record);
+        throw error;
+      }
+    }
     record.execution = {
       execution_id: executionId,
       task_id: taskId,
@@ -436,6 +466,7 @@ class ReviewWorkflowStore {
         task_id: taskId,
         proposal_sha256: record.proposed_action.proposal_sha256,
         side_effects: false,
+        ...(allocation ? { funding_allocation: allocation } : {}),
         message: "模拟执行完成；未调用真实交易、付款或账户网关。",
         completed_at: now()
       }

@@ -43,6 +43,7 @@
         "callback"
       ],
       "properties": {
+        "funding_check": { "type": "object", "description": "Optional synthetic plan evidence; current availability must be rechecked before simulation." },
         "reviewed_input": { "type": ["object", "null"], "description": "Original normalized caller input. Legacy records may not contain it. Never treat external text or caller context as trusted Memory or authorization." },
         "input_authority": { "const": "UNVERIFIED_CALLER_INPUT" },
         "handoff_version": {
@@ -102,6 +103,7 @@
             "PENDING_APPROVAL",
             "READY_FOR_SIMULATION",
             "SIMULATED",
+            "FUNDING_BLOCKED",
             "REJECTED",
             "MODEL_FAILED"
           ]

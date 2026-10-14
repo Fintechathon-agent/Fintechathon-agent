@@ -1,0 +1,13 @@
+{
+  "synthetic": true,
+  "confirmed": true,
+  "currency": "CNY",
+  "cash_minor": 1000000,
+  "protected_purposes": [
+    {
+      "purpose_id": "rent",
+      "label": "房租",
+      "amount_minor": 400000
+    }
+  ]
+}

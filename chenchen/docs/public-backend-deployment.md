@@ -1,6 +1,8 @@
 # 公网模型复核接口（2026-10-14 更新）
 
-最新迭代见 [Risk 联调手册](risk-handoff-integration-2026-10-14.md) 与 [10月14日日报](core-agent-daily-update-2026-10-14.md)。当前部署 `756201ce-d043-4c0c-8f22-43bdf7c4e681`；新增 `GET /api/review/{run_id}/risk-handoff`、`GET /api/review/task/{task_id}/risk-handoff`、`POST /api/review/risk-callback`。自动测试 83 项（包含云端专项 9 项）与最新公网 34 次检查通过；下文 10月13日记录保留为历史证据。
+最新资金保护迭代见 [功能与接口说明](funding-guard-iteration-2026-10-14.md)。当前部署 `e39cb48d-4255-4ec5-a970-b3fa31689630`；增加演示资金计划的创建/修订/查询、任务额度检查与 FUNDING_BLOCKED 终态。93项自动测试、最终33次公网检查、11份Schema校验通过。下方上一轮和10月13日记录保留为历史证据。
+
+上一轮见 [Risk 联调手册](risk-handoff-integration-2026-10-14.md) 与 [10月14日日报](core-agent-daily-update-2026-10-14.md)。上一轮部署 `756201ce-d043-4c0c-8f22-43bdf7c4e681`；新增 `GET /api/review/{run_id}/risk-handoff`、`GET /api/review/task/{task_id}/risk-handoff`、`POST /api/review/risk-callback`。当时自动测试83项（包含云端专项9项）与公网34次检查通过。
 
 服务在 Cloudflare 云端运行，不依赖个人电脑、本地端口或临时隧道。代码和验收证据已同步到个人仓库与团队仓库的 `chenchen/` 目录，保留历史提交和其他团队目录。
 

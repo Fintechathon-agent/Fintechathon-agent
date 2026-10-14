@@ -98,4 +98,28 @@ test("HTTP model-to-Risk-to-approval-to-simulation chain is queryable", async t 
   assert.equal((await mismatch.json()).error.code, "RISK_HANDOFF_MISMATCH");
   const unchanged = await fetch(base + "/api/review/" + created.run_id).then(r => r.json());
   assert.equal(unchanged.status, "SIMULATED");
+  await t.test("local funding endpoints preserve plan revisions and share the workflow guard", async () => {
+    const post = (path, body) => fetch(base + path, { method: "POST", headers, body: JSON.stringify(body) });
+    const definition = { synthetic: true, confirmed: true, currency: "CNY", cash_minor: 1000000,
+      protected_purposes: [{ purpose_id: "rent", label: "房租", amount_minor: 400000 }] };
+    assert.equal((await post("/api/funding-demo/plan", { ...definition, confirmed: false })).status, 422);
+    const planResponse = await post("/api/funding-demo/plan", definition);
+    assert.equal(planResponse.status, 200);
+    const plan = await planResponse.json();
+    const task = await post("/api/review", { kind: "bill", text: "synthetic", action_parameters: {
+      synthetic: true, currency: "CNY", amount: 8000, funding_plan_id: plan.plan_id, funding_plan_revision: 1
+    } }).then(r => r.json());
+    assert.equal(task.funding_check.code, "FUNDING_CONFLICT");
+    const binding = { task_id: task.task_id, proposal_sha256: task.proposed_action.proposal_sha256 };
+    await post("/api/review/risk-decision", { ...binding, decision: "APPROVE", reviewer: "demo", reason: "test" });
+    await post("/api/review/approval", { ...binding, decision: "APPROVE", approver: "demo", reason: "test" });
+    const blocked = await post("/api/review/simulate", binding);
+    assert.equal(blocked.status, 409);
+    assert.equal((await blocked.json()).workflow.execution.simulation_allowed, false);
+    const revision = await post("/api/funding-demo/plan/revise", { ...definition, plan_id: plan.plan_id, expected_revision: 1 });
+    assert.equal(revision.status, 200);
+    const reloaded = await fetch(base + "/api/funding-demo/plan/" + plan.plan_id).then(r => r.json());
+    assert.equal(reloaded.revision, 2);
+    assert.equal(reloaded.allocations.length, 0);
+  });
 });

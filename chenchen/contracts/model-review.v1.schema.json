@@ -35,7 +35,7 @@
         "task_id": { "type": "string" },
         "request_id": { "type": "string" },
         "run_id": { "type": "string" },
-        "status": { "type": "string", "enum": ["PENDING_RISK", "PENDING_APPROVAL", "READY_FOR_SIMULATION", "SIMULATED", "REJECTED", "MODEL_FAILED"] },
+        "status": { "type": "string", "enum": ["PENDING_RISK", "PENDING_APPROVAL", "READY_FOR_SIMULATION", "SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED"] },
         "model": { "type": "object" },
         "proposed_action": { "anyOf": [{ "$ref": "#/$defs/ProposedAction" }, { "type": "null" }] },
         "risk_handoff": { "$ref": "#/$defs/RiskHandoff" },
@@ -56,6 +56,7 @@
         "requested_action": { "type": ["string", "null"] },
         "action_parameters": { "type": "object" },
         "model_response_id": { "type": ["string", "null"] },
+        "funding": { "$ref": "https://fintechathon-agent.github.io/contracts/funding-plan-demo.v1.schema.json#/$defs/Binding" },
         "proposal_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
       }
     },

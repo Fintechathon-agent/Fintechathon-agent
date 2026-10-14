@@ -6,6 +6,7 @@ import modelReviewModule from "../integrations/model-review.js";
 import legacyReviewAdapterModule from "../integrations/legacy-review-adapter.js";
 import riskHandoffModule from "../integrations/risk-handoff.js";
 import reviewWorkflowModule from "../integrations/review-workflow.js";
+import fundingPlanModule from "../integrations/funding-plan.js";
 import { reviewDocs } from "./review-docs.js";
 
 const { Harness } = harnessModule;
@@ -16,6 +17,7 @@ const modelReview = modelReviewModule;
 const legacyReviewAdapter = legacyReviewAdapterModule;
 const riskHandoff = riskHandoffModule;
 const { ReviewWorkflowStore, WorkflowError } = reviewWorkflowModule;
+const { FundingPlanStore } = fundingPlanModule;
 const harness = new Harness({ toolset: tools });
 const DEFAULT_ORIGINS = [
   "https://fund-risk-workbench.panxintian44.chatgpt.site",
@@ -164,12 +166,21 @@ export class ReviewService {
     return pending;
   }
 
-  async persist(record) {
+  async persist(record, fundingPlans = null) {
     if (!record?.run_id) return;
-    await this.storage.put({
+    const entries = {
       ["run:" + record.run_id]: record,
       ["task:" + record.task_id]: record.run_id
-    });
+    };
+    // One atomic storage operation commits both the simulation receipt and its allocation.
+    for (const plan of fundingPlans?.plans.values() || []) entries["funding:" + plan.plan_id] = plan;
+    await this.storage.put(entries);
+  }
+
+  async loadFundingPlan(store, planId) {
+    if (typeof planId !== "string") return;
+    const plan = await this.storage.get("funding:" + planId);
+    if (plan) store.save(plan);
   }
 
   async lookupTask(taskId) {
@@ -180,7 +191,13 @@ export class ReviewService {
   async handle(request) {
     const env = this.env;
     const url = new URL(request.url);
+    const fundingPlans = new FundingPlanStore();
     try {
+      if (request.method === "GET" && url.pathname.startsWith("/api/funding-demo/plan/")) {
+        const planId = decodeURIComponent(url.pathname.slice("/api/funding-demo/plan/".length));
+        await this.loadFundingPlan(fundingPlans, planId);
+        return json(request, env, 200, fundingPlans.summary(planId));
+      }
       if (request.method === "GET") {
         const handoffRequested = url.pathname.endsWith("/risk-handoff");
         const key = decodeURIComponent(url.pathname.slice("/api/review/".length, handoffRequested ? -"/risk-handoff".length : undefined));
@@ -191,7 +208,13 @@ export class ReviewService {
       if (!body || typeof body !== "object" || Array.isArray(body)) {
         throw new modelReview.ReviewError("INVALID_REVIEW_INPUT", "请求正文必须是 JSON 对象。", { statusCode: 422, stage: "VALIDATION" });
       }
-      const workflow = new ReviewWorkflowStore();
+      if (["/api/funding-demo/plan", "/api/funding-demo/plan/revise"].includes(url.pathname)) {
+        await this.loadFundingPlan(fundingPlans, body.plan_id);
+        const plan = url.pathname.endsWith("/revise") ? fundingPlans.revise(body) : fundingPlans.create(body);
+        await this.storage.put({ ["funding:" + plan.plan_id]: fundingPlans.require(plan.plan_id) });
+        return json(request, env, 200, plan);
+      }
+      const workflow = new ReviewWorkflowStore({ fundingPlans });
       let result;
       if (["/api/review", "/api/review/legacy"].includes(url.pathname)) {
         const input = url.pathname === "/api/review/legacy"
@@ -213,10 +236,12 @@ export class ReviewService {
         }
         bucket.count++;
         this.modelBuckets.set(ip, bucket);
+        await this.loadFundingPlan(fundingPlans, input.action_parameters?.funding_plan_id);
         result = await workflow.start(input, env);
       } else {
         const record = await this.lookupTask(body.task_id);
         if (record) workflow.save(record);
+        await this.loadFundingPlan(fundingPlans, record?.proposed_action?.funding?.plan_id);
         if (url.pathname === "/api/review/risk-callback") {
           const callback = await workflow.receiveRiskCallback(body);
           await this.persist(callback.workflow);
@@ -230,13 +255,13 @@ export class ReviewService {
         if (!method) return json(request, env, 404, { error: { code: "NOT_FOUND" } });
         result = await workflow[method](body);
       }
-      await this.persist(result);
+      await this.persist(result, fundingPlans);
       return json(request, env, 200, url.pathname === "/api/review/legacy"
         ? legacyReviewAdapter.mapWorkflowToLegacyResponse(result)
         : result);
     } catch (error) {
       if (error.name === "ReviewError" || error.name === "WorkflowError") {
-        await this.persist(error.workflowRecord || error.record);
+        await this.persist(error.workflowRecord || error.record, fundingPlans);
         return json(request, env, error.statusCode || 502, workflowErrorPayload(error));
       }
       if (error.code === "INVALID_JSON") return json(request, env, 400, errorPayload(error));
@@ -278,17 +303,18 @@ export default {
         execution_allowed: false
       });
     }
-    const isReviewRead = request.method === "GET" && url.pathname.startsWith("/api/review/");
+    const isReviewRead = request.method === "GET" && (url.pathname.startsWith("/api/review/") || url.pathname.startsWith("/api/funding-demo/plan/"));
     const isKnownPost = request.method === "POST" && [
       "/api/health-check/run", "/api/risk-workbench/handoff", "/api/review", "/api/review/legacy",
-      "/api/review/risk-decision", "/api/review/risk-callback", "/api/review/approval", "/api/review/simulate"
+      "/api/review/risk-decision", "/api/review/risk-callback", "/api/review/approval", "/api/review/simulate",
+      "/api/funding-demo/plan", "/api/funding-demo/plan/revise"
     ].includes(url.pathname);
     if (!isKnownPost && !isReviewRead) {
       return json(request, env, 404, { error: { code: "NOT_FOUND", message: "route not found" } });
     }
     if (!requiresApiKey(request, env)) return json(request, env, 401, errorPayload(authFailure()), { "WWW-Authenticate": "X-Core-Agent-Key" });
     if (!allowedByRateLimit(request, env)) return json(request, env, 429, errorPayload(rateLimitFailure()), { "Retry-After": "60" });
-    if (url.pathname === "/api/review" || url.pathname.startsWith("/api/review/")) {
+    if (url.pathname === "/api/review" || url.pathname.startsWith("/api/review/") || url.pathname.startsWith("/api/funding-demo/")) {
       try {
         const service = env.REVIEW_SERVICE.get(env.REVIEW_SERVICE.idFromName("team-review-v1"));
         return await service.fetch(request);

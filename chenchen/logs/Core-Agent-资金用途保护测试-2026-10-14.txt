@@ -1,0 +1,64 @@
+Core Agent 资金用途保护验收 · 2026-10-14
+
+虚构金额；模型真实调用，Risk/审批为脚本演示，不代表外部服务联合验收。
+开始：2026-10-14T07:51:25.0783656Z
+结束：2026-10-14T07:52:17.3432781Z
+公网后端：https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev
+部署版本：e39cb48d-4255-4ec5-a970-b3fa31689630
+结果：33次HTTP检查通过；4个真实模型任务。
+
+review-task-73d12fff-e038-470f-8e55-089d7e7169bc
+  请求金额：8000元；状态：FUNDING_BLOCKED；资金检查：FUNDING_CONFLICT
+  模型响应编号：chatcmpl-3cec9fe8-5c23-42ce-9b97-75788c12e39d
+  审计编号：audit-58baf69f-650c-42cc-9853-fea20eec69e0；真实执行：false
+review-task-392274dc-609b-4fef-ab9a-c33d87320c61
+  请求金额：4000元；状态：SIMULATED；资金检查：ALLOCATED
+  模型响应编号：chatcmpl-c22947f2-7228-47a6-8a1a-b1c6345f9b30
+  审计编号：audit-55793495-4f42-4a9d-803d-890910cdf52f；真实执行：false
+review-task-20767bf7-5c4b-4288-8377-e6661ac84104
+  请求金额：4000元；状态：FUNDING_BLOCKED；资金检查：FUNDING_CONFLICT
+  模型响应编号：chatcmpl-7383f6d6-e636-496e-8ef0-d51f17802d49
+  审计编号：audit-442ad07c-b203-422f-8357-2bc3ba81976d；真实执行：false
+review-task-60f5360b-5aab-4b85-b9ef-95d02e315e88
+  请求金额：1000元；状态：FUNDING_BLOCKED；资金检查：FUNDING_PLAN_CHANGED
+  模型响应编号：chatcmpl-0e16b73b-374a-44f9-bb64-390c57785b41
+  审计编号：audit-25691e7e-25e5-4477-8cbc-8cbd0fa66591；真实执行：false
+
+结论：房租预留生效；任务共用额度；重复模拟不重复占用；用途改变后旧审批失效。最终占用4000元，修订后房租5000元，可安排1000元。
+
+逐请求日志
+2026-10-14T07:51:26.2746544Z | health | HTTP 200 | ok
+2026-10-14T07:51:27.2475403Z | plan/create | HTTP 200 |
+2026-10-14T07:51:32.6493624Z | rent-conflict-8000/model | HTTP 200 | PENDING_RISK
+2026-10-14T07:51:33.5489144Z | rent-conflict-8000/pending-risk | HTTP 409 | EXECUTION_BLOCKED
+2026-10-14T07:51:34.4311753Z | rent-conflict-8000/risk-callback | HTTP 200 |
+2026-10-14T07:51:35.3173133Z | rent-conflict-8000/pending-approval | HTTP 409 | EXECUTION_BLOCKED
+2026-10-14T07:51:36.2204295Z | rent-conflict-8000/approval | HTTP 200 | READY_FOR_SIMULATION
+2026-10-14T07:51:38.1308946Z | rent-conflict-8000/simulate | HTTP 409 | FUNDING_CONFLICT
+2026-10-14T07:51:41.6054355Z | overlap-first-4000/model | HTTP 200 | PENDING_RISK
+2026-10-14T07:51:42.4535204Z | overlap-first-4000/pending-risk | HTTP 409 | EXECUTION_BLOCKED
+2026-10-14T07:51:43.3210731Z | overlap-first-4000/risk-callback | HTTP 200 |
+2026-10-14T07:51:44.2690875Z | overlap-first-4000/pending-approval | HTTP 409 | EXECUTION_BLOCKED
+2026-10-14T07:51:45.1379313Z | overlap-first-4000/approval | HTTP 200 | READY_FOR_SIMULATION
+2026-10-14T07:51:53.1999143Z | overlap-second-4000/model | HTTP 200 | PENDING_RISK
+2026-10-14T07:51:54.2595026Z | overlap-second-4000/pending-risk | HTTP 409 | EXECUTION_BLOCKED
+2026-10-14T07:51:55.2054639Z | overlap-second-4000/risk-callback | HTTP 200 |
+2026-10-14T07:51:56.0836842Z | overlap-second-4000/pending-approval | HTTP 409 | EXECUTION_BLOCKED
+2026-10-14T07:51:57.5748366Z | overlap-second-4000/approval | HTTP 200 | READY_FOR_SIMULATION
+2026-10-14T07:51:58.4072087Z | overlap-first-4000/simulate | HTTP 200 | SIMULATED
+2026-10-14T07:51:59.9071457Z | overlap-first-4000/retry | HTTP 200 | SIMULATED
+2026-10-14T07:52:00.8191617Z | overlap-second-4000/simulate | HTTP 409 | FUNDING_CONFLICT
+2026-10-14T07:52:06.2149782Z | changed-purpose-1000/model | HTTP 200 | PENDING_RISK
+2026-10-14T07:52:07.6124484Z | changed-purpose-1000/pending-risk | HTTP 409 | EXECUTION_BLOCKED
+2026-10-14T07:52:09.4649288Z | changed-purpose-1000/risk-callback | HTTP 200 |
+2026-10-14T07:52:10.3244872Z | changed-purpose-1000/pending-approval | HTTP 409 | EXECUTION_BLOCKED
+2026-10-14T07:52:11.1869053Z | changed-purpose-1000/approval | HTTP 200 | READY_FOR_SIMULATION
+2026-10-14T07:52:12.0236700Z | plan/revise-after-approval | HTTP 200 |
+2026-10-14T07:52:12.8740489Z | changed-purpose-1000/simulate | HTTP 409 | FUNDING_PLAN_CHANGED
+2026-10-14T07:52:13.6997546Z | final-record | HTTP 200 | FUNDING_BLOCKED
+2026-10-14T07:52:14.7573249Z | final-record | HTTP 200 | SIMULATED
+2026-10-14T07:52:15.5814044Z | final-record | HTTP 200 | FUNDING_BLOCKED
+2026-10-14T07:52:16.4409936Z | final-record | HTTP 200 | FUNDING_BLOCKED
+2026-10-14T07:52:17.3395468Z | final-plan | HTTP 200 |
+
+完整响应与审计见 docs/public-funding-guard-2026-10-14.json。终端使用本机HTTP代理，不代表所有网络直连可达。

@@ -165,6 +165,16 @@ async function handleApi(request, response, pathname, url) {
   let body = {};
   if (method === "POST") body = await parseBody(request);
   if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("JSON body must be an object");
+  if (method === "POST" && ["/api/funding-demo/plan", "/api/funding-demo/plan/revise"].includes(pathname)) {
+    requireReviewApiKey(request);
+    sendJson(response, 200, pathname.endsWith("/revise") ? reviewWorkflow.fundingPlans.revise(body) : reviewWorkflow.fundingPlans.create(body));
+    return true;
+  }
+  if (method === "GET" && pathname.startsWith("/api/funding-demo/plan/")) {
+    requireReviewApiKey(request);
+    sendJson(response, 200, reviewWorkflow.fundingPlans.summary(decodeURIComponent(pathname.slice("/api/funding-demo/plan/".length))));
+    return true;
+  }
   if (method === "POST" && ["/api/review", "/api/review/legacy"].includes(pathname)) {
     requireReviewApiKey(request);
     const input = pathname === "/api/review/legacy"
@@ -350,6 +360,7 @@ function serveStatic(response, pathname) {
   const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
   const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html", "versions/risk-workbench.html",
     "contracts/risk-handoff.v1.schema.json", "contracts/examples/risk-callback.request.json",
+    "contracts/funding-plan-demo.v1.schema.json", "contracts/examples/funding-plan.request.json",
     "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/risk-workbench.js", "versions/common.js",
     "contracts/investment-agent.v1.schema.json", "contracts/model-review.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json", "contracts/examples/model-review.request.json", "contracts/examples/model-review.response.json", "contracts/examples/risk-decision.request.json", "contracts/examples/approval.request.json", "contracts/examples/simulation.request.json",
     "data/market-brief-2026-10-08.json", "data/market-brief-2026-10-09.json", "data/risk-workbench-demo.json", "index.html", "app.js", "styles.css"]);
