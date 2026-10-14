@@ -1,0 +1,10 @@
+{
+  "remote": "https://github.com/Fintechathon-agent/Fintechathon-agent.git",
+  "initialMain": "55b8978cd267064d5a972059a925b624e69d95fd",
+  "finalMain": "3dfa86b3114de46d1d0b0abc3ff664c88f4757ac",
+  "p0Source": "d067b3810802792cd7646ec214491b7afa9c95d0",
+  "landingSource": "e218efe189b5fff8a85681da20c9bc137c361294",
+  "logoSha256": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+  "logoByteIdentical": true,
+  "push": false
+}

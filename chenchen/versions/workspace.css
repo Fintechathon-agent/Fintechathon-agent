@@ -99,3 +99,8 @@ body.unified-workspace, body.unified-directory {
 .unified-workspace #open-portfolio{white-space:nowrap}
 
 .unified-workspace .data-strip span{color:var(--text-secondary);background:transparent}.unified-workspace .data-strip .date-warning{color:#ffd1a9;background:#30251d}
+/* Match the original Landing typography and navigation rhythm. */
+body.unified-workspace,body.unified-directory{font-family:'Segoe UI','Microsoft YaHei',sans-serif}
+.workspace-brand b{font-family:inherit}
+.rail-note>a{display:block;margin-top:12px}
+@media(prefers-reduced-motion:no-preference){.workspace-main{animation:workspace-arrive var(--motion-duration) var(--motion-ease)}@keyframes workspace-arrive{from{opacity:.6;transform:translateY(6px)}to{opacity:1;transform:none}}}

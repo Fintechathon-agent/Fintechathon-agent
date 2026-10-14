@@ -1,3 +1,4 @@
+import { rememberTask, savedTask } from "./site-context.mjs";
 import { $, api } from "./common.js";
 import { healthTask, labels, auditEvents } from "./workspace-model.mjs";
 
@@ -97,6 +98,7 @@ export function renderTaskStates(view) {
 }
 export function showHealth(data, { restored = false } = {}) {
   current = data;
+  rememberTask(data.task_state.task_id);
   const view = healthTask(data);
   $("#task-empty").hidden = true; $("#task-detail").hidden = false; $("#task-stale").hidden = false;
   if (!restored) $("#task-stale").hidden = true;
@@ -134,3 +136,6 @@ $("#restore-form").onsubmit = async event => {
   }
 };
 progress("WAITING_INPUT");
+
+const saved = savedTask();
+if (saved) { $("#restore-id").value = saved; $("#restore-form").requestSubmit(); }

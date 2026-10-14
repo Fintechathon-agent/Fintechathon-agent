@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "A: index to Landing to single Workspace",
+    "B: real local Core health-check and comparisons",
+    "C: read-only Risk handoff, no execution control",
+    "Task identifier survives Landing roundtrip; data re-read from service",
+    "D/F: preserved investment, legacy, merchant, Risk and catalog routes with return links",
+    "E: network failure shows ERROR without success fallback",
+    "G: desktop and 390/375 mobile layouts without page overflow",
+    "Pages subpath asset/navigation checks; missing backend stays unavailable"
+  ],
+  "errors": [],
+  "axe": {
+    "/landing.html": [],
+    "/workspace.html": [],
+    "/investment.html": []
+  },
+  "staticOutput": "C:\\Users\\Y7000P\\AppData\\Local\\Temp\\finance-lab-site-eSZo5O",
+  "publicDeployment": "NOT_VERIFIED"
+}

@@ -1,19 +1,17 @@
-import { assertHealthResponse } from "./workspace-model.mjs";
-import { inputChanged, requestStarted, requestFailed, showHealth } from "./workspace.js";
 import { $, esc, money, pct, api, toast, downloadLink, chart, today, tip, healthCheckRequest } from "./common.js";
 import { dateStatus, planComparison } from "./presentation.mjs";
 let result, inputVersion = 0;
 const names = { CURRENT:"当前组合", A:"A 保持或最小动作", B:"B 温和调整", C:"C 风险优先" };
 const planCopy = { A:"保留当前配置", B:"适度降低集中度", C:"降低高波动资产权重" };
 function invalidate() {
-  inputVersion++; inputChanged();
+  inputVersion++;
   if (result) { result=null; $("#results").hidden=true; $("#input-changed").hidden=false; }
 }
 async function init() {
   const data=await api("/api/demo/portfolio"), p=data.output.snapshot;
   const raw={portfolio_id:p.portfolio_id,as_of:p.as_of,cash:p.cash,positions:p.positions.map(({instrument_id,type,quantity,price,name,sector})=>({instrument_id,type,quantity,price,name,sector}))};
   $("#portfolio-json").value=JSON.stringify(raw,null,2);
-  renderHoldings(p); $("#run").disabled=false; $("#load-error").hidden=true; $("#retry-load").hidden=true; $("#service-state").textContent="DEMO / FIXTURE · 本地 Core 已响应";
+  renderHoldings(p); $("#run").disabled=false;
 }
 function renderHoldings(p) {
   const dated=dateStatus(p.as_of,today());
@@ -53,25 +51,14 @@ function renderNextSteps(profile, snapshot, report, metrics) {
 $("#check-form").addEventListener("input",invalidate);
 $("#demo-profile").onclick=()=>{ invalidate(); $("#horizon").value=365;$("#drawdown").value=10;$("#liquidity").value="medium";toast("已填入虚构偏好，可修改。"); };
 $("#check-form").onsubmit=async event=>{
-  event.preventDefault();
-  const invalid=[...document.querySelectorAll('#check-form input, #check-form select')].filter(el=>!el.checkValidity());
-  if(invalid.length){ $('#input-feedback').hidden=false; $('#input-feedback').textContent='WAITING_INPUT · 请补充或修正投资期限、回撤上限和流动性需求。'; invalid[0].focus(); return; }
-  $('#input-feedback').hidden=true; requestStarted();
-  const version=inputVersion;$("#run").disabled=true;$("#results").hidden=true;$("#input-changed").hidden=true;$("#run").textContent="正在诊断…";
+  event.preventDefault();const version=inputVersion;$("#run").disabled=true;$("#results").hidden=true;$("#input-changed").hidden=true;$("#run").textContent="正在诊断…";
   try {
-    const outgoing=healthCheckRequest({
+    const next=await api("/api/health-check/run",healthCheckRequest({
       riskProfile:{investment_horizon_days:Number($("#horizon").value),max_drawdown:Number($("#drawdown").value)/100,liquidity_need:$("#liquidity").value},
       portfolio:JSON.parse($("#portfolio-json").value)
-    });
-    const next=await api("/api/health-check/run",outgoing);
+    }));
     if(version!==inputVersion) { $("#input-changed").hidden=false; return toast("输入已改变，请重新检查。"); }
-    assertHealthResponse(next);
-    if(next.request_id!==outgoing.request_id)throw new Error("响应不属于本次请求，结果未采用。");
-    if(next.task_state.status!=="HANDOFF_REQUIRED") {
-      if (!['WAITING_INPUT','BLOCKED','ERROR','FAILED'].includes(next.task_state.status)) throw new Error('服务返回未知阶段，尚未展示完成。');
-      showHealth(next); $('#input-feedback').hidden=false;
-      $('#input-feedback').textContent=next.task_state.missing_fields?.length ? 'WAITING_INPUT · 缺少：'+next.task_state.missing_fields.join('、') : next.task_state.error_state?.message || '请查看我的任务中的服务端状态。'; return;
-    }
+    if(next.task_state.status!=="HANDOFF_REQUIRED")throw new Error(next.task_state.error_state?.reasons?.join("；")||"请补齐有效的持仓与风险信息。");
     result=next; const a=result.artifacts,m=a.health_report.metrics,s=a.simulation,view=planComparison(s.comparisons);
     if(!view.best||!view.baseline)throw new Error("模拟缺少有效结果，暂不展示结论。");
     renderHoldings(a.portfolio_snapshot);
@@ -104,15 +91,9 @@ $("#check-form").onsubmit=async event=>{
     }).catch(()=>{
       if(result===next&&version===inputVersion)$("#evidence").textContent+="\n完整运行记录暂未读取成功，可重新检查后再试。";
     });
-    showHealth(next); $("#results").hidden=false;$("#input-panel").open=false;$("#result-summary").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth",block:"start"});toast("分析完成。展开方案可查看细节。");
-  }catch(error){ if(version!==inputVersion)return; result=null; requestFailed(error); toast(error.message); }
-  finally{$("#run").disabled=false;$("#run").textContent="开始健康检查"; $("#run").removeAttribute("aria-busy");}
+    $("#results").hidden=false;$("#input-panel").open=false;$("#result-summary").scrollIntoView({behavior:"smooth",block:"start"});toast("分析完成。展开方案可查看细节。");
+  }catch(error){ result=null;toast(error.message); }
+  finally{$("#run").disabled=false;$("#run").textContent="开始健康检查 →";}
 };
 $("#export").onclick=()=>{if(result)downloadLink("/api/task/"+encodeURIComponent(result.task_state.task_id)+"/export");};
-async function loadPortfolio(){
-  $('#retry-load').disabled=true;
-  try{await init();}catch(error){$('#run').disabled=true;$('#load-error').hidden=false;$('#load-error').textContent='ERROR · 数据读取失败：'+error.message;$('#retry-load').hidden=false;$('#service-state').textContent='ERROR · 服务暂不可用';}
-  finally{$('#retry-load').disabled=false;}
-}
-$('#retry-load').onclick=loadPortfolio;
-loadPortfolio();
+init().catch(error=>{$("#load-error").hidden=false;$("#load-error").textContent="数据读取失败："+error.message+"。请确认服务已启动，再刷新页面。";});

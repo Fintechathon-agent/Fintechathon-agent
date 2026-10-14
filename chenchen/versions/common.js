@@ -1,3 +1,4 @@
+import { siteUrl } from "./site-context.mjs";
 import { responseError } from "./workspace-model.mjs";
 export const $ = (s) => document.querySelector(s);
 export const esc = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
@@ -6,7 +7,7 @@ export const pct = value => (value * 100).toFixed(2) + "%";
 export const today = () => new Intl.DateTimeFormat("sv-SE", {timeZone:"Asia/Shanghai",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 export const tip = (label, id, copy) => '<span class="term-label">'+esc(label)+' <button type="button" class="tip-toggle" data-tip-toggle="'+esc(id)+'" aria-controls="'+esc(id)+'" aria-expanded="false" aria-label="解释 '+esc(label)+'">?</button></span><span class="tip-copy" id="'+esc(id)+'" hidden>'+esc(copy)+'</span>';
 export async function api(path, body) {
-  const response = await fetch(path, body === undefined ? {} : { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
+  const response = await fetch(siteUrl(path), body === undefined ? {} : { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
   const data = await response.json();
   const error = responseError(data, response.ok);
   if (error) throw error;
@@ -24,7 +25,7 @@ export function healthCheckRequest({ riskProfile, portfolio, taskId = null, sess
 export function toast(message) { $("#status").textContent = message; clearTimeout(toast.timer); toast.timer = setTimeout(() => $("#status").textContent = "", 5500); }
 export function downloadLink(url) {
   const anchor = document.createElement("a");
-  anchor.href = url; anchor.download = ""; anchor.hidden = true;
+  anchor.href = siteUrl(url); anchor.download = ""; anchor.hidden = true;
   document.body.append(anchor); anchor.click(); anchor.remove();
 }
 document.addEventListener("click",event=>{

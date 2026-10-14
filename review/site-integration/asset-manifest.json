@@ -1,0 +1,71 @@
+{
+  "kind": "UI_OVERLAY_NOT_STANDALONE",
+  "runtime": "Existing chenchen Node server and static allowlist required; no API mocks included",
+  "assets": [
+    {
+      "file": "versions/workspace.html",
+      "bytes": 14170,
+      "sha256": "ed4b7e17bd7dc9dc8bc2e81ca8ebfba02971c3ab4678e6cd1c039c6d9a678376"
+    },
+    {
+      "file": "versions/home.html",
+      "bytes": 1654,
+      "sha256": "f7ad6ffc1261656eace9a189c8eeabcc926a72eeedeab2cf5b92770a65d4db6a"
+    },
+    {
+      "file": "versions/workspace-investment.js",
+      "bytes": 12965,
+      "sha256": "655daa9cbeb9c5b0e6e334517d1e96d127ac5c0d0145f66a7d54dfb36c29ec4c"
+    },
+    {
+      "file": "versions/site-context.mjs",
+      "bytes": 492,
+      "sha256": "65e13b673fb67e8991caee1740dfdf0574a1a0ba2c3d1d9eab56f9ec2892ad00"
+    },
+    {
+      "file": "versions/common.js",
+      "bytes": 4567,
+      "sha256": "11356ddb8a4e1aea51e62ca7a29513bd0be27f305374ea3000aa3f78f2145915"
+    },
+    {
+      "file": "versions/presentation.mjs",
+      "bytes": 3153,
+      "sha256": "3c101315ff25b886969f5a88dee77d39ecdf0d3ba6a35c86c64a47ff4f4404d8"
+    },
+    {
+      "file": "versions/workspace.js",
+      "bytes": 7618,
+      "sha256": "be5f0f86e7e724ec84d15a8e040d6d1ae8f58b828cee2801deb681f26019412d"
+    },
+    {
+      "file": "versions/workspace-model.mjs",
+      "bytes": 4852,
+      "sha256": "32040d62f26c75987c5403abec8b7d904b9fbb1874cef234f947a8220b3cedde"
+    },
+    {
+      "file": "versions/workspace.css",
+      "bytes": 10896,
+      "sha256": "a2010a7b111f84deaee503322ca2c9bf11d869a14f9a8c45a8c1b5043cdbf86c"
+    },
+    {
+      "file": "versions/tokens.css",
+      "bytes": 815,
+      "sha256": "83aebf27a001e1bd8cceb871c73e69891cb9f0134d62907af1a243441e81db35"
+    },
+    {
+      "file": "versions/style.css",
+      "bytes": 6273,
+      "sha256": "8d875cac265f673e2408a48fc0238050b68553ab7ccd082ac89e5a8b7eb5f519"
+    },
+    {
+      "file": "versions/product-overrides.css",
+      "bytes": 20918,
+      "sha256": "2312064f7fd803535212fdaffc445d2ab355f618d4b3dac21274507e764a0e5b"
+    },
+    {
+      "file": "versions/team-logo-transparent.png",
+      "bytes": 818348,
+      "sha256": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6"
+    }
+  ]
+}

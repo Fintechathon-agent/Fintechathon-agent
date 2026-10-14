@@ -4,7 +4,7 @@ const fs = require("node:fs"), path = require("node:path");
 const base = "http://127.0.0.1:" + (process.env.PORT || 4175);
 (async()=>{
   for (const [route,file] of [
-    ["/","versions/investment.html"],["/investment","versions/investment.html"],["/investment-v0.10","versions/investment-legacy.html"],["/merchant","versions/merchant.html"],
+    ["/","versions/landing.html"],["/workspace.html","versions/workspace.html"],["/landing.html","versions/landing.html"],["/index.html","versions/index.html"],["/investment","versions/investment.html"],["/investment-v0.10","versions/investment-legacy.html"],["/merchant","versions/merchant.html"],
     ["/contracts/investment-agent.v1.schema.json","contracts/investment-agent.v1.schema.json"],
     ["/contracts/model-review.v1.schema.json","contracts/model-review.v1.schema.json"],
     ["/contracts/examples/health-check.request.json","contracts/examples/health-check.request.json"],

@@ -4,7 +4,7 @@ const fs = require("node:fs"), path = require("node:path"), os = require("node:o
 const crypto = require("node:crypto"), { spawnSync } = require("node:child_process");
 const root = path.resolve(__dirname, "..");
 const output = fs.mkdtempSync(path.join(os.tmpdir(), "xinlan-ui-p0-"));
-const files = ["investment.html","home.html","investment.js","common.js","presentation.mjs",
+const files = ["workspace.html","home.html","workspace-investment.js","site-context.mjs","common.js","presentation.mjs",
   "workspace.js","workspace-model.mjs","workspace.css","tokens.css","style.css","product-overrides.css","team-logo-transparent.png"];
 const assets = [];
 for (const name of files) {
@@ -21,7 +21,7 @@ for (const name of files) {
 }
 const manifest = {kind:"UI_OVERLAY_NOT_STANDALONE",runtime:"Existing chenchen Node server and static allowlist required; no API mocks included",assets};
 fs.writeFileSync(path.join(output,"manifest.json"),JSON.stringify(manifest,null,2));
-const evidence = path.resolve(root,"../review/ui-p0");
+const evidence = path.resolve(root,"../review/site-integration");
 fs.mkdirSync(evidence,{recursive:true});
 fs.writeFileSync(path.join(evidence,"asset-manifest.json"),JSON.stringify(manifest,null,2));
 console.log(JSON.stringify({output,assets:assets.length,apiMocks:false}));

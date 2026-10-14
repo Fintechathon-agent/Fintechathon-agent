@@ -31,7 +31,7 @@ const port = Number(process.env.PORT || 4175);
 const harness = new Harness({ toolset: tools });
 const publicAccessEnabled = () => process.env.PUBLIC_ACCESS === "true";
 const corsOrigins = new Set((process.env.CORS_ORIGINS || "").split(",").map(value => value.trim()).filter(Boolean));
-const mime = { ".png": "image/png",
+const mime = { ".svg": "image/svg+xml", ".png": "image/png",
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -337,9 +337,9 @@ function serveStatic(response, pathname) {
     sendJson(response, 400, { error: { code: "INVALID_PATH", message: "invalid URL path" } });
     return;
   }
-  const routes = { "/": "versions/investment.html", "/index.html": "versions/investment.html", "/catalog": "versions/home.html", "/investment": "versions/investment.html", "/investment-v0.10": "versions/investment-legacy.html", "/merchant": "versions/merchant.html", "/risk-workbench": "versions/risk-workbench.html" };
+  const routes = { "/": "versions/landing.html", "/index.html": "versions/index.html", "/landing.html": "versions/landing.html", "/landing": "versions/landing.html", "/workspace": "versions/workspace.html", "/workspace.html": "versions/workspace.html", "/investment.html": "versions/investment.html", "/merchant.html": "versions/merchant.html", "/catalog.html": "versions/home.html", "/risk-workbench.html": "versions/risk-workbench.html", "/investment-v0.10.html": "versions/investment-legacy.html", "/catalog": "versions/home.html", "/investment": "versions/investment.html", "/investment-v0.10": "versions/investment-legacy.html", "/merchant": "versions/merchant.html", "/risk-workbench": "versions/risk-workbench.html" };
   const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
-  const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html", "versions/risk-workbench.html",
+  const allowed = new Set(["versions/index.html", "versions/landing.html", "versions/landing.css", "versions/landing.js", "versions/archive.js", "versions/glass.css", "versions/favicon.svg", "versions/workspace.html", "versions/workspace-investment.js", "versions/site-shell.css", "versions/site-context.mjs", "versions/home.html", "versions/investment.html", "versions/merchant.html", "versions/risk-workbench.html",
     "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/risk-workbench.js", "versions/common.js", "versions/workspace.js", "versions/workspace-model.mjs", "versions/workspace.css", "versions/tokens.css", "versions/team-logo-transparent.png",
     "contracts/investment-agent.v1.schema.json", "contracts/model-review.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json", "contracts/examples/model-review.request.json", "contracts/examples/model-review.response.json", "contracts/examples/risk-decision.request.json", "contracts/examples/approval.request.json", "contracts/examples/simulation.request.json",
     "data/market-brief-2026-10-08.json", "data/market-brief-2026-10-09.json", "data/risk-workbench-demo.json", "index.html", "app.js", "styles.css"]);
