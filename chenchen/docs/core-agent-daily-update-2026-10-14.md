@@ -103,3 +103,17 @@
 - 手机390px初查无横向溢出，详情默认折叠；发现金额换行，已将手机金额区域调整为两项并排、可安排金额单独一行。发起新复核时收起旧任务按钮，避免操作对象混淆。
 - 最终手机复查通过：390px视口、内容宽375px，金额全部单行显示；刷新仍可读回2000元剩余额度。样式与脚本已加版本号，避免旧缓存。检查后恢复正常视口；这是浏览器模拟，不代表真机测试。
 - 最终网页代码：个人 `f83fc74`、团队 `b4b2f0b`；[Pages最终发布](https://github.com/realchenchenluo/agent/actions/runs/38532644888)成功。[直接打开本轮页面](https://realchenchenluo.github.io/agent/risk-workbench/?v=funding-20261014-2)。后台仍为 `e39cb48d-4255-4ec5-a970-b3fa31689630`。
+
+## 22:00 自动化收尾核验
+
+今日真实产出：完成 Risk handoff/callback、资金计划保护与公网工作台验收的收尾记录，并生成本日 DOCX；今日无新增业务代码变更（业务提交已在当日较早时段完成）。
+
+A. 已完成的核心接口：risk-handoff.v1、risk-callback.v1、model-review.v1、funding-plan-demo.v1；生产方 Core Agent/Backend，消费方 Risk/UI/Approval；字段绑定 handoff_id/task_id/request_id/run_id/audit_id/proposal_sha256，execution_allowed 固定 false。证据：chenchen/contracts/risk-handoff.v1.schema.json、chenchen/docs/risk-handoff-integration-2026-10-14.md、chenchen/docs/public-funding-workbench-2026-10-14.json。
+
+B. 可验证的集成进度：两仓库均执行 node --test tests/*.test.js tests/*.test.mjs，93/93 通过；git diff --check 通过。覆盖 callback 幂等/审计绑定、资金并发与重启、Contract 校验、Session/TaskState/trace、Memory consent、Quant no-drift、HTTP 链路。公网记录 33 次 HTTP 检查、4 个真实模型任务、11 份 Contract/任务校验。
+
+C. 需要其他 Owner 配合的阻塞项：Risk 需确认独立接收地址、认证与回写；Memory 需确认资金用途可信引用/版本/有效期/撤回；Backend/Approval 需正式审批身份与隔离；Execution/Risk 需跨任务额度和执行前再检查。当前无其他外部 Owner 阻塞。
+
+主链路状态：Core Agent 只复用现有 Quant 输出，未重算 Quant；未改 Memory 规则；已经过 Risk 边界，仍停在人工审核/模拟，未宣称 Risk 审核闭环。request_id、task_id、session_id、Contract version 和 audit_evidence 可追踪。市场价格与新闻冲突保持 REVIEW_REQUIRED，不生成交易动作。
+
+下一步：先完成 Risk/Memory/Backend/Approval 的字段与身份确认，再做独立 Consumer 联合验收；保持 execution_allowed=false。
