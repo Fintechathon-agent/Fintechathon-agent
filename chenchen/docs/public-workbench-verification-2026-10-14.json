@@ -1,0 +1,291 @@
+{
+  "checked_at": "2026-10-14T07:30:02.791Z",
+  "frontend_url": "https://realchenchenluo.github.io/agent/risk-workbench/",
+  "frontend_deployment": "https://github.com/realchenchenluo/agent/actions/runs/38528489267",
+  "backend_deployment": "756201ce-d043-4c0c-8f22-43bdf7c4e681",
+  "method": "Clicked the deployed workbench's model button, then REQUEST_MORE_INFO, using the in-app browser. Queried the public task record.",
+  "observations": {
+    "real_model_response": true,
+    "risk_callback_recorded": true,
+    "final_state": "PENDING_RISK",
+    "execution_blocked": true,
+    "no_further_risk_buttons": true,
+    "details_collapsed": true,
+    "phone_viewport_width": 390,
+    "document_scroll_width": 375,
+    "horizontal_overflow": false,
+    "viewport_restored": true
+  },
+  "workflow": {
+    "workflow_version": "review-workflow.v1",
+    "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+    "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+    "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2",
+    "status": "PENDING_RISK",
+    "reviewed_input": {
+      "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+      "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+      "source": "risk-workbench-demo",
+      "kind": "bill",
+      "text": "虚构案例：我现在有 10000 元可用现金，下个月需交 4000 元房租，想再投入 8000 元买基金。请检查投资计划会不会影响房租安排。以下金额仅供演示。",
+      "context": {
+        "synthetic": true,
+        "user_goal": "看清钱的用途并确认不会影响后续安排"
+      },
+      "action_parameters": {
+        "amount": 8000,
+        "currency": "CNY",
+        "synthetic": true
+      },
+      "requested_action": "检查新增基金投资与房租安排是否冲突",
+      "allow_rule_fallback": false
+    },
+    "model": {
+      "status": "PROPOSED",
+      "source": "model",
+      "model_response": {
+        "provider": "cloudflare_workers_ai",
+        "call_succeeded": true,
+        "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "endpoint": "cloudflare:AI",
+        "api_style": "workers_ai",
+        "response_format": "json_schema",
+        "provider_response_id": "chatcmpl-0d11b668-6722-4348-bfe4-352cecbf6e68",
+        "raw_text": "{\"summary\":\"检查投资计划对房租安排的影响\",\"risk_level\":\"low\",\"proposed_action\":\"HOLD_FOR_REVIEW\",\"action_reason\":\"投资金额较大，可能影响房租安排，需要人工审查\",\"missing_information\":[],\"evidence\":[\"虚构案例：我现在有 10000 元可用现金，下个月需交 4000 元房租，想再投入 8000 元买基金。请检查投资计划会不会影响房租安排。以下金额仅供演示。\"]}",
+        "raw_text_format": "provider_json_serialized",
+        "proposal": {
+          "summary": "检查投资计划对房租安排的影响",
+          "risk_level": "low",
+          "proposed_action": "HOLD_FOR_REVIEW",
+          "action_reason": "投资金额较大，可能影响房租安排，需要人工审查",
+          "missing_information": [],
+          "evidence": [
+            "虚构案例：我现在有 10000 元可用现金，下个月需交 4000 元房租，想再投入 8000 元买基金。请检查投资计划会不会影响房租安排。以下金额仅供演示。"
+          ]
+        },
+        "usage": {
+          "prompt_tokens": 334,
+          "completion_tokens": 130,
+          "total_tokens": 464,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "neurons": 35.53169250488281
+        }
+      },
+      "input": {
+        "kind": "bill",
+        "source": "risk-workbench-demo",
+        "input_sha256": "2eef209a6de1c97c7a38f7781fe931d074aa58b1c4058fc63dc9af111d489307"
+      }
+    },
+    "proposed_action": {
+      "proposed_action": "HOLD_FOR_REVIEW",
+      "action_reason": "投资金额较大，可能影响房租安排，需要人工审查",
+      "risk_level": "low",
+      "requested_action": "检查新增基金投资与房租安排是否冲突",
+      "action_parameters": {
+        "amount": 8000,
+        "currency": "CNY",
+        "synthetic": true
+      },
+      "model_response_id": "chatcmpl-0d11b668-6722-4348-bfe4-352cecbf6e68",
+      "proposal_sha256": "3d4d2f43ab4623543388ddba63fcee5e89b8f64316f97c6242afb55deb788eeb"
+    },
+    "risk_handoff": {
+      "contract_version": "model-review.v1",
+      "handoff_id": "handoff-72ab1e1a-3e97-4160-a261-3eda69e71ba5",
+      "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+      "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2",
+      "status": "PENDING_REVIEW",
+      "decision": "REQUEST_MORE_INFO",
+      "owner": "Unified Risk",
+      "reason": "模型输出只是拟议动作，必须由统一 Risk 决定是否进入审批。",
+      "evidence": {
+        "input_sha256": "2eef209a6de1c97c7a38f7781fe931d074aa58b1c4058fc63dc9af111d489307",
+        "model_response_id": "chatcmpl-0d11b668-6722-4348-bfe4-352cecbf6e68",
+        "proposal_sha256": "3d4d2f43ab4623543388ddba63fcee5e89b8f64316f97c6242afb55deb788eeb",
+        "audit_id": "audit-53792e4f-edb5-469d-9fb2-b876120c9cd4"
+      },
+      "execution_allowed": false
+    },
+    "risk_decision": {
+      "risk_decision_id": "risk-decision-cc63fbad-b417-4761-8c1b-0de7e76a4bc4",
+      "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+      "decision": "REQUEST_MORE_INFO",
+      "status": "PENDING_REVIEW",
+      "reviewer": "demo-risk-owner",
+      "reason": "演示环境人工模拟的 Risk 决策，尚非远程 Risk 系统回写",
+      "proposal_sha256": "3d4d2f43ab4623543388ddba63fcee5e89b8f64316f97c6242afb55deb788eeb",
+      "decided_at": "2026-10-14T07:30:02.791Z"
+    },
+    "approval": {
+      "approval_id": "approval-af162611-ab72-49c6-851d-2ecb366bc407",
+      "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+      "required": true,
+      "status": "BLOCKED",
+      "decision": null,
+      "proposal_sha256": "3d4d2f43ab4623543388ddba63fcee5e89b8f64316f97c6242afb55deb788eeb",
+      "approver": null,
+      "decided_at": null
+    },
+    "execution": {
+      "execution_id": null,
+      "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+      "status": "BLOCKED",
+      "simulation_allowed": false,
+      "execution_allowed": false,
+      "receipt": null
+    },
+    "audit": {
+      "audit_id": "audit-53792e4f-edb5-469d-9fb2-b876120c9cd4",
+      "workflow_version": "review-workflow.v1",
+      "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+      "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+      "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2",
+      "events": [
+        {
+          "event_id": "event-a87ac194-72fb-4ac5-a807-8e56f383822d",
+          "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+          "actor": "model-service",
+          "event_type": "review.received",
+          "payload": {
+            "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+            "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2"
+          },
+          "timestamp": "2026-10-14T07:29:06.812Z"
+        },
+        {
+          "event_id": "event-5984d98b-1b83-4846-81e7-ac24b0b7cc38",
+          "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+          "actor": "model-service",
+          "event_type": "model.completed",
+          "payload": {
+            "source": "model",
+            "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+            "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2"
+          },
+          "timestamp": "2026-10-14T07:29:12.708Z"
+        },
+        {
+          "event_id": "event-35da8f98-5aa9-4ca2-8c42-b5b02fd16854",
+          "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+          "actor": "model-service",
+          "event_type": "gateway.checked",
+          "payload": {
+            "execution_allowed": false,
+            "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+            "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2"
+          },
+          "timestamp": "2026-10-14T07:29:12.708Z"
+        },
+        {
+          "event_id": "event-4039ca22-5bc7-4c7e-9aa8-ee9bd56fdab4",
+          "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+          "actor": "core-agent",
+          "event_type": "workflow.created",
+          "payload": {
+            "stage": "MODEL",
+            "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+            "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2"
+          },
+          "timestamp": "2026-10-14T07:29:12.708Z"
+        },
+        {
+          "event_id": "event-a3ceb2ae-cb40-45d9-89fd-0dd6f3e682ea",
+          "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+          "actor": "core-agent",
+          "event_type": "proposal.bound",
+          "payload": {
+            "source": "model",
+            "proposal_sha256": "3d4d2f43ab4623543388ddba63fcee5e89b8f64316f97c6242afb55deb788eeb",
+            "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+            "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2"
+          },
+          "timestamp": "2026-10-14T07:29:12.708Z"
+        },
+        {
+          "event_id": "event-e42d56b2-7841-4705-a110-c120b755be7a",
+          "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+          "actor": "risk-gateway",
+          "event_type": "risk.handoff.created",
+          "payload": {
+            "handoff_id": "handoff-72ab1e1a-3e97-4160-a261-3eda69e71ba5",
+            "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+            "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2"
+          },
+          "timestamp": "2026-10-14T07:29:12.708Z"
+        },
+        {
+          "event_id": "event-9884415a-828c-46bf-b324-5d88eb2be3b8",
+          "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+          "actor": "execution-gateway",
+          "event_type": "execution.blocked",
+          "payload": {
+            "reason": "risk_pending",
+            "execution_allowed": false,
+            "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+            "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2"
+          },
+          "timestamp": "2026-10-14T07:29:12.708Z"
+        },
+        {
+          "event_id": "event-c9e711ac-3d30-4a1c-91b9-1d6bb667b539",
+          "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+          "actor": "risk",
+          "event_type": "risk.more_info_requested",
+          "payload": {
+            "reason": "演示环境人工模拟的 Risk 决策，尚非远程 Risk 系统回写",
+            "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+            "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2"
+          },
+          "timestamp": "2026-10-14T07:30:02.791Z"
+        },
+        {
+          "event_id": "event-87af0e77-41ee-4bfc-bd65-601ebbee6f87",
+          "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+          "actor": "execution-gateway",
+          "event_type": "execution.blocked",
+          "payload": {
+            "reason": "risk_more_info",
+            "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+            "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2"
+          },
+          "timestamp": "2026-10-14T07:30:02.791Z"
+        },
+        {
+          "event_id": "event-14f4be2e-b172-4286-aba4-e558d612327d",
+          "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+          "actor": "risk-gateway",
+          "event_type": "risk.callback.recorded",
+          "payload": {
+            "handoff_id": "handoff-72ab1e1a-3e97-4160-a261-3eda69e71ba5",
+            "audit_id": "audit-53792e4f-edb5-469d-9fb2-b876120c9cd4",
+            "proposal_sha256": "3d4d2f43ab4623543388ddba63fcee5e89b8f64316f97c6242afb55deb788eeb",
+            "decision": "REQUEST_MORE_INFO",
+            "risk_decision_id": "risk-decision-cc63fbad-b417-4761-8c1b-0de7e76a4bc4",
+            "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+            "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2"
+          },
+          "timestamp": "2026-10-14T07:30:02.791Z"
+        }
+      ]
+    },
+    "risk_callback": {
+      "callback_version": "risk-callback.v1",
+      "request": {
+        "callback_version": "risk-callback.v1",
+        "handoff_id": "handoff-72ab1e1a-3e97-4160-a261-3eda69e71ba5",
+        "task_id": "review-task-fc64e6e2-680c-48ab-ae7a-8144ca79e4b3",
+        "request_id": "req-workbench-05167cb2-7050-47b5-8759-3194ac061b73",
+        "run_id": "review-b8b77811-f4c2-414d-8e7e-39dbbd0dd6e2",
+        "audit_id": "audit-53792e4f-edb5-469d-9fb2-b876120c9cd4",
+        "proposal_sha256": "3d4d2f43ab4623543388ddba63fcee5e89b8f64316f97c6242afb55deb788eeb",
+        "decision": "REQUEST_MORE_INFO",
+        "reviewer": "demo-risk-owner",
+        "reason": "演示环境人工模拟的 Risk 决策，尚非远程 Risk 系统回写"
+      },
+      "received_at": "2026-10-14T07:30:02.791Z"
+    }
+  }
+}
