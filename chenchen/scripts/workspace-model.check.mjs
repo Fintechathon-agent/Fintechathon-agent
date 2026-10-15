@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { responseError, executionView, provenance, assertHealthResponse, healthTask, auditEvents } from "../versions/workspace-model.mjs";
+import { responseError, executionView, provenance, assertHealthResponse, healthTask, auditEvents, riskLabel } from "../versions/workspace-model.mjs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { Harness } = require("../core/harness.js");
@@ -53,3 +53,17 @@ test("waiting input is not waiting approval", () => {
 });
 
 test("unrecognized task status remains UNKNOWN", () => { const data=response(); data.task_state.status="FUTURE_STATE"; assert.equal(healthTask(data).state,"UNKNOWN"); });
+
+test("Risk presentation states are distinct and never confer execution permission",()=>{
+ const expected={NOT_CONNECTED:"风控服务未连接",REVIEW:"等待风险审核",RUNNING:"审核进行中",ALLOW:"审核通过",BLOCK:"审核阻断",ERROR:"审核错误"};
+ for(const [state,label] of Object.entries(expected)) assert.equal(riskLabel(state),label);
+ assert.equal(riskLabel("REQUIRED"),expected.NOT_CONNECTED);
+ assert.equal(riskLabel("future"),"风险状态待核验");
+});
+test("Core pending handoff is not proof of a connected Risk service",()=>{
+ const data=response(); assert.equal(data.risk_handoff.status,"PENDING_REVIEW");
+ assert.equal(healthTask(data).risk,"NOT_CONNECTED");
+ // Unverified decisions in the Core handoff cannot impersonate a Risk integration.
+ data.risk_handoff.decision="ALLOW";
+ assert.equal(healthTask(data).risk,"NOT_CONNECTED");assert.equal(healthTask(data).canExecute,false);
+});

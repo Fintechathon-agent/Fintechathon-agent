@@ -1,0 +1,638 @@
+TAP version 13
+# Subtest: public review survives cold starts and keeps workflow mutations in the audit
+ok 1 - public review survives cold starts and keeps workflow mutations in the audit
+  ---
+  duration_ms: 53.5665
+  type: 'test'
+  ...
+# Subtest: durable workflow refuses Risk mutation after simulation
+ok 2 - durable workflow refuses Risk mutation after simulation
+  ---
+  duration_ms: 10.1301
+  type: 'test'
+  ...
+# Subtest: failed real inference returns an error and a persistent blocked record
+ok 3 - failed real inference returns an error and a persistent blocked record
+  ---
+  duration_ms: 3.4268
+  type: 'test'
+  ...
+# Subtest: public endpoint validates input, caps requests, and accepts frontend preflight
+ok 4 - public endpoint validates input, caps requests, and accepts frontend preflight
+  ---
+  duration_ms: 5.3718
+  type: 'test'
+  ...
+# Subtest: explicit task ids cannot create a second workflow record
+ok 5 - explicit task ids cannot create a second workflow record
+  ---
+  duration_ms: 3.7804
+  type: 'test'
+  ...
+# Subtest: legacy question endpoint returns an adapter response without bypassing Risk
+ok 6 - legacy question endpoint returns an adapter response without bypassing Risk
+  ---
+  duration_ms: 5.1692
+  type: 'test'
+  ...
+# Subtest: test page is reachable even when opening the POST URL in a browser
+ok 7 - test page is reachable even when opening the POST URL in a browser
+  ---
+  duration_ms: 1.412
+  type: 'test'
+  ...
+# Subtest: public contract examples validate and preserve the request id
+ok 8 - public contract examples validate and preserve the request id
+  ---
+  duration_ms: 2.4003
+  type: 'test'
+  ...
+# Subtest: Agent output creates a Risk handoff from the same contract
+ok 9 - Agent output creates a Risk handoff from the same contract
+  ---
+  duration_ms: 54.6577
+  type: 'test'
+  ...
+# Subtest: response semantics reject broken references and authorization changes
+ok 10 - response semantics reject broken references and authorization changes
+  ---
+  duration_ms: 28.727
+  type: 'test'
+  ...
+# Subtest: contract rejects the old unversioned bare request
+ok 11 - contract rejects the old unversioned bare request
+  ---
+  duration_ms: 0.4111
+  type: 'test'
+  ...
+# Subtest: contract keeps investment errors traceable
+ok 12 - contract keeps investment errors traceable
+  ---
+  duration_ms: 0.2903
+  type: 'test'
+  ...
+# Subtest: failed task errors carry task, session and audit trace
+ok 13 - failed task errors carry task, session and audit trace
+  ---
+  duration_ms: 1.5284
+  type: 'test'
+  ...
+# Subtest: Risk Workbench adapter preserves evidence and stays read-only
+ok 14 - Risk Workbench adapter preserves evidence and stays read-only
+  ---
+  duration_ms: 32.611
+  type: 'test'
+  ...
+# Subtest: demo portfolio validates and preserves the weight invariant
+ok 15 - demo portfolio validates and preserves the weight invariant
+  ---
+  duration_ms: 2.6415
+  type: 'test'
+  ...
+# Subtest: invalid market values stop the tool instead of being guessed
+ok 16 - invalid market values stop the tool instead of being guessed
+  ---
+  duration_ms: 0.402
+  type: 'test'
+  ...
+# Subtest: diagnosis is deterministic and exposes hidden concentration
+ok 17 - diagnosis is deterministic and exposes hidden concentration
+  ---
+  duration_ms: 62.7753
+  type: 'test'
+  ...
+# Subtest: candidate generation creates three structured plans
+ok 18 - candidate generation creates three structured plans
+  ---
+  duration_ms: 36.2692
+  type: 'test'
+  ...
+# Subtest: simulation rejects a tampered ActionProposal
+ok 19 - simulation rejects a tampered ActionProposal
+  ---
+  duration_ms: 23.4401
+  type: 'test'
+  ...
+# Subtest: simulation returns reproducible quantiles with fixed seed
+ok 20 - simulation returns reproducible quantiles with fixed seed
+  ---
+  duration_ms: 43.9223
+  type: 'test'
+  ...
+# Subtest: harness stops at the ownership boundary and supports clarification
+ok 21 - harness stops at the ownership boundary and supports clarification
+  ---
+  duration_ms: 22.1514
+  type: 'test'
+  ...
+# Subtest: harness resumes from the last completed checkpoint after a tool failure
+ok 22 - harness resumes from the last completed checkpoint after a tool failure
+  ---
+  duration_ms: 19.7424
+  type: 'test'
+  ...
+# Subtest: memory requires explicit consent and is session-only
+ok 23 - memory requires explicit consent and is session-only
+  ---
+  duration_ms: 0.6382
+  type: 'test'
+  ...
+# Subtest: paper trading fails closed and is idempotent
+ok 24 - paper trading fails closed and is idempotent
+  ---
+  duration_ms: 21.0963
+  type: 'test'
+  ...
+# Subtest: HTTP flows: pages, independent cookies, review gating, import failure and disabled execution
+    # Subtest: all page assets load with the right type including the separate product stylesheet
+    not ok 1 - all page assets load with the right type including the separate product stylesheet
+      ---
+      duration_ms: 14.8471
+      type: 'test'
+      location: 'C:\\Users\\Y7000P\\.codex\\worktrees\\ui-site-integration-v1\\chenchen\\tests\\http.test.js:20:11'
+      failureType: 'testCodeFailure'
+      error: |-
+        The input did not match the regular expression /product-overrides\.css/. Input:
+        
+        '<!doctype html>\r\n' +
+          '<html lang="zh-CN">\r\n' +
+          '<head>\r\n' +
+          '  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">\r\n' +
+          '  <title>Finance Lab · 让每一步，都有据可循</title>\r\n' +
+          '  <meta name="description" content="从一笔想法，到每一笔有据可循的决策。探索 Finance Lab 投资组合诊断与任务记录。">\r\n' +
+          '  <meta name="theme-color" content="#0a0a0a">\r\n' +
+          '  <link rel="icon" href="/versions/favicon.svg" type="image/svg+xml">\r\n' +
+          '  <link rel="stylesheet" href="/versions/landing.css">\r\n' +
+          '  <script type="module" src="/versions/landing.js"></script>\r\n' +
+          '<link rel="stylesheet" href="/versions/tokens.css"><script type="module" src="/versions/archive.js"></script></head>\r\n' +
+          '<body class="landing-product">\r\n' +
+          '  <a class="skip-link" href="#explore">跳到核心功能</a>\r\n' +
+          '  <header class="landing-nav">\r\n' +
+          '    <a class="landing-brand" href="/landing.html" aria-label="Finance Lab 首页"><img class="team-logo-cutout" src="/versions/team-logo-transparent.png?v=fba7a4e1b36b" width="80" height="80" alt="团队标识"></a>\r\n' +
+          '    <nav aria-label="主导航"><a href="#explore">探索功能</a><a class="nav-enter" href="/workspace.html">进入工作台 <span><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg></span></a></nav>\r\n' +
+          '  </header>\r\n' +
+          '  <main>\r\n' +
+          '    <section class="scroll-story" aria-labelledby="story-title">\r\n' +
+          '      <div class="story-stage">\r\n' +
+          '        <div class="archive-host" data-archive-scene="full"></div>\r\n' +
+          '        <div class="story-copy">\r\n' +
+          '          <p class="eyebrow"><span></span> FINTECHATHON 2026 / FINANCE LAB</p>\r\n' +
+          '          <h1 id="story-title">从一笔想法，<br>到<span>每一步有据可循。</span></h1>\r\n' +
+          '          <p class="story-description">让复杂的财务问题，变成看得清的下一步。<br>从组合诊断，到风险与任务记录。</p>\r\n' +
+          '\r\n' +
+          '        </div>\r\n' +
+          '        <div class="story-next" aria-hidden="true"><p class="eyebrow">FROM IDEAS TO INSIGHT</p><p>让每一笔，<br><span>都看得清下一步。</span></p><small>投资组合 / 任务记录</small></div>\r\n' +
+          '        <a class="story-action" href="#explore">探索金融工作台 <span><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg></span></a>\r\n' +
+          '        <div class="object-stage" aria-hidden="true">\r\n' +
+          '\r\n' +
+          '          <div class="coin-travel" id="coin">\r\n' +
+          '            <div class="coin-edge-ridges"></div><div class="coin-flip"><svg class="k-coin-art" viewBox="0 0 400 400" fill="none">\r\n' +
+          '              <defs>\r\n' +
+          '                <linearGradient id="k-gold" x1="60" y1="40" x2="320" y2="350" gradientUnits="userSpaceOnUse"><stop stop-color="var(--brand-highlight)"/><stop offset=".3" stop-color="var(--brand-orange)"/><stop offset=".42" stop-color="#ffb865"/><stop offset=".46" stop-color="#ffeac4"/><stop offset=".50" stop-color="#c25b1b"/><stop offset=".72" stop-color="#f68b32"/><stop offset="1" stop-color="var(--brand-shadow)"/></linearGradient>\r\n' +
+          '                <linearGradient id="coin-gold" x1="85" y1="65" x2="320" y2="340" gradientUnits="userSpaceOnUse"><stop stop-color="#ffdea4"/><stop offset=".32" stop-color="#e89043"/><stop offset=".53" stop-color="#ffd08a"/><stop offset=".77" stop-color="#c56528"/><stop offset="1" stop-color="#f4aa59"/></linearGradient>\r\n' +
+          '              </defs>\r\n' +
+          '              <g class="coin-material">\r\n' +
+          '                <circle cx="204" cy="207" r="155" fill="#753610"/>\r\n' +
+          '                <circle cx="200" cy="200" r="148" fill="url(#coin-gold)"/>\r\n' +
+          '                <circle cx="200" cy="200" r="133" stroke="#994419" stroke-width="3"/>\r\n' +
+          '                <circle cx="200" cy="200" r="126" stroke="#ffdb9a" stroke-width="2"/>\r\n' +
+          '                <g stroke="#7b3c15" stroke-width="2"><path d="M200 49V58" transform="rotate(0 200 200)"/><path d="M200 49V58" transform="rotate(5 200 200)"/><path d="M200 49V58" transform="rotate(10 200 200)"/><path d="M200 49V58" transform="rotate(15 200 200)"/><path d="M200 49V58" transform="rotate(20 200 200)"/><path d="M200 49V58" transform="rotate(25 200 200)"/><path d="M200 49V58" transform="rotate(30 200 200)"/><path d="M200 49V58" transform="rotate(35 200 200)"/><path d="M200 49V58" transform="rotate(40 200 200)"/><path d="M200 49V58" transform="rotate(45 200 200)"/><path d="M200 49V58" transform="rotate(50 200 200)"/><path d="M200 49V58" transform="rotate(55 200 200)"/><path d="M200 49V58" transform="rotate(60 200 200)"/><path d="M200 49V58" transform="rotate(65 200 200)"/><path d="M200 49V58" transform="rotate(70 200 200)"/><path d="M200 49V58" transform="rotate(75 200 200)"/><path d="M200 49V58" transform="rotate(80 200 200)"/><path d="M200 49V58" transform="rotate(85 200 200)"/><path d="M200 49V58" transform="rotate(90 200 200)"/><path d="M200 49V58" transform="rotate(95 200 200)"/><path d="M200 49V58" transform="rotate(100 200 200)"/><path d="M200 49V58" transform="rotate(105 200 200)"/><path d="M200 49V58" transform="rotate(110 200 200)"/><path d="M200 49V58" transform="rotate(115 200 200)"/><path d="M200 49V58" transform="rotate(120 200 200)"/><path d="M200 49V58" transform="rotate(125 200 200)"/><path d="M200 49V58" transform="rotate(130 200 200)"/><path d="M200 49V58" transform="rotate(135 200 200)"/><path d="M200 49V58" transform="rotate(140 200 200)"/><path d="M200 49V58" transform="rotate(145 200 200)"/><path d="M200 49V58" transform="rotate(150 200 200)"/><path d="M200 49V58" transform="rotate(155 200 200)"/><path d="M200 49V58" transform="rotate(160 200 200)"/><path d="M200 49V58" transform="rotate(165 200 200)"/><path d="M200 49V58" transform="rotate(170 200 200)"/><path d="M200 49V58" transform="rotate(175 200 200)"/><path d="M200 49V58" transform="rotate(180 200 200)"/><path d="M200 49V58" transform="rotate(185 200 200)"/><path d="M200 49V58" transform="rotate(190 200 200)"/><path d="M200 49V58" transform="rotate(195 200 200)"/><path d="M200 49V58" transform="rotate(200 200 200)"/><path d="M200 49V58" transform="rotate(205 200 200)"/><path d="M200 49V58" transform="rotate(210 200 200)"/><path d="M200 49V58" transform="rotate(215 200 200)"/><path d="M200 49V58" transform="rotate(220 200 200)"/><path d="M200 49V58" transform="rotate(225 200 200)"/><path d="M200 49V58" transform="rotate(230 200 200)"/><path d="M200 49V58" transform="rotate(235 200 200)"/><path d="M200 49V58" transform="rotate(240 200 200)"/><path d="M200 49V58" transform="rotate(245 200 200)"/><path d="M200 49V58" transform="rotate(250 200 200)"/><path d="M200 49V58" transform="rotate(255 200 200)"/><path d="M200 49V58" transform="rotate(260 200 200)"/><path d="M200 49V58" transform="rotate(265 200 200)"/><path d="M200 49V58" transform="rotate(270 200 200)"/><path d="M200 49V58" transform="rotate(275 200 200)"/><path d="M200 49V58" transform="rotate(280 200 200)"/><path d="M200 49V58" transform="rotate(285 200 200)"/><path d="M200 49V58" transform="rotate(290 200 200)"/><path d="M200 49V58" transform="rotate(295 200 200)"/><path d="M200 49V58" transform="rotate(300 200 200)"/><path d="M200 49V58" transform="rotate(305 200 200)"/><path d="M200 49V58" transform="rotate(310 200 200)"/><path d="M200 49V58" transform="rotate(315 200 200)"/><path d="M200 49V58" transform="rotate(320 200 200)"/><path d="M200 49V58" transform="rotate(325 200 200)"/><path d="M200 49V58" transform="rotate(330 200 200)"/><path d="M200 49V58" transform="rotate(335 200 200)"/><path d="M200 49V58" transform="rotate(340 200 200)"/><path d="M200 49V58" transform="rotate(345 200 200)"/><path d="M200 49V58" transform="rotate(350 200 200)"/><path d="M200 49V58" transform="rotate(355 200 200)"/></g>\r\n' +
+          '                <text x="200" y="111" text-anchor="middle" fill="#6a3414" font-family="Arial,sans-serif" font-size="11" letter-spacing="4">FINANCE · LAB</text>\r\n' +
+          '\r\n' +
+          '                <text x="200" y="302" text-anchor="middle" fill="#6a3414" font-family="Arial,sans-serif" font-size="9" letter-spacing="3">MAKE IT COUNT</text>\r\n' +
+          '              </g>\r\n' +
+          '              <path id="k-spine" d="M78 44V356" stroke="url(#k-gold)" stroke-width="58"/>\r\n' +
+          '              <g id="k-arms" stroke="url(#k-gold)" stroke-width="58">\r\n' +
+          '                <path id="k-upper" d="M104 200C136 174 168 148 200 122C232 96 264 70 296 44"/>\r\n' +
+          '                <path id="k-lower" d="M104 200C136 226 168 252 200 278C232 304 264 330 296 356"/>\r\n' +
+          '              </g>\r\n' +
+          '            </svg></div><span class="coin-glyph">¥</span>\r\n' +
+          '          </div>\r\n' +
+          '        </div>\r\n' +
+          '        <div class="scene-bottom"><span>SCROLL TO DISCOVER</span><div class="scroll-meter"><i></i></div><span class="scene-count">IDEA <b>→</b> INSIGHT</span></div>\r\n' +
+          '      </div>\r\n' +
+          '    </section>\r\n' +
+          '    <section class="explore-section" id="explore" tabindex="-1" aria-labelledby="explore-title">\r\n' +
+          '      <div class="archive-host" data-archive-scene="quiet"></div>\r\n' +
+          '      <div class="section-heading"><div><p class="eyebrow">ONE WORKSPACE. EVERY STEP WITH EVIDENCE.</p><h2 id="explore-title">每一笔，都值得<span>看清楚。</span></h2></div><p>从诊断到记录，每一步都能回看。轻点天平，探索你的金融工作空间。</p></div>\r\n' +
+          '      <div class="feature-grid"><div class="balance-beam" aria-hidden="true"><i></i><span></span></div>\r\n' +
+          '        <article class="feature-card glass investment-feature">\r\n' +
+          '          <div class="card-top"><span>01 / PERSONAL FINANCE</span><span class="feature-icon"><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg></span></div>\r\n' +
+          '          <div class="feature-visual archive-diagram"><span aria-hidden="true">01</span><button type="button" class="liquid-vessel" aria-label="向个人投资一侧注入液体"><canvas class="liquid-water" aria-hidden="true"></canvas></button><canvas class="liquid-drops" aria-hidden="true"></canvas><div class="balance-caption"><span class="pour-hint" aria-hidden="true">TAP TO POUR</span><b>PORTFOLIO / RECORD 0026</b></div></div>\r\n' +
+          '          <h3>个人投资顾问</h3><p>读懂持仓结构，检查组合健康。<br>对照不同方案，追溯每一项分析依据。</p>\r\n' +
+          '          <ul><li>持仓健康检查</li><li>三种方案对照</li><li>分析证据导出</li></ul>\r\n' +
+          '          <a class="feature-link" href="/workspace.html">探索投资工作台 <span><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg></span></a>\r\n' +
+          '        </article>\r\n' +
+          '        <article class="feature-card glass merchant-feature">\r\n' +
+          '          <div class="card-top"><span>02 / TASK E'... 1263 more characters
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      actual: |-
+        <!doctype html>
+        <html lang="zh-CN">
+        <head>
+          <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Finance Lab · 让每一步，都有据可循</title>
+          <meta name="description" content="从一笔想法，到每一笔有据可循的决策。探索 Finance Lab 投资组合诊断与任务记录。">
+          <meta name="theme-color" content="#0a0a0a">
+          <link rel="icon" href="/versions/favicon.svg" type="image/svg+xml">
+          <link rel="stylesheet" href="/versions/landing.css">
+          <script type="module" src="/versions/landing.js"></script>
+        <link rel="stylesheet" href="/versions/tokens.css"><script type="module" src="/versions/archive.js"></script></head>
+        <body class="landing-product">
+          <a class="skip-link" href="#explore">跳到核心功能</a>
+          <header class="landing-nav">
+            <a class="landing-brand" href="/landing.html" aria-label="Finance Lab 首页"><img class="team-logo-cutout" src="/versions/team-logo-transparent.png?v=fba7a4e1b36b" width="80" height="80" alt="团队标识"></a>
+            <nav aria-label="主导航"><a href="#explore">探索功能</a><a class="nav-enter" href="/workspace.html">进入工作台 <span><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg></span></a></nav>
+          </header>
+          <main>
+            <section class="scroll-story" aria-labelledby="story-title">
+              <div class="story-stage">
+                <div class="archive-host" data-archive-scene="full"></div>
+                <div class="story-copy">
+                  <p class="eyebrow"><span></span> FINTECHATHON 2026 / FINANCE LAB</p>
+                  <h1 id="story-title">从一笔想法，<br>到<span>每一步有据可循。</span></h1>
+                  <p class="story-description">让复杂的财务问题，变成看得清的下一步。<br>从组合诊断，到风险与任务记录。</p>
+        
+                </div>
+                <div class="story-next" aria-hidden="true"><p class="eyebrow">FROM IDEAS TO INSIGHT</p><p>让每一笔，<br><span>都看得清下一步。</span></p><small>投资组合 / 任务记录</small></div>
+                <a class="story-action" href="#explore">探索金融工作台 <span><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg></span></a>
+                <div class="object-stage" aria-hidden="true">
+        
+                  <div class="coin-travel" id="coin">
+                    <div class="coin-edge-ridges"></div><div class="coin-flip"><svg class="k-coin-art" viewBox="0 0 400 400" fill="none">
+                      <defs>
+                        <linearGradient id="k-gold" x1="60" y1="40" x2="320" y2="350" gradientUnits="userSpaceOnUse"><stop stop-color="var(--brand-highlight)"/><stop offset=".3" stop-color="var(--brand-orange)"/><stop offset=".42" stop-color="#ffb865"/><stop offset=".46" stop-color="#ffeac4"/><stop offset=".50" stop-color="#c25b1b"/><stop offset=".72" stop-color="#f68b32"/><stop offset="1" stop-color="var(--brand-shadow)"/></linearGradient>
+                        <linearGradient id="coin-gold" x1="85" y1="65" x2="320" y2="340" gradientUnits="userSpaceOnUse"><stop stop-color="#ffdea4"/><stop offset=".32" stop-color="#e89043"/><stop offset=".53" stop-color="#ffd08a"/><stop offset=".77" stop-color="#c56528"/><stop offset="1" stop-color="#f4aa59"/></linearGradient>
+                      </defs>
+                      <g class="coin-material">
+                        <circle cx="204" cy="207" r="155" fill="#753610"/>
+                        <circle cx="200" cy="200" r="148" fill="url(#coin-gold)"/>
+                        <circle cx="200" cy="200" r="133" stroke="#994419" stroke-width="3"/>
+                        <circle cx="200" cy="200" r="126" stroke="#ffdb9a" stroke-width="2"/>
+                        <g stroke="#7b3c15" stroke-width="2"><path d="M200 49V58" transform="rotate(0 200 200)"/><path d="M200 49V58" transform="rotate(5 200 200)"/><path d="M200 49V58" transform="rotate(10 200 200)"/><path d="M200 49V58" transform="rotate(15 200 200)"/><path d="M200 49V58" transform="rotate(20 200 200)"/><path d="M200 49V58" transform="rotate(25 200 200)"/><path d="M200 49V58" transform="rotate(30 200 200)"/><path d="M200 49V58" transform="rotate(35 200 200)"/><path d="M200 49V58" transform="rotate(40 200 200)"/><path d="M200 49V58" transform="rotate(45 200 200)"/><path d="M200 49V58" transform="rotate(50 200 200)"/><path d="M200 49V58" transform="rotate(55 200 200)"/><path d="M200 49V58" transform="rotate(60 200 200)"/><path d="M200 49V58" transform="rotate(65 200 200)"/><path d="M200 49V58" transform="rotate(70 200 200)"/><path d="M200 49V58" transform="rotate(75 200 200)"/><path d="M200 49V58" transform="rotate(80 200 200)"/><path d="M200 49V58" transform="rotate(85 200 200)"/><path d="M200 49V58" transform="rotate(90 200 200)"/><path d="M200 49V58" transform="rotate(95 200 200)"/><path d="M200 49V58" transform="rotate(100 200 200)"/><path d="M200 49V58" transform="rotate(105 200 200)"/><path d="M200 49V58" transform="rotate(110 200 200)"/><path d="M200 49V58" transform="rotate(115 200 200)"/><path d="M200 49V58" transform="rotate(120 200 200)"/><path d="M200 49V58" transform="rotate(125 200 200)"/><path d="M200 49V58" transform="rotate(130 200 200)"/><path d="M200 49V58" transform="rotate(135 200 200)"/><path d="M200 49V58" transform="rotate(140 200 200)"/><path d="M200 49V58" transform="rotate(145 200 200)"/><path d="M200 49V58" transform="rotate(150 200 200)"/><path d="M200 49V58" transform="rotate(155 200 200)"/><path d="M200 49V58" transform="rotate(160 200 200)"/><path d="M200 49V58" transform="rotate(165 200 200)"/><path d="M200 49V58" transform="rotate(170 200 200)"/><path d="M200 49V58" transform="rotate(175 200 200)"/><path d="M200 49V58" transform="rotate(180 200 200)"/><path d="M200 49V58" transform="rotate(185 200 200)"/><path d="M200 49V58" transform="rotate(190 200 200)"/><path d="M200 49V58" transform="rotate(195 200 200)"/><path d="M200 49V58" transform="rotate(200 200 200)"/><path d="M200 49V58" transform="rotate(205 200 200)"/><path d="M200 49V58" transform="rotate(210 200 200)"/><path d="M200 49V58" transform="rotate(215 200 200)"/><path d="M200 49V58" transform="rotate(220 200 200)"/><path d="M200 49V58" transform="rotate(225 200 200)"/><path d="M200 49V58" transform="rotate(230 200 200)"/><path d="M200 49V58" transform="rotate(235 200 200)"/><path d="M200 49V58" transform="rotate(240 200 200)"/><path d="M200 49V58" transform="rotate(245 200 200)"/><path d="M200 49V58" transform="rotate(250 200 200)"/><path d="M200 49V58" transform="rotate(255 200 200)"/><path d="M200 49V58" transform="rotate(260 200 200)"/><path d="M200 49V58" transform="rotate(265 200 200)"/><path d="M200 49V58" transform="rotate(270 200 200)"/><path d="M200 49V58" transform="rotate(275 200 200)"/><path d="M200 49V58" transform="rotate(280 200 200)"/><path d="M200 49V58" transform="rotate(285 200 200)"/><path d="M200 49V58" transform="rotate(290 200 200)"/><path d="M200 49V58" transform="rotate(295 200 200)"/><path d="M200 49V58" transform="rotate(300 200 200)"/><path d="M200 49V58" transform="rotate(305 200 200)"/><path d="M200 49V58" transform="rotate(310 200 200)"/><path d="M200 49V58" transform="rotate(315 200 200)"/><path d="M200 49V58" transform="rotate(320 200 200)"/><path d="M200 49V58" transform="rotate(325 200 200)"/><path d="M200 49V58" transform="rotate(330 200 200)"/><path d="M200 49V58" transform="rotate(335 200 200)"/><path d="M200 49V58" transform="rotate(340 200 200)"/><path d="M200 49V58" transform="rotate(345 200 200)"/><path d="M200 49V58" transform="rotate(350 200 200)"/><path d="M200 49V58" transform="rotate(355 200 200)"/></g>
+                        <text x="200" y="111" text-anchor="middle" fill="#6a3414" font-family="Arial,sans-serif" font-size="11" letter-spacing="4">FINANCE · LAB</text>
+        
+                        <text x="200" y="302" text-anchor="middle" fill="#6a3414" font-family="Arial,sans-serif" font-size="9" letter-spacing="3">MAKE IT COUNT</text>
+                      </g>
+                      <path id="k-spine" d="M78 44V356" stroke="url(#k-gold)" stroke-width="58"/>
+                      <g id="k-arms" stroke="url(#k-gold)" stroke-width="58">
+                        <path id="k-upper" d="M104 200C136 174 168 148 200 122C232 96 264 70 296 44"/>
+                        <path id="k-lower" d="M104 200C136 226 168 252 200 278C232 304 264 330 296 356"/>
+                      </g>
+                    </svg></div><span class="coin-glyph">¥</span>
+                  </div>
+                </div>
+                <div class="scene-bottom"><span>SCROLL TO DISCOVER</span><div class="scroll-meter"><i></i></div><span class="scene-count">IDEA <b>→</b> INSIGHT</span></div>
+              </div>
+            </section>
+            <section class="explore-section" id="explore" tabindex="-1" aria-labelledby="explore-title">
+              <div class="archive-host" data-archive-scene="quiet"></div>
+              <div class="section-heading"><div><p class="eyebrow">ONE WORKSPACE. EVERY STEP WITH EVIDENCE.</p><h2 id="explore-title">每一笔，都值得<span>看清楚。</span></h2></div><p>从诊断到记录，每一步都能回看。轻点天平，探索你的金融工作空间。</p></div>
+              <div class="feature-grid"><div class="balance-beam" aria-hidden="true"><i></i><span></span></div>
+                <article class="feature-card glass investment-feature">
+                  <div class="card-top"><span>01 / PERSONAL FINANCE</span><span class="feature-icon"><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg></span></div>
+                  <div class="feature-visual archive-diagram"><span aria-hidden="true">01</span><button type="button" class="liquid-vessel" aria-label="向个人投资一侧注入液体"><canvas class="liquid-water" aria-hidden="true"></canvas></button><canvas class="liquid-drops" aria-hidden="true"></canvas><div class="balance-caption"><span class="pour-hint" aria-hidden="true">TAP TO POUR</span><b>PORTFOLIO / RECORD 0026</b></div></div>
+                  <h3>个人投资顾问</h3><p>读懂持仓结构，检查组合健康。<br>对照不同方案，追溯每一项分析依据。</p>
+                  <ul><li>持仓健康检查</li><li>三种方案对照</li><li>分析证据导出</li></ul>
+                  <a class="feature-link" href="/workspace.html">探索投资工作台 <span><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg></span></a>
+                </article>
+                <article class="feature-card glass merchant-feature">
+                  <div class="card-top"><span>02 / TASK EVIDENCE</span><span class="feature-icon">⌘</span></div>
+                  <div class="feature-visual archive-diagram"><span aria-hidden="true">02</span><button type="button" class="liquid-vessel" aria-label="向任务记录一侧注入液体"><canvas class="liquid-water" aria-hidden="true"></canvas></button><canvas class="liquid-drops" aria-hidden="true"></canvas><div class="balance-caption"><span class="pour-hint" aria-hidden="true">TAP TO POUR</span><b>TASK / RECORD 0062</b></div></div>
+                  <h3>我的任务与记录</h3><p>查看原任务，核对风险交接与分析依据。<br>审批与执行待正式接口接入。</p>
+                  <ul><li>任务编号关联</li><li>只读风险交接</li><li>审计记录回看</li></ul>
+                  <a class="feature-link" href="/workspace.html#tasks">查看任务与记录 <span><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg></span></a>
+                </article>
+              </div>
+              <div class="method-strip"><p><b>01</b> 看见数据</p><span>→</span><p><b>02</b> 核对依据</p><span>→</span><p><b>03</b> 比较可能</p></div>
+            </section>
+          </main>
+          <footer><a href="/landing.html">FINANCE LAB</a><p>比赛演示 · 使用合成示例数据 · 不接真实账户或交易</p><a href="/catalog.html">产品目录 <svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg></a></footer>
+        </body>
+        </html>
+        
+      operator: 'match'
+      stack: |-
+        TestContext.<anonymous> (C:\Users\Y7000P\.codex\worktrees\ui-site-integration-v1\chenchen\tests\http.test.js:24:14)
+        process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        async Test.run (node:internal/test_runner/test:1389:7)
+        async TestContext.<anonymous> (C:\Users\Y7000P\.codex\worktrees\ui-site-integration-v1\chenchen\tests\http.test.js:20:3)
+        async Test.run (node:internal/test_runner/test:1389:7)
+        async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+      ...
+    1..1
+not ok 25 - HTTP flows: pages, independent cookies, review gating, import failure and disabled execution
+  ---
+  duration_ms: 907.4569
+  type: 'test'
+  location: 'C:\\Users\\Y7000P\\.codex\\worktrees\\ui-site-integration-v1\\chenchen\\tests\\http.test.js:7:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: legacy question input maps into the unified review contract
+ok 26 - legacy question input maps into the unified review contract
+  ---
+  duration_ms: 21.3983
+  type: 'test'
+  ...
+# Subtest: market brief fixture validates and flags abnormal moves without inventing attribution
+ok 27 - market brief fixture validates and flags abnormal moves without inventing attribution
+  ---
+  duration_ms: 2.6307
+  type: 'test'
+  ...
+# Subtest: Core Agent carries market context to Risk while preserving Quant outputs
+ok 28 - Core Agent carries market context to Risk while preserving Quant outputs
+  ---
+  duration_ms: 72.771
+  type: 'test'
+  ...
+# Subtest: duplicate market observations stop at the Core Agent input boundary
+ok 29 - duplicate market observations stop at the Core Agent input boundary
+  ---
+  duration_ms: 1.1076
+  type: 'test'
+  ...
+# Subtest: 2026-10-09 market brief replays with source conflict evidence and no Quant drift
+ok 30 - 2026-10-09 market brief replays with source conflict evidence and no Quant drift
+  ---
+  duration_ms: 61.1297
+  type: 'test'
+  ...
+# Subtest: ledger totals use net receipts and never add settled bills to opening cash
+ok 31 - ledger totals use net receipts and never add settled bills to opening cash
+  ---
+  duration_ms: 33.5649
+  type: 'test'
+  ...
+# Subtest: the payout equation keeps fees and refunds visible
+ok 32 - the payout equation keeps fees and refunds visible
+  ---
+  duration_ms: 0.7801
+  type: 'test'
+  ...
+# Subtest: duplicate imports are idempotent and conflicting duplicates are rejected atomically
+ok 33 - duplicate imports are idempotent and conflicting duplicates are rejected atomically
+  ---
+  duration_ms: 4.2667
+  type: 'test'
+  ...
+# Subtest: cents, dates, status, currency and quantity validation reject invalid imports
+ok 34 - cents, dates, status, currency and quantity validation reject invalid imports
+  ---
+  duration_ms: 1.0682
+  type: 'test'
+  ...
+# Subtest: review requires bill viewing and explicit confirmation of the current revision
+ok 35 - review requires bill viewing and explicit confirmation of the current revision
+  ---
+  duration_ms: 1.6721
+  type: 'test'
+  ...
+# Subtest: a replacement resets review and followups even after a previously confirmed import
+ok 36 - a replacement resets review and followups even after a previously confirmed import
+  ---
+  duration_ms: 1.773
+  type: 'test'
+  ...
+# Subtest: same-item price and quantity effects sum to the actual purchase increase
+ok 37 - same-item price and quantity effects sum to the actual purchase increase
+  ---
+  duration_ms: 0.5025
+  type: 'test'
+  ...
+# Subtest: mixed items or absent baseline do not get invented unit-price explanations
+ok 38 - mixed items or absent baseline do not get invented unit-price explanations
+  ---
+  duration_ms: 0.4292
+  type: 'test'
+  ...
+# Subtest: arrival delay exposes an earlier cash gap without moving supplier due dates
+ok 39 - arrival delay exposes an earlier cash gap without moving supplier due dates
+  ---
+  duration_ms: 1.3899
+  type: 'test'
+  ...
+# Subtest: overdue payments are reserved tomorrow and not subtracted repeatedly
+ok 40 - overdue payments are reserved tomorrow and not subtracted repeatedly
+  ---
+  duration_ms: 1.9104
+  type: 'test'
+  ...
+# Subtest: separate merchant sessions cannot see each other’s ledger or confirmation
+ok 41 - separate merchant sessions cannot see each other’s ledger or confirmation
+  ---
+  duration_ms: 1.2893
+  type: 'test'
+  ...
+# Subtest: empty ledger has a flat known-cash forecast without fabricated warnings
+ok 42 - empty ledger has a flat known-cash forecast without fabricated warnings
+  ---
+  duration_ms: 0.3843
+  type: 'test'
+  ...
+# Subtest: negative opening cash is the first gap even when next-day receipts cover it
+ok 43 - negative opening cash is the first gap even when next-day receipts cover it
+  ---
+  duration_ms: 0.6459
+  type: 'test'
+  ...
+# Subtest: notice status moves through plain-language states and resets after replacement
+ok 44 - notice status moves through plain-language states and resets after replacement
+  ---
+  duration_ms: 2.7996
+  type: 'test'
+  ...
+# Subtest: single receipt delay scenario moves only the selected income bill
+ok 45 - single receipt delay scenario moves only the selected income bill
+  ---
+  duration_ms: 1.1043
+  type: 'test'
+  ...
+# Subtest: model review calls the configured Responses endpoint and stays read-only
+ok 46 - model review calls the configured Responses endpoint and stays read-only
+  ---
+  duration_ms: 45.7677
+  type: 'test'
+  ...
+# Subtest: chat completions request uses the configured JSON object response format
+ok 47 - chat completions request uses the configured JSON object response format
+  ---
+  duration_ms: 1.1891
+  type: 'test'
+  ...
+# Subtest: model failure is explicit unless rule fallback is requested
+ok 48 - model failure is explicit unless rule fallback is requested
+  ---
+  duration_ms: 4.603
+  type: 'test'
+  ...
+# Subtest: unsupported model actions are rejected before gateway output
+ok 49 - unsupported model actions are rejected before gateway output
+  ---
+  duration_ms: 1.1685
+  type: 'test'
+  ...
+# Subtest: Workers AI invokes the bound model without an API key and retains provider output
+ok 50 - Workers AI invokes the bound model without an API key and retains provider output
+  ---
+  duration_ms: 1.0005
+  type: 'test'
+  ...
+# Subtest: public configuration disallows requested fallback when real inference fails
+ok 51 - public configuration disallows requested fallback when real inference fails
+  ---
+  duration_ms: 0.8472
+  type: 'test'
+  ...
+# Subtest: combined input preserves both bill and news
+ok 52 - combined input preserves both bill and news
+  ---
+  duration_ms: 0.2562
+  type: 'test'
+  ...
+# Subtest: data date labels describe age, not automatic real-time freshness
+ok 53 - data date labels describe age, not automatic real-time freshness
+  ---
+  duration_ms: 4.5098
+  type: 'test'
+  ...
+# Subtest: negative drawdown compares closer to zero; CURRENT is never a candidate
+ok 54 - negative drawdown compares closer to zero; CURRENT is never a candidate
+  ---
+  duration_ms: 2.0584
+  type: 'test'
+  ...
+# Subtest: ties prefer lower turnover; invalid and empty plans have no invented winner
+ok 55 - ties prefer lower turnover; invalid and empty plans have no invented winner
+  ---
+  duration_ms: 0.3866
+  type: 'test'
+  ...
+# Subtest: gap changes with delay and opening negative cash is reported as already negative
+ok 56 - gap changes with delay and opening negative cash is reported as already negative
+  ---
+  duration_ms: 25.1673
+  type: 'test'
+  ...
+# Subtest: due-today unsettled receipts agree with forecast exclusions
+ok 57 - due-today unsettled receipts agree with forecast exclusions
+  ---
+  duration_ms: 1.0437
+  type: 'test'
+  ...
+# Subtest: bill priority surfaces pending dates without changing the ledger
+ok 58 - bill priority surfaces pending dates without changing the ledger
+  ---
+  duration_ms: 1.1408
+  type: 'test'
+  ...
+# Subtest: empty merchant overview does not fabricate bills or gaps
+ok 59 - empty merchant overview does not fabricate bills or gaps
+  ---
+  duration_ms: 0.3893
+  type: 'test'
+  ...
+# Subtest: numeric strings, mismatched replay dates and missing snapshot amounts are rejected
+ok 60 - numeric strings, mismatched replay dates and missing snapshot amounts are rejected
+  ---
+  duration_ms: 4.3844
+  type: 'test'
+  ...
+# Subtest: negative correlation is not labelled as same-direction concentration; cash is separate
+ok 61 - negative correlation is not labelled as same-direction concentration; cash is separate
+  ---
+  duration_ms: 1.4618
+  type: 'test'
+  ...
+# Subtest: net return equals curve endpoint and holding A matches baseline scenarios exactly
+ok 62 - net return equals curve endpoint and holding A matches baseline scenarios exactly
+  ---
+  duration_ms: 34.1073
+  type: 'test'
+  ...
+# Subtest: C includes the price path of a new bond holding even when the original portfolio lacks it
+ok 63 - C includes the price path of a new bond holding even when the original portfolio lacks it
+  ---
+  duration_ms: 29.6923
+  type: 'test'
+  ...
+# Subtest: extreme concentration and zero cash still produce auditable plans
+ok 64 - extreme concentration and zero cash still produce auditable plans
+  ---
+  duration_ms: 113.8352
+  type: 'test'
+  ...
+# Subtest: stale or fabricated health reports do not influence strategy generation
+ok 65 - stale or fabricated health reports do not influence strategy generation
+  ---
+  duration_ms: 0.5822
+  type: 'test'
+  ...
+# Subtest: changing inputs invalidates cached artifacts; identical completed requests reuse the result
+ok 66 - changing inputs invalidates cached artifacts; identical completed requests reuse the result
+  ---
+  duration_ms: 23.2499
+  type: 'test'
+  ...
+# Subtest: clearing risk preferences requests clarification and unknown tasks are not recreated
+ok 67 - clearing risk preferences requests clarification and unknown tasks are not recreated
+  ---
+  duration_ms: 14.6681
+  type: 'test'
+  ...
+# Subtest: the circuit breaker stops repeated tool failure instead of running forever
+ok 68 - the circuit breaker stops repeated tool failure instead of running forever
+  ---
+  duration_ms: 0.8545
+  type: 'test'
+  ...
+# Subtest: HTTP model-to-Risk-to-approval-to-simulation chain is queryable
+ok 69 - HTTP model-to-Risk-to-approval-to-simulation chain is queryable
+  ---
+  duration_ms: 175.656
+  type: 'test'
+  ...
+# Subtest: golden path keeps one task across model, Risk, approval, simulation and audit
+ok 70 - golden path keeps one task across model, Risk, approval, simulation and audit
+  ---
+  duration_ms: 25.9728
+  type: 'test'
+  ...
+# Subtest: Risk rejection remains terminal for execution
+ok 71 - Risk rejection remains terminal for execution
+  ---
+  duration_ms: 2.2879
+  type: 'test'
+  ...
+# Subtest: proposal hash prevents approval after parameters change
+ok 72 - proposal hash prevents approval after parameters change
+  ---
+  duration_ms: 2.1256
+  type: 'test'
+  ...
+# Subtest: model failure creates an auditable blocked workflow
+ok 73 - model failure creates an auditable blocked workflow
+  ---
+  duration_ms: 1.0055
+  type: 'test'
+  ...
+# Subtest: terminal workflow states cannot be mutated by repeated Risk or approval calls
+ok 74 - terminal workflow states cannot be mutated by repeated Risk or approval calls
+  ---
+  duration_ms: 3.1478
+  type: 'test'
+  ...
+1..74
+# tests 75
+# suites 0
+# pass 73
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1114.0798

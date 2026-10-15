@@ -43,9 +43,11 @@ body.unified-workspace, body.unified-directory {
 .service-catalog>*{display:block;padding:16px;border:1px solid var(--line);border-radius:10px;text-decoration:none}
 .service-catalog small{display:block;margin-top:5px;font-size:11px}
 .service-catalog .service-active{border-color:#885532;background:#2b211a}
-.task-steps{list-style:none;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding:0;gap:5px;margin:30px 0 16px}
-.task-steps li{border-top:2px solid #51483e;padding:12px 4px;font-size:11px;color:#c9c0b6}
-.task-steps li[data-phase=done]{border-color:#8db79c;color:#b0d4bb}
+.step-summary{padding:10px 16px;border-radius:18px;background:#28211b;color:#ffd0aa;font-size:13px;margin:16px 0 8px}
+.step-details{margin:0 0 18px}.step-details>summary{padding:10px 2px;cursor:pointer;min-height:44px}.step-details>summary span{color:var(--text-secondary);margin-left:8px}
+.task-steps{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0;gap:8px;margin:12px 0}
+.task-steps li{border:1px solid #51483e;border-radius:999px;padding:10px 14px;font-size:12px;color:#c9c0b6}
+.task-steps li[data-phase=done]{border-color:#729780;color:#b0d4bb;background:#1d2720}
 .task-steps li[data-phase=current]{border-color:var(--signal-orange);color:#ffc494;background:#32251b}
 .unified-workspace .hero{padding-top:8px}
 .unified-workspace .compact-hero h1{font-size:30px}
@@ -111,10 +113,35 @@ body.unified-workspace,body.unified-directory{font-family:'Segoe UI','Microsoft 
 .workspace-nav a[aria-current=location]{background:#30251d;border-color:#65442c;color:#ffd0aa}
 .brand-title{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.brand-title .brand-k{font-size:24px;font-weight:600;line-height:1.2}
 .workspace-brand .brand-title b{display:inline;font-size:15px;margin:0}
-[data-brand=a] .brand-title{display:block}[data-brand=a] .brand-title b{display:block;margin-top:3px}
-.brand-options{display:flex;gap:6px;margin-top:16px}.brand-options button{padding:5px 10px;border:1px solid var(--line);font-size:11px;background:transparent;color:var(--text-secondary);border-radius:6px}
-.brand-options button[aria-pressed=true]{border-color:#8c5b37;color:#ffd0aa;background:#30251d}
 .unified-workspace .rail-caption{margin-top:24px}
-@media(max-width:850px){.unified-workspace .workspace-rail{position:sticky;top:0;z-index:20}.brand-options{position:absolute;right:16px;top:16px;margin:0;flex-direction:column}.unified-workspace [data-panel]{padding:18px 12px;scroll-margin-top:200px}.workspace-brand{max-width:calc(100% - 76px)}}
 @media(prefers-reduced-motion:reduce){.unified-workspace [data-panel],.unified-workspace [data-panel].is-active,.unified-workspace [data-panel].is-active:hover{transform:none;transition:none}}
-@media(max-width:850px){.brand-options{position:static;flex-direction:row;margin-top:10px}.workspace-brand{max-width:100%}.unified-workspace .workspace-nav{margin-top:10px}}
+
+/* Compact approved brand; safety content remains accessible. */
+@media(max-width:1100px){
+.unified-workspace .workspace-rail{width:196px;padding:24px 14px}
+.unified-workspace .workspace-main{margin-left:196px;padding:0 20px 24px}
+.unified-workspace [data-panel]{padding:18px 16px}
+.service-catalog{margin:16px 0 8px;gap:8px}.service-catalog>*{padding:12px}
+.task-steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:850px){
+.unified-workspace .workspace-rail{position:sticky;top:0;width:auto;padding:10px 16px;z-index:20}
+.unified-workspace .workspace-main{margin-left:0}
+.brand-logo{width:36px;height:36px}.workspace-brand{max-width:100%;gap:9px}
+.brand-title .brand-k{font-size:22px}.workspace-brand small{line-height:1.5}
+.unified-workspace .workspace-nav{margin-top:8px;gap:4px}
+.unified-workspace .workspace-nav a{min-height:44px;border-radius:999px;padding:10px 2px}
+.unified-workspace [data-panel]{padding:16px 12px;scroll-margin-top:128px}
+.unified-workspace .command-panel textarea{min-height:96px}
+.unified-workspace .workspace-hero{padding-bottom:16px}
+}
+@media(max-width:520px){
+.unified-workspace .workspace-main{padding:0 12px 20px}
+.service-catalog{grid-template-columns:1fr 1fr;gap:6px}
+.service-catalog .service-active{grid-column:1/-1;padding:10px 12px}
+.service-catalog .service-active small{display:inline;margin-left:8px}
+.service-catalog>span{padding:8px 12px;font-size:13px;color:var(--text-secondary);border-style:dashed;border-radius:16px}
+.service-catalog small{margin-top:2px}.service-note{margin:8px 0;font-size:12px!important}
+.task-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.task-steps li{padding:10px 12px}
+.step-summary{margin-top:12px}.unified-workspace .compact-hero h1{font-size:26px}
+}

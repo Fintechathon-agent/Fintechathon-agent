@@ -1,6 +1,6 @@
 import { rememberTask, savedTask } from "./site-context.mjs";
 import { $, api } from "./common.js";
-import { healthTask, labels, auditEvents } from "./workspace-model.mjs";
+import { healthTask, labels, auditEvents, riskLabel } from "./workspace-model.mjs";
 
 let current = null, auditRevision = 0, restoreRevision = 0;
 const eventNames = {
@@ -64,22 +64,12 @@ document.addEventListener("click", event => {
   if (!panels.some(p => p.dataset.panel === view)) return;
   event.preventDefault(); navigate(view, true);
 });
-function setBrand(version) {
-  const value = version === "a" ? "a" : "b";
-  document.body.dataset.brand = value;
-  document.querySelectorAll("[data-brand]").forEach(button => {
-    if (button.tagName === "BUTTON") button.setAttribute("aria-pressed", String(button.dataset.brand === value));
-  });
-  if (!version) return;
-  const url = new URL(location.href); url.searchParams.set("brand", value);
-  history.replaceState(null, "", url);
-}
-document.querySelectorAll("button[data-brand]").forEach(button => {
-  button.onclick = () => { setBrand(button.dataset.brand); scheduleFocus(); };
-});
-setBrand(new URL(location.href).searchParams.get("brand"));
 const initialView = location.hash.slice(1) || "workspace";
-requestAnimationFrame(() => navigate(initialView === "portfolio-flow" ? "banking" : initialView));
+// Avoid moving the browser keyboard starting point on an ordinary page load.
+requestAnimationFrame(() => {
+  if (initialView === "workspace") activate("workspace");
+  else navigate(initialView === "portfolio-flow" ? "banking" : initialView);
+});
 $("#open-portfolio").onclick = () => {
   const draft = $("#task-intent").value.trim();
   $("#intent-preview").hidden = !draft;
@@ -87,11 +77,12 @@ $("#open-portfolio").onclick = () => {
   navigate("banking", true);
 };
 export function progress(state) {
+  text("#step-summary", ({WAITING_INPUT:"当前：填写投资信息",RUNNING:"当前：正在分析投资组合",WAITING_RISK:"诊断与方案比较已完成 · 风控服务未连接，未审批、未执行",ERROR:"本次检查失败 · 请核对错误信息",BLOCKED:"本次检查已阻断"})[state] || "当前状态待核查");
   const done = state === "WAITING_RISK";
   document.querySelectorAll("[data-step]").forEach(item => {
     const key = item.dataset.step;
     item.dataset.phase = done && ["input", "diagnose", "compare"].includes(key) ? "done" :
-      (state === "RUNNING" && key === "diagnose") || (done && key === "risk") ||
+      (state === "RUNNING" && key === "diagnose") ||
       (state === "WAITING_INPUT" && key === "input") ? "current" : "pending";
     if (item.dataset.phase === "current") item.setAttribute("aria-current", "step");
     else item.removeAttribute("aria-current");
@@ -145,7 +136,7 @@ export async function refreshAudit() {
   } finally { $("#retry-audit").disabled = false; }
 }
 export function renderTaskStates(view) {
-  text("#risk-label", view.risk === "REQUIRED" || view.risk === "NOT_CONNECTED" ? "等待正式 Risk 结论" : view.risk);
+  text("#risk-label", riskLabel(view.risk));
   text("#risk-reason", view.reason);
   text("#approval-label", labels[view.approval] || ({APPROVED:"审批已通过 · 未执行",REJECTED:"审批已拒绝"})[view.approval] || "审批状态待核验");
   text("#execution-label", labels[view.execution.state]);
@@ -158,19 +149,20 @@ export function showHealth(data, { restored = false } = {}) {
   $("#task-empty").hidden = true; $("#task-detail").hidden = false; $("#task-stale").hidden = false;
   if (!restored) $("#task-stale").hidden = true;
   text("#task-stale", restored ? "这是查询得到的历史记录，未与当前表单绑定。" : "输入已修改。旧任务仅供回看，请重新检查。");
-  text("#task-label", labels[view.state]); $("#task-label").dataset.state = view.state;
+  text("#task-label", view.state === "WAITING_RISK" ? riskLabel(view.risk) : labels[view.state]); $("#task-label").dataset.state = view.state;
   text("#task-id", "task_id · " + view.taskId);
   $("#restore-id").value = view.taskId;
   text("#task-source", "DEMO / FIXTURE · 本地 Core 响应 · " + (data.contract_version || data.task_state.contract_version) + " · 原始任务编号未改写");
   renderTaskStates(view);
   text("#task-raw", JSON.stringify(data, null, 2));
-  text("#run-feedback", view.state === "WAITING_RISK" ? "分析与方案比较已完成。Risk 仍待交接，未审批、未执行。" : labels[view.state]);
+  if (!restored) text("#run-feedback", view.state === "WAITING_RISK" ? "分析与方案比较已完成。风控服务未连接，未审批、未执行。" : labels[view.state]);
   $("#audit-timeline").replaceChildren();
   if (data.audit_evidence) {
     try { renderAudit(data.audit_evidence, view.taskId); }
     catch (error) { text("#audit-message", error.message); }
   }
-  progress(view.state); refreshAudit();
+  if (!restored) progress(view.state);
+  refreshAudit();
 }
 $("#retry-audit").onclick = refreshAudit;
 $("#restore-form").onsubmit = async event => {

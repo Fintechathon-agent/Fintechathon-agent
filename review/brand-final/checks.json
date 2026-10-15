@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "Approved B brand is unconditional, including legacy preview URLs",
+    "Four navigation targets synchronize one active container",
+    "Real wheel scrolling visits all four active regions without POST requests",
+    "Reduced motion removes floating transforms",
+    "Navigation, focus and layout at 1024/390/375"
+  ],
+  "errors": [],
+  "axeViolations": 0
+}

@@ -1,0 +1,24 @@
+{
+  "mode": "local service plus explicit intercepted TEST FIXTURES",
+  "checks": [
+    "Four navigation sections and default workspace",
+    "Natural-language draft is not sent to an incompatible model API; required input remains explicit",
+    "Real local v1 health-check and A/B/C comparison preserve calculations",
+    "Read-only handoff has no approval/trade controls and shares Core task ID with audit",
+    "Axe task detail has zero violations",
+    "Axe workspace, banking results and safety sections have zero violations",
+    "Explicit TEST FIXTURES render approval, blocked, error, unknown and receipt states without adding trade controls or injecting markup",
+    "Six explicit Risk presentation fixtures remain distinct without execution controls",
+    "Original task read-only recovery without execution",
+    "Refresh, history recovery, Landing return and new task keep form progress independent",
+    "Audit failure shows explicit error and clears outdated events",
+    "All four sections fit 1024/390/375 widths",
+    "Input edit invalidates comparisons and marks prior task as historical",
+    "HTTP 200 business error never becomes mock success",
+    "Late response cannot override newer input",
+    "Initial service failure disables diagnosis; explicit retry restores it",
+    "Keyboard skip link and reduced-motion preference supported"
+  ],
+  "errors": [],
+  "axeViolations": 0
+}

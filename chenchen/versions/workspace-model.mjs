@@ -4,6 +4,10 @@ export const labels = Object.freeze({
   ERROR: "处理失败", UNKNOWN: "执行结果待核查", SUCCEEDED: "已取得完成回执",
   NOT_EXECUTED: "尚未执行", WAITING_RISK: "等待 Risk 审核", RUNNING: "正在分析", NOT_CONNECTED: "待接入"
 });
+// Presentation vocabulary only; REVIEW is not an execution permission.
+export function riskLabel(state) {
+  return ({NOT_CONNECTED:"风控服务未连接",REQUIRED:"风控服务未连接",REVIEW:"等待风险审核",RUNNING:"审核进行中",ALLOW:"审核通过",BLOCK:"审核阻断",ERROR:"审核错误"})[state] || "风险状态待核验";
+}
 export function responseError(data, ok = true) {
   if (!ok || data?.status === "error" || data?.error) {
     const error = new Error(data?.error?.message || "服务请求失败，未生成成功结果。");
@@ -59,8 +63,9 @@ export function healthTask(data) {
     t.status === "BLOCKED" ? "BLOCKED" : t.status === "HANDOFF_REQUIRED" ? "WAITING_RISK" : "UNKNOWN";
   return {
     taskId: t.task_id, sourceTaskId: t.task_id, state,
-    risk: h?.decision || "NOT_CONNECTED",
-    reason: h?.reason || t.error_state?.message || "正式 Risk 决策尚未接入。",
+    // Core only supplies a read-only handoff, not a verified Risk decision.
+    risk: "NOT_CONNECTED",
+    reason: h ? "当前仅取得诊断交接记录，风控服务尚未连接；没有正式风险审核结论。" : "尚无风险交接记录；风控服务未连接。",
     readOnly: true, canExecute: false,
     approval: "NOT_CONNECTED", execution: executionView(null, t.task_id),
     missing: t.missing_fields || [], audit: data.audit_evidence
