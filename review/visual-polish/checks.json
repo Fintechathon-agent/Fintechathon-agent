@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "A/B switch and Chinese brand removal",
+    "Four navigation targets synchronize one active container",
+    "Real wheel scrolling visits all four active regions without POST requests",
+    "Reduced motion removes floating transforms",
+    "Sticky mobile navigation, focus and layout at 390/375"
+  ],
+  "errors": [],
+  "axeViolations": 0
+}

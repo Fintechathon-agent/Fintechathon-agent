@@ -6,7 +6,7 @@ const load = process.env.UI_MODULE_ROOT ? createRequire(path.join(process.env.UI
 const { chromium } = load("playwright");
 const AxeBuilder = load("@axe-core/playwright").default;
 const { server } = require("../server.js");
-const out = path.resolve(__dirname, "../../review/site-integration/p0-regression");
+const out = process.env.UI_EVIDENCE_DIR || path.resolve(__dirname, "../../review/site-integration/p0-regression");
 fs.mkdirSync(out, { recursive:true });
 const checks = [], errors = [];
 let browser;

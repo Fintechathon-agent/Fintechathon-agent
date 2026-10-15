@@ -10,26 +10,81 @@ const eventNames = {
   "task.handoff": "任务交接", "tool.completed": "工具返回结果"
 };
 function text(id, value) { $(id).textContent = value; }
-export function navigate(view, focus = false) {
-  if (!["workspace", "banking", "tasks", "safety"].includes(view)) view = "workspace";
-  document.querySelectorAll("[data-panel]").forEach(panel => { panel.hidden = panel.dataset.panel !== view; });
+const panels = [...document.querySelectorAll("[data-panel]")];
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+let activeView = "", scrollFrame = 0;
+function activate(view, updateHash = true) {
+  if (view === activeView) return;
+  activeView = view;
+  panels.forEach(panel => panel.classList.toggle("is-active", panel.dataset.panel === view));
   document.querySelectorAll("[data-view]").forEach(link => {
-    if (link.dataset.view === view) link.setAttribute("aria-current", "page");
+    const selected = link.dataset.view === view;
+    link.classList.toggle("is-active", selected);
+    if (selected) link.setAttribute("aria-current", "location");
     else link.removeAttribute("aria-current");
   });
-  if (focus) document.getElementById(view + "-heading")?.focus();
+  if (updateHash) history.replaceState(null, "", location.pathname + location.search + "#" + view);
 }
-function route(focus = true) {
+function centerFocus() {
+  scrollFrame = 0;
+  const rail = document.querySelector(".workspace-rail");
+  const inset = innerWidth <= 850 ? rail.getBoundingClientRect().bottom : 0;
+  const center = inset + (innerHeight - inset) * .48;
+  let best = panels[0], distance = Infinity;
+  for (const panel of panels) {
+    const box = panel.getBoundingClientRect();
+    const gap = center < box.top ? box.top - center : center > box.bottom ? center - box.bottom : 0;
+    if (gap < distance) { best = panel; distance = gap; }
+  }
+  activate(best.dataset.panel);
+}
+function scheduleFocus() { if (!scrollFrame) scrollFrame = requestAnimationFrame(centerFocus); }
+export function navigate(view, focus = false) {
+  if (!panels.some(p => p.dataset.panel === view)) view = "workspace";
+  activate(view);
+  const panel = panels.find(p => p.dataset.panel === view);
+  panel.style.scrollMarginTop = (innerWidth <= 850 ? document.querySelector(".workspace-rail").offsetHeight + 20 : 24) + "px";
+  panel.scrollIntoView({behavior: reducedMotion.matches ? "instant" : "smooth", block:"start"});
+  if (focus) document.getElementById(view + "-heading")?.focus({preventScroll:true});
+}
+panels.forEach(panel => { panel.hidden = false; });
+const observer = new IntersectionObserver(scheduleFocus, {threshold:[0,.1,.25,.5,.75,1]});
+panels.forEach(panel => observer.observe(panel));
+addEventListener("scroll", scheduleFocus, {passive:true});
+addEventListener("resize", scheduleFocus);
+function route() {
   const key = location.hash.slice(1);
-  navigate(key === "portfolio-flow" ? "banking" : key || (location.pathname === "/investment" ? "banking" : "workspace"), Boolean(focus));
+  navigate(key === "portfolio-flow" ? "banking" : key || "workspace");
 }
 window.addEventListener("hashchange", route);
-route(false);
+document.addEventListener("click", event => {
+  const link = event.target.closest('a[href^="#"]');
+  const key = link?.getAttribute("href").slice(1);
+  const view = key === "portfolio-flow" ? "banking" : key;
+  if (!panels.some(p => p.dataset.panel === view)) return;
+  event.preventDefault(); navigate(view, true);
+});
+function setBrand(version) {
+  const value = version === "a" ? "a" : "b";
+  document.body.dataset.brand = value;
+  document.querySelectorAll("[data-brand]").forEach(button => {
+    if (button.tagName === "BUTTON") button.setAttribute("aria-pressed", String(button.dataset.brand === value));
+  });
+  if (!version) return;
+  const url = new URL(location.href); url.searchParams.set("brand", value);
+  history.replaceState(null, "", url);
+}
+document.querySelectorAll("button[data-brand]").forEach(button => {
+  button.onclick = () => { setBrand(button.dataset.brand); scheduleFocus(); };
+});
+setBrand(new URL(location.href).searchParams.get("brand"));
+const initialView = location.hash.slice(1) || "workspace";
+requestAnimationFrame(() => navigate(initialView === "portfolio-flow" ? "banking" : initialView));
 $("#open-portfolio").onclick = () => {
   const draft = $("#task-intent").value.trim();
   $("#intent-preview").hidden = !draft;
   text("#intent-preview", "你的目标（仅本页草稿，未发送模型）：" + draft);
-  location.hash = "banking";
+  navigate("banking", true);
 };
 export function progress(state) {
   const done = state === "WAITING_RISK";

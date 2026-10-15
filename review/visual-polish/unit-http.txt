@@ -1,0 +1,20 @@
+✔ integrated website routes and typed assets (638.9235ms)
+✔ HTTP 200 business errors cannot become success (0.8166ms)
+✔ Core response retains identity and stops at read-only Risk (27.1427ms)
+✔ cross-task responses and malformed analysis are rejected (41.0531ms)
+✔ approval alone does not claim execution (0.1204ms)
+✔ success without a bound receipt remains UNKNOWN (0.1236ms)
+✔ simulation receipt explicitly says no ledger change (0.1744ms)
+✔ UNKNOWN requires reconciliation, never blind retry (0.2084ms)
+✔ transport success cannot prove LIVE provenance (0.1073ms)
+✔ audit events must belong to the selected task (0.6289ms)
+✔ waiting input is not waiting approval (13.674ms)
+✔ unrecognized task status remains UNKNOWN (9.9759ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 772.7766
