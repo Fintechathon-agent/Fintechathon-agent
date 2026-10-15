@@ -52,3 +52,5 @@ Core Agent 模型重试迭代测试记录 — 2026-10-15
 边界：正式独立Risk与身份认证仍未联合验收。公网故障恢复未人为触发；本地用受控假故障验证。
 配置：默认最多2次尝试，总预算45000ms；退避250ms/500ms，HTTP Retry-After优先；耗尽后停止。
 旧版本：个人ec9b69c；团队c28249d；后端c2580383-d2c2-4d7f-9266-bc0a5653426a。
+
+发布后的网络补查：本机直连 /health、/docs 各20秒超时；使用现有本机代理后，status=ok、configured=true、audit_storage=durable_object，接口说明包含Retry-After与45秒预算。不能视为全网络可用性验收。

@@ -60,3 +60,4 @@
 - 公网真实模型任务 `review-task-b38d706d-6fbe-4eb4-817f-f97dd4486cc8`：Risk前模拟返回409；演示Risk回调、必要审批通过后SIMULATED；重复请求同一回执；16条审计事件持久保存，真实执行false。
 - 模型响应 `chatcmpl-3a132729-5196-4970-a32b-962830c9c47d`，本次调用次数1、重试0。本地故障注入验证重试；不宣称公网故障恢复/正式Risk已联合验收。
 - [公网完整证据](public-model-retry-release-2026-10-15.json) · [记事本日志](../logs/Core-Agent-模型重试测试-2026-10-15.txt) · [公网复现脚本](../scripts/verify-public-model-retry.ps1)。
+- 可达性补查：本机直连健康/说明接口出现20秒超时；现有代理下健康ok、部署说明正确。公网链路通过不等于所有手机网络均可稳定直连，需Backend Owner继续做真实访问网络验收。
