@@ -98,6 +98,27 @@ test("HTTP model-to-Risk-to-approval-to-simulation chain is queryable", async t 
   assert.equal((await mismatch.json()).error.code, "RISK_HANDOFF_MISMATCH");
   const unchanged = await fetch(base + "/api/review/" + created.run_id).then(r => r.json());
   assert.equal(unchanged.status, "SIMULATED");
+  await t.test("HTTP retries require exact approval evidence and return traceable conflicts", async () => {
+    const post = (path, body) => fetch(base + path, { method: "POST", headers, body: JSON.stringify(body) });
+    const task = await post("/api/review", { kind: "bill", text: "Synthetic retry test" }).then(r => r.json());
+    const binding = { task_id: task.task_id, proposal_sha256: task.proposed_action.proposal_sha256 };
+    const risk = { ...binding, decision: "APPROVE", reviewer: "risk", reason: "same" };
+    await post("/api/review/risk-decision", risk);
+    const original = { ...binding, decision: "APPROVE", approver: "user", reason: "same" };
+    const first = await post("/api/review/approval", original).then(r => r.json());
+    assert.deepEqual(await post("/api/review/approval", original).then(r => r.json()), first);
+    const conflict = await post("/api/review/approval", { ...original, approver: "different" });
+    assert.equal(conflict.status, 409);
+    const body = await conflict.json();
+    assert.equal(body.error.code, "APPROVAL_IMMUTABLE");
+    assert.equal(body.trace.audit_id, task.audit.audit_id);
+    assert.equal(body.workflow.approval.approver, "user");
+    const invalid = await post("/api/review/approval", { ...original, reason: "x".repeat(501) });
+    assert.equal(invalid.status, 422);
+    const final = await fetch(base + "/api/review/task/" + task.task_id).then(r => r.json());
+    assert.equal(final.audit.events.filter(e => e.event_type === "workflow.operation_blocked").length, 2);
+    assert.equal(final.execution.execution_allowed, false);
+  });
   await t.test("local funding endpoints preserve plan revisions and share the workflow guard", async () => {
     const post = (path, body) => fetch(base + path, { method: "POST", headers, body: JSON.stringify(body) });
     const definition = { synthetic: true, confirmed: true, currency: "CNY", cash_minor: 1000000,

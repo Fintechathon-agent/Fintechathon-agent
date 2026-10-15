@@ -147,6 +147,36 @@ test("explicit task ids cannot create a second workflow record", async () => {
   assert.equal((await duplicate.json()).error.code, "TASK_ALREADY_EXISTS");
 });
 
+test("decision retry conflicts and validation failures persist without changing approved evidence", async () => {
+  const app = setup();
+  const created = await worker.fetch(req("/api/review", { text: "Synthetic approval identity check" }), app.env).then(r => r.json());
+  const binding = { task_id: created.task_id, proposal_sha256: created.proposed_action.proposal_sha256 };
+  for (const [path, actor, conflictCode] of [["risk-decision", "reviewer", "RISK_DECISION_IMMUTABLE"], ["approval", "approver", "APPROVAL_IMMUTABLE"]]) {
+    const body = { ...binding, decision: "APPROVE", [actor]: "synthetic-owner", reason: "Same evidence" };
+    const first = await worker.fetch(req("/api/review/" + path, body), app.env).then(r => r.json());
+    app.restart();
+    const repeat = await worker.fetch(req("/api/review/" + path, body), app.env);
+    assert.equal(repeat.status, 200);
+    assert.deepEqual(await repeat.json(), first);
+    for (const patch of [{ [actor]: "different-owner" }, { reason: "Different evidence" }]) {
+      const conflict = await worker.fetch(req("/api/review/" + path, { ...body, ...patch }), app.env);
+      assert.equal(conflict.status, 409);
+      const payload = await conflict.json();
+      assert.equal(payload.error.code, conflictCode);
+      assert.equal(payload.trace.task_id, created.task_id);
+      assert.equal(payload.trace.audit_id, created.audit.audit_id);
+    }
+    const invalid = await worker.fetch(req("/api/review/" + path, { ...body, reason: " " }), app.env);
+    assert.equal(invalid.status, 422);
+  }
+  app.restart();
+  const final = await worker.fetch(req("/api/review/task/" + created.task_id), app.env).then(r => r.json());
+  assert.equal(final.risk_decision.reviewer, "synthetic-owner");
+  assert.equal(final.approval.approver, "synthetic-owner");
+  assert.equal(final.audit.events.filter(e => e.event_type === "workflow.operation_blocked").length, 6);
+  assert.equal(final.execution.execution_allowed, false);
+});
+
 test("legacy question endpoint returns an adapter response without bypassing Risk", async () => {
   const { env } = setup();
   const response = await worker.fetch(req("/api/review/legacy", {

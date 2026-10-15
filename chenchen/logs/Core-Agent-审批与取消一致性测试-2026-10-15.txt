@@ -1,0 +1,128 @@
+Core Agent 审批与取消一致性测试 · 2026-10-15
+================================================
+结论：本轮113/113自动测试通过；公网两条路径通过。只验证模拟执行，不是正式Risk或审批身份联合验收。
+范围：Core Agent。未重算Quant，未修改Memory规则，未开放真实执行。
+已部署后端：https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev
+后端版本：9b2692e7-86d3-4372-ba49-39096ea66e73
+公网完成时间（UTC）：2026-10-15T03:06:13.2813974Z
+公网访问方式：本机已有代理（explicit-proxy）。不代表所有手机/地区直连都可用。
+
+一、修改前后
+修改前新增5个测试全部失败：回调与取消并发覆盖取消记录、相同回调并发误报冲突、Risk重复判定换人/换理由仍返回成功、审批重复提交换人/换理由仍返回成功、缺少/超长理由逃过校验。
+修改后：完全相同重试复用已有记录；改人/改理由/改决定返回409；空理由或超过500字符返回422；取消不会被旧回调恢复。
+本地复现不是线上事故。公网入口原有串行保障；本轮修复公共工作流的本地并发缺口。
+本地单元/HTTP/Worker持久化替身测试合计113通过、0失败、0跳过。
+Schema核验：本地及公网8份Workflow/Handoff + 2份有效请求通过；4份无效请求被拒绝。
+
+二、本地合成验证
+时间（UTC）：2026-10-15T03:03:36.837Z
+模型为合成替身，未调用真实模型。
+场景：callback_cancel_race；任务：review-task-70f8ef80-d93f-4411-b300-c6ac2d75e01a；最终：CANCELLED；真实执行：false
+场景：changed_approval_evidence；任务：review-task-0bfcf822-87c0-4fb9-9e89-877d6c876a6a；最终：READY_FOR_SIMULATION；真实执行：false
+更换Risk/审批人员或理由共4次被409拒绝。
+
+三、公网真实模型响应与完整审计摘要
+以下现金10000元、房租4000元、投资1000元均为虚构数据；Risk与审批人员只是演示标签。
+
+场景：cancel_after_approval
+任务：review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+运行：review-1ecbc403-0d76-40af-865d-1f62a2dc19dc
+审计：audit-61cca6df-f7fd-4113-8957-d17e4ed64d72
+最终状态：CANCELLED
+模型：cloudflare_workers_ai / @cf/meta/llama-3.3-70b-instruct-fp8-fast
+模型响应ID：chatcmpl-9a6d28ac-0886-448d-ae2b-d1bdfda2d4f7
+模型调用成功：true；调用次数：1；重试：0
+模型原始响应：{"summary":"内容涉及虚构案例，提及现金和投资金额，但存在用途冲突，需要人工审查","risk_level":"low","proposed_action":"HOLD_FOR_REVIEW","action_reason":"内容中提到的用途冲突和资金分配需要进一步审查","missing_information":[],"evidence":["虚构案例：现金10000元，为房租保留4000元，拟投资1000元。核对用途冲突；不能执行真实交易。"]}
+Risk：APPROVE；演示复核人：synthetic-risk-owner
+审批：APPROVE；演示审批人：synthetic-user
+真实执行允许：false
+执行回执：null
+审计事件：21
+2026-10-15T03:05:41.778Z | review.received | event-7dfbec90-c53e-4da3-911e-b6634a8a28b5 | {"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:45.564Z | model.completed | event-e7135210-4767-45ba-b003-a3fa4765aea8 | {"source":"model","attempt_count":1,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:45.564Z | gateway.checked | event-b4cd031f-9dcb-4f91-b9ba-3afbf5bf26d2 | {"execution_allowed":false,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:45.564Z | workflow.created | event-553b9c21-a23e-43fb-a99c-9d62fcde6485 | {"stage":"MODEL","request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:45.564Z | funding.bound | event-7a3ba259-8ef1-4ba5-8704-92e82d4736f6 | {"funding":{"guard_version":"funding-plan-demo.v1","plan_id":"funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059","revision":1,"amount_minor":100000,"currency":"CNY","authority":"DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY","cash_minor":1000000,"protected_purposes":[{"purpose_id":"rent","label":"虚构房租","amount_minor":400000}]},"check":{"guard_version":"funding-plan-demo.v1","plan_id":"funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059","bound_revision":1,"current_revision":1,"requested_minor":100000,"available_minor":600000,"protected_minor":400000,"allocated_minor":0,"deficit_minor":0,"execution_allowed":false,"status":"AVAILABLE","code":null,"message":"当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"},"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:45.564Z | proposal.bound | event-91e07c45-f0ad-4fd0-a19b-a10cf0bc490b | {"source":"model","proposal_sha256":"f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad","request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:45.564Z | risk.handoff.created | event-af135e49-726b-4fd7-9aac-b257e95ae50a | {"handoff_id":"handoff-d983beda-031c-4ec1-bf6c-602d8ad39ae6","request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:45.564Z | execution.blocked | event-0655c77b-2b7f-4115-b373-f1c262b43975 | {"reason":"risk_pending","execution_allowed":false,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:46.506Z | workflow.operation_blocked | event-b4a74bf8-6882-4fc8-acd6-512205400303 | {"code":"EXECUTION_BLOCKED","stage":"EXECUTION","execution_allowed":false,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:47.408Z | risk.approved | event-3ecce9c7-92da-4285-9ff7-8e44487b55d6 | {"approval_required":true,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:47.408Z | approval.pending | event-9fb9c9ba-6630-4df7-9c8c-211f30e6b8dc | {"approval_id":"approval-19d6a2d8-a479-4355-8c49-cd65078d12be","request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:47.408Z | risk.callback.recorded | event-6996227a-5229-4cdf-b974-77ab3c7cbf30 | {"handoff_id":"handoff-d983beda-031c-4ec1-bf6c-602d8ad39ae6","audit_id":"audit-61cca6df-f7fd-4113-8957-d17e4ed64d72","proposal_sha256":"f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad","decision":"APPROVE","risk_decision_id":"risk-decision-1a46f89d-d0f1-4a8c-8bea-dfe121d9a685","request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:48.302Z | approval.approved | event-b359f46c-8831-4f67-be01-c4ed38e1d48a | {"approval_id":"approval-19d6a2d8-a479-4355-8c49-cd65078d12be","request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:48.302Z | execution.ready_for_simulation | event-e658abbc-c63a-43ce-8136-1720f5815a7a | {"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:49.944Z | workflow.operation_blocked | event-440e6b77-3afd-4e3d-9231-b99f10bd8b06 | {"code":"APPROVAL_IMMUTABLE","stage":"APPROVAL","execution_allowed":false,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:50.827Z | workflow.operation_blocked | event-b93837d4-8cf7-493e-a97c-aa77367e327e | {"code":"APPROVAL_IMMUTABLE","stage":"APPROVAL","execution_allowed":false,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:51.729Z | workflow.operation_blocked | event-9ba345b4-12f6-4532-88a1-9c4d9cc710fa | {"code":"INVALID_WORKFLOW_INPUT","stage":"APPROVAL","execution_allowed":false,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:53.618Z | workflow.operation_blocked | event-5099a9b3-2052-4bf9-8014-5821ee01daf0 | {"code":"RISK_DECISION_IMMUTABLE","stage":"RISK","execution_allowed":false,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:54.611Z | task.cancelled | event-eb66bf92-a422-4220-9151-3165af53d514 | {"canceler":"synthetic-user","reason":"停止这次模拟","execution_allowed":false,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:54.611Z | execution.blocked | event-3c67b970-d49c-430d-9f03-106a3037a65b | {"reason":"task_cancelled","request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+2026-10-15T03:05:56.724Z | workflow.operation_blocked | event-015ec732-8d6f-4594-99df-27e1418a0060 | {"code":"EXECUTION_BLOCKED","stage":"EXECUTION","execution_allowed":false,"request_id":"req-625d143a-1660-48bd-a7b9-e15b52e678b4","run_id":"review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"}
+
+场景：normal_simulation
+任务：review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684
+运行：review-bad9ea02-d20f-463b-96f9-158818867ac6
+审计：audit-9161d1e3-6aaa-449b-bc59-5d5ac9976d51
+最终状态：SIMULATED
+模型：cloudflare_workers_ai / @cf/meta/llama-3.3-70b-instruct-fp8-fast
+模型响应ID：chatcmpl-e851e1bc-22db-4963-b679-75af88b75747
+模型调用成功：true；调用次数：1；重试：0
+模型原始响应：{"summary":"内容涉及虚构案例，提及现金和投资金额，存在用途冲突，需要人工审查","risk_level":"low","proposed_action":"HOLD_FOR_REVIEW","action_reason":"内容包含模拟交易和保留金额，需要进一步核实和审批","missing_information":[],"evidence":["虚构案例：现金10000元，为房租保留4000元，拟投资1000元。核对用途冲突；不能执行真实交易。"]}
+Risk：APPROVE；演示复核人：synthetic-risk-owner
+审批：APPROVE；演示审批人：synthetic-user
+真实执行允许：false
+执行回执：{"mode":"SIMULATED","execution_id":"sim-exec-fb2ed026-2925-428e-b83f-48f22e20fd79","task_id":"review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684","proposal_sha256":"d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb","side_effects":false,"funding_allocation":{"allocation_id":"allocation-6e9b503e-6109-4026-8930-6cf31b77d435","task_id":"review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684","proposal_sha256":"d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb","execution_id":"sim-exec-fb2ed026-2925-428e-b83f-48f22e20fd79","revision":1,"amount_minor":100000,"created_at":"2026-10-15T03:06:09.91Z","mode":"SIMULATED","side_effects":false},"message":"模拟执行完成；未调用真实交易、付款或账户网关。","completed_at":"2026-10-15T03:06:09.91Z"}
+审计事件：16
+2026-10-15T03:06:00.01Z | review.received | event-c4570b2d-6915-46ba-9d25-a062c966c7ef | {"request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:04.089Z | model.completed | event-b224ac4b-ad9d-4744-9d21-b0fdae32fbdd | {"source":"model","attempt_count":1,"request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:04.089Z | gateway.checked | event-b07c370e-43f7-47b0-ba89-39464fe46e19 | {"execution_allowed":false,"request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:04.089Z | workflow.created | event-78ce7776-8987-4b11-853b-e45bd2de64b0 | {"stage":"MODEL","request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:04.089Z | funding.bound | event-ce525e24-a4e0-44e6-a2c3-5ffd0d6a3cfa | {"funding":{"guard_version":"funding-plan-demo.v1","plan_id":"funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059","revision":1,"amount_minor":100000,"currency":"CNY","authority":"DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY","cash_minor":1000000,"protected_purposes":[{"purpose_id":"rent","label":"虚构房租","amount_minor":400000}]},"check":{"guard_version":"funding-plan-demo.v1","plan_id":"funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059","bound_revision":1,"current_revision":1,"requested_minor":100000,"available_minor":600000,"protected_minor":400000,"allocated_minor":0,"deficit_minor":0,"execution_allowed":false,"status":"AVAILABLE","code":null,"message":"当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"},"request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:04.089Z | proposal.bound | event-13f05d23-6c06-4582-98f9-ba372df3f530 | {"source":"model","proposal_sha256":"d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb","request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:04.089Z | risk.handoff.created | event-664c8543-7f96-45c3-8ae3-60d9b0628363 | {"handoff_id":"handoff-9b9037e4-9950-4274-b3f3-6f354e71ccaf","request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:04.089Z | execution.blocked | event-d30dae2c-939d-4911-8068-0f22c62fb8ec | {"reason":"risk_pending","execution_allowed":false,"request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:05.536Z | workflow.operation_blocked | event-c2a1f6a3-2b36-4178-9ccb-57cff5d61ff9 | {"code":"EXECUTION_BLOCKED","stage":"EXECUTION","execution_allowed":false,"request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:07.031Z | risk.approved | event-13ffe123-84ab-4a4a-a09c-48372a29c07a | {"approval_required":true,"request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:07.031Z | approval.pending | event-c399b1dd-0219-4f10-89c9-688bcbbd1585 | {"approval_id":"approval-bb97af2d-0fa4-4c6f-94b1-bef64fe04bda","request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:07.031Z | risk.callback.recorded | event-3cd844b6-447c-4acd-b004-d6f215900159 | {"handoff_id":"handoff-9b9037e4-9950-4274-b3f3-6f354e71ccaf","audit_id":"audit-9161d1e3-6aaa-449b-bc59-5d5ac9976d51","proposal_sha256":"d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb","decision":"APPROVE","risk_decision_id":"risk-decision-bb942040-2fc2-434f-acc8-a8908a71747b","request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:08.533Z | approval.approved | event-8c880bc7-4397-4598-8525-7c77b9142501 | {"approval_id":"approval-bb97af2d-0fa4-4c6f-94b1-bef64fe04bda","request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:08.533Z | execution.ready_for_simulation | event-09e9c200-fffc-4428-a393-b10fdafe220b | {"request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:09.91Z | funding.allocated | event-80137877-5bd2-4c34-b769-3df09ad185a0 | {"allocation_id":"allocation-6e9b503e-6109-4026-8930-6cf31b77d435","task_id":"review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684","proposal_sha256":"d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb","execution_id":"sim-exec-fb2ed026-2925-428e-b83f-48f22e20fd79","revision":1,"amount_minor":100000,"created_at":"2026-10-15T03:06:09.91Z","mode":"SIMULATED","side_effects":false,"request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+2026-10-15T03:06:09.91Z | execution.simulated | event-fd5e491f-0642-4886-a09c-5082ae258354 | {"execution_id":"sim-exec-fb2ed026-2925-428e-b83f-48f22e20fd79","side_effects":false,"request_id":"req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22","run_id":"review-bad9ea02-d20f-463b-96f9-158818867ac6"}
+
+四、公网接口逐步结果（HTTP 409/422为预期拦截，不是测试失败）
+01 | /api/funding-demo/plan | HTTP 200 | OK | 关联信息见完整JSON
+02 | /api/review | HTTP 200 | OK | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+03 | /api/review/simulate | HTTP 409 | EXECUTION_BLOCKED | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+04 | /api/review/risk-callback | HTTP 200 | OK | 关联信息见完整JSON
+05 | /api/review/approval | HTTP 200 | OK | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+06 | /api/review/approval | HTTP 200 | OK | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+07 | /api/review/approval | HTTP 409 | APPROVAL_IMMUTABLE | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+08 | /api/review/approval | HTTP 409 | APPROVAL_IMMUTABLE | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+09 | /api/review/approval | HTTP 422 | INVALID_WORKFLOW_INPUT | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+10 | /api/review/risk-decision | HTTP 200 | OK | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+11 | /api/review/risk-decision | HTTP 409 | RISK_DECISION_IMMUTABLE | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+12 | /api/review/cancel | HTTP 200 | OK | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+13 | /api/review/risk-callback | HTTP 200 | OK | 关联信息见完整JSON
+14 | /api/review/simulate | HTTP 409 | EXECUTION_BLOCKED | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+15 | /api/review/task/review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3 | HTTP 200 | OK | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+16 | /api/review/task/review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3/risk-handoff | HTTP 200 | OK | review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3
+17 | /api/review | HTTP 200 | OK | review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684
+18 | /api/review/simulate | HTTP 409 | EXECUTION_BLOCKED | review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684
+19 | /api/review/risk-callback | HTTP 200 | OK | 关联信息见完整JSON
+20 | /api/review/approval | HTTP 200 | OK | review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684
+21 | /api/review/simulate | HTTP 200 | OK | review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684
+22 | /api/review/simulate | HTTP 200 | OK | review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684
+23 | /api/review/task/review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684 | HTTP 200 | OK | review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684
+24 | /api/review/task/review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684/risk-handoff | HTTP 200 | OK | review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684
+
+五、仍需其他Owner配合
+Risk/Approval：接通正式认证和受信任人员身份；这些演示标签不是身份验证。
+Backend：正式访问域名与不同手机网络可达性验收；若改多实例，必须保留串行/事务保障。
+UI：409冲突应提示查看原记录，不能自动生成新理由再次提交。
+本轮没有新增创建任务的幂等键，也不宣称全系统已联合验收。
+完整原始结构：chenchen/docs/public-decision-integrity-2026-10-15.json
+本地证据：chenchen/docs/decision-integrity-local-2026-10-15.json
+复现脚本：chenchen/scripts/verify-public-decision-integrity.ps1、verify-decision-integrity.js
+旧版本保留：个人4b7dc45、团队3c02837、旧后端63dc7b67-60e8-4f38-b6b9-1f5a341adb93。

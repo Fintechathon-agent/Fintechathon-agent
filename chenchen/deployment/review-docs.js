@@ -20,6 +20,7 @@ export const reviewDocs = String.raw`<!doctype html>
 <details id="response"><summary>完整接口返回</summary><pre id="result">提交后显示。</pre></details></section>
 <section><h2>Risk 交接与回写</h2><p>模型返回后，用 <code>GET /api/review/{run_id}/risk-handoff</code> 读取独立交接包，也可按任务查询 <code>GET /api/review/task/{task_id}/risk-handoff</code>。</p>
 <details><summary>给接入同学：回调字段与重试规则</summary><p><code>POST /api/review/risk-callback</code> 需要 callback_version=risk-callback.v1、handoff_id、task_id、request_id、run_id、audit_id、proposal_sha256、decision、reviewer、reason。编号和参数指纹必须与交接包一致。</p><p>decision 支持 APPROVE / REJECT / REQUEST_MORE_INFO；相同回调重试返回 DUPLICATE。改动字段、串单或缺少证据会被拒绝并留痕。补充信息须新建任务重新评审。</p><p>当前 reviewer 为演示标签，不代表已经认证的 Risk 身份。远程工作台接入仍待 Risk Owner 联合验收；真实执行保持阻断。</p></details></section>
+<section><h2>重复提交不会变成另一份审批</h2><details><summary>断网后重试，该怎样处理？</summary><p><code>/api/review/risk-decision</code> 和 <code>/api/review/approval</code> 必须重发原来的任务、参数指纹、决定、人员标签和理由。完全一致且任务未终结时，返回已有记录，不新增审批。换人或换理由返回409并留痕；缺少理由或人员/理由超过500字符返回422，不静默截断。终态不能恢复为等待审批。人员标签仍只是演示字段，不代表已经完成身份认证。</p></details></section>
 <section><h2>用户主动停止</h2><p><code>POST /api/review/cancel</code> 需要 task_id、proposal_sha256、canceler、reason。它只能将尚未终结的任务标为 CANCELLED，保留完整审计；不会释放已经完成的模拟占用，也不会绕过 Risk。取消后如需继续，必须重新创建任务。</p></section>
 <section><h2>前端接入</h2><pre id="snippet"></pre>
 <p>模型内容：<code>model.model_response.raw_text</code>；真实调用标记：<code>model.source === "model"</code> 且 <code>model.model_response.call_succeeded === true</code>。</p>

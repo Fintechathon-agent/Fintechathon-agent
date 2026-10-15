@@ -12,6 +12,10 @@
     { "$ref": "#/$defs/CancellationRequest" }
   ],
   "$defs": {
+    "DecisionText": {
+      "type": "string", "minLength": 1, "maxLength": 500, "pattern": "\\S",
+      "description": "Non-empty label/reason, trimmed by the server. Never silently truncated. Actor labels are not authenticated identities."
+    },
     "ReviewRequest": {
       "type": "object",
       "additionalProperties": false,
@@ -135,26 +139,28 @@
     },
     "RiskDecisionRequest": {
       "type": "object",
+      "description": "For a nonterminal task, a retry must match decision, reviewer, reason and proposal hash after normalization. Changed evidence returns 409 and is audited. Terminal tasks still reject new decisions.",
       "additionalProperties": false,
       "required": ["task_id", "proposal_sha256", "decision", "reviewer", "reason"],
       "properties": {
         "task_id": { "type": "string" },
         "proposal_sha256": { "type": "string" },
         "decision": { "type": "string", "enum": ["APPROVE", "REJECT", "REQUEST_MORE_INFO"] },
-        "reviewer": { "type": "string" },
-        "reason": { "type": "string" }
+        "reviewer": { "$ref": "#/$defs/DecisionText" },
+        "reason": { "$ref": "#/$defs/DecisionText" }
       }
     },
     "ApprovalRequest": {
       "type": "object",
+      "description": "A retry must match decision, approver, reason and proposal hash after normalization. Identical nonterminal retries return the existing record; changed evidence returns 409. Invalid labels/reasons return 422.",
       "additionalProperties": false,
       "required": ["task_id", "proposal_sha256", "decision", "approver", "reason"],
       "properties": {
         "task_id": { "type": "string" },
         "proposal_sha256": { "type": "string" },
         "decision": { "type": "string", "enum": ["APPROVE", "REJECT"] },
-        "approver": { "type": "string" },
-        "reason": { "type": "string" }
+        "approver": { "$ref": "#/$defs/DecisionText" },
+        "reason": { "$ref": "#/$defs/DecisionText" }
       }
     },
     "SimulationRequest": {
@@ -173,8 +179,8 @@
       "properties": {
         "task_id": { "type": "string" },
         "proposal_sha256": { "type": "string" },
-        "canceler": { "type": "string" },
-        "reason": { "type": "string" }
+        "canceler": { "$ref": "#/$defs/DecisionText" },
+        "reason": { "$ref": "#/$defs/DecisionText" }
       }
     }
   }

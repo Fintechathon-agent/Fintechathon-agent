@@ -51,14 +51,14 @@ function decisionValue(value, allowed, field) {
 }
 
 function requiredString(value, field) {
-  if (typeof value !== "string" || !value.trim()) {
-    throw new WorkflowError("INVALID_WORKFLOW_INPUT", `${field} is required`, {
+  if (typeof value !== "string" || !value.trim() || value.length > 500) {
+    throw new WorkflowError("INVALID_WORKFLOW_INPUT", `${field} must be a non-empty string of at most 500 characters`, {
       statusCode: 422,
       stage: "VALIDATION",
       recovery: `Provide ${field} and retry.`
     });
   }
-  return value.trim().slice(0, 500);
+  return value.trim();
 }
 
 async function hash(value) {
@@ -291,10 +291,21 @@ class ReviewWorkflowStore {
     return record;
   }
 
-  deny(record, code, message, stage, recovery) {
+  deny(record, code, message, stage, recovery, statusCode = 409) {
     event(record, "workflow.operation_blocked", { code, stage, execution_allowed: false }, "execution-gateway");
     const saved = this.save(record);
-    throw new WorkflowError(code, message, { stage, recovery, record: saved });
+    throw new WorkflowError(code, message, { statusCode, stage, recovery, record: saved });
+  }
+
+  decisionInput(record, input, decisions, actorField, stage) {
+    this.checkInput(record, input, ["task_id", "proposal_sha256", "decision", actorField, "reason"], stage);
+    try {
+      return { decision: decisionValue(input.decision, decisions, "decision"),
+        actor: requiredString(input[actorField], actorField), reason: requiredString(input.reason, "reason") };
+    } catch (error) {
+      if (!(error instanceof WorkflowError)) throw error;
+      this.deny(record, error.code, error.message, stage, error.recovery, error.statusCode);
+    }
   }
 
   checkInput(record, input, allowed, stage) {
@@ -326,7 +337,9 @@ class ReviewWorkflowStore {
       this.deny(record, "RISK_DECISION_IMMUTABLE", "A Risk decision already exists; callback cannot replace it", "RISK_CALLBACK", "Read the existing decision or create a new task.");
     }
     const { task_id, proposal_sha256, decision, reviewer, reason } = callback;
-    const result = await this.decideRisk({ task_id, proposal_sha256, decision, reviewer, reason });
+    // Do not yield between recording Risk and its callback receipt. A cancellation
+    // or duplicate callback must observe both changes, never an intermediate state.
+    const result = this.applyRiskDecision({ task_id, proposal_sha256, decision, reviewer, reason });
     result.risk_callback = { callback_version: riskHandoff.CALLBACK_VERSION, request: callback, received_at: now() };
     event(result, "risk.callback.recorded", {
       handoff_id: callback.handoff_id, audit_id: callback.audit_id,
@@ -336,18 +349,20 @@ class ReviewWorkflowStore {
   }
 
   async decideRisk(input = {}) {
+    return this.applyRiskDecision(input);
+  }
+
+  applyRiskDecision(input = {}) {
     const taskId = requiredString(input.task_id, "task_id");
     const record = this.requireRecord(taskId);
     if (!record.proposed_action) throw new WorkflowError("RISK_BLOCKED", "model failure cannot be approved", { stage: "RISK", record });
-    const decision = decisionValue(input.decision, RISK_DECISIONS, "decision");
-    const reviewer = requiredString(input.reviewer, "reviewer");
-    this.checkInput(record, input, ["task_id", "proposal_sha256", "decision", "reviewer", "reason"], "RISK");
+    const { decision, actor: reviewer, reason } = this.decisionInput(record, input, RISK_DECISIONS, "reviewer", "RISK");
     if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
       this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot receive another Risk decision", "RISK", "Create a new task for a new proposal.");
     }
     if (record.risk_decision?.decision) {
-      if (record.risk_decision.decision === decision) return this.save(record);
-      throw new WorkflowError("RISK_DECISION_IMMUTABLE", "risk decision is already recorded", { stage: "RISK", record });
+      if (record.risk_decision.decision === decision && record.risk_decision.reviewer === reviewer && record.risk_decision.reason === reason) return record;
+      this.deny(record, "RISK_DECISION_IMMUTABLE", "Risk retry must match the recorded decision, reviewer and reason", "RISK", "Read the existing decision. Changed evidence requires a new task and review.");
     }
     record.risk_decision = {
       risk_decision_id: record.risk_decision?.risk_decision_id || id("risk-decision-"),
@@ -355,7 +370,7 @@ class ReviewWorkflowStore {
       decision,
       status: decision === "APPROVE" ? "APPROVED" : decision === "REJECT" ? "REJECTED" : "PENDING_REVIEW",
       reviewer,
-      reason: requiredString(input.reason, "reason"),
+      reason,
       proposal_sha256: record.proposed_action.proposal_sha256,
       decided_at: now()
     };
@@ -389,9 +404,7 @@ class ReviewWorkflowStore {
     const taskId = requiredString(input.task_id, "task_id");
     const record = this.requireRecord(taskId);
     if (!record.proposed_action) throw new WorkflowError("APPROVAL_BLOCKED", "model failure cannot be approved", { stage: "APPROVAL", record });
-    const decision = decisionValue(input.decision, APPROVAL_DECISIONS, "decision");
-    const approver = requiredString(input.approver, "approver");
-    this.checkInput(record, input, ["task_id", "proposal_sha256", "decision", "approver", "reason"], "APPROVAL");
+    const { decision, actor: approver, reason } = this.decisionInput(record, input, APPROVAL_DECISIONS, "approver", "APPROVAL");
     if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
       this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot receive another approval", "APPROVAL", "Create a new task for a new proposal.");
     }
@@ -400,11 +413,11 @@ class ReviewWorkflowStore {
     }
     if (!record.approval.required) throw new WorkflowError("APPROVAL_NOT_REQUIRED", "this task does not require approval", { stage: "APPROVAL", record });
     if (record.approval.status !== "PENDING") {
-      if (record.approval.decision === decision) return this.save(record);
-      throw new WorkflowError("APPROVAL_IMMUTABLE", "approval decision is already recorded", { stage: "APPROVAL", record });
+      if (record.approval.decision === decision && record.approval.approver === approver && record.approval.reason === reason) return record;
+      this.deny(record, "APPROVAL_IMMUTABLE", "Approval retry must match the recorded decision, approver and reason", "APPROVAL", "Read the existing approval. Changed evidence requires a new task and review.");
     }
     record.approval.decision = decision;
-    record.approval.reason = requiredString(input.reason, "reason");
+    record.approval.reason = reason;
     record.approval.approver = approver;
     record.approval.decided_at = now();
     record.approval.status = decision === "APPROVE" ? "APPROVED" : "REJECTED";
@@ -412,7 +425,7 @@ class ReviewWorkflowStore {
       record.status = "REJECTED";
       record.execution.status = "BLOCKED";
       record.execution.simulation_allowed = false;
-      event(record, "approval.rejected", { reason: input.reason || "审批人拒绝" }, "approval");
+      event(record, "approval.rejected", { reason }, "approval");
       event(record, "execution.blocked", { reason: "approval_rejected" }, "execution-gateway");
     } else {
       record.status = "READY_FOR_SIMULATION";

@@ -1,0 +1,1551 @@
+{
+  "checked_at": "2026-10-15T03:06:13.2813974Z",
+  "deployment": "9b2692e7-86d3-4372-ba49-39096ea66e73",
+  "passed": true,
+  "evidence_type": "PUBLIC_REAL_MODEL_SYNTHETIC_DATA",
+  "network_route": "explicit-proxy",
+  "limitations": "Public Risk/approval remain demo labels. Local concurrency is tested separately; no real transactions.",
+  "steps": [
+    {
+      "path": "/api/funding-demo/plan",
+      "http": 200,
+      "code": null,
+      "task_id": null,
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/simulate",
+      "http": 409,
+      "code": "EXECUTION_BLOCKED",
+      "task_id": null,
+      "trace_task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3"
+    },
+    {
+      "path": "/api/review/risk-callback",
+      "http": 200,
+      "code": null,
+      "task_id": null,
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 409,
+      "code": "APPROVAL_IMMUTABLE",
+      "task_id": null,
+      "trace_task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3"
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 409,
+      "code": "APPROVAL_IMMUTABLE",
+      "task_id": null,
+      "trace_task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3"
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 422,
+      "code": "INVALID_WORKFLOW_INPUT",
+      "task_id": null,
+      "trace_task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3"
+    },
+    {
+      "path": "/api/review/risk-decision",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/risk-decision",
+      "http": 409,
+      "code": "RISK_DECISION_IMMUTABLE",
+      "task_id": null,
+      "trace_task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3"
+    },
+    {
+      "path": "/api/review/cancel",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/risk-callback",
+      "http": 200,
+      "code": null,
+      "task_id": null,
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/simulate",
+      "http": 409,
+      "code": "EXECUTION_BLOCKED",
+      "task_id": null,
+      "trace_task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3"
+    },
+    {
+      "path": "/api/review/task/review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/task/review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3/risk-handoff",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/simulate",
+      "http": 409,
+      "code": "EXECUTION_BLOCKED",
+      "task_id": null,
+      "trace_task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684"
+    },
+    {
+      "path": "/api/review/risk-callback",
+      "http": 200,
+      "code": null,
+      "task_id": null,
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/simulate",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/simulate",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/task/review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/task/review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684/risk-handoff",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+      "trace_task_id": null
+    }
+  ],
+  "results": [
+    {
+      "scenario": "cancel_after_approval",
+      "workflow": {
+        "workflow_version": "review-workflow.v1",
+        "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+        "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+        "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc",
+        "status": "CANCELLED",
+        "reviewed_input": {
+          "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+          "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+          "source": "synthetic-decision-integrity-release",
+          "kind": "combined",
+          "text": "虚构案例：现金10000元，为房租保留4000元，拟投资1000元。核对用途冲突；不能执行真实交易。",
+          "context": {
+            "synthetic": true,
+            "demo_funding_snapshot": {
+              "guard_version": "funding-plan-demo.v1",
+              "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+              "revision": 1,
+              "amount_minor": 100000,
+              "currency": "CNY",
+              "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+              "cash_minor": 1000000,
+              "protected_purposes": [
+                {
+                  "purpose_id": "rent",
+                  "label": "虚构房租",
+                  "amount_minor": 400000
+                }
+              ],
+              "check": {
+                "guard_version": "funding-plan-demo.v1",
+                "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+                "bound_revision": 1,
+                "current_revision": 1,
+                "requested_minor": 100000,
+                "available_minor": 600000,
+                "protected_minor": 400000,
+                "allocated_minor": 0,
+                "deficit_minor": 0,
+                "execution_allowed": false,
+                "status": "AVAILABLE",
+                "code": null,
+                "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+              },
+              "instruction_authority": false
+            }
+          },
+          "action_parameters": {
+            "amount": 1000,
+            "currency": "CNY",
+            "synthetic": true,
+            "funding_plan_revision": 1,
+            "funding_plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059"
+          },
+          "requested_action": null,
+          "allow_rule_fallback": false
+        },
+        "model": {
+          "status": "PROPOSED",
+          "source": "model",
+          "model_response": {
+            "provider": "cloudflare_workers_ai",
+            "call_succeeded": true,
+            "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            "endpoint": "cloudflare:AI",
+            "api_style": "workers_ai",
+            "response_format": "json_schema",
+            "provider_response_id": "chatcmpl-9a6d28ac-0886-448d-ae2b-d1bdfda2d4f7",
+            "raw_text": "{\"summary\":\"内容涉及虚构案例，提及现金和投资金额，但存在用途冲突，需要人工审查\",\"risk_level\":\"low\",\"proposed_action\":\"HOLD_FOR_REVIEW\",\"action_reason\":\"内容中提到的用途冲突和资金分配需要进一步审查\",\"missing_information\":[],\"evidence\":[\"虚构案例：现金10000元，为房租保留4000元，拟投资1000元。核对用途冲突；不能执行真实交易。\"]}",
+            "raw_text_format": "provider_json_serialized",
+            "proposal": {
+              "summary": "内容涉及虚构案例，提及现金和投资金额，但存在用途冲突，需要人工审查",
+              "risk_level": "low",
+              "proposed_action": "HOLD_FOR_REVIEW",
+              "action_reason": "内容中提到的用途冲突和资金分配需要进一步审查",
+              "missing_information": [],
+              "evidence": [
+                "虚构案例：现金10000元，为房租保留4000元，拟投资1000元。核对用途冲突；不能执行真实交易。"
+              ]
+            },
+            "usage": {
+              "prompt_tokens": 551,
+              "completion_tokens": 128,
+              "total_tokens": 679,
+              "prompt_tokens_details": {
+                "cached_tokens": 0
+              },
+              "neurons": 40.908966064453125
+            },
+            "attempt_count": 1,
+            "retry_count": 0
+          },
+          "input": {
+            "kind": "combined",
+            "source": "synthetic-decision-integrity-release",
+            "input_sha256": "08fa1213e0524c366c71dddad88722f3c7cc3f3b90b5d9eb3341a6819b485e93"
+          }
+        },
+        "proposed_action": {
+          "proposed_action": "HOLD_FOR_REVIEW",
+          "action_reason": "内容中提到的用途冲突和资金分配需要进一步审查",
+          "risk_level": "low",
+          "requested_action": null,
+          "action_parameters": {
+            "amount": 1000,
+            "currency": "CNY",
+            "synthetic": true,
+            "funding_plan_revision": 1,
+            "funding_plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059"
+          },
+          "model_response_id": "chatcmpl-9a6d28ac-0886-448d-ae2b-d1bdfda2d4f7",
+          "funding": {
+            "guard_version": "funding-plan-demo.v1",
+            "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+            "revision": 1,
+            "amount_minor": 100000,
+            "currency": "CNY",
+            "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+            "cash_minor": 1000000,
+            "protected_purposes": [
+              {
+                "purpose_id": "rent",
+                "label": "虚构房租",
+                "amount_minor": 400000
+              }
+            ]
+          },
+          "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad"
+        },
+        "risk_handoff": {
+          "contract_version": "model-review.v1",
+          "handoff_id": "handoff-d983beda-031c-4ec1-bf6c-602d8ad39ae6",
+          "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+          "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc",
+          "status": "BLOCKED",
+          "decision": "CANCELLED",
+          "owner": "Unified Risk",
+          "reason": "模型输出只是拟议动作，必须由统一 Risk 决定是否进入审批。",
+          "evidence": {
+            "input_sha256": "08fa1213e0524c366c71dddad88722f3c7cc3f3b90b5d9eb3341a6819b485e93",
+            "model_response_id": "chatcmpl-9a6d28ac-0886-448d-ae2b-d1bdfda2d4f7",
+            "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad",
+            "audit_id": "audit-61cca6df-f7fd-4113-8957-d17e4ed64d72"
+          },
+          "execution_allowed": false
+        },
+        "risk_decision": {
+          "risk_decision_id": "risk-decision-1a46f89d-d0f1-4a8c-8bea-dfe121d9a685",
+          "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+          "decision": "APPROVE",
+          "status": "APPROVED",
+          "reviewer": "synthetic-risk-owner",
+          "reason": "仅虚构复核，非独立Risk验收",
+          "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad",
+          "decided_at": "2026-10-15T03:05:47.408Z"
+        },
+        "approval": {
+          "approval_id": "approval-19d6a2d8-a479-4355-8c49-cd65078d12be",
+          "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+          "required": true,
+          "status": "BLOCKED",
+          "decision": "APPROVE",
+          "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad",
+          "approver": "synthetic-user",
+          "decided_at": "2026-10-15T03:05:48.302Z",
+          "reason": "只同意这次1000元模拟"
+        },
+        "execution": {
+          "execution_id": null,
+          "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+          "status": "BLOCKED",
+          "simulation_allowed": false,
+          "execution_allowed": false,
+          "receipt": null
+        },
+        "audit": {
+          "audit_id": "audit-61cca6df-f7fd-4113-8957-d17e4ed64d72",
+          "workflow_version": "review-workflow.v1",
+          "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+          "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+          "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc",
+          "events": [
+            {
+              "event_id": "event-7dfbec90-c53e-4da3-911e-b6634a8a28b5",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "model-service",
+              "event_type": "review.received",
+              "payload": {
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:41.778Z"
+            },
+            {
+              "event_id": "event-e7135210-4767-45ba-b003-a3fa4765aea8",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "model-service",
+              "event_type": "model.completed",
+              "payload": {
+                "source": "model",
+                "attempt_count": 1,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:45.564Z"
+            },
+            {
+              "event_id": "event-b4cd031f-9dcb-4f91-b9ba-3afbf5bf26d2",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "model-service",
+              "event_type": "gateway.checked",
+              "payload": {
+                "execution_allowed": false,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:45.564Z"
+            },
+            {
+              "event_id": "event-553b9c21-a23e-43fb-a99c-9d62fcde6485",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "core-agent",
+              "event_type": "workflow.created",
+              "payload": {
+                "stage": "MODEL",
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:45.564Z"
+            },
+            {
+              "event_id": "event-7a3ba259-8ef1-4ba5-8704-92e82d4736f6",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "funding-guard",
+              "event_type": "funding.bound",
+              "payload": {
+                "funding": {
+                  "guard_version": "funding-plan-demo.v1",
+                  "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+                  "revision": 1,
+                  "amount_minor": 100000,
+                  "currency": "CNY",
+                  "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+                  "cash_minor": 1000000,
+                  "protected_purposes": [
+                    {
+                      "purpose_id": "rent",
+                      "label": "虚构房租",
+                      "amount_minor": 400000
+                    }
+                  ]
+                },
+                "check": {
+                  "guard_version": "funding-plan-demo.v1",
+                  "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+                  "bound_revision": 1,
+                  "current_revision": 1,
+                  "requested_minor": 100000,
+                  "available_minor": 600000,
+                  "protected_minor": 400000,
+                  "allocated_minor": 0,
+                  "deficit_minor": 0,
+                  "execution_allowed": false,
+                  "status": "AVAILABLE",
+                  "code": null,
+                  "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+                },
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:45.564Z"
+            },
+            {
+              "event_id": "event-91e07c45-f0ad-4fd0-a19b-a10cf0bc490b",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "core-agent",
+              "event_type": "proposal.bound",
+              "payload": {
+                "source": "model",
+                "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad",
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:45.564Z"
+            },
+            {
+              "event_id": "event-af135e49-726b-4fd7-9aac-b257e95ae50a",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "risk-gateway",
+              "event_type": "risk.handoff.created",
+              "payload": {
+                "handoff_id": "handoff-d983beda-031c-4ec1-bf6c-602d8ad39ae6",
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:45.564Z"
+            },
+            {
+              "event_id": "event-0655c77b-2b7f-4115-b373-f1c262b43975",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "execution-gateway",
+              "event_type": "execution.blocked",
+              "payload": {
+                "reason": "risk_pending",
+                "execution_allowed": false,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:45.564Z"
+            },
+            {
+              "event_id": "event-b4a74bf8-6882-4fc8-acd6-512205400303",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "execution-gateway",
+              "event_type": "workflow.operation_blocked",
+              "payload": {
+                "code": "EXECUTION_BLOCKED",
+                "stage": "EXECUTION",
+                "execution_allowed": false,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:46.506Z"
+            },
+            {
+              "event_id": "event-3ecce9c7-92da-4285-9ff7-8e44487b55d6",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "risk",
+              "event_type": "risk.approved",
+              "payload": {
+                "approval_required": true,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:47.408Z"
+            },
+            {
+              "event_id": "event-9fb9c9ba-6630-4df7-9c8c-211f30e6b8dc",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "approval-gateway",
+              "event_type": "approval.pending",
+              "payload": {
+                "approval_id": "approval-19d6a2d8-a479-4355-8c49-cd65078d12be",
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:47.408Z"
+            },
+            {
+              "event_id": "event-6996227a-5229-4cdf-b974-77ab3c7cbf30",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "risk-gateway",
+              "event_type": "risk.callback.recorded",
+              "payload": {
+                "handoff_id": "handoff-d983beda-031c-4ec1-bf6c-602d8ad39ae6",
+                "audit_id": "audit-61cca6df-f7fd-4113-8957-d17e4ed64d72",
+                "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad",
+                "decision": "APPROVE",
+                "risk_decision_id": "risk-decision-1a46f89d-d0f1-4a8c-8bea-dfe121d9a685",
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:47.408Z"
+            },
+            {
+              "event_id": "event-b359f46c-8831-4f67-be01-c4ed38e1d48a",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "approval",
+              "event_type": "approval.approved",
+              "payload": {
+                "approval_id": "approval-19d6a2d8-a479-4355-8c49-cd65078d12be",
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:48.302Z"
+            },
+            {
+              "event_id": "event-e658abbc-c63a-43ce-8136-1720f5815a7a",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "execution-gateway",
+              "event_type": "execution.ready_for_simulation",
+              "payload": {
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:48.302Z"
+            },
+            {
+              "event_id": "event-440e6b77-3afd-4e3d-9231-b99f10bd8b06",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "execution-gateway",
+              "event_type": "workflow.operation_blocked",
+              "payload": {
+                "code": "APPROVAL_IMMUTABLE",
+                "stage": "APPROVAL",
+                "execution_allowed": false,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:49.944Z"
+            },
+            {
+              "event_id": "event-b93837d4-8cf7-493e-a97c-aa77367e327e",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "execution-gateway",
+              "event_type": "workflow.operation_blocked",
+              "payload": {
+                "code": "APPROVAL_IMMUTABLE",
+                "stage": "APPROVAL",
+                "execution_allowed": false,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:50.827Z"
+            },
+            {
+              "event_id": "event-9ba345b4-12f6-4532-88a1-9c4d9cc710fa",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "execution-gateway",
+              "event_type": "workflow.operation_blocked",
+              "payload": {
+                "code": "INVALID_WORKFLOW_INPUT",
+                "stage": "APPROVAL",
+                "execution_allowed": false,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:51.729Z"
+            },
+            {
+              "event_id": "event-5099a9b3-2052-4bf9-8014-5821ee01daf0",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "execution-gateway",
+              "event_type": "workflow.operation_blocked",
+              "payload": {
+                "code": "RISK_DECISION_IMMUTABLE",
+                "stage": "RISK",
+                "execution_allowed": false,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:53.618Z"
+            },
+            {
+              "event_id": "event-eb66bf92-a422-4220-9151-3165af53d514",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "user",
+              "event_type": "task.cancelled",
+              "payload": {
+                "canceler": "synthetic-user",
+                "reason": "停止这次模拟",
+                "execution_allowed": false,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:54.611Z"
+            },
+            {
+              "event_id": "event-3c67b970-d49c-430d-9f03-106a3037a65b",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "execution-gateway",
+              "event_type": "execution.blocked",
+              "payload": {
+                "reason": "task_cancelled",
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:54.611Z"
+            },
+            {
+              "event_id": "event-015ec732-8d6f-4594-99df-27e1418a0060",
+              "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+              "actor": "execution-gateway",
+              "event_type": "workflow.operation_blocked",
+              "payload": {
+                "code": "EXECUTION_BLOCKED",
+                "stage": "EXECUTION",
+                "execution_allowed": false,
+                "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+                "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+              },
+              "timestamp": "2026-10-15T03:05:56.724Z"
+            }
+          ]
+        },
+        "funding_check": {
+          "guard_version": "funding-plan-demo.v1",
+          "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+          "bound_revision": 1,
+          "current_revision": 1,
+          "requested_minor": 100000,
+          "available_minor": 600000,
+          "protected_minor": 400000,
+          "allocated_minor": 0,
+          "deficit_minor": 0,
+          "execution_allowed": false,
+          "status": "AVAILABLE",
+          "code": null,
+          "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+        },
+        "risk_callback": {
+          "callback_version": "risk-callback.v1",
+          "request": {
+            "callback_version": "risk-callback.v1",
+            "handoff_id": "handoff-d983beda-031c-4ec1-bf6c-602d8ad39ae6",
+            "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+            "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+            "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc",
+            "audit_id": "audit-61cca6df-f7fd-4113-8957-d17e4ed64d72",
+            "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad",
+            "decision": "APPROVE",
+            "reviewer": "synthetic-risk-owner",
+            "reason": "仅虚构复核，非独立Risk验收"
+          },
+          "received_at": "2026-10-15T03:05:47.408Z"
+        },
+        "cancellation": {
+          "canceler": "synthetic-user",
+          "reason": "停止这次模拟",
+          "cancelled_at": "2026-10-15T03:05:54.611Z",
+          "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad"
+        }
+      },
+      "handoff": {
+        "handoff_version": "risk-handoff.v1",
+        "contract_version": "model-review.v1",
+        "workflow_version": "review-workflow.v1",
+        "handoff_id": "handoff-d983beda-031c-4ec1-bf6c-602d8ad39ae6",
+        "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+        "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+        "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc",
+        "audit_id": "audit-61cca6df-f7fd-4113-8957-d17e4ed64d72",
+        "workflow_status": "CANCELLED",
+        "status": "BLOCKED",
+        "decision": "CANCELLED",
+        "owner": "Unified Risk",
+        "execution_allowed": false,
+        "proposal": {
+          "proposed_action": "HOLD_FOR_REVIEW",
+          "action_reason": "内容中提到的用途冲突和资金分配需要进一步审查",
+          "risk_level": "low",
+          "requested_action": null,
+          "action_parameters": {
+            "amount": 1000,
+            "currency": "CNY",
+            "synthetic": true,
+            "funding_plan_revision": 1,
+            "funding_plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059"
+          },
+          "model_response_id": "chatcmpl-9a6d28ac-0886-448d-ae2b-d1bdfda2d4f7",
+          "funding": {
+            "guard_version": "funding-plan-demo.v1",
+            "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+            "revision": 1,
+            "amount_minor": 100000,
+            "currency": "CNY",
+            "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+            "cash_minor": 1000000,
+            "protected_purposes": [
+              {
+                "purpose_id": "rent",
+                "label": "虚构房租",
+                "amount_minor": 400000
+              }
+            ]
+          },
+          "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad"
+        },
+        "funding_check": {
+          "guard_version": "funding-plan-demo.v1",
+          "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+          "bound_revision": 1,
+          "current_revision": 1,
+          "requested_minor": 100000,
+          "available_minor": 600000,
+          "protected_minor": 400000,
+          "allocated_minor": 0,
+          "deficit_minor": 0,
+          "execution_allowed": false,
+          "status": "AVAILABLE",
+          "code": null,
+          "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+        },
+        "cancellation": {
+          "canceler": "synthetic-user",
+          "reason": "停止这次模拟",
+          "cancelled_at": "2026-10-15T03:05:54.611Z",
+          "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad"
+        },
+        "reviewed_input": {
+          "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+          "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+          "source": "synthetic-decision-integrity-release",
+          "kind": "combined",
+          "text": "虚构案例：现金10000元，为房租保留4000元，拟投资1000元。核对用途冲突；不能执行真实交易。",
+          "context": {
+            "synthetic": true,
+            "demo_funding_snapshot": {
+              "guard_version": "funding-plan-demo.v1",
+              "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+              "revision": 1,
+              "amount_minor": 100000,
+              "currency": "CNY",
+              "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+              "cash_minor": 1000000,
+              "protected_purposes": [
+                {
+                  "purpose_id": "rent",
+                  "label": "虚构房租",
+                  "amount_minor": 400000
+                }
+              ],
+              "check": {
+                "guard_version": "funding-plan-demo.v1",
+                "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+                "bound_revision": 1,
+                "current_revision": 1,
+                "requested_minor": 100000,
+                "available_minor": 600000,
+                "protected_minor": 400000,
+                "allocated_minor": 0,
+                "deficit_minor": 0,
+                "execution_allowed": false,
+                "status": "AVAILABLE",
+                "code": null,
+                "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+              },
+              "instruction_authority": false
+            }
+          },
+          "action_parameters": {
+            "amount": 1000,
+            "currency": "CNY",
+            "synthetic": true,
+            "funding_plan_revision": 1,
+            "funding_plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059"
+          },
+          "requested_action": null,
+          "allow_rule_fallback": false
+        },
+        "input_authority": "UNVERIFIED_CALLER_INPUT",
+        "model": {
+          "source": "model",
+          "status": "PROPOSED",
+          "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "provider_response_id": "chatcmpl-9a6d28ac-0886-448d-ae2b-d1bdfda2d4f7",
+          "call_succeeded": true,
+          "attempt_count": 1,
+          "retry_count": 0
+        },
+        "evidence": {
+          "input_sha256": "08fa1213e0524c366c71dddad88722f3c7cc3f3b90b5d9eb3341a6819b485e93",
+          "model_response_id": "chatcmpl-9a6d28ac-0886-448d-ae2b-d1bdfda2d4f7",
+          "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad",
+          "audit_id": "audit-61cca6df-f7fd-4113-8957-d17e4ed64d72"
+        },
+        "approval": {
+          "approval_id": "approval-19d6a2d8-a479-4355-8c49-cd65078d12be",
+          "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+          "required": true,
+          "status": "BLOCKED",
+          "decision": "APPROVE",
+          "proposal_sha256": "f80486801c5b6dc2b7772a6da5136242235cbd39254d979e2ab63672ab02a6ad",
+          "approver": "synthetic-user",
+          "decided_at": "2026-10-15T03:05:48.302Z",
+          "reason": "只同意这次1000元模拟"
+        },
+        "audit": {
+          "audit_id": "audit-61cca6df-f7fd-4113-8957-d17e4ed64d72",
+          "event_count": 21,
+          "latest_event": {
+            "event_id": "event-015ec732-8d6f-4594-99df-27e1418a0060",
+            "task_id": "review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+            "actor": "execution-gateway",
+            "event_type": "workflow.operation_blocked",
+            "payload": {
+              "code": "EXECUTION_BLOCKED",
+              "stage": "EXECUTION",
+              "execution_allowed": false,
+              "request_id": "req-625d143a-1660-48bd-a7b9-e15b52e678b4",
+              "run_id": "review-1ecbc403-0d76-40af-865d-1f62a2dc19dc"
+            },
+            "timestamp": "2026-10-15T03:05:56.724Z"
+          }
+        },
+        "record_endpoint": "/api/review/task/review-task-bc8b8d67-9e94-461f-a833-2b6ef0706aa3",
+        "callback": {
+          "callback_version": "risk-callback.v1",
+          "endpoint": "/api/review/risk-callback",
+          "method": "POST",
+          "required_fields": [
+            "callback_version",
+            "handoff_id",
+            "task_id",
+            "request_id",
+            "run_id",
+            "audit_id",
+            "proposal_sha256",
+            "decision",
+            "reviewer",
+            "reason"
+          ],
+          "decisions": [
+            "APPROVE",
+            "REJECT",
+            "REQUEST_MORE_INFO"
+          ],
+          "retry_policy": "Identical accepted callback returns DUPLICATE without another decision or audit event. Changed callbacks are rejected. REQUEST_MORE_INFO requires a new reviewed task."
+        }
+      }
+    },
+    {
+      "scenario": "normal_simulation",
+      "workflow": {
+        "workflow_version": "review-workflow.v1",
+        "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+        "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+        "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6",
+        "status": "SIMULATED",
+        "reviewed_input": {
+          "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+          "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+          "source": "synthetic-decision-integrity-release",
+          "kind": "combined",
+          "text": "虚构案例：现金10000元，为房租保留4000元，拟投资1000元。核对用途冲突；不能执行真实交易。",
+          "context": {
+            "synthetic": true,
+            "demo_funding_snapshot": {
+              "guard_version": "funding-plan-demo.v1",
+              "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+              "revision": 1,
+              "amount_minor": 100000,
+              "currency": "CNY",
+              "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+              "cash_minor": 1000000,
+              "protected_purposes": [
+                {
+                  "purpose_id": "rent",
+                  "label": "虚构房租",
+                  "amount_minor": 400000
+                }
+              ],
+              "check": {
+                "guard_version": "funding-plan-demo.v1",
+                "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+                "bound_revision": 1,
+                "current_revision": 1,
+                "requested_minor": 100000,
+                "available_minor": 600000,
+                "protected_minor": 400000,
+                "allocated_minor": 0,
+                "deficit_minor": 0,
+                "execution_allowed": false,
+                "status": "AVAILABLE",
+                "code": null,
+                "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+              },
+              "instruction_authority": false
+            }
+          },
+          "action_parameters": {
+            "amount": 1000,
+            "currency": "CNY",
+            "synthetic": true,
+            "funding_plan_revision": 1,
+            "funding_plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059"
+          },
+          "requested_action": null,
+          "allow_rule_fallback": false
+        },
+        "model": {
+          "status": "PROPOSED",
+          "source": "model",
+          "model_response": {
+            "provider": "cloudflare_workers_ai",
+            "call_succeeded": true,
+            "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            "endpoint": "cloudflare:AI",
+            "api_style": "workers_ai",
+            "response_format": "json_schema",
+            "provider_response_id": "chatcmpl-e851e1bc-22db-4963-b679-75af88b75747",
+            "raw_text": "{\"summary\":\"内容涉及虚构案例，提及现金和投资金额，存在用途冲突，需要人工审查\",\"risk_level\":\"low\",\"proposed_action\":\"HOLD_FOR_REVIEW\",\"action_reason\":\"内容包含模拟交易和保留金额，需要进一步核实和审批\",\"missing_information\":[],\"evidence\":[\"虚构案例：现金10000元，为房租保留4000元，拟投资1000元。核对用途冲突；不能执行真实交易。\"]}",
+            "raw_text_format": "provider_json_serialized",
+            "proposal": {
+              "summary": "内容涉及虚构案例，提及现金和投资金额，存在用途冲突，需要人工审查",
+              "risk_level": "low",
+              "proposed_action": "HOLD_FOR_REVIEW",
+              "action_reason": "内容包含模拟交易和保留金额，需要进一步核实和审批",
+              "missing_information": [],
+              "evidence": [
+                "虚构案例：现金10000元，为房租保留4000元，拟投资1000元。核对用途冲突；不能执行真实交易。"
+              ]
+            },
+            "usage": {
+              "prompt_tokens": 551,
+              "completion_tokens": 128,
+              "total_tokens": 679,
+              "prompt_tokens_details": {
+                "cached_tokens": 0
+              },
+              "neurons": 40.908966064453125
+            },
+            "attempt_count": 1,
+            "retry_count": 0
+          },
+          "input": {
+            "kind": "combined",
+            "source": "synthetic-decision-integrity-release",
+            "input_sha256": "ec8f4d7eca6375561dca3ede5fdc67c50c56a4e34a92fb7bb55ed116183bddda"
+          }
+        },
+        "proposed_action": {
+          "proposed_action": "HOLD_FOR_REVIEW",
+          "action_reason": "内容包含模拟交易和保留金额，需要进一步核实和审批",
+          "risk_level": "low",
+          "requested_action": null,
+          "action_parameters": {
+            "amount": 1000,
+            "currency": "CNY",
+            "synthetic": true,
+            "funding_plan_revision": 1,
+            "funding_plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059"
+          },
+          "model_response_id": "chatcmpl-e851e1bc-22db-4963-b679-75af88b75747",
+          "funding": {
+            "guard_version": "funding-plan-demo.v1",
+            "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+            "revision": 1,
+            "amount_minor": 100000,
+            "currency": "CNY",
+            "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+            "cash_minor": 1000000,
+            "protected_purposes": [
+              {
+                "purpose_id": "rent",
+                "label": "虚构房租",
+                "amount_minor": 400000
+              }
+            ]
+          },
+          "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb"
+        },
+        "risk_handoff": {
+          "contract_version": "model-review.v1",
+          "handoff_id": "handoff-9b9037e4-9950-4274-b3f3-6f354e71ccaf",
+          "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+          "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6",
+          "status": "APPROVED",
+          "decision": "APPROVE",
+          "owner": "Unified Risk",
+          "reason": "模型输出只是拟议动作，必须由统一 Risk 决定是否进入审批。",
+          "evidence": {
+            "input_sha256": "ec8f4d7eca6375561dca3ede5fdc67c50c56a4e34a92fb7bb55ed116183bddda",
+            "model_response_id": "chatcmpl-e851e1bc-22db-4963-b679-75af88b75747",
+            "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+            "audit_id": "audit-9161d1e3-6aaa-449b-bc59-5d5ac9976d51"
+          },
+          "execution_allowed": false
+        },
+        "risk_decision": {
+          "risk_decision_id": "risk-decision-bb942040-2fc2-434f-acc8-a8908a71747b",
+          "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+          "decision": "APPROVE",
+          "status": "APPROVED",
+          "reviewer": "synthetic-risk-owner",
+          "reason": "仅虚构复核，非独立Risk验收",
+          "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+          "decided_at": "2026-10-15T03:06:07.031Z"
+        },
+        "approval": {
+          "approval_id": "approval-bb97af2d-0fa4-4c6f-94b1-bef64fe04bda",
+          "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+          "required": true,
+          "status": "APPROVED",
+          "decision": "APPROVE",
+          "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+          "approver": "synthetic-user",
+          "decided_at": "2026-10-15T03:06:08.533Z",
+          "reason": "只同意这次1000元模拟"
+        },
+        "execution": {
+          "execution_id": "sim-exec-fb2ed026-2925-428e-b83f-48f22e20fd79",
+          "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+          "status": "SIMULATED",
+          "simulation_allowed": false,
+          "execution_allowed": false,
+          "receipt": {
+            "mode": "SIMULATED",
+            "execution_id": "sim-exec-fb2ed026-2925-428e-b83f-48f22e20fd79",
+            "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+            "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+            "side_effects": false,
+            "funding_allocation": {
+              "allocation_id": "allocation-6e9b503e-6109-4026-8930-6cf31b77d435",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+              "execution_id": "sim-exec-fb2ed026-2925-428e-b83f-48f22e20fd79",
+              "revision": 1,
+              "amount_minor": 100000,
+              "created_at": "2026-10-15T03:06:09.91Z",
+              "mode": "SIMULATED",
+              "side_effects": false
+            },
+            "message": "模拟执行完成；未调用真实交易、付款或账户网关。",
+            "completed_at": "2026-10-15T03:06:09.91Z"
+          }
+        },
+        "audit": {
+          "audit_id": "audit-9161d1e3-6aaa-449b-bc59-5d5ac9976d51",
+          "workflow_version": "review-workflow.v1",
+          "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+          "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+          "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6",
+          "events": [
+            {
+              "event_id": "event-c4570b2d-6915-46ba-9d25-a062c966c7ef",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "model-service",
+              "event_type": "review.received",
+              "payload": {
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:00.01Z"
+            },
+            {
+              "event_id": "event-b224ac4b-ad9d-4744-9d21-b0fdae32fbdd",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "model-service",
+              "event_type": "model.completed",
+              "payload": {
+                "source": "model",
+                "attempt_count": 1,
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:04.089Z"
+            },
+            {
+              "event_id": "event-b07c370e-43f7-47b0-ba89-39464fe46e19",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "model-service",
+              "event_type": "gateway.checked",
+              "payload": {
+                "execution_allowed": false,
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:04.089Z"
+            },
+            {
+              "event_id": "event-78ce7776-8987-4b11-853b-e45bd2de64b0",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "core-agent",
+              "event_type": "workflow.created",
+              "payload": {
+                "stage": "MODEL",
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:04.089Z"
+            },
+            {
+              "event_id": "event-ce525e24-a4e0-44e6-a2c3-5ffd0d6a3cfa",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "funding-guard",
+              "event_type": "funding.bound",
+              "payload": {
+                "funding": {
+                  "guard_version": "funding-plan-demo.v1",
+                  "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+                  "revision": 1,
+                  "amount_minor": 100000,
+                  "currency": "CNY",
+                  "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+                  "cash_minor": 1000000,
+                  "protected_purposes": [
+                    {
+                      "purpose_id": "rent",
+                      "label": "虚构房租",
+                      "amount_minor": 400000
+                    }
+                  ]
+                },
+                "check": {
+                  "guard_version": "funding-plan-demo.v1",
+                  "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+                  "bound_revision": 1,
+                  "current_revision": 1,
+                  "requested_minor": 100000,
+                  "available_minor": 600000,
+                  "protected_minor": 400000,
+                  "allocated_minor": 0,
+                  "deficit_minor": 0,
+                  "execution_allowed": false,
+                  "status": "AVAILABLE",
+                  "code": null,
+                  "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+                },
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:04.089Z"
+            },
+            {
+              "event_id": "event-13f05d23-6c06-4582-98f9-ba372df3f530",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "core-agent",
+              "event_type": "proposal.bound",
+              "payload": {
+                "source": "model",
+                "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:04.089Z"
+            },
+            {
+              "event_id": "event-664c8543-7f96-45c3-8ae3-60d9b0628363",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "risk-gateway",
+              "event_type": "risk.handoff.created",
+              "payload": {
+                "handoff_id": "handoff-9b9037e4-9950-4274-b3f3-6f354e71ccaf",
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:04.089Z"
+            },
+            {
+              "event_id": "event-d30dae2c-939d-4911-8068-0f22c62fb8ec",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "execution-gateway",
+              "event_type": "execution.blocked",
+              "payload": {
+                "reason": "risk_pending",
+                "execution_allowed": false,
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:04.089Z"
+            },
+            {
+              "event_id": "event-c2a1f6a3-2b36-4178-9ccb-57cff5d61ff9",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "execution-gateway",
+              "event_type": "workflow.operation_blocked",
+              "payload": {
+                "code": "EXECUTION_BLOCKED",
+                "stage": "EXECUTION",
+                "execution_allowed": false,
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:05.536Z"
+            },
+            {
+              "event_id": "event-13ffe123-84ab-4a4a-a09c-48372a29c07a",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "risk",
+              "event_type": "risk.approved",
+              "payload": {
+                "approval_required": true,
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:07.031Z"
+            },
+            {
+              "event_id": "event-c399b1dd-0219-4f10-89c9-688bcbbd1585",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "approval-gateway",
+              "event_type": "approval.pending",
+              "payload": {
+                "approval_id": "approval-bb97af2d-0fa4-4c6f-94b1-bef64fe04bda",
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:07.031Z"
+            },
+            {
+              "event_id": "event-3cd844b6-447c-4acd-b004-d6f215900159",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "risk-gateway",
+              "event_type": "risk.callback.recorded",
+              "payload": {
+                "handoff_id": "handoff-9b9037e4-9950-4274-b3f3-6f354e71ccaf",
+                "audit_id": "audit-9161d1e3-6aaa-449b-bc59-5d5ac9976d51",
+                "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+                "decision": "APPROVE",
+                "risk_decision_id": "risk-decision-bb942040-2fc2-434f-acc8-a8908a71747b",
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:07.031Z"
+            },
+            {
+              "event_id": "event-8c880bc7-4397-4598-8525-7c77b9142501",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "approval",
+              "event_type": "approval.approved",
+              "payload": {
+                "approval_id": "approval-bb97af2d-0fa4-4c6f-94b1-bef64fe04bda",
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:08.533Z"
+            },
+            {
+              "event_id": "event-09e9c200-fffc-4428-a393-b10fdafe220b",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "execution-gateway",
+              "event_type": "execution.ready_for_simulation",
+              "payload": {
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:08.533Z"
+            },
+            {
+              "event_id": "event-80137877-5bd2-4c34-b769-3df09ad185a0",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "funding-guard",
+              "event_type": "funding.allocated",
+              "payload": {
+                "allocation_id": "allocation-6e9b503e-6109-4026-8930-6cf31b77d435",
+                "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+                "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+                "execution_id": "sim-exec-fb2ed026-2925-428e-b83f-48f22e20fd79",
+                "revision": 1,
+                "amount_minor": 100000,
+                "created_at": "2026-10-15T03:06:09.91Z",
+                "mode": "SIMULATED",
+                "side_effects": false,
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:09.91Z"
+            },
+            {
+              "event_id": "event-fd5e491f-0642-4886-a09c-5082ae258354",
+              "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+              "actor": "execution-gateway",
+              "event_type": "execution.simulated",
+              "payload": {
+                "execution_id": "sim-exec-fb2ed026-2925-428e-b83f-48f22e20fd79",
+                "side_effects": false,
+                "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+                "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+              },
+              "timestamp": "2026-10-15T03:06:09.91Z"
+            }
+          ]
+        },
+        "funding_check": {
+          "guard_version": "funding-plan-demo.v1",
+          "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+          "bound_revision": 1,
+          "current_revision": 1,
+          "requested_minor": 100000,
+          "available_minor": 600000,
+          "protected_minor": 400000,
+          "allocated_minor": 0,
+          "deficit_minor": 0,
+          "execution_allowed": false,
+          "status": "ALLOCATED",
+          "code": null,
+          "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。",
+          "available_after_minor": 500000
+        },
+        "risk_callback": {
+          "callback_version": "risk-callback.v1",
+          "request": {
+            "callback_version": "risk-callback.v1",
+            "handoff_id": "handoff-9b9037e4-9950-4274-b3f3-6f354e71ccaf",
+            "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+            "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+            "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6",
+            "audit_id": "audit-9161d1e3-6aaa-449b-bc59-5d5ac9976d51",
+            "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+            "decision": "APPROVE",
+            "reviewer": "synthetic-risk-owner",
+            "reason": "仅虚构复核，非独立Risk验收"
+          },
+          "received_at": "2026-10-15T03:06:07.031Z"
+        }
+      },
+      "handoff": {
+        "handoff_version": "risk-handoff.v1",
+        "contract_version": "model-review.v1",
+        "workflow_version": "review-workflow.v1",
+        "handoff_id": "handoff-9b9037e4-9950-4274-b3f3-6f354e71ccaf",
+        "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+        "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+        "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6",
+        "audit_id": "audit-9161d1e3-6aaa-449b-bc59-5d5ac9976d51",
+        "workflow_status": "SIMULATED",
+        "status": "APPROVED",
+        "decision": "APPROVE",
+        "owner": "Unified Risk",
+        "execution_allowed": false,
+        "proposal": {
+          "proposed_action": "HOLD_FOR_REVIEW",
+          "action_reason": "内容包含模拟交易和保留金额，需要进一步核实和审批",
+          "risk_level": "low",
+          "requested_action": null,
+          "action_parameters": {
+            "amount": 1000,
+            "currency": "CNY",
+            "synthetic": true,
+            "funding_plan_revision": 1,
+            "funding_plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059"
+          },
+          "model_response_id": "chatcmpl-e851e1bc-22db-4963-b679-75af88b75747",
+          "funding": {
+            "guard_version": "funding-plan-demo.v1",
+            "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+            "revision": 1,
+            "amount_minor": 100000,
+            "currency": "CNY",
+            "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+            "cash_minor": 1000000,
+            "protected_purposes": [
+              {
+                "purpose_id": "rent",
+                "label": "虚构房租",
+                "amount_minor": 400000
+              }
+            ]
+          },
+          "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb"
+        },
+        "funding_check": {
+          "guard_version": "funding-plan-demo.v1",
+          "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+          "bound_revision": 1,
+          "current_revision": 1,
+          "requested_minor": 100000,
+          "available_minor": 600000,
+          "protected_minor": 400000,
+          "allocated_minor": 0,
+          "deficit_minor": 0,
+          "execution_allowed": false,
+          "status": "ALLOCATED",
+          "code": null,
+          "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。",
+          "available_after_minor": 500000
+        },
+        "reviewed_input": {
+          "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+          "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+          "source": "synthetic-decision-integrity-release",
+          "kind": "combined",
+          "text": "虚构案例：现金10000元，为房租保留4000元，拟投资1000元。核对用途冲突；不能执行真实交易。",
+          "context": {
+            "synthetic": true,
+            "demo_funding_snapshot": {
+              "guard_version": "funding-plan-demo.v1",
+              "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+              "revision": 1,
+              "amount_minor": 100000,
+              "currency": "CNY",
+              "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+              "cash_minor": 1000000,
+              "protected_purposes": [
+                {
+                  "purpose_id": "rent",
+                  "label": "虚构房租",
+                  "amount_minor": 400000
+                }
+              ],
+              "check": {
+                "guard_version": "funding-plan-demo.v1",
+                "plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059",
+                "bound_revision": 1,
+                "current_revision": 1,
+                "requested_minor": 100000,
+                "available_minor": 600000,
+                "protected_minor": 400000,
+                "allocated_minor": 0,
+                "deficit_minor": 0,
+                "execution_allowed": false,
+                "status": "AVAILABLE",
+                "code": null,
+                "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+              },
+              "instruction_authority": false
+            }
+          },
+          "action_parameters": {
+            "amount": 1000,
+            "currency": "CNY",
+            "synthetic": true,
+            "funding_plan_revision": 1,
+            "funding_plan_id": "funding-demo-346675c8-e60d-4e41-abfd-f288ab77a059"
+          },
+          "requested_action": null,
+          "allow_rule_fallback": false
+        },
+        "input_authority": "UNVERIFIED_CALLER_INPUT",
+        "model": {
+          "source": "model",
+          "status": "PROPOSED",
+          "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "provider_response_id": "chatcmpl-e851e1bc-22db-4963-b679-75af88b75747",
+          "call_succeeded": true,
+          "attempt_count": 1,
+          "retry_count": 0
+        },
+        "evidence": {
+          "input_sha256": "ec8f4d7eca6375561dca3ede5fdc67c50c56a4e34a92fb7bb55ed116183bddda",
+          "model_response_id": "chatcmpl-e851e1bc-22db-4963-b679-75af88b75747",
+          "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+          "audit_id": "audit-9161d1e3-6aaa-449b-bc59-5d5ac9976d51"
+        },
+        "approval": {
+          "approval_id": "approval-bb97af2d-0fa4-4c6f-94b1-bef64fe04bda",
+          "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+          "required": true,
+          "status": "APPROVED",
+          "decision": "APPROVE",
+          "proposal_sha256": "d6b0cfc400878feb49aa51f10516a21f19653cb646afedf9645162a8e7e960cb",
+          "approver": "synthetic-user",
+          "decided_at": "2026-10-15T03:06:08.533Z",
+          "reason": "只同意这次1000元模拟"
+        },
+        "audit": {
+          "audit_id": "audit-9161d1e3-6aaa-449b-bc59-5d5ac9976d51",
+          "event_count": 16,
+          "latest_event": {
+            "event_id": "event-fd5e491f-0642-4886-a09c-5082ae258354",
+            "task_id": "review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+            "actor": "execution-gateway",
+            "event_type": "execution.simulated",
+            "payload": {
+              "execution_id": "sim-exec-fb2ed026-2925-428e-b83f-48f22e20fd79",
+              "side_effects": false,
+              "request_id": "req-54a6fe88-58a7-4e74-bcbe-71b2bbfb4e22",
+              "run_id": "review-bad9ea02-d20f-463b-96f9-158818867ac6"
+            },
+            "timestamp": "2026-10-15T03:06:09.91Z"
+          }
+        },
+        "record_endpoint": "/api/review/task/review-task-b3a9413d-0efb-4202-bdb0-70287b7c9684",
+        "callback": {
+          "callback_version": "risk-callback.v1",
+          "endpoint": "/api/review/risk-callback",
+          "method": "POST",
+          "required_fields": [
+            "callback_version",
+            "handoff_id",
+            "task_id",
+            "request_id",
+            "run_id",
+            "audit_id",
+            "proposal_sha256",
+            "decision",
+            "reviewer",
+            "reason"
+          ],
+          "decisions": [
+            "APPROVE",
+            "REJECT",
+            "REQUEST_MORE_INFO"
+          ],
+          "retry_policy": "Identical accepted callback returns DUPLICATE without another decision or audit event. Changed callbacks are rejected. REQUEST_MORE_INFO requires a new reviewed task."
+        }
+      }
+    }
+  ]
+}
