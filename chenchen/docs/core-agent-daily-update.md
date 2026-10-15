@@ -490,3 +490,47 @@ Core Agent 已完成架构图、模块调用时序和统一 Contract 的第一�
 先冻结跨 Owner Risk 接收与回写 Contract，再补可复现接收/拒绝/重试联调；随后由 Backend、UI、Data、Memory、Quant Owner 完成各自字段确认。
 
 - DOCX 版式验收：标准 renderer 缺少 LibreOffice，Word/WPS COM 导出因 RPC/E_FAIL 失败；已完成结构性检查，未将版式验收标记为完成。
+
+## 2026-10-15 22时自动化收尾
+
+### 今日真实产出
+
+今日已有业务代码提交；本次自动化无业务代码变更。补充双链路架构、模块时序和统一 Contract 对照手册，生成今日日报 DOCX；独立复跑测试与四个合成边界场景，并对 8 份实际 Workflow/Handoff 检查必填键及 request/task/run/audit 等值关系（不是完整 JSON Schema 校验）。
+
+### A 已完成的核心接口
+
+| 接口 | 版本 | 生产方与消费方 | 字段状态 |
+| --- | --- | --- | --- |
+| 健康检查 | investment-agent.v1 | Caller → Backend / Harness → UI / Risk | trace/task_state/artifacts/tool_results/audit_evidence/risk_handoff；已实现且已验证 |
+| 模型工作流 | model-review.v1 / review-workflow.v1 | Backend / Store → Risk / UI | request/task/run/audit；取消、失败、审批证据重试；已实现且已验证 |
+| 交接与回调 | risk-handoff.v1 / risk-callback.v1 | Core → Risk；Risk → Backend | 六个关联值及 hash 一致；DUPLICATE 返回当前状态；正式身份待确认 |
+| 资金计划 | funding-plan-demo.v1 | Backend → Core / UI | 虚构用途、revision、资金冲突；非真实余额或长期 Memory |
+
+证据文件：contracts/investment-agent.v1.schema.json、contracts/model-review.v1.schema.json、contracts/risk-handoff.v1.schema.json、contracts/funding-plan-demo.v1.schema.json；docs/daily-closeout-2026-10-15-evidence.json；docs/core-agent-integration-guide-2026-10-15.md。
+
+### B 可验证的集成进度
+
+本次两个仓库 chenchen 均执行 npm run check（exit 0）；node --test tests/*.test.js tests/*.test.mjs（113/113，fail 0）；node scripts/verify-model-retry.js（2 场景通过）；node scripts/verify-decision-integrity.js（2 场景通过）；git diff --check（exit 0）。
+
+追踪检查：健康链路 request_id/task_id/session_id/contract_version/audit_evidence 与 checkpoint 可关联；模型链路 request_id/task_id/run_id/audit.audit_id 可关联，但无标准 session_id、task_state、artifacts、tool_results、audit_evidence 字段。禁止把 run_id 当 session_id，或把模型 audit 默认为旧 audit_evidence。
+
+同日已提交公网证据 public-decision-integrity-2026-10-15.json 记录 24 步检查、2 次真实模型调用，取消终态 21 条审计、模拟终态 16 条审计；本次自动化未再次访问公网或制造供应商故障。公网经已有代理，不能代表手机网络普遍直连可用。
+
+金融数据测试：2026-10-08/09 固定市场夹具、重复观察拒绝、价格与新闻冲突 REVIEW_REQUIRED 和 Quant 无漂移测试通过；不是 2026-10-15 实时行情验收。健康链路消费现有 diagnosePortfolio metrics、generateCandidates target_weights、runSimulation comparisons；本次模型故障脚本不调用或重算 Quant。未修改 Memory 规则。
+
+### C 需要其他 Owner 配合的阻塞项
+
+- Risk：确认独立接收地址、服务身份/签名、六个关联字段和 409/422/重复回调语义；当前仅演示标签。期望提供正式接收与回写样例及联调验收。
+- Backend：确认两套追踪字段映射、生产身份与跨实例事务、实际网络可达性。模型 Schema 没有 session_id/task_state/artifacts/tool_results/audit_evidence，不能假称统一；期望版本化适配方案。
+- UI：确认冲突时展示原审批人和理由，不改理由自动重试；取消后保持终态。期望 409/422、失败和任务找回验收记录。
+- Memory：确认资金用途可信引用、版本、有效期及撤回；调用方 context 仍是 UNVERIFIED_CALLER_INPUT。期望接口样例；consent、范围、生命周期和清理规则保持原样。
+- Quant / Data：确认现有 metrics、target_weights、comparisons 的版本与数据日期，以及市场来源、时效和冲突复核协议。期望版本化数据样例；本轮仅固定夹具回放。
+- Risk / Backend（审批与执行）：提供受信任审批身份、权限及 Safety Action Gateway；执行前额度检查与跨任务隔离待联合确认，真实执行继续阻断。
+
+### 今日结论与下一步
+
+当前已实现并验证到 Core Agent 自有交接、演示 Risk/审批、取消保护及无副作用模拟；独立 Risk 正式认证与审核闭环尚未验收。execution_allowed=false，前端 approval 不是交易授权。 下一步先冻结双链路字段映射和正式 Risk 认证/回写，再按原样重试、409/422、取消后重复回调的场景联合验收。
+
+DOCX 版式验收未完成：两仓库日报与联调手册均实际运行 render_docx.py，全部 exit 1；原因 LibreOffice soffice.exe was not found on PATH。已检查 DOCX 结构和两幅原始图像，但无页面 PNG，未完成逐页视觉验收。日志见 daily-closeout-2026-10-15-render.txt。
+
+可复现字段检查：在 chenchen 下执行 python docs/daily-closeout-check-2026-10-15.py；对已保存的本次真实合成输出复核 required 键和四类追踪值。重新产生合成输出可运行 node scripts/verify-model-retry.js 与 node scripts/verify-decision-integrity.js。

@@ -46,3 +46,20 @@ flowchart LR
 | Audit | audit_id、task/session/request/version、阶段事件 | 进程内事件，不是长期 Memory 或持久化审计存储 |
 
 当前完整响应的 trace 与 TaskState、AuditEvidence 可对齐；Handoff 自身没有 request_id，须连同响应 trace/audit 或 bridge.source 交接。续跑后审计信封 request_id 为最新请求，历史 contract.accepted payload 保留旧编号。失败信封尚不含 task_id/session_id/audit_id。证据与复现见 core-agent-verification-2026-10-10.md；字段必填与归属见 ../contracts/README.md。
+
+## 2026-10-15 双链路架构补充
+
+本节补充当前链路；上方 2026-10-10 图仅描述健康检查，旧限制以本节和新联调手册为准。
+
+1. UI / Caller  →  Backend HTTP  →  Contract 校验  →  Core Agent 编排
+2. 健康检查 investment-agent.v1：Harness → Session / Context → TaskState / Checkpoint
+3. Harness → Tools / 既有 Quant → artifacts / tool_results → Risk Handoff
+4. 模型复核 model-review.v1：ReviewWorkflowStore → 模型提议 / 参数指纹 → Risk Handoff
+5. 模型任务：request / task / run / audit；未定义 session_id，不等同 Harness Session
+6. Audit：健康链路进程内；模型链路本地文件或云端 Durable Object 持久化
+7. Memory：独立会话接口；主健康链路不自动读取；调用材料不等于可信记忆
+8. Risk 导出包 → 独立 Risk Owner 待认证联调；演示回调 → 必要审批 → 无副作用模拟
+9. 停止点：等待 Risk / 审批；取消、失败、冲突均阻断；真实 execution_allowed=false
+10. UI 只消费状态与证据；Quant 计算归原工具；Memory consent 和生命周期归 Memory
+
+图像版与字段归属见 core-agent-integration-guide-2026-10-15.docx；未完成独立 Risk 正式审核闭环。

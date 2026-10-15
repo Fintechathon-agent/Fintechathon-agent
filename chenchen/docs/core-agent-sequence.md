@@ -81,3 +81,22 @@ sequenceDiagram
 4. 市场上下文在 Quant 之前校验、之后装配；主链路不会自动读取 Memory。读取按 session_id 隔离，写入须现有 consent，清理继续走原接口。
 5. POST /api/risk-workbench/handoff 会运行同一主链路并生成 READ_ONLY_HANDOFF_PREVIEW；不导入远程工作台，不自动审批。
 6. checkpoint.result_refs 对应实际 tool_results 的 key；追踪、HTTP 与边界验证见 core-agent-verification-2026-10-10.md。
+
+## 2026-10-15 双链路时序补充
+
+本节补充当前链路；上方 2026-10-10 图仅描述健康检查，旧限制以本节和新联调手册为准。
+
+1. 01 UI → Backend：版本化健康请求 / 模型复核请求；非法输入停止并返回错误
+2. 02 健康链路：校验市场夹具 → 装载 Session / Context → 绑定 TaskState
+3. 03 Harness → Tools / Quant：按 checkpoint 复用或运行四阶段；失败最多重试一次
+4. 04 Harness → Audit：阶段与 checkpoint；装配 trace / artifacts / tool_results / Handoff
+5. 05 模型链路：创建 request / task / run / audit → 调用模型；默认总尝试 2 次
+6. 06 模型重试：总预算 45 秒含退避 / Retry-After；耗尽 MODEL_FAILED 并保存失败证据
+7. 07 模型成功 → 提议及 proposal_sha256 → PENDING_RISK → 持久化 → 返回 UI
+8. 08 Risk 读取导出包；正式独立接收和认证待 Owner；测试用演示 callback
+9. 09 callback：核对 handoff / task / request / run / audit / hash → 决定及回执原子保存
+10. 10 完全相同回调 → DUPLICATE 返回当前状态；改判定证据 409；非法输入 422
+11. 11 Risk 通过 → 必要审批 → 仅模拟；取消后旧回调不能恢复；真实执行始终关闭
+12. 12 UI 查询 task / run / audit；Memory 无自动长期读写；冲突市场上下文仅待复核
+
+图像版与字段归属见 core-agent-integration-guide-2026-10-15.docx；未完成独立 Risk 正式审核闭环。
