@@ -129,6 +129,7 @@ function resolveModelConfig(env = {}) {
   const endpoint = rawUrl || (style === "responses" ? DEFAULT_RESPONSES_URL : DEFAULT_CHAT_URL);
   const responseFormat = envString(env, ["MODEL_RESPONSE_FORMAT"], style === "responses" ? "json_schema" : "json_object").toLowerCase();
   const timeoutMs = Number(envString(env, ["MODEL_TIMEOUT_MS"], "30000"));
+  const maxAttempts = Number(envString(env, ["MODEL_MAX_ATTEMPTS"], "2"));
   return {
     provider: workersAI ? "cloudflare_workers_ai" : "http",
     apiKey: envString(env, ["MODEL_API_KEY", "OPENAI_API_KEY"]),
@@ -137,6 +138,7 @@ function resolveModelConfig(env = {}) {
     style: workersAI ? "workers_ai" : style === "responses" ? "responses" : "chat_completions",
     responseFormat: workersAI ? "json_schema" : ["json_schema", "json_object", "none"].includes(responseFormat) ? responseFormat : "json_object",
     timeoutMs: Number.isFinite(timeoutMs) && timeoutMs > 0 ? Math.min(timeoutMs, 120000) : 30000,
+    maxAttempts: Number.isInteger(maxAttempts) && maxAttempts > 0 ? Math.min(maxAttempts, 3) : 2,
     fallbackToRules: envString(env, ["MODEL_FALLBACK_TO_RULES"], "false").toLowerCase() === "true",
     disableRuleFallback: envString(env, ["MODEL_DISABLE_RULE_FALLBACK"], "false").toLowerCase() === "true"
   };
@@ -213,13 +215,14 @@ async function fetchJson(fetchImpl, endpoint, options, timeoutMs) {
     try {
       payload = await response.json();
     } catch {
-      throw new ReviewError("MODEL_PROVIDER_INVALID_JSON", "model provider returned invalid JSON", { retryable: response.status >= 500, details: { status: response.status } });
+      throw new ReviewError("MODEL_PROVIDER_INVALID_JSON", "model provider returned invalid JSON", { retryable: response.status >= 500, details: { status: response.status, retry_after_ms: retryAfterMs(response.headers.get("Retry-After")) } });
     }
     if (!response.ok) {
       const providerError = payload?.error;
       throw new ReviewError("MODEL_PROVIDER_ERROR", "model provider rejected the review request", {
         retryable: response.status >= 500 || response.status === 429,
-        details: { status: response.status, provider_code: providerError?.code || null, provider_type: providerError?.type || null }
+        details: { status: response.status, provider_code: providerError?.code || null, provider_type: providerError?.type || null,
+          retry_after_ms: retryAfterMs(response.headers.get("Retry-After")) }
       });
     }
     return payload;
@@ -230,6 +233,14 @@ async function fetchJson(fetchImpl, endpoint, options, timeoutMs) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+function retryAfterMs(value) {
+  if (!value) return 0;
+  const seconds = Number(value);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
+  const deadline = Date.parse(value);
+  return Number.isFinite(deadline) ? Math.max(0, deadline - Date.now()) : 0;
 }
 
 function extractModelText(payload, style) {
@@ -334,42 +345,66 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
   let usage = null;
   let rawTextFormat = "provider_text";
   let modelError = null;
+  let lastModelError = null;
+  let attemptCount = 0;
+  const retryEvents = [];
+  let pendingRetry;
+  // All attempts and backoff share one budget; the deployed value is 45s.
+  const deadline = Date.now() + config.timeoutMs;
 
-  try {
+  for (let attempt = 1; attempt <= config.maxAttempts; attempt += 1) {
+    const remainingMs = Math.max(1, deadline - Date.now());
+    if (attempt > 1 && Date.now() >= deadline) break;
+    attemptCount = attempt;
+    if (pendingRetry) retryEvents.push({ ...pendingRetry, at: new Date().toISOString() });
     let payload;
-    if (config.style === "workers_ai") {
-      if (typeof env.AI?.run !== "function") throw new ReviewError("MODEL_NOT_CONFIGURED", "Workers AI binding is not configured", { statusCode: 503, stage: "CONFIGURATION" });
-      let timer;
-      try {
-        payload = await Promise.race([
-          env.AI.run(config.model, buildModelRequest(normalized, config)),
-          new Promise((_, reject) => {
-            timer = setTimeout(() => reject(new ReviewError("MODEL_TIMEOUT", "模型响应超时，请稍后重试。", { statusCode: 504, retryable: true })), config.timeoutMs);
-          })
-        ]);
-      } finally {
-        clearTimeout(timer);
+    try {
+      if (config.style === "workers_ai") {
+        if (typeof env.AI?.run !== "function") throw new ReviewError("MODEL_NOT_CONFIGURED", "Workers AI binding is not configured", { statusCode: 503, stage: "CONFIGURATION" });
+        let timer;
+        try {
+          payload = await Promise.race([
+            env.AI.run(config.model, buildModelRequest(normalized, config)),
+            new Promise((_, reject) => {
+              timer = setTimeout(() => reject(new ReviewError("MODEL_TIMEOUT", "模型响应超时，请稍后重试。", { statusCode: 504, retryable: true })), remainingMs);
+            })
+          ]);
+        } finally {
+          clearTimeout(timer);
+        }
+        if (typeof payload?.response === "object") rawTextFormat = "provider_json_serialized";
+      } else {
+        if (!config.apiKey) throw new ReviewError("MODEL_NOT_CONFIGURED", "model API key is not configured", { statusCode: 503, stage: "CONFIGURATION", recovery: "Set MODEL_API_KEY or OPENAI_API_KEY on the backend and retry." });
+        payload = await fetchJson(fetchImpl, config.endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: "Bearer " + config.apiKey },
+          body: JSON.stringify(buildModelRequest(normalized, config))
+        }, remainingMs);
       }
-      if (typeof payload?.response === "object") rawTextFormat = "provider_json_serialized";
-    } else {
-      if (!config.apiKey) throw new ReviewError("MODEL_NOT_CONFIGURED", "model API key is not configured", { statusCode: 503, stage: "CONFIGURATION", recovery: "Set MODEL_API_KEY or OPENAI_API_KEY on the backend and retry." });
-      payload = await fetchJson(fetchImpl, config.endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: "Bearer " + config.apiKey },
-        body: JSON.stringify(buildModelRequest(normalized, config))
-      }, config.timeoutMs);
+      rawText = extractModelText(payload, config.style);
+      if (!rawText) throw new ReviewError("MODEL_EMPTY_RESPONSE", "model provider returned no text", { retryable: true, recovery: "Retry the review or use a model that returns text output." });
+      proposal = normalizeProposal(parseJsonText(rawText));
+      providerResponseId = payload.id || null;
+      usage = payload.usage || null;
+      break;
+    } catch (error) {
+      const normalizedError = error instanceof ReviewError ? error : new ReviewError("MODEL_PROVIDER_UNAVAILABLE", "model provider failed", { retryable: true });
+      lastModelError = normalizedError;
+      if (!normalizedError.retryable || attempt >= config.maxAttempts) break;
+      const delayMs = Math.max(250 * (2 ** (attempt - 1)), normalizedError.details?.retry_after_ms || 0);
+      if (Date.now() + delayMs >= deadline) break;
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      if (Date.now() >= deadline) break;
+      pendingRetry = { event_type: "model.retry_scheduled", attempt, next_attempt: attempt + 1,
+        delay_ms: delayMs, code: normalizedError.code };
     }
-    rawText = extractModelText(payload, config.style);
-    if (!rawText) throw new ReviewError("MODEL_EMPTY_RESPONSE", "model provider returned no text", { retryable: true, recovery: "Retry the review or use a model that returns text output." });
-    proposal = normalizeProposal(parseJsonText(rawText));
-    providerResponseId = payload.id || null;
-    usage = payload.usage || null;
-  } catch (error) {
-    const normalizedError = error instanceof ReviewError ? error : new ReviewError("MODEL_PROVIDER_UNAVAILABLE", "model provider failed", { retryable: true });
+  }
+
+  if (!proposal && lastModelError) {
     if (config.disableRuleFallback || !(normalized.allow_rule_fallback || config.fallbackToRules)) {
-      normalizedError.runId = runId;
-      normalizedError.auditId = auditId;
-      normalizedError.reviewRecord = {
+      lastModelError.runId = runId;
+      lastModelError.auditId = auditId;
+      lastModelError.reviewRecord = {
         review_version: REVIEW_VERSION,
         run_id: runId,
         request_id: normalized.request_id,
@@ -378,7 +413,9 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
         source: "model",
         created_at: createdAt,
         input: { kind: normalized.kind, source: normalized.source, input_sha256: inputSha256 },
-        error: { code: normalizedError.code, message: normalizedError.message, retryable: normalizedError.retryable },
+        attempt_count: attemptCount,
+        retry_count: retryEvents.length,
+        error: { code: lastModelError.code, message: lastModelError.message, retryable: lastModelError.retryable },
         gateway: { gateway_version: "review-gateway.v1", status: "BLOCKED", decision: "MODEL_FAILED", execution_allowed: false },
         audit: {
           audit_id: auditId,
@@ -387,17 +424,18 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
           input_sha256: inputSha256,
           events: [
             { event_type: "review.received", at: createdAt },
-            { event_type: "model.failed", at: new Date().toISOString(), code: normalizedError.code },
+            ...retryEvents,
+            { event_type: "model.failed", at: new Date().toISOString(), code: lastModelError.code, attempt_count: attemptCount },
             { event_type: "gateway.blocked", at: new Date().toISOString(), execution_allowed: false }
           ]
         }
       };
-      throw normalizedError;
+      throw lastModelError;
     }
     source = "rule_fallback";
-    modelError = { code: normalizedError.code, message: normalizedError.message, retryable: normalizedError.retryable };
+    modelError = { code: lastModelError.code, message: lastModelError.message, retryable: lastModelError.retryable };
     rawText = "";
-    proposal = buildRuleFallback(normalized, normalizedError);
+    proposal = buildRuleFallback(normalized, lastModelError);
   }
 
   const gateway = gatewayCheck(proposal);
@@ -426,6 +464,8 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
       raw_text_format: rawTextFormat,
       proposal,
       usage,
+      attempt_count: attemptCount,
+      retry_count: retryEvents.length,
       ...(modelError ? { error: modelError } : {})
     },
     gateway,
@@ -436,7 +476,8 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
       input_sha256: inputSha256,
       events: [
         { event_type: "review.received", at: createdAt },
-        { event_type: source === "model" ? "model.completed" : "model.failed.rule_fallback", at: new Date().toISOString(), source },
+        ...retryEvents,
+        { event_type: source === "model" ? "model.completed" : "model.failed.rule_fallback", at: new Date().toISOString(), source, attempt_count: attemptCount },
         { event_type: "gateway.checked", at: new Date().toISOString(), execution_allowed: false }
       ]
     }

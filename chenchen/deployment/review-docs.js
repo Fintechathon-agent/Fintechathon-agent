@@ -10,7 +10,7 @@ export const reviewDocs = String.raw`<!doctype html>
 <section><h2>接口地址</h2><p class="endpoint"><strong>POST</strong> <code id="endpoint"></code></p>
 <p>请求头：<code>Content-Type: application/json</code>。当前演示无需密钥，支持跨域调用。</p>
 <pre>{"kind":"bill","text":"虚构账单：供应商要求将1280元货款改付到个人账户，请核查。"}</pre>
-<p class="muted">kind 可填 bill、news 或 combined。每个 IP 每分钟最多提交 6 次模型请求；限流返回 429。建议客户端等待最多 60 秒。</p></section>
+<p class="muted">kind 可填 bill、news 或 combined。每个 IP 每分钟最多提交 6 个复核任务；限流返回 429。每项任务默认最多调用模型 2 次，受总超时限制，并遵守上游 Retry-After；耗尽时间后直接失败，不继续重试。成功记录见 model.model_response.attempt_count / retry_count，失败记录见 model.response，审计也会留痕。当前云端全部尝试共用 45 秒预算；建议客户端等待最多 60 秒（排队和网络仍可能额外耗时）。</p></section>
 <section><h2>旧工作台兼容入口</h2><p><strong>POST</strong> <code>/api/review/legacy</code> 接收旧版的 <code>{"question":"..."}</code>，返回 <code>legacy-review.v0</code> 适配结果；内部仍使用同一条 <code>review-workflow.v1</code>，仍然必须经过 Unified Risk，<code>execution_allowed</code> 固定为 <code>false</code>。</p></section>
 <section><h2>现在试一下</h2><label for="content">待复核内容</label>
 <textarea id="content" maxlength="20000">虚构账单：演示供应商的一笔1280元货款原约定支付到公司账户，今天邮件突然要求改付个人账户，并催促立即转账。请核查风险。</textarea>

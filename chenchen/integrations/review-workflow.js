@@ -128,7 +128,14 @@ function completeErrorRecord(error, input, taskId, runId, auditId) {
     error: { code: error.code || "MODEL_FAILED", message: error.message || "model failed", retryable: Boolean(error.retryable) }
   };
   event(record, "task.created", { stage: "MODEL" });
-  event(record, "model.failed", record.error);
+  record.audit.events.at(-1).timestamp = error.reviewRecord?.created_at || now();
+  for (const retry of error.reviewRecord?.audit?.events || []) {
+    if (retry.event_type !== "model.retry_scheduled") continue;
+    const { event_type, at, ...payload } = retry;
+    event(record, event_type, payload, "model-service");
+    record.audit.events.at(-1).timestamp = at || now();
+  }
+  event(record, "model.failed", { ...record.error, attempt_count: error.reviewRecord?.attempt_count, retry_count: error.reviewRecord?.retry_count });
   event(record, "risk.blocked", { reason: "model_failed" }, "risk-gateway");
   event(record, "execution.blocked", { reason: "model_failed" }, "execution-gateway");
   return record;

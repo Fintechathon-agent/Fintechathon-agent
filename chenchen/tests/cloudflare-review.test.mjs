@@ -68,7 +68,8 @@ test("durable workflow refuses Risk mutation after simulation", async () => {
 
 test("failed real inference returns an error and a persistent blocked record", async () => {
   const app = setup();
-  app.env.AI.run = async () => { throw new Error("unavailable"); };
+  let calls = 0;
+  app.env.AI.run = async () => { calls++; throw new Error("unavailable"); };
   const response = await worker.fetch(req("/api/review", { text: "虚构新闻", allow_rule_fallback: true }), app.env);
   assert.equal(response.status, 502);
   const failed = await response.json();
@@ -76,11 +77,48 @@ test("failed real inference returns an error and a persistent blocked record", a
   app.restart();
   const record = await worker.fetch(req("/api/review/" + failed.trace.run_id), app.env).then(r => r.json());
   assert.equal(record.status, "MODEL_FAILED");
+  assert.equal(calls, 2);
+  assert.equal(record.model.response.attempt_count, 2);
+  assert.equal(record.model.response.retry_count, 1);
+  assert.equal(record.audit.events.filter(e => e.event_type === "model.retry_scheduled").length, 1);
+  const handoff = await worker.fetch(req("/api/review/" + record.run_id + "/risk-handoff"), app.env).then(r => r.json());
+  assert.equal(handoff.model.attempt_count, 2);
+  assert.equal(handoff.model.retry_count, 1);
+  assert.equal(handoff.model.call_succeeded, false);
   const approval = await worker.fetch(req("/api/review/risk-decision", {
     task_id: record.task_id, decision: "APPROVE", reviewer: "demo"
   }), app.env);
   assert.equal(approval.status, 409);
   assert.equal((await approval.json()).error.code, "RISK_BLOCKED");
+});
+
+test("retried Workers AI inference retains one task and durable Risk evidence without authorizing execution", async () => {
+  const app = setup();
+  let calls = 0;
+  app.env.AI.run = async () => {
+    calls++;
+    if (calls === 1) throw new Error("temporary");
+    return { id: "synthetic-retry-response", response: proposal };
+  };
+  const response = await worker.fetch(req("/api/review", { task_id: "retry-task", text: "synthetic" }), app.env);
+  assert.equal(response.status, 200);
+  const record = await response.json();
+  assert.equal(calls, 2);
+  assert.equal(record.status, "PENDING_RISK");
+  assert.equal(record.model.model_response.retry_count, 1);
+  const retry = record.audit.events.find(e => e.event_type === "model.retry_scheduled");
+  assert.equal(retry.task_id, record.task_id);
+  assert.equal(retry.payload.run_id, record.run_id);
+  assert.equal(retry.payload.request_id, record.request_id);
+  app.restart();
+  const restored = await worker.fetch(req("/api/review/task/" + record.task_id), app.env).then(r => r.json());
+  assert.deepEqual(restored, record);
+  const handoff = await worker.fetch(req("/api/review/task/" + record.task_id + "/risk-handoff"), app.env).then(r => r.json());
+  assert.equal(handoff.model.attempt_count, 2);
+  assert.equal(handoff.model.retry_count, 1);
+  const blocked = await worker.fetch(req("/api/review/simulate", { task_id: record.task_id, proposal_sha256: record.proposed_action.proposal_sha256 }), app.env);
+  assert.equal(blocked.status, 409);
+  assert.equal(restored.execution.execution_allowed, false);
 });
 
 test("public endpoint validates input, caps requests, and accepts frontend preflight", async () => {

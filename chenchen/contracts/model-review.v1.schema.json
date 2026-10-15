@@ -37,7 +37,25 @@
         "request_id": { "type": "string" },
         "run_id": { "type": "string" },
         "status": { "type": "string", "enum": ["PENDING_RISK", "PENDING_APPROVAL", "READY_FOR_SIMULATION", "SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"] },
-        "model": { "type": "object" },
+        "model": {
+          "type": "object",
+          "properties": {
+            "response": {
+              "type": ["object", "null"],
+              "properties": {
+                "attempt_count": { "type": "integer", "minimum": 1, "maximum": 3 },
+                "retry_count": { "type": "integer", "minimum": 0, "maximum": 2 }
+              }
+            },
+            "model_response": {
+              "type": "object",
+              "properties": {
+                "attempt_count": { "type": "integer", "minimum": 1 },
+                "retry_count": { "type": "integer", "minimum": 0 }
+              }
+            }
+          }
+        },
         "proposed_action": { "anyOf": [{ "$ref": "#/$defs/ProposedAction" }, { "type": "null" }] },
         "risk_handoff": { "$ref": "#/$defs/RiskHandoff" },
         "risk_decision": { "type": ["object", "null"] },
@@ -86,7 +104,7 @@
         "required": { "type": "boolean" },
         "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED", "BLOCKED", "NOT_REQUIRED"] },
         "decision": { "type": ["string", "null"] },
-        "proposal_sha256": { "type": "string" },
+        "proposal_sha256": { "type": ["string", "null"] },
         "approver": { "type": ["string", "null"] },
         "decided_at": { "type": ["string", "null"] }
       }

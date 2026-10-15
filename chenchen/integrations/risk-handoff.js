@@ -13,6 +13,7 @@ function invalid(code, message, statusCode = 422) {
 
 function buildRiskHandoffPackage(record) {
   const model = record.model?.model_response;
+  const attempts = model || record.model?.response;
   return structuredClone({
     handoff_version: HANDOFF_VERSION,
     contract_version: REVIEW_VERSION,
@@ -37,7 +38,8 @@ function buildRiskHandoffPackage(record) {
       status: record.model.status,
       model: model?.model || null,
       provider_response_id: model?.provider_response_id || null,
-      call_succeeded: model?.call_succeeded === true
+      call_succeeded: model?.call_succeeded === true,
+      ...(Number.isInteger(attempts?.attempt_count) ? { attempt_count: attempts.attempt_count, retry_count: attempts.retry_count } : {})
     },
     evidence: record.risk_handoff.evidence,
     approval: record.approval,

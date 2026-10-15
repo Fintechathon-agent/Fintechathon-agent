@@ -6,6 +6,7 @@ const {
   buildModelRequest,
   buildReviewError,
   normalizeReviewInput,
+  resolveModelConfig,
   runReview
 } = require("../integrations/model-review");
 
@@ -101,6 +102,22 @@ test("model failure is explicit unless rule fallback is requested", async () => 
   assert.equal(fallback.gateway.execution_allowed, false);
 });
 
+test("transient model failures retry once and expose the retry in the audit", async () => {
+  let calls = 0;
+  const result = await runReview({ kind: "bill", text: "虚构账单需要核查" }, env, {
+    fetchImpl: async () => {
+      calls += 1;
+      if (calls === 1) return new Response(JSON.stringify({ error: { code: "temporary" } }), { status: 503 });
+      return new Response(JSON.stringify({ id: "resp-after-retry", output_text: JSON.stringify(proposal) }), { status: 200 });
+    }
+  });
+  assert.equal(calls, 2);
+  assert.equal(result.model_response.attempt_count, 2);
+  assert.equal(result.model_response.retry_count, 1);
+  assert.ok(result.audit.events.some(event => event.event_type === "model.retry_scheduled"));
+  assert.equal(result.audit.events.at(-2).event_type, "model.completed");
+});
+
 test("unsupported model actions are rejected before gateway output", async () => {
   await assert.rejects(
     runReview({ kind: "combined", text: "买入这只基金" }, env, {
@@ -140,4 +157,92 @@ test("public configuration disallows requested fallback when real inference fail
 test("combined input preserves both bill and news", () => {
   const input = normalizeReviewInput({ bill: { amount: 1280 }, news: "供应商变更账户" });
   assert.deepEqual(JSON.parse(input.text), { bill: { amount: 1280 }, news: "供应商变更账户" });
+});
+
+test("attempt configuration is bounded and fractional configuration cannot skip inference", () => {
+  for (const value of ["0", "-1", "0.5", "NaN", "Infinity"]) {
+    assert.equal(resolveModelConfig({ MODEL_MAX_ATTEMPTS: value }).maxAttempts, 2);
+  }
+  assert.equal(resolveModelConfig({ MODEL_MAX_ATTEMPTS: "1" }).maxAttempts, 1);
+  assert.equal(resolveModelConfig({ MODEL_MAX_ATTEMPTS: "50" }).maxAttempts, 3);
+});
+
+test("persistent transient failures stop at the cap and retain retry evidence", async () => {
+  let calls = 0;
+  await assert.rejects(runReview({ text: "synthetic" }, { ...env, MODEL_MAX_ATTEMPTS: "50" }, {
+    fetchImpl: async () => { calls++; return new Response('{}', { status: 503 }); }
+  }), error => {
+    assert.equal(calls, 3);
+    assert.equal(error.reviewRecord.attempt_count, 3);
+    assert.equal(error.reviewRecord.retry_count, 2);
+    assert.equal(error.reviewRecord.audit.events.filter(e => e.event_type === "model.retry_scheduled").length, 2);
+    assert.equal(error.reviewRecord.gateway.execution_allowed, false);
+    return true;
+  });
+});
+
+test("authentication errors, invalid proposals and unsafe actions are never retried", async () => {
+  for (const [status, body, expected] of [
+    [401, {}, "MODEL_PROVIDER_ERROR"],
+    [200, { output_text: "not a proposal" }, "MODEL_INVALID_RESPONSE"],
+    [200, { output_text: JSON.stringify({ ...proposal, proposed_action: "BUY" }) }, "MODEL_UNSAFE_ACTION"]
+  ]) {
+    let calls = 0;
+    await assert.rejects(runReview({ text: "synthetic" }, env, { fetchImpl: async () => {
+      calls++;
+      return new Response(JSON.stringify(body), { status });
+    } }), error => {
+      assert.equal(error.code, expected);
+      assert.equal(calls, 1);
+      assert.equal(error.reviewRecord.retry_count, 0);
+      return true;
+    });
+  }
+});
+
+test("Retry-After longer than the shared time budget returns a failure without another call", async () => {
+  let calls = 0;
+  await assert.rejects(runReview({ text: "synthetic" }, { ...env, MODEL_TIMEOUT_MS: "1000" }, { fetchImpl: async () => {
+    calls++;
+    return new Response('{}', { status: 429, headers: { "Retry-After": "60" } });
+  } }), error => {
+    assert.equal(calls, 1);
+    assert.equal(error.reviewRecord.retry_count, 0);
+    assert.equal(error.details.retry_after_ms, 60000);
+    return true;
+  });
+});
+
+test("Workers AI timeout uses one total budget and a late result cannot change the failed record", async () => {
+  let finish, calls = 0;
+  const pending = new Promise(resolve => { finish = resolve; });
+  let failure;
+  await assert.rejects(runReview({ text: "synthetic" }, {
+    MODEL_PROVIDER: "workers_ai", MODEL_TIMEOUT_MS: "30", MODEL_DISABLE_RULE_FALLBACK: "true",
+    AI: { run: () => { calls++; return pending; } }
+  }), error => {
+    failure = error;
+    assert.equal(error.code, "MODEL_TIMEOUT");
+    assert.equal(calls, 1);
+    return true;
+  });
+  finish({ response: proposal });
+  await pending;
+  assert.equal(failure.reviewRecord.status, "FAILED");
+  assert.equal(failure.reviewRecord.retry_count, 0);
+  assert.equal(failure.reviewRecord.gateway.execution_allowed, false);
+});
+
+test("HTTP timeout aborts the request and does not create another attempt after the budget", async () => {
+  let calls = 0;
+  await assert.rejects(runReview({ text: "synthetic" }, { ...env, MODEL_TIMEOUT_MS: "30" }, {
+    fetchImpl: async (_url, options) => new Promise((_resolve, reject) => {
+      calls++;
+      options.signal.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")), { once: true });
+    })
+  }), error => {
+    assert.equal(error.code, "MODEL_TIMEOUT");
+    assert.equal(calls, 1);
+    return true;
+  });
 });

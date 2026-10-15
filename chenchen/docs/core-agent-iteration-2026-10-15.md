@@ -29,6 +29,12 @@
 - GET 查询请求不再携带 POST body，刷新恢复和额度刷新走正确的 GET 语义。
 - 原来“旧版持仓联调 Demo”、模型解释、Risk 交接和完整运行记录仍保留，默认收起。
 
+### 5. 模型短暂失败的受控重试
+
+模型服务遇到可重试的短暂错误时，同一次 review 默认最多自动再试 1 次。配置可用 `MODEL_MAX_ATTEMPTS` 调整，但服务端总尝试上限为 3；配置错误、有效 HTTP 200 中的非法模型协议和不支持的模型动作不会盲目重试。当前部署全部尝试共用 45 秒预算，重试前等待至少 250ms（下一次 500ms），HTTP 接入还遵守 Retry-After。等待会超出预算或已超时则直接结束，不额外再等 45 秒。
+
+每次实际启动重试都会写入 `model.retry_scheduled` 审计事件；成功记录的 `model.model_response`、失败记录的 `model.response` 同时返回 `attempt_count` 和 `retry_count`，Risk Handoff 也携带这两个可选字段。旧记录没有计数时不补造。所有尝试都只产生拟议结果，最终失败仍然是 `MODEL_FAILED`，不会进入 Risk 审批或模拟执行。详细协议和复现方式见 [第二轮说明](core-agent-model-retry-2026-10-15.md)。
+
 ## 运行状态与职责边界
 
 用户确认虚构用途 → Core Agent → 模型只提出建议 → Unified Risk → 人工审批 → 模拟前再检查 → SIMULATED 或 FUNDING_BLOCKED。用户也可以在终态前主动取消，形成 CANCELLED 和审计记录。
@@ -41,12 +47,13 @@
 
 ## 验证结果
 
-- 自动测试：95/95 通过，JavaScript 语法检查通过。
+- 第一轮自动测试：95/95 通过；本日第二轮重试加固后 103/103 通过，JavaScript 语法检查通过。
 - 新增覆盖：相同计划重复确认、取消后的审计持久化、取消后 Risk 不能继续改写、刷新恢复任务、GET 查询语义。
 - Contract JSON 可解析；model-review.v1 新增 CancellationRequest 和 CANCELLED 状态；risk-handoff.v1 增加取消状态与取消证据。
 - 后端已部署：c2580383-d2c2-4d7f-9266-bc0a5653426a。
 - 公网地址：https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev。
 - 公网取消路径已实测：任务 `review-task-49e241ef-73dc-4598-ae0c-221e23878813` 从 `PENDING_RISK` 变为 `CANCELLED`，重复取消返回 HTTP 409；完整证据见 public-cancel-verification-2026-10-15.json。Risk 与审批仍只能使用演示身份。
+- 模型重试单测已实测：第一次返回 503，第二次成功；请求次数 2、`attempt_count=2`、`retry_count=1`，并出现 `model.retry_scheduled` 审计事件。持续失败仍保留失败记录并阻断执行，证据见 model-retry-verification-2026-10-15.json。
 
 ## 仍需团队配合
 

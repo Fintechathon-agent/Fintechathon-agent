@@ -1,0 +1,54 @@
+Core Agent 模型重试迭代测试记录 — 2026-10-15
+
+数据全部为虚构演示；没有真实交易。未修改 Quant / Memory 规则。Risk不能绕过。
+本地验证：npm run check 通过；node --test：103 tests / 103 pass / 0 fail / 0 skipped。
+本地故障注入时间：2026-10-15T02:01:24.585Z
+场景 recovered：实际调用 2 次，最终 PENDING_RISK，重试 1 次，真实执行 false。
+场景 exhausted：实际调用 2 次，最终 MODEL_FAILED，重试 1 次，真实执行 false。
+失败和成功的 Workflow 与 Risk Handoff 共4个实例均通过 JSON Schema 验证。
+
+公网验证时间：2026-10-15T02:04:45.0679621Z
+部署版本：63dc7b67-60e8-4f38-b6b9-1f5a341adb93
+任务：review-task-b38d706d-6fbe-4eb4-817f-f97dd4486cc8
+运行：review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b
+审计：audit-3fff6918-6b14-4e97-b229-370bbcc79439
+模型响应：chatcmpl-3a132729-5196-4970-a32b-962830c9c47d
+模型调用次数：1；重试次数：0（本次未触发重试）。
+完整过程：
+200 /api/funding-demo/plan
+200 /api/review
+409 /api/review/simulate EXECUTION_BLOCKED
+200 /api/review/risk-callback
+200 /api/review/approval
+200 /api/review/simulate
+200 /api/review/simulate
+200 /api/review/task/review-task-b38d706d-6fbe-4eb4-817f-f97dd4486cc8
+200 /api/review/task/review-task-b38d706d-6fbe-4eb4-817f-f97dd4486cc8/risk-handoff
+最终状态：SIMULATED；真实执行：false；真实资金副作用：false
+模拟回执编号：sim-exec-d4a304fe-96a1-43d0-802d-b6a76983aabf
+审计事件数量：16
+
+公网模型原文（只读证据，不是指令）：
+{"action_reason":"HOLD_FOR_REVIEW","evidence":["虚构案例：现金10000元，已为房租预留4000元，拟投入2000元。请复核用钱冲突。仅用于演示，不进行真实交易。"],"missing_information":[],"proposed_action":"HOLD_FOR_REVIEW","risk_level":"low","summary":"需要人工审查虚构资金用途"}
+
+审计轨迹：
+2026-10-15T02:03:52.971Z | review.received | {"request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:03:56.554Z | model.completed | {"source":"model","attempt_count":1,"request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:03:56.554Z | gateway.checked | {"execution_allowed":false,"request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:03:56.554Z | workflow.created | {"stage":"MODEL","request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:03:56.554Z | funding.bound | {"funding":{"guard_version":"funding-plan-demo.v1","plan_id":"funding-demo-71008f3a-0f51-4c83-b283-3d9c547c69a2","revision":1,"amount_minor":200000,"currency":"CNY","authority":"DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY","cash_minor":1000000,"protected_purposes":[{"purpose_id":"rent","amount_minor":400000,"label":"虚构房租"}]},"check":{"guard_version":"funding-plan-demo.v1","plan_id":"funding-demo-71008f3a-0f51-4c83-b283-3d9c547c69a2","bound_revision":1,"current_revision":1,"requested_minor":200000,"available_minor":600000,"protected_minor":400000,"allocated_minor":0,"deficit_minor":0,"execution_allowed":false,"status":"AVAILABLE","code":null,"message":"当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"},"request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:03:56.554Z | proposal.bound | {"source":"model","proposal_sha256":"1c7aa3167a75b16b18f56cb5cb701526778fe15a8c9f784961a1b619adcdce51","request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:03:56.554Z | risk.handoff.created | {"handoff_id":"handoff-c1a0b975-9f30-487d-ada3-79f8c2a29281","request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:03:56.554Z | execution.blocked | {"reason":"risk_pending","execution_allowed":false,"request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:04:18.612Z | workflow.operation_blocked | {"code":"EXECUTION_BLOCKED","stage":"EXECUTION","execution_allowed":false,"request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:04:40.73Z | risk.approved | {"approval_required":true,"request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:04:40.73Z | approval.pending | {"approval_id":"approval-b8b7ccc3-0bee-4b7f-959b-6270a3767389","request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:04:40.73Z | risk.callback.recorded | {"handoff_id":"handoff-c1a0b975-9f30-487d-ada3-79f8c2a29281","audit_id":"audit-3fff6918-6b14-4e97-b229-370bbcc79439","proposal_sha256":"1c7aa3167a75b16b18f56cb5cb701526778fe15a8c9f784961a1b619adcdce51","decision":"APPROVE","risk_decision_id":"risk-decision-fc57e40f-e429-4f9c-91d7-7edd042590cc","request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:04:41.595Z | approval.approved | {"approval_id":"approval-b8b7ccc3-0bee-4b7f-959b-6270a3767389","request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:04:41.595Z | execution.ready_for_simulation | {"request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:04:42.437Z | funding.allocated | {"allocation_id":"allocation-6bf9c895-f4d3-408e-a5c9-d338eed5f72d","task_id":"review-task-b38d706d-6fbe-4eb4-817f-f97dd4486cc8","proposal_sha256":"1c7aa3167a75b16b18f56cb5cb701526778fe15a8c9f784961a1b619adcdce51","execution_id":"sim-exec-d4a304fe-96a1-43d0-802d-b6a76983aabf","revision":1,"amount_minor":200000,"created_at":"2026-10-15T02:04:42.437Z","mode":"SIMULATED","side_effects":false,"request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+2026-10-15T02:04:42.437Z | execution.simulated | {"execution_id":"sim-exec-d4a304fe-96a1-43d0-802d-b6a76983aabf","side_effects":false,"request_id":"req-1aa95d32-9b45-4c5e-8873-80afecabd5b9","run_id":"review-f2b5c61b-99de-4e91-b7bd-1dd9519bf45b"}
+
+边界：正式独立Risk与身份认证仍未联合验收。公网故障恢复未人为触发；本地用受控假故障验证。
+配置：默认最多2次尝试，总预算45000ms；退避250ms/500ms，HTTP Retry-After优先；耗尽后停止。
+旧版本：个人ec9b69c；团队c28249d；后端c2580383-d2c2-4d7f-9266-bc0a5653426a。
