@@ -1,0 +1,52 @@
+{
+  "rule_id": "R07",
+  "title_zh": "高相关资产集中",
+  "version": "risk-rules.v0.1-draft",
+  "status": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW",
+  "stages": [
+    "PLAN_REVIEW",
+    "EXECUTION_PREFLIGHT"
+  ],
+  "check_key": "correlation_concentration",
+  "input_refs": [
+    "/upstream/artifacts/health_report/correlation_matrix",
+    "/upstream/artifacts/candidates"
+  ],
+  "conditions": [
+    {
+      "condition_id": "R07-correlation",
+      "metric": "pair_correlation",
+      "operator": "GTE",
+      "threshold": 0.8,
+      "threshold_ref": null,
+      "unit": "CORRELATION",
+      "basis": "SAMPLE",
+      "group": "PAIR_AND"
+    },
+    {
+      "condition_id": "R07-weight",
+      "metric": "pair_combined_weight",
+      "operator": "GT",
+      "threshold": 0.4,
+      "threshold_ref": null,
+      "unit": "RATIO",
+      "basis": "TOTAL_ASSETS",
+      "group": "PAIR_AND"
+    }
+  ],
+  "reason_codes": [
+    "HIGH_CORRELATION_CONCENTRATION"
+  ],
+  "failure_decisions": [
+    "REVIEW"
+  ],
+  "acceptance_policy_zh": "明确接受指定样本内相关性风险。",
+  "enforcement_owner": [
+    "RISK",
+    "ORCHESTRATOR",
+    "TOOLS"
+  ],
+  "recovery_zh": "降低集中度或逐项接受风险后确认完整计划。",
+  "source": "MODULE4_PROPOSAL",
+  "notes_zh": "配置仅供队内虚构演示；规则定义不是可执行规则引擎。"
+}
