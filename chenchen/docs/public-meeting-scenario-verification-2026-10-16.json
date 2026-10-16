@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-16",
+  "endpoint": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+  "deployment_version": "5c60edf0-1f30-4652-87c9-c1bf877adf80",
+  "input_mode": "SYNTHETIC_REPLAY",
+  "scenario": "DOUBLE11_COMPARE",
+  "requested_output_formats": ["json", "xlsx", "chart"],
+  "actual_output_formats": ["json"],
+  "output_status": "PENDING_CONVERTER",
+  "model": {
+    "source": "model",
+    "call_succeeded": true,
+    "provider": "cloudflare_workers_ai"
+  },
+  "workflow": {
+    "status": "PENDING_RISK",
+    "risk_status": "PENDING_REVIEW",
+    "execution_allowed": false
+  },
+  "risk_dispatch_without_owner": {
+    "http_status": 503,
+    "error_code": "RISK_OWNER_NOT_CONFIGURED",
+    "dispatch_status": "FAILED",
+    "execution_allowed": false
+  },
+  "scope": [
+    "未接入真实优惠券或价格接口",
+    "未接入真实订阅扣款",
+    "未开启真实交易",
+    "未上传真实账户资料"
+  ]
+}
