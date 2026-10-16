@@ -8,7 +8,7 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   t.after(()=>new Promise(resolve=>{server.closeAllConnections();server.close(resolve);}));
   const base='http://127.0.0.1:'+server.address().port;
-  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/risk-workbench','/versions/merchant.js','/versions/investment-legacy.js','/versions/risk-workbench.js','/contracts/investment-agent.v1.schema.json','/contracts/model-review.v1.schema.json','/contracts/examples/health-check.request.json','/contracts/examples/health-check.response.json','/contracts/examples/model-review.request.json','/contracts/examples/model-review.response.json','/contracts/examples/risk-decision.request.json','/contracts/examples/approval.request.json','/contracts/examples/simulation.request.json','/data/market-brief-2026-10-08.json','/data/market-brief-2026-10-09.json','/data/risk-workbench-demo.json']) assert.equal((await fetch(base+page)).status,200);
+  for(const page of ['/','/catalog','/investment','/investment-v0.10','/merchant','/risk-workbench','/versions/merchant.js','/versions/investment-legacy.js','/versions/risk-workbench.js','/contracts/investment-agent.v1.schema.json','/contracts/core-agent-error.v1.schema.json','/contracts/model-review.v1.schema.json','/contracts/examples/health-check.request.json','/contracts/examples/health-check.response.json','/contracts/examples/core-agent-error.response.json','/contracts/examples/model-review.request.json','/contracts/examples/model-review.response.json','/contracts/examples/risk-decision.request.json','/contracts/examples/approval.request.json','/contracts/examples/simulation.request.json','/data/market-brief-2026-10-08.json','/data/market-brief-2026-10-09.json','/data/risk-workbench-demo.json']) assert.equal((await fetch(base+page)).status,200);
   const health=await fetch(base+'/health');
   assert.equal(health.status,200);
   assert.equal((await health.json()).status,'ok');
@@ -106,7 +106,7 @@ test('HTTP flows: pages, independent cookies, review gating, import failure and 
   assertHealthCheckError(invalidBody);
   assert.equal(invalidBody.contract_version,CONTRACT_VERSION);
   assert.equal(invalidBody.request_id,request.request_id);
-  assert.deepEqual(invalidBody.trace,{contract_version:CONTRACT_VERSION,request_id:request.request_id,task_id:null,session_id:null,audit_id:null});
+  assert.deepEqual(invalidBody.trace,{contract_version:CONTRACT_VERSION,error_contract_version:'core-agent-error.v1',source_contract_version:CONTRACT_VERSION,request_id:request.request_id,task_id:null,session_id:null,run_id:null,audit_id:null,handoff_id:null});
   assert.equal(invalidBody.error.retryable,false);
   assert.equal(invalidBody.error.stage,'BACKEND');
   assert.ok(invalidBody.error.recovery);

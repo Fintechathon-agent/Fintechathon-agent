@@ -60,7 +60,12 @@ test("durable workflow refuses Risk mutation after simulation", async () => {
   assert.equal(simulated.status, "SIMULATED");
   const repeated = await worker.fetch(req("/api/review/risk-decision", { ...base, decision: "APPROVE", reviewer: "risk", reason: "重复" }), app.env);
   assert.equal(repeated.status, 409);
-  assert.equal((await repeated.json()).error.code, "WORKFLOW_TERMINAL");
+  const repeatedError = await repeated.json();
+  assert.equal(repeatedError.error.code, "WORKFLOW_TERMINAL");
+  assert.equal(repeatedError.error_contract_version, "core-agent-error.v1");
+  assert.equal(repeatedError.source_contract_version, "model-review.v1");
+  assert.equal(repeatedError.trace.task_id, created.task_id);
+  assert.equal(repeatedError.trace.session_id, null);
   const queried = await worker.fetch(req("/api/review/task/" + created.task_id), app.env).then(r => r.json());
   assert.equal(queried.status, "SIMULATED");
   assert.equal(queried.execution.status, "SIMULATED");

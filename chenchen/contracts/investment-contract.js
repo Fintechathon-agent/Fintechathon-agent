@@ -5,6 +5,7 @@ const crypto = require("node:crypto");
 const CONTRACT_VERSION = "investment-agent.v1";
 const OPERATION = "PORTFOLIO_HEALTH_CHECK";
 const schema = require("./investment-agent.v1.schema.json");
+const coreError = require("./core-agent-error");
 
 class ContractError extends Error {
   constructor(message, details = {}) {
@@ -274,7 +275,7 @@ function sanitizeErrorDetails(value, depth = 0, key = "") {
 
 function buildErrorResponse(error, { requestId = null, taskId = null, sessionId = null, auditId = null } = {}) {
   const resolvedRequestId = error.requestId ?? requestId;
-  const response = {
+  const response = coreError.decorate({
     contract_version: CONTRACT_VERSION,
     request_id: resolvedRequestId,
     operation: OPERATION,
@@ -293,7 +294,15 @@ function buildErrorResponse(error, { requestId = null, taskId = null, sessionId 
       recovery: error.recovery || "Review the request and retry after correcting the reported issue.",
       details: error.details ? sanitizeErrorDetails(error.details) : null
     }
-  };
+  }, {
+    sourceContractVersion: CONTRACT_VERSION,
+    requestId: resolvedRequestId,
+    taskId: error.taskId ?? taskId,
+    sessionId: error.sessionId ?? sessionId,
+    auditId: error.auditId ?? auditId,
+    operation: OPERATION,
+    legacyContractVersion: CONTRACT_VERSION
+  });
   return assertHealthCheckError(response);
 }
 
@@ -309,5 +318,6 @@ module.exports = {
   assertHealthCheckResponseSemantics,
   assertHealthCheckError,
   buildErrorResponse,
-  sanitizeErrorDetails
+  sanitizeErrorDetails,
+  ERROR_CONTRACT_VERSION: coreError.ERROR_CONTRACT_VERSION
 };

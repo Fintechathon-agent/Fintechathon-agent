@@ -160,6 +160,8 @@
       "required": ["contract_version", "request_id", "operation", "error"],
       "properties": {
         "contract_version": { "const": "investment-agent.v1" },
+        "error_contract_version": { "const": "core-agent-error.v1" },
+        "source_contract_version": { "const": "investment-agent.v1" },
         "request_id": { "type": ["string", "null"] },
         "operation": { "const": "PORTFOLIO_HEALTH_CHECK" },
         "trace": { "$ref": "#/$defs/ErrorTrace" },
@@ -213,10 +215,14 @@
       "required": ["contract_version", "request_id", "task_id", "session_id", "audit_id"],
       "properties": {
         "contract_version": { "const": "investment-agent.v1" },
+        "error_contract_version": { "const": "core-agent-error.v1" },
+        "source_contract_version": { "const": "investment-agent.v1" },
         "request_id": { "type": ["string", "null"] },
         "task_id": { "type": ["string", "null"] },
         "session_id": { "type": ["string", "null"] },
-        "audit_id": { "type": ["string", "null"] }
+        "audit_id": { "type": ["string", "null"] },
+        "run_id": { "type": ["string", "null"] },
+        "handoff_id": { "type": ["string", "null"] }
       }
     },
     "ErrorState": {

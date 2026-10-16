@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/core-agent-error.v1.schema.json",
+  "title": "Core Agent shared error envelope",
+  "description": "Additive error contract shared by health-check, model-review and Risk workflow HTTP surfaces. Legacy source fields may remain alongside this envelope.",
+  "type": "object",
+  "required": ["error_contract_version", "source_contract_version", "operation", "request_id", "trace", "error"],
+  "properties": {
+    "error_contract_version": { "const": "core-agent-error.v1" },
+    "source_contract_version": { "type": "string", "minLength": 1 },
+    "operation": { "type": "string", "minLength": 1 },
+    "request_id": { "type": ["string", "null"] },
+    "trace": { "$ref": "#/$defs/Trace" },
+    "error": { "$ref": "#/$defs/Error" }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "Trace": {
+      "type": "object",
+      "required": ["error_contract_version", "source_contract_version", "request_id", "task_id", "session_id", "run_id", "audit_id", "handoff_id"],
+      "properties": {
+        "contract_version": { "type": ["string", "null"] },
+        "error_contract_version": { "const": "core-agent-error.v1" },
+        "source_contract_version": { "type": "string", "minLength": 1 },
+        "request_id": { "type": ["string", "null"] },
+        "task_id": { "type": ["string", "null"] },
+        "session_id": { "type": ["string", "null"] },
+        "run_id": { "type": ["string", "null"] },
+        "audit_id": { "type": ["string", "null"] },
+        "handoff_id": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "Error": {
+      "type": "object",
+      "required": ["code", "message", "retryable", "stage", "recovery"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "retryable": { "type": "boolean" },
+        "stage": { "type": "string", "minLength": 1 },
+        "recovery": { "type": "string", "minLength": 1 },
+        "details": {}
+      },
+      "additionalProperties": true
+    }
+  }
+}

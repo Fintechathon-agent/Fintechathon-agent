@@ -1,0 +1,61 @@
+Core Agent 统一错误 Contract 公网验证记录 | 2026-10-16
+====================================================
+部署版本：8394f4fc-6e73-4b20-a350-155a1fd5beeb
+公网地址：https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev
+测试时间（UTC）：2026-10-16T06:54:12.8038805Z
+公网访问方式：本机已有代理（explicit-proxy）
+
+结论：通过。
+- 2 条虚构资金计划路径，24 个接口步骤通过。
+- 取消路径最终 CANCELLED，旧 Risk 回调不能恢复，模拟执行被阻断。
+- 正常路径完成 Risk 演示回调、必要审批和 SIMULATED；side_effects=false。
+- 2 次真实 Workers AI 模型调用成功。
+- 7 个预期 HTTP 错误响应均带 error_contract_version=core-agent-error.v1、source_contract_version 和 task_id/session_id/run_id/audit_id/handoff_id 五个 trace 字段。
+- 本地完整自动测试：115/115 通过。
+
+场景一：cancel_after_approval
+任务：review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33
+运行：review-5c93e44b-509e-4e59-84f7-5792169fd4aa
+审计：audit-59d4ce1b-b851-4ce9-a913-30557dcd255d
+模型响应：chatcmpl-bb9f57f8-0f29-4c91-b7be-0e28a677c0d4
+最终状态：CANCELLED
+审计事件：21
+真实执行允许：false
+
+场景二：normal_simulation
+任务：review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79
+运行：review-6d1a0ae5-5571-4e86-9629-8a5714922121
+审计：audit-f7039579-ecd4-468c-a8a1-99bbbbc55fdb
+模型响应：chatcmpl-56d68b8a-8d52-449d-bff5-b2613f16f209
+最终状态：SIMULATED
+审计事件：16
+模拟回执 side_effects：false
+真实执行允许：false
+
+逐步 HTTP 结果：
+01 | /api/funding-demo/plan | HTTP 200 | OK
+02 | /api/review | HTTP 200 | OK
+03 | /api/review/simulate | HTTP 409 | EXECUTION_BLOCKED
+04 | /api/review/risk-callback | HTTP 200 | OK
+05 | /api/review/approval | HTTP 200 | OK
+06 | /api/review/approval | HTTP 200 | OK
+07 | /api/review/approval | HTTP 409 | APPROVAL_IMMUTABLE
+08 | /api/review/approval | HTTP 409 | APPROVAL_IMMUTABLE
+09 | /api/review/approval | HTTP 422 | INVALID_WORKFLOW_INPUT
+10 | /api/review/risk-decision | HTTP 200 | OK
+11 | /api/review/risk-decision | HTTP 409 | RISK_DECISION_IMMUTABLE
+12 | /api/review/cancel | HTTP 200 | OK
+13 | /api/review/risk-callback | HTTP 200 | OK
+14 | /api/review/simulate | HTTP 409 | EXECUTION_BLOCKED
+15 | /api/review/task/review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33 | HTTP 200 | OK
+16 | /api/review/task/review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33/risk-handoff | HTTP 200 | OK
+17 | /api/review | HTTP 200 | OK
+18 | /api/review/simulate | HTTP 409 | EXECUTION_BLOCKED
+19 | /api/review/risk-callback | HTTP 200 | OK
+20 | /api/review/approval | HTTP 200 | OK
+21 | /api/review/simulate | HTTP 200 | OK
+22 | /api/review/simulate | HTTP 200 | OK
+23 | /api/review/task/review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79 | HTTP 200 | OK
+24 | /api/review/task/review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79/risk-handoff | HTTP 200 | OK
+
+边界：Risk/审批仍是演示标签，未接正式认证或真实交易网关；公网测试经过本机代理，不代表全部手机网络直连。

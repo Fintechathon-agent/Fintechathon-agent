@@ -6,6 +6,7 @@ const path = require("node:path");
 const { Harness } = require("./core/harness");
 const tools = require("./tools/financial-tools");
 const contract = require("./contracts/investment-contract");
+const coreError = require("./contracts/core-agent-error");
 const { buildRiskWorkbenchHandoff } = require("./integrations/risk-workbench-adapter");
 const modelReview = require("./integrations/model-review");
 const legacyReviewAdapter = require("./integrations/legacy-review-adapter");
@@ -118,15 +119,10 @@ function storeReviewRun(result) {
 }
 
 function buildWorkflowError(error) {
-  const trace = {
-    contract_version: modelReview.REVIEW_VERSION,
-    request_id: error.workflowRecord?.request_id || error.record?.request_id || null,
-    task_id: error.workflowRecord?.task_id || error.record?.task_id || error.taskId || null,
-    run_id: error.workflowRecord?.run_id || error.record?.run_id || error.runId || null,
-    audit_id: error.workflowRecord?.audit?.audit_id || error.record?.audit?.audit_id || error.auditId || null
-  };
-  const payload = {
+  const record = error.workflowRecord || error.record || null;
+  const payload = coreError.decorate({
     review_version: modelReview.REVIEW_VERSION,
+    contract_version: modelReview.REVIEW_VERSION,
     error: {
       code: error.code || "WORKFLOW_FAILED",
       message: error.message || "workflow failed",
@@ -135,9 +131,17 @@ function buildWorkflowError(error) {
       recovery: error.recovery || "Review the task state and retry.",
       details: error.details || null
     },
-    trace,
-    workflow: error.workflowRecord || error.record || null
-  };
+    workflow: record
+  }, {
+    sourceContractVersion: modelReview.REVIEW_VERSION,
+    requestId: record?.request_id || error.requestId || null,
+    taskId: record?.task_id || error.taskId || null,
+    runId: record?.run_id || error.runId || null,
+    auditId: record?.audit?.audit_id || error.auditId || null,
+    handoffId: record?.risk_handoff?.handoff_id || null,
+    operation: "MODEL_REVIEW",
+    legacyContractVersion: modelReview.REVIEW_VERSION
+  });
   return payload;
 }
 
@@ -367,7 +371,7 @@ function serveStatic(response, pathname) {
     "contracts/risk-handoff.v1.schema.json", "contracts/examples/risk-callback.request.json",
     "contracts/funding-plan-demo.v1.schema.json", "contracts/examples/funding-plan.request.json",
     "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/risk-workbench.js", "versions/common.js",
-    "contracts/investment-agent.v1.schema.json", "contracts/model-review.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json", "contracts/examples/model-review.request.json", "contracts/examples/model-review.response.json", "contracts/examples/risk-decision.request.json", "contracts/examples/approval.request.json", "contracts/examples/simulation.request.json",
+    "contracts/investment-agent.v1.schema.json", "contracts/core-agent-error.v1.schema.json", "contracts/model-review.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json", "contracts/examples/core-agent-error.response.json", "contracts/examples/model-review.request.json", "contracts/examples/model-review.response.json", "contracts/examples/risk-decision.request.json", "contracts/examples/approval.request.json", "contracts/examples/simulation.request.json",
     "data/market-brief-2026-10-08.json", "data/market-brief-2026-10-09.json", "data/risk-workbench-demo.json", "index.html", "app.js", "styles.css"]);
   if (!allowed.has(relativePath)) { sendJson(response, 404, { error: { code: "NOT_FOUND", message: "not found" } }); return; }
   const filePath = path.resolve(root, relativePath);

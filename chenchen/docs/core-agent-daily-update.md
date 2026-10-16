@@ -2,6 +2,21 @@
 
 > 用途：每天 22:00 前更新一次，供团队同步主链路进展。本文档只记录 Core Agent 主链路，不替代 Risk、Memory、Quant 或 UI 的专项日报。
 
+## 2026-10-12
+
+### 本轮继续实现
+
+- 新增 `assertHealthCheckResponseSemantics`，在真实响应和 Risk Workbench Adapter 输出前检查跨对象追踪键、审计归属、checkpoint 引用、ToolResult `trace_id` 和 Risk Handoff 证据引用。
+- 强制保留 `risk_handoff.execution_allowed = false`；非 `HANDOFF_REQUIRED` 状态不得生成 Handoff；候选方案、市场上下文、模拟结果和审计 ID 不得指向其他任务或旧结果。
+- 增加断裂 checkpoint 引用和篡改执行授权的回归测试；主项目测试由 53 项增至 54 项，全部通过。
+
+### 验证结果
+
+- `npm run check`：通过。
+- `npm test`：54/54 通过。
+- 既有响应示例继续通过基础 Schema 校验；运行时响应额外通过语义校验。
+- Risk Owner 正式接收/回写 Contract、持久化恢复和生产级分布式限流仍需外部协议或基础设施，未在本轮臆造。
+
 ## 2026-10-11
 
 ### 22:00 自动化收尾核验（本轮新增记录）
@@ -39,6 +54,15 @@
 **主链路阶段 / 今日结论**：请求 → 公网 Backend → Session/Context → Harness → 现有 Tools/Quant → investment-agent.v1 响应 → Risk Handoff 已可复现；仍停在 HANDOFF_REQUIRED/PENDING_REVIEW，未证明独立 Risk 审核闭环。Core Agent 只调用现有 Quant 结果，未重新计算；未修改 Memory consent、范围、生命周期或清理规则；已经过 Risk 停止边界，execution_allowed=false。request_id、task_id、session_id、Contract version 和 audit_evidence 在成功回放中可追踪，失败和跨请求归因仍有限。
 
 **下一步**：Risk Owner 提供正式接收/回写 Contract；Backend Owner 补齐认证、限流、脱敏和失败事件归因；UI 按统一字段验收等待/错误状态。日报与 DOCX 作为两仓库获准文档产出提交，不修改业务实现来让测试通过。
+
+### 本轮继续实现
+
+- Backend 失败路径已补齐统一 `ErrorTrace`：Contract 错误响应可携带 `request_id`、`task_id`、`session_id`、`audit_id`；尚未创建任务的 Schema 错误保留空值。
+- Harness 在任务执行前绑定当前 `request_id`，审计事件 payload 逐条记录对应请求号；工具失败后可用错误 trace 读取 `/api/audit/{task_id}`，并保留原有重试与熔断规则。
+- Node Backend 与 Cloudflare Worker 共用错误构造和详情脱敏逻辑；Worker 增加可选 `CORE_AGENT_API_KEY`、每客户端 IP 每分钟 60 次 best-effort 限流，以及 401/429 Contract 错误返回。
+- 新增失败任务 HTTP/Contract 回归覆盖，主项目测试由 52 项增至 53 项，全部通过。
+
+这部分代码已在本地验证；Cloudflare 公网实例需重新部署后才会获得新的认证、限流和错误响应行为。Risk 正式接收/回写 Contract、持久化恢复和生产级分布式限流仍待对应 Owner 提供协议或基础设施。
 
 
 ### 今日结论
@@ -534,3 +558,13 @@ Core Agent 已完成架构图、模块调用时序和统一 Contract 的第一�
 DOCX 版式验收未完成：两仓库日报与联调手册均实际运行 render_docx.py，全部 exit 1；原因 LibreOffice soffice.exe was not found on PATH。已检查 DOCX 结构和两幅原始图像，但无页面 PNG，未完成逐页视觉验收。日志见 daily-closeout-2026-10-15-render.txt。
 
 可复现字段检查：在 chenchen 下执行 python docs/daily-closeout-check-2026-10-15.py；对已保存的本次真实合成输出复核 required 键和四类追踪值。重新产生合成输出可运行 node scripts/verify-model-retry.js 与 node scripts/verify-decision-integrity.js。
+
+## 2026-10-16：统一错误 Contract
+
+本轮新增 core-agent-error.v1 作为健康检查、模型复核和 Risk 工作流的共享错误信封。它增加 error_contract_version、source_contract_version、operation 和统一 trace；trace 固定包含 request_id、task_id、session_id、run_id、audit_id、handoff_id，旧字段继续保留以兼容已有调用方。
+
+本地 115/115 测试通过。新部署版本为 8394f4fc-6e73-4b20-a350-155a1fd5beeb。公网用两条虚构资金计划路径完成 24 步回归：取消路径为 CANCELLED，正常路径为 SIMULATED；2 次真实模型调用成功，7 个预期错误响应均通过共享错误 Contract 检查。
+
+- 团队简报：core-agent-team-brief-2026-10-16.md；统一错误 Contract：../contracts/core-agent-error.v1.schema.json；公网证据：public-error-contract-verification-2026-10-16.json；记事本日志：../logs/Core-Agent-统一错误Contract公网验证-2026-10-16.txt。
+
+正式 Risk/审批身份和真实执行网关仍待联合验收；本轮未改 Quant、Memory，真实执行保持关闭。

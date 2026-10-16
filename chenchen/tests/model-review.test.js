@@ -88,6 +88,10 @@ test("model failure is explicit unless rule fallback is requested", async () => 
       assert.equal(error.reviewRecord.gateway.execution_allowed, false);
       const payload = buildReviewError(error);
       assert.equal(payload.error.code, "MODEL_PROVIDER_ERROR");
+      assert.equal(payload.error_contract_version, "core-agent-error.v1");
+      assert.equal(payload.source_contract_version, "model-review.v1");
+      assert.equal(payload.trace.run_id, error.runId);
+      assert.equal(payload.trace.audit_id, error.auditId);
       return true;
     }
   );

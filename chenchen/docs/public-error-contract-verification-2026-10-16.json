@@ -1,0 +1,264 @@
+{
+  "checked_at": "2026-10-16T06:54:12.8038805Z",
+  "recorded_at_utc": "2026-10-16 06:55:08 UTC",
+  "deployment": "8394f4fc-6e73-4b20-a350-155a1fd5beeb",
+  "passed": true,
+  "evidence_type": "PUBLIC_REAL_MODEL_SYNTHETIC_DATA_AND_SHARED_ERROR_CONTRACT",
+  "network_route": "explicit-proxy",
+  "shared_error_contract": {
+    "version": "core-agent-error.v1",
+    "checked_error_responses": 7,
+    "required_trace_fields": [
+      "task_id",
+      "session_id",
+      "run_id",
+      "audit_id",
+      "handoff_id"
+    ],
+    "assertion": "每个预期错误响应均包含 error_contract_version、source_contract_version 和五个 trace 字段"
+  },
+  "limitations": "Public Risk/approval remain demo labels. Local concurrency is tested separately; no real transactions.",
+  "steps": [
+    {
+      "path": "/api/funding-demo/plan",
+      "http": 200,
+      "code": null,
+      "task_id": null,
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/simulate",
+      "http": 409,
+      "code": "EXECUTION_BLOCKED",
+      "task_id": null,
+      "trace_task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33"
+    },
+    {
+      "path": "/api/review/risk-callback",
+      "http": 200,
+      "code": null,
+      "task_id": null,
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 409,
+      "code": "APPROVAL_IMMUTABLE",
+      "task_id": null,
+      "trace_task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33"
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 409,
+      "code": "APPROVAL_IMMUTABLE",
+      "task_id": null,
+      "trace_task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33"
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 422,
+      "code": "INVALID_WORKFLOW_INPUT",
+      "task_id": null,
+      "trace_task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33"
+    },
+    {
+      "path": "/api/review/risk-decision",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/risk-decision",
+      "http": 409,
+      "code": "RISK_DECISION_IMMUTABLE",
+      "task_id": null,
+      "trace_task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33"
+    },
+    {
+      "path": "/api/review/cancel",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/risk-callback",
+      "http": 200,
+      "code": null,
+      "task_id": null,
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/simulate",
+      "http": 409,
+      "code": "EXECUTION_BLOCKED",
+      "task_id": null,
+      "trace_task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33"
+    },
+    {
+      "path": "/api/review/task/review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/task/review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33/risk-handoff",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/simulate",
+      "http": 409,
+      "code": "EXECUTION_BLOCKED",
+      "task_id": null,
+      "trace_task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79"
+    },
+    {
+      "path": "/api/review/risk-callback",
+      "http": 200,
+      "code": null,
+      "task_id": null,
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/approval",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/simulate",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/simulate",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/task/review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+      "trace_task_id": null
+    },
+    {
+      "path": "/api/review/task/review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79/risk-handoff",
+      "http": 200,
+      "code": null,
+      "task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+      "trace_task_id": null
+    }
+  ],
+  "results": [
+    {
+      "scenario": "cancel_after_approval",
+      "task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33",
+      "request_id": "req-ff1fefa0-28ae-4006-81e6-e4460636d906",
+      "run_id": "review-5c93e44b-509e-4e59-84f7-5792169fd4aa",
+      "audit_id": "audit-59d4ce1b-b851-4ce9-a913-30557dcd255d",
+      "final_status": "CANCELLED",
+      "audit_event_count": 21,
+      "model_response_id": "chatcmpl-bb9f57f8-0f29-4c91-b7be-0e28a677c0d4",
+      "model_call_succeeded": true,
+      "model_attempt_count": 1,
+      "model_retry_count": 0,
+      "risk_decision": "APPROVE",
+      "approval_status": "BLOCKED",
+      "execution": {
+        "execution_id": null,
+        "task_id": "review-task-4990ee4e-4fa8-411f-92f9-b0304c238d33",
+        "status": "BLOCKED",
+        "simulation_allowed": false,
+        "execution_allowed": false,
+        "receipt": null
+      },
+      "execution_allowed": false,
+      "handoff_status": "BLOCKED",
+      "handoff_execution_allowed": false
+    },
+    {
+      "scenario": "normal_simulation",
+      "task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+      "request_id": "req-c7010ae1-02ba-467a-8a79-66542125cee8",
+      "run_id": "review-6d1a0ae5-5571-4e86-9629-8a5714922121",
+      "audit_id": "audit-f7039579-ecd4-468c-a8a1-99bbbbc55fdb",
+      "final_status": "SIMULATED",
+      "audit_event_count": 16,
+      "model_response_id": "chatcmpl-56d68b8a-8d52-449d-bff5-b2613f16f209",
+      "model_call_succeeded": true,
+      "model_attempt_count": 1,
+      "model_retry_count": 0,
+      "risk_decision": "APPROVE",
+      "approval_status": "APPROVED",
+      "execution": {
+        "execution_id": "sim-exec-d23b7235-87c0-499d-a917-fa8385a0baa6",
+        "task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+        "status": "SIMULATED",
+        "simulation_allowed": false,
+        "execution_allowed": false,
+        "receipt": {
+          "mode": "SIMULATED",
+          "execution_id": "sim-exec-d23b7235-87c0-499d-a917-fa8385a0baa6",
+          "task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+          "proposal_sha256": "9017364c6c1894649cc6da1c9db99657be5717857613e32814e60238c275e0d5",
+          "side_effects": false,
+          "funding_allocation": {
+            "allocation_id": "allocation-c9458466-5a35-41fd-99d6-4fd67927867d",
+            "task_id": "review-task-e107b6ac-c756-4b7d-acd0-8a38041dec79",
+            "proposal_sha256": "9017364c6c1894649cc6da1c9db99657be5717857613e32814e60238c275e0d5",
+            "execution_id": "sim-exec-d23b7235-87c0-499d-a917-fa8385a0baa6",
+            "revision": 1,
+            "amount_minor": 100000,
+            "created_at": "2026-10-16T06:54:09.621Z",
+            "mode": "SIMULATED",
+            "side_effects": false
+          },
+          "message": "模拟执行完成；未调用真实交易、付款或账户网关。",
+          "completed_at": "2026-10-16T06:54:09.621Z"
+        }
+      },
+      "execution_allowed": false,
+      "handoff_status": "APPROVED",
+      "handoff_execution_allowed": false
+    }
+  ]
+}

@@ -74,3 +74,13 @@ Caller 产生输入与可选 request/task 编号；Backend/Store 创建缺省编
 DOCX 版式验收未完成：两仓库日报与联调手册均实际运行 render_docx.py，全部 exit 1；原因 LibreOffice soffice.exe was not found on PATH。已检查 DOCX 结构和两幅原始图像，但无页面 PNG，未完成逐页视觉验收。日志见 daily-closeout-2026-10-15-render.txt。
 
 可复现字段检查：在 chenchen 下执行 python docs/daily-closeout-check-2026-10-15.py；对已保存的本次真实合成输出复核 required 键和四类追踪值。重新产生合成输出可运行 node scripts/verify-model-retry.js 与 node scripts/verify-decision-integrity.js。
+
+## 2026-10-16：统一错误 Contract
+
+本轮新增 core-agent-error.v1 作为健康检查、模型复核和 Risk 工作流的共享错误信封。它增加 error_contract_version、source_contract_version、operation 和统一 trace；trace 固定包含 request_id、task_id、session_id、run_id、audit_id、handoff_id，旧字段继续保留以兼容已有调用方。
+
+本地 115/115 测试通过。新部署版本为 8394f4fc-6e73-4b20-a350-155a1fd5beeb。公网用两条虚构资金计划路径完成 24 步回归：取消路径为 CANCELLED，正常路径为 SIMULATED；2 次真实模型调用成功，7 个预期错误响应均通过共享错误 Contract 检查。
+
+- 团队简报：core-agent-team-brief-2026-10-16.md；统一错误 Contract：../contracts/core-agent-error.v1.schema.json；公网证据：public-error-contract-verification-2026-10-16.json；记事本日志：../logs/Core-Agent-统一错误Contract公网验证-2026-10-16.txt。
+
+正式 Risk/审批身份和真实执行网关仍待联合验收；本轮未改 Quant、Memory，真实执行保持关闭。

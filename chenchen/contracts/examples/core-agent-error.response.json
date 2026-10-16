@@ -1,0 +1,26 @@
+{
+  "error_contract_version": "core-agent-error.v1",
+  "source_contract_version": "model-review.v1",
+  "operation": "MODEL_REVIEW",
+  "request_id": "req-error-example-001",
+  "trace": {
+    "contract_version": "model-review.v1",
+    "error_contract_version": "core-agent-error.v1",
+    "source_contract_version": "model-review.v1",
+    "request_id": "req-error-example-001",
+    "task_id": "review-task-example-001",
+    "session_id": null,
+    "run_id": "review-example-001",
+    "audit_id": "audit-example-001",
+    "handoff_id": "handoff-example-001"
+  },
+  "error": {
+    "code": "EXECUTION_BLOCKED",
+    "message": "Risk and required approval must refer to this exact proposal",
+    "retryable": false,
+    "stage": "EXECUTION",
+    "recovery": "Complete Risk and approval first.",
+    "details": null
+  },
+  "review_version": "model-review.v1"
+}

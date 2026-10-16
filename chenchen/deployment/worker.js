@@ -7,6 +7,7 @@ import legacyReviewAdapterModule from "../integrations/legacy-review-adapter.js"
 import riskHandoffModule from "../integrations/risk-handoff.js";
 import reviewWorkflowModule from "../integrations/review-workflow.js";
 import fundingPlanModule from "../integrations/funding-plan.js";
+import coreErrorModule from "../contracts/core-agent-error.js";
 import { reviewDocs } from "./review-docs.js";
 
 const { Harness } = harnessModule;
@@ -18,6 +19,7 @@ const legacyReviewAdapter = legacyReviewAdapterModule;
 const riskHandoff = riskHandoffModule;
 const { ReviewWorkflowStore, WorkflowError } = reviewWorkflowModule;
 const { FundingPlanStore } = fundingPlanModule;
+const coreError = coreErrorModule;
 const harness = new Harness({ toolset: tools });
 const DEFAULT_ORIGINS = [
   "https://fund-risk-workbench.panxintian44.chatgpt.site",
@@ -103,6 +105,25 @@ function rateLimitFailure() {
   return error;
 }
 
+function serviceUnavailableFailure() {
+  const error = new Error("复核服务暂时不可用，请稍后重试。");
+  error.code = "REVIEW_SERVICE_UNAVAILABLE";
+  error.statusCode = 503;
+  error.retryable = true;
+  error.stage = "BACKEND";
+  error.recovery = "稍后重试；如果持续失败，请检查 Durable Object 和模型服务状态。";
+  return error;
+}
+
+function routeNotFoundFailure() {
+  const error = new Error("route not found");
+  error.code = "NOT_FOUND";
+  error.statusCode = 404;
+  error.stage = "ROUTING";
+  error.recovery = "Use a documented Core Agent endpoint and retry.";
+  return error;
+}
+
 function requestIdentity(request) {
   return request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For")?.split(",")[0].trim() || "anonymous";
 }
@@ -129,8 +150,10 @@ function requiresApiKey(request, env) {
 
 function workflowErrorPayload(error) {
   const record = error.workflowRecord || error.record || null;
-  return {
+  const requestId = record?.request_id || error.requestId || null;
+  return coreError.decorate({
     review_version: modelReview.REVIEW_VERSION,
+    contract_version: modelReview.REVIEW_VERSION,
     error: {
       code: error.code || "WORKFLOW_FAILED",
       message: error.message || "workflow failed",
@@ -139,15 +162,17 @@ function workflowErrorPayload(error) {
       recovery: error.recovery || "Review the task state and retry.",
       details: error.details || null
     },
-    trace: {
-      contract_version: modelReview.REVIEW_VERSION,
-      request_id: record?.request_id || null,
-      task_id: record?.task_id || error.taskId || null,
-      run_id: record?.run_id || error.runId || null,
-      audit_id: record?.audit?.audit_id || error.auditId || null
-    },
     workflow: record
-  };
+  }, {
+    sourceContractVersion: modelReview.REVIEW_VERSION,
+    requestId,
+    taskId: record?.task_id || error.taskId || null,
+    runId: record?.run_id || error.runId || null,
+    auditId: record?.audit?.audit_id || error.auditId || null,
+    handoffId: record?.risk_handoff?.handoff_id || null,
+    operation: "MODEL_REVIEW",
+    legacyContractVersion: modelReview.REVIEW_VERSION
+  });
 }
 
 // One durable coordinator keeps demo workflow updates ordered and audit reads
@@ -253,7 +278,7 @@ export class ReviewService {
           "/api/review/simulate": "simulate",
           "/api/review/cancel": "cancel"
         }[url.pathname];
-        if (!method) return json(request, env, 404, { error: { code: "NOT_FOUND" } });
+        if (!method) return json(request, env, 404, errorPayload(routeNotFoundFailure()));
         result = await workflow[method](body);
       }
       await this.persist(result, fundingPlans);
@@ -266,7 +291,7 @@ export class ReviewService {
         return json(request, env, error.statusCode || 502, workflowErrorPayload(error));
       }
       if (error.code === "INVALID_JSON") return json(request, env, 400, errorPayload(error));
-      return json(request, env, 503, { error: { code: "REVIEW_SERVICE_UNAVAILABLE", message: "复核服务暂时不可用，请稍后重试。", retryable: true } });
+      return json(request, env, 503, errorPayload(serviceUnavailableFailure()));
     }
   }
 }
@@ -311,7 +336,7 @@ export default {
       "/api/funding-demo/plan", "/api/funding-demo/plan/revise"
     ].includes(url.pathname);
     if (!isKnownPost && !isReviewRead) {
-      return json(request, env, 404, { error: { code: "NOT_FOUND", message: "route not found" } });
+      return json(request, env, 404, errorPayload(routeNotFoundFailure()));
     }
     if (!requiresApiKey(request, env)) return json(request, env, 401, errorPayload(authFailure()), { "WWW-Authenticate": "X-Core-Agent-Key" });
     if (!allowedByRateLimit(request, env)) return json(request, env, 429, errorPayload(rateLimitFailure()), { "Retry-After": "60" });
@@ -320,7 +345,7 @@ export default {
         const service = env.REVIEW_SERVICE.get(env.REVIEW_SERVICE.idFromName("team-review-v1"));
         return await service.fetch(request);
       } catch {
-        return json(request, env, 503, { error: { code: "REVIEW_SERVICE_UNAVAILABLE", message: "复核服务暂时不可用，请稍后重试。", retryable: true } });
+        return json(request, env, 503, errorPayload(serviceUnavailableFailure()));
       }
     }
     let body;

@@ -16,6 +16,13 @@ function Call-Api([string]$Path, $Body, [int]$Expected = 200) {
   $data = $response.Content | ConvertFrom-Json
   $steps.Add([pscustomobject]@{path=$Path;http=[int]$response.StatusCode;code=$data.error.code;task_id=$data.task_id;trace_task_id=$data.trace.task_id})
   if ([int]$response.StatusCode -ne $Expected) { throw "Unexpected HTTP $($response.StatusCode) on $Path" }
+  if ($Expected -ge 400) {
+    Require ($data.error_contract_version -eq 'core-agent-error.v1') "Missing shared error contract on $Path"
+    Require ($data.source_contract_version) "Missing source contract on $Path"
+    foreach ($field in @('task_id','session_id','run_id','audit_id','handoff_id')) {
+      Require ($data.trace.PSObject.Properties.Name -contains $field) "Missing trace.$field on $Path"
+    }
+  }
   return $data
 }
 function Require($Condition, [string]$Message) { if (-not $Condition) { throw $Message } }

@@ -48,7 +48,9 @@ PowerShell 调用示例：
     $body = Get-Content .\contracts\examples\health-check.request.json -Raw
     Invoke-RestMethod -Method Post -Uri http://127.0.0.1:4175/api/health-check/run -ContentType 'application/json' -Body $body
 
-错误响应的 error 固定包含 code、message、retryable、stage 和 recovery；需要人工修复时由 recovery 给出恢复方向。错误响应另外包含可选的 trace，保留 contract_version、request_id、task_id、session_id 和 audit_id；任务执行失败时可以据此读取 `/api/audit/{task_id}`。缺少 contract_version、request_id、context 或 input 时，尚未创建任务，trace 中的 task/session/audit 会为空。不要在生产代码中拼接旧的裸字段请求。
+错误响应的 error 固定包含 code、message、retryable、stage 和 recovery；需要人工修复时由 recovery 给出恢复方向。现在所有健康检查、模型复核和 Risk 工作流错误都增加同一个 `core-agent-error.v1` 错误信封：`error_contract_version`、`source_contract_version`、`operation`、`request_id` 和统一 trace。trace 固定包含 task_id、session_id、run_id、audit_id、handoff_id；没有对应编号时明确为 null。旧的 `contract_version`、`review_version` 和 workflow 字段继续保留，便于旧页面和调用方兼容。详见 [core-agent-error.v1.schema.json](core-agent-error.v1.schema.json) 和 [错误响应示例](examples/core-agent-error.response.json)。
+
+任务执行失败时可以用统一 trace 读取 `/api/audit/{task_id}`。缺少 contract_version、request_id、context 或 input 时，尚未创建任务，trace 中的 task/session/audit/run/handoff 会为空。不要在生产代码中拼接旧的裸字段请求。
 
 风控工作台适配接口当前只生成 READ_ONLY_HANDOFF_PREVIEW，不伪造远程写入，不提交确认，不触发执行。远程工作台没有公开外部 Handoff 导入接口前，Core Agent 只能通过适配层把证据整理给人工复核。
 

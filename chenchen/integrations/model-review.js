@@ -8,6 +8,7 @@ const MAX_CONTEXT_LENGTH = 12000;
 const DEFAULT_MODEL = "gpt-5.6-terra";
 const DEFAULT_RESPONSES_URL = "https://api.openai.com/v1/responses";
 const DEFAULT_CHAT_URL = "https://api.openai.com/v1/chat/completions";
+const coreError = require("../contracts/core-agent-error");
 
 const REVIEW_SCHEMA = {
   type: "object",
@@ -485,8 +486,10 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
 }
 
 function buildReviewError(error) {
-  return {
+  const requestId = error.requestId || error.reviewRecord?.request_id || null;
+  return coreError.decorate({
     review_version: REVIEW_VERSION,
+    contract_version: REVIEW_VERSION,
     run_id: error.runId || null,
     audit_id: error.auditId || null,
     error: {
@@ -497,7 +500,16 @@ function buildReviewError(error) {
       recovery: error.recovery || "Review the request and retry.",
       details: error.details || null
     }
-  };
+  }, {
+    sourceContractVersion: REVIEW_VERSION,
+    requestId,
+    taskId: error.taskId || error.reviewRecord?.task_id || null,
+    runId: error.runId || error.reviewRecord?.run_id || null,
+    auditId: error.auditId || error.reviewRecord?.audit?.audit_id || null,
+    handoffId: error.reviewRecord?.risk_handoff?.handoff_id || null,
+    operation: "MODEL_REVIEW",
+    legacyContractVersion: REVIEW_VERSION
+  });
 }
 
 module.exports = {
