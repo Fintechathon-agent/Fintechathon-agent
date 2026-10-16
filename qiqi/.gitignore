@@ -39,3 +39,5 @@ brief/out/fund_all_*.json
 
 # 微信群分析报告：仅保留本地，不同步 GitHub
 docs/KOSX三队微信群状态分析_*.md
+# 成员称呼对照（含群内昵称）：仅保留本地，不同步 GitHub
+docs/成员称呼对照_*.md
