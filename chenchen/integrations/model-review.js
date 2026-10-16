@@ -8,6 +8,11 @@ const MAX_CONTEXT_LENGTH = 12000;
 const DEFAULT_MODEL = "gpt-5.6-terra";
 const DEFAULT_RESPONSES_URL = "https://api.openai.com/v1/responses";
 const DEFAULT_CHAT_URL = "https://api.openai.com/v1/chat/completions";
+const DATA_MODES = ["FIXTURE", "LIVE", "SYNTHETIC_REPLAY", "REFERENCE_FIXTURE"];
+const EXECUTION_MODES = ["PAPER"];
+const CAPABILITIES = ["REVIEW_ONLY", "SIMULATION_ONLY"];
+const DEFAULT_POLICY_VERSION = "risk-policy.v1";
+const DEFAULT_RISK_PROFILE_VERSION = "risk-profile.v1";
 const coreError = require("../contracts/core-agent-error");
 
 const REVIEW_SCHEMA = {
@@ -101,16 +106,59 @@ function normalizeReviewInput(input = {}) {
   if (content === undefined && body.bill !== undefined) content = typeof body.bill === "string" ? body.bill : JSON.stringify(body.bill);
   if (content === undefined && body.news !== undefined) content = typeof body.news === "string" ? body.news : JSON.stringify(body.news);
   const text = stringValue(content, "text", { required: true, max: MAX_TEXT_LENGTH });
+  const schemaVersion = stringValue(body.schema_version, "schema_version", { max: 100 }) || REVIEW_VERSION;
+  if (schemaVersion !== REVIEW_VERSION) {
+    throw new ReviewError("UNSUPPORTED_CONTRACT_VERSION", "schema_version must be model-review.v1", {
+      statusCode: 422, stage: "VALIDATION", recovery: "Use the published model-review.v1 contract."
+    });
+  }
+  const dataMode = stringValue(body.data_mode ?? body.context?.data_mode, "data_mode", { max: 40 }) || "FIXTURE";
+  if (!DATA_MODES.includes(dataMode)) {
+    throw new ReviewError("INVALID_REVIEW_INPUT", "data_mode must be FIXTURE, LIVE, SYNTHETIC_REPLAY, or REFERENCE_FIXTURE", {
+      statusCode: 422, stage: "VALIDATION", recovery: "Declare the input data mode explicitly."
+    });
+  }
+  const executionMode = stringValue(body.execution_mode ?? body.context?.execution_mode, "execution_mode", { max: 40 }) || "PAPER";
+  if (!EXECUTION_MODES.includes(executionMode)) {
+    throw new ReviewError("EXECUTION_MODE_NOT_SUPPORTED", "Core Agent only supports PAPER execution mode", {
+      statusCode: 422, stage: "VALIDATION", recovery: "Use execution_mode=PAPER; real execution stays behind the Gateway."
+    });
+  }
+  const capability = stringValue(body.capability ?? body.context?.capability, "capability", { max: 50 }) || "REVIEW_ONLY";
+  if (!CAPABILITIES.includes(capability)) {
+    throw new ReviewError("INVALID_REVIEW_INPUT", "capability must be REVIEW_ONLY or SIMULATION_ONLY", {
+      statusCode: 422, stage: "VALIDATION", recovery: "Declare a supported Core Agent capability."
+    });
+  }
+  const planHash = stringValue(body.plan_hash, "plan_hash", { max: 128 });
+  if (planHash && !/^[0-9a-f]{64}$/i.test(planHash)) {
+    throw new ReviewError("INVALID_REVIEW_INPUT", "plan_hash must be a SHA-256 hex string", {
+      statusCode: 422, stage: "VALIDATION", recovery: "Use the hash of the proposed plan or omit it before planning."
+    });
+  }
   return {
+    schema_version: schemaVersion,
     request_id: stringValue(body.request_id, "request_id", { max: 200 }),
     task_id: stringValue(body.task_id, "task_id", { max: 200 }),
+    session_id: stringValue(body.session_id, "session_id", { max: 200 }),
+    source_task_id: stringValue(body.source_task_id, "source_task_id", { max: 200 }),
     source: stringValue(body.source, "source", { max: 500 }),
     kind,
     text,
     context: objectValue(body.context, "context"),
     action_parameters: objectValue(body.action_parameters ?? body.proposed_action_parameters, "action_parameters"),
     requested_action: stringValue(body.requested_action, "requested_action", { max: 1000 }),
-    allow_rule_fallback: body.allow_rule_fallback === true
+    allow_rule_fallback: body.allow_rule_fallback === true,
+    data_mode: dataMode,
+    execution_mode: executionMode,
+    capability,
+    portfolio_snapshot_id: stringValue(body.portfolio_snapshot_id, "portfolio_snapshot_id", { max: 200 }),
+    risk_profile_version: stringValue(body.risk_profile_version, "risk_profile_version", { max: 100 }) || DEFAULT_RISK_PROFILE_VERSION,
+    plan_id: stringValue(body.plan_id, "plan_id", { max: 200 }),
+    plan_hash: planHash,
+    policy_version: stringValue(body.policy_version, "policy_version", { max: 100 }) || DEFAULT_POLICY_VERSION,
+    idempotency_key: stringValue(body.idempotency_key, "idempotency_key", { max: 200 }),
+    memory_consent: body.memory_consent === true
   };
 }
 
@@ -316,12 +364,16 @@ function buildRuleFallback(input, error) {
   };
 }
 
-function gatewayCheck(proposal) {
+function gatewayCheck(proposal, input) {
   return {
     gateway_version: "review-gateway.v1",
     status: "PENDING_REVIEW",
     decision: "REVIEW_REQUIRED",
     proposed_action: proposal.proposed_action,
+    schema_version: input.schema_version,
+    data_mode: input.data_mode,
+    execution_mode: input.execution_mode,
+    capability: input.capability,
     execution_allowed: false,
     checks: [
       { name: "proposal_schema", passed: true },
@@ -402,7 +454,7 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
   }
 
   if (!proposal && lastModelError) {
-    if (config.disableRuleFallback || !(normalized.allow_rule_fallback || config.fallbackToRules)) {
+    if (config.disableRuleFallback || !(normalized.allow_rule_fallback && config.fallbackToRules)) {
       lastModelError.runId = runId;
       lastModelError.auditId = auditId;
       lastModelError.reviewRecord = {
@@ -413,7 +465,23 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
         status: "FAILED",
         source: "model",
         created_at: createdAt,
-        input: { kind: normalized.kind, source: normalized.source, input_sha256: inputSha256 },
+        schema_version: normalized.schema_version,
+        input: {
+          schema_version: normalized.schema_version,
+          kind: normalized.kind,
+          source: normalized.source,
+          input_sha256: inputSha256,
+          session_id: normalized.session_id,
+          source_task_id: normalized.source_task_id,
+          data_mode: normalized.data_mode,
+          execution_mode: normalized.execution_mode,
+          capability: normalized.capability,
+          portfolio_snapshot_id: normalized.portfolio_snapshot_id,
+          risk_profile_version: normalized.risk_profile_version,
+          plan_id: normalized.plan_id,
+          plan_hash: normalized.plan_hash,
+          policy_version: normalized.policy_version
+        },
         attempt_count: attemptCount,
         retry_count: retryEvents.length,
         error: { code: lastModelError.code, message: lastModelError.message, retryable: lastModelError.retryable },
@@ -439,9 +507,10 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
     proposal = buildRuleFallback(normalized, lastModelError);
   }
 
-  const gateway = gatewayCheck(proposal);
+  const gateway = gatewayCheck(proposal, normalized);
   return {
     review_version: REVIEW_VERSION,
+    schema_version: normalized.schema_version,
     run_id: runId,
     request_id: normalized.request_id,
     task_id: normalized.task_id,
@@ -449,14 +518,28 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
     source,
     created_at: createdAt,
     input: {
+      schema_version: normalized.schema_version,
       kind: normalized.kind,
       source: normalized.source,
-      input_sha256: inputSha256
+      input_sha256: inputSha256,
+      session_id: normalized.session_id,
+      source_task_id: normalized.source_task_id,
+      data_mode: normalized.data_mode,
+      execution_mode: normalized.execution_mode,
+      capability: normalized.capability,
+      portfolio_snapshot_id: normalized.portfolio_snapshot_id,
+      risk_profile_version: normalized.risk_profile_version,
+      plan_id: normalized.plan_id,
+      plan_hash: normalized.plan_hash,
+      policy_version: normalized.policy_version
     },
     model_response: {
       provider: config.provider,
       call_succeeded: source === "model",
       model: config.model,
+      data_mode: normalized.data_mode,
+      execution_mode: normalized.execution_mode,
+      capability: normalized.capability,
       endpoint: config.endpoint,
       api_style: config.style,
       response_format: config.responseFormat,
@@ -515,6 +598,9 @@ function buildReviewError(error) {
 module.exports = {
   ACTIONS,
   KINDS,
+  DATA_MODES,
+  EXECUTION_MODES,
+  CAPABILITIES,
   REVIEW_VERSION,
   REVIEW_SCHEMA,
   ReviewError,

@@ -1,7 +1,21 @@
 {
   "workflow_version": "review-workflow.v1",
+  "schema_version": "model-review.v1",
   "task_id": "review-task-example-001",
   "request_id": "req-example-20261013-001",
+  "session_id": "session-example-001",
+  "source_task_id": null,
+  "data_mode": "SYNTHETIC_REPLAY",
+  "execution_mode": "PAPER",
+  "capability": "REVIEW_ONLY",
+  "portfolio_snapshot_id": "snapshot-example-001",
+  "risk_profile_version": "risk-profile.v1",
+  "plan_id": "plan-example-001",
+  "plan_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "policy_version": "risk-policy.v1",
+  "idempotency_key": "idem-example-001",
+  "memory_consent": false,
+  "memory_write_status": "NOT_REQUESTED",
   "run_id": "review-example-001",
   "status": "PENDING_RISK",
   "model": {
@@ -51,7 +65,7 @@
     "execution_allowed": false
   },
   "risk_decision": null,
-  "approval": { "approval_id": "approval-example-001", "task_id": "review-task-example-001", "required": true, "status": "PENDING", "decision": null, "proposal_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "approver": null, "decided_at": null },
+  "approval": { "approval_id": "approval-example-001", "task_id": "review-task-example-001", "required": true, "status": "PENDING", "decision": null, "proposal_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "approver": null, "decided_at": null, "expires_at": "2026-10-13T00:15:00.000Z" },
   "execution": { "execution_id": null, "task_id": "review-task-example-001", "status": "BLOCKED", "simulation_allowed": false, "execution_allowed": false, "receipt": null },
   "audit": { "audit_id": "audit-example-001", "workflow_version": "review-workflow.v1", "task_id": "review-task-example-001", "request_id": "req-example-20261013-001", "run_id": "review-example-001", "events": [{ "event_id": "event-example-001", "task_id": "review-task-example-001", "actor": "core-agent", "event_type": "risk.handoff.created", "payload": { "request_id": "req-example-20261013-001", "run_id": "review-example-001" }, "timestamp": "2026-10-13T00:00:00.000Z" }] }
 }

@@ -8,6 +8,7 @@ const { FundingPlanStore } = require("./funding-plan");
 const WORKFLOW_VERSION = "review-workflow.v1";
 const RISK_DECISIONS = ["APPROVE", "REJECT", "REQUEST_MORE_INFO"];
 const APPROVAL_DECISIONS = ["APPROVE", "REJECT"];
+const APPROVAL_TTL_MS = 15 * 60 * 1000;
 
 function clone(value) {
   return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
@@ -67,13 +68,30 @@ async function hash(value) {
   return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
+async function fingerprint(input) {
+  const canonical = clone(input);
+  delete canonical.request_id;
+  delete canonical.task_id;
+  delete canonical.idempotency_key;
+  delete canonical.session_id;
+  return hash(canonical);
+}
+
 function event(record, eventType, payload = {}, actor = "core-agent") {
+  const trace = {
+    request_id: record.request_id,
+    task_id: record.task_id,
+    session_id: record.session_id || null,
+    run_id: record.run_id,
+    audit_id: record.audit.audit_id,
+    handoff_id: record.risk_handoff?.handoff_id || null
+  };
   record.audit.events.push({
     event_id: id("event-"),
     task_id: record.task_id,
     actor,
     event_type: eventType,
-    payload: { ...clone(payload), request_id: record.request_id, run_id: record.run_id },
+    payload: { ...clone(payload), ...trace, trace },
     timestamp: now()
   });
 }
@@ -96,9 +114,25 @@ function isApprovalRequired(proposal) {
 function completeErrorRecord(error, input, taskId, runId, auditId) {
   const record = {
     workflow_version: WORKFLOW_VERSION,
+    schema_version: modelReview.REVIEW_VERSION,
     task_id: taskId,
     request_id: input.request_id || null,
+    session_id: input.session_id || id("session-"),
+    source_task_id: input.source_task_id || null,
+    data_mode: input.data_mode || "FIXTURE",
+    execution_mode: input.execution_mode || "PAPER",
+    capability: input.capability || "REVIEW_ONLY",
+    portfolio_snapshot_id: input.portfolio_snapshot_id || null,
+    risk_profile_version: input.risk_profile_version || "risk-profile.v1",
+    plan_id: input.plan_id || null,
+    plan_hash: null,
+    policy_version: input.policy_version || "risk-policy.v1",
+    idempotency_key: input.idempotency_key || null,
+    request_fingerprint: null,
+    memory_consent: input.memory_consent === true,
+    memory_write_status: input.memory_consent === true ? "PENDING" : "NOT_REQUESTED",
     run_id: runId,
+    reviewed_input: clone(input),
     status: "MODEL_FAILED",
     model: { status: "FAILED", response: null },
     proposed_action: null,
@@ -115,7 +149,7 @@ function completeErrorRecord(error, input, taskId, runId, auditId) {
       reason: "模型调用失败，不能交给 Risk 或执行端。"
     },
     risk_decision: null,
-    approval: { approval_id: id("approval-"), task_id: taskId, proposal_sha256: null, required: true, status: "BLOCKED", decision: null },
+    approval: { approval_id: id("approval-"), task_id: taskId, proposal_sha256: null, required: true, status: "BLOCKED", decision: null, expires_at: null },
     execution: { execution_id: null, task_id: taskId, status: "BLOCKED", simulation_allowed: false, execution_allowed: false, receipt: null },
     audit: {
       audit_id: auditId,
@@ -142,11 +176,14 @@ function completeErrorRecord(error, input, taskId, runId, auditId) {
 }
 
 class ReviewWorkflowStore {
-  constructor({ modelRunner = modelReview.runReview, fundingPlans = new FundingPlanStore() } = {}) {
+  constructor({ modelRunner = modelReview.runReview, fundingPlans = new FundingPlanStore(), memoryWriter = null, approvalTtlMs = APPROVAL_TTL_MS } = {}) {
     this.modelRunner = modelRunner;
     this.fundingPlans = fundingPlans;
+    this.memoryWriter = memoryWriter;
+    this.approvalTtlMs = Number.isFinite(approvalTtlMs) && approvalTtlMs > 0 ? approvalTtlMs : APPROVAL_TTL_MS;
     this.records = new Map();
     this.byTask = new Map();
+    this.byIdempotency = new Map();
     this.startingTasks = new Set();
   }
 
@@ -154,6 +191,7 @@ class ReviewWorkflowStore {
     const snapshot = clone(record);
     this.records.set(snapshot.run_id, snapshot);
     this.byTask.set(snapshot.task_id, snapshot.run_id);
+    if (snapshot.idempotency_key) this.byIdempotency.set(snapshot.idempotency_key, snapshot.run_id);
     return clone(snapshot);
   }
 
@@ -170,6 +208,13 @@ class ReviewWorkflowStore {
   async start(input = {}, env = {}, options = {}) {
     input = modelReview.normalizeReviewInput(input);
     const taskId = input.task_id || id("review-task-");
+    if (input.idempotency_key && this.byIdempotency.has(input.idempotency_key)) {
+      const existing = this.getByRunId(this.byIdempotency.get(input.idempotency_key));
+      if (existing?.request_fingerprint === await fingerprint(input)) return existing;
+      throw new WorkflowError("IDEMPOTENCY_CONFLICT", "idempotency key is already bound to different review input", {
+        statusCode: 409, stage: "VALIDATION", recovery: "Reuse the original request body or create a new idempotency key.", record: existing
+      });
+    }
     if (this.byTask.has(taskId) || this.startingTasks.has(taskId)) {
       throw new WorkflowError("TASK_ALREADY_EXISTS", "task_id already exists; load its record or create a new task", { stage: "VALIDATION", record: this.getByTaskId(taskId) });
     }
@@ -183,7 +228,8 @@ class ReviewWorkflowStore {
 
   async startNew(input, taskId, env, options) {
     const requestId = input.request_id || id("req-");
-    const modelInput = { ...input, task_id: taskId, request_id: requestId };
+    const sessionId = input.session_id || id("session-");
+    const modelInput = { ...input, task_id: taskId, request_id: requestId, session_id: sessionId };
     const funding = this.fundingPlans.bind(modelInput.action_parameters);
     if (funding) modelInput.context = { ...modelInput.context, demo_funding_snapshot: {
       ...funding, check: this.fundingPlans.check(funding), instruction_authority: false
@@ -194,6 +240,7 @@ class ReviewWorkflowStore {
       review = await this.modelRunner(modelInput, env, options);
     } catch (error) {
       const failed = completeErrorRecord(error, modelInput, taskId, error.reviewRecord?.run_id || runId, error.reviewRecord?.audit?.audit_id || error.auditId || id("audit-"));
+      failed.request_fingerprint = await fingerprint(modelInput);
       if (error.reviewRecord) {
         failed.model.response = clone(error.reviewRecord);
         failed.model.status = "FAILED";
@@ -209,11 +256,27 @@ class ReviewWorkflowStore {
     const proposal = proposalPayload(modelInput, review);
     if (funding) proposal.funding = funding;
     const proposalSha256 = await hash(proposal);
+    const planId = modelInput.plan_id || id("plan-");
     const approvalRequired = Boolean(funding) || isApprovalRequired(proposal);
     const record = {
       workflow_version: WORKFLOW_VERSION,
+      schema_version: modelInput.schema_version,
       task_id: taskId,
       request_id: requestId,
+      session_id: sessionId,
+      source_task_id: modelInput.source_task_id,
+      data_mode: modelInput.data_mode,
+      execution_mode: modelInput.execution_mode,
+      capability: modelInput.capability,
+      portfolio_snapshot_id: modelInput.portfolio_snapshot_id,
+      risk_profile_version: modelInput.risk_profile_version,
+      plan_id: planId,
+      plan_hash: proposalSha256,
+      policy_version: modelInput.policy_version,
+      idempotency_key: modelInput.idempotency_key,
+      request_fingerprint: await fingerprint(modelInput),
+      memory_consent: modelInput.memory_consent === true,
+      memory_write_status: modelInput.memory_consent === true ? "PENDING" : "NOT_REQUESTED",
       run_id: review.run_id,
       status: "PENDING_RISK",
       reviewed_input: clone(modelInput),
@@ -237,7 +300,10 @@ class ReviewWorkflowStore {
           input_sha256: review.input.input_sha256,
           model_response_id: review.model_response.provider_response_id || null,
           proposal_sha256: proposalSha256,
-          audit_id: review.audit.audit_id
+          audit_id: review.audit.audit_id,
+          plan_id: planId,
+          plan_hash: proposalSha256,
+          policy_version: modelInput.policy_version
         },
         execution_allowed: false
       },
@@ -250,7 +316,8 @@ class ReviewWorkflowStore {
         decision: null,
         proposal_sha256: proposalSha256,
         approver: null,
-        decided_at: null
+        decided_at: null,
+        expires_at: null
       },
       execution: {
         execution_id: null,
@@ -282,6 +349,7 @@ class ReviewWorkflowStore {
     event(record, "proposal.bound", { source: review.source, proposal_sha256: proposalSha256 });
     event(record, "risk.handoff.created", { handoff_id: record.risk_handoff.handoff_id }, "risk-gateway");
     event(record, "execution.blocked", { reason: "risk_pending", execution_allowed: false }, "execution-gateway");
+    if (record.memory_consent) event(record, "memory.write.pending", { status: record.memory_write_status }, "memory");
     return this.save(record);
   }
 
@@ -289,6 +357,20 @@ class ReviewWorkflowStore {
     const record = this.getByTaskId(taskId);
     if (!record) throw new WorkflowError("WORKFLOW_NOT_FOUND", "review task not found", { statusCode: 404, stage: "LOOKUP", recovery: "Use the task_id returned by POST /api/review." });
     return record;
+  }
+
+  expireApproval(record) {
+    const expiresAt = Date.parse(record.approval?.expires_at || "");
+    if (!record.approval?.required || record.approval.status !== "PENDING" || !Number.isFinite(expiresAt) || expiresAt > Date.now()) return false;
+    record.approval.status = "EXPIRED";
+    record.status = "EXPIRED";
+    record.execution.status = "BLOCKED";
+    record.execution.simulation_allowed = false;
+    record.execution.execution_allowed = false;
+    event(record, "approval.expired", { approval_id: record.approval.approval_id, expires_at: record.approval.expires_at }, "approval-gateway");
+    event(record, "execution.blocked", { reason: "approval_expired" }, "execution-gateway");
+    this.save(record);
+    return true;
   }
 
   deny(record, code, message, stage, recovery, statusCode = 409) {
@@ -357,7 +439,8 @@ class ReviewWorkflowStore {
     const record = this.requireRecord(taskId);
     if (!record.proposed_action) throw new WorkflowError("RISK_BLOCKED", "model failure cannot be approved", { stage: "RISK", record });
     const { decision, actor: reviewer, reason } = this.decisionInput(record, input, RISK_DECISIONS, "reviewer", "RISK");
-    if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
+    this.expireApproval(record);
+    if (["SIMULATED", "REJECTED", "EXPIRED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
       this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot receive another Risk decision", "RISK", "Create a new task for a new proposal.");
     }
     if (record.risk_decision?.decision) {
@@ -391,6 +474,7 @@ class ReviewWorkflowStore {
     } else {
       record.status = record.approval.required ? "PENDING_APPROVAL" : "READY_FOR_SIMULATION";
       record.approval.status = record.approval.required ? "PENDING" : "NOT_REQUIRED";
+      record.approval.expires_at = record.approval.required ? new Date(Date.now() + this.approvalTtlMs).toISOString() : null;
       record.execution.status = record.approval.required ? "BLOCKED" : "READY";
       record.execution.simulation_allowed = !record.approval.required;
       event(record, "risk.approved", { approval_required: record.approval.required }, "risk");
@@ -405,7 +489,12 @@ class ReviewWorkflowStore {
     const record = this.requireRecord(taskId);
     if (!record.proposed_action) throw new WorkflowError("APPROVAL_BLOCKED", "model failure cannot be approved", { stage: "APPROVAL", record });
     const { decision, actor: approver, reason } = this.decisionInput(record, input, APPROVAL_DECISIONS, "approver", "APPROVAL");
-    if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
+    if (this.expireApproval(record)) {
+      throw new WorkflowError("APPROVAL_EXPIRED", "approval window has expired; the proposal must be reviewed again", {
+        stage: "APPROVAL", recovery: "Create a new task so Risk and approval use a fresh plan version.", record: this.getByTaskId(taskId)
+      });
+    }
+    if (["SIMULATED", "REJECTED", "EXPIRED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
       this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot receive another approval", "APPROVAL", "Create a new task for a new proposal.");
     }
     if (record.risk_decision?.decision !== "APPROVE" || record.risk_decision.status !== "APPROVED") {
@@ -431,6 +520,7 @@ class ReviewWorkflowStore {
       record.status = "READY_FOR_SIMULATION";
       record.execution.status = "READY";
       record.execution.simulation_allowed = true;
+      record.approval.expires_at = record.approval.expires_at || new Date(Date.now() + this.approvalTtlMs).toISOString();
       event(record, "approval.approved", { approval_id: record.approval.approval_id }, "approval");
       event(record, "execution.ready_for_simulation", {}, "execution-gateway");
     }
@@ -447,6 +537,11 @@ class ReviewWorkflowStore {
     // Re-read after the asynchronous hash so concurrent retries cannot mint two receipts.
     record = this.requireRecord(taskId);
     if (record.status === "SIMULATED") return record;
+    if (this.expireApproval(record)) {
+      throw new WorkflowError("APPROVAL_EXPIRED", "approval window has expired; simulation is blocked", {
+        stage: "EXECUTION", recovery: "Create a new task so Risk and approval use a fresh plan version.", record: this.getByTaskId(taskId)
+      });
+    }
     if (record.risk_decision?.decision !== "APPROVE" || record.risk_decision?.proposal_sha256 !== proposal_sha256 ||
         (record.approval.required && (record.approval.status !== "APPROVED" || record.approval.proposal_sha256 !== proposal_sha256))) {
       this.deny(record, "EXECUTION_BLOCKED", "Risk and required approval must refer to this exact proposal", "EXECUTION", "Complete Risk and approval first.");
@@ -493,7 +588,31 @@ class ReviewWorkflowStore {
     };
     record.status = "SIMULATED";
     event(record, "execution.simulated", { execution_id: executionId, side_effects: false }, "execution-gateway");
+    await this.writeMemory(record);
     return this.save(record);
+  }
+
+  async writeMemory(record) {
+    if (record.memory_consent !== true) return;
+    if (typeof this.memoryWriter !== "function") {
+      record.memory_write_status = "UNAVAILABLE";
+      event(record, "memory.write.blocked", { reason: "memory_writer_not_configured" }, "memory");
+      return;
+    }
+    try {
+      const entry = await this.memoryWriter(record.session_id, {
+        type: "decision",
+        key: "review:" + record.task_id,
+        value: { task_id: record.task_id, plan_id: record.plan_id, proposal_sha256: record.proposed_action.proposal_sha256, status: record.status },
+        consent: true
+      });
+      record.memory_write_status = "WRITTEN";
+      record.memory_id = entry?.memory_id || null;
+      event(record, "memory.saved", { memory_id: record.memory_id, status: record.memory_write_status }, "memory");
+    } catch (error) {
+      record.memory_write_status = "FAILED";
+      event(record, "memory.write.failed", { code: error.code || "MEMORY_WRITE_FAILED", message: error.message }, "memory");
+    }
   }
 
   async cancel(input = {}) {
@@ -503,7 +622,7 @@ class ReviewWorkflowStore {
     const canceler = requiredString(input.canceler, "canceler");
     const reason = requiredString(input.reason, "reason");
     this.checkInput(record, input, ["task_id", "proposal_sha256", "canceler", "reason"], "CANCELLATION");
-    if (["SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
+    if (["SIMULATED", "REJECTED", "EXPIRED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"].includes(record.status)) {
       this.deny(record, "WORKFLOW_TERMINAL", "this task is terminal and cannot be cancelled again", "CANCELLATION", "Read the existing record. Create a new task if needed.");
     }
     record.status = "CANCELLED";
@@ -523,8 +642,9 @@ class ReviewWorkflowStore {
   reset() {
     this.records.clear();
     this.byTask.clear();
+    this.byIdempotency.clear();
     this.startingTasks.clear();
   }
 }
 
-module.exports = { WORKFLOW_VERSION, RISK_DECISIONS, APPROVAL_DECISIONS, WorkflowError, ReviewWorkflowStore };
+module.exports = { WORKFLOW_VERSION, RISK_DECISIONS, APPROVAL_DECISIONS, WorkflowError, ReviewWorkflowStore, fingerprint };

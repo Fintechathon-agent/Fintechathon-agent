@@ -17,7 +17,7 @@ const { buildRiskWorkbenchHandoff } = adapterModule;
 const modelReview = modelReviewModule;
 const legacyReviewAdapter = legacyReviewAdapterModule;
 const riskHandoff = riskHandoffModule;
-const { ReviewWorkflowStore, WorkflowError } = reviewWorkflowModule;
+const { ReviewWorkflowStore, WorkflowError, fingerprint } = reviewWorkflowModule;
 const { FundingPlanStore } = fundingPlanModule;
 const coreError = coreErrorModule;
 const harness = new Harness({ toolset: tools });
@@ -40,7 +40,7 @@ function headers(request, env, contentType = "application/json; charset=utf-8") 
   if (origin) {
     result["Access-Control-Allow-Origin"] = origin;
     result["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS";
-    result["Access-Control-Allow-Headers"] = "Content-Type, X-Core-Agent-Key";
+    result["Access-Control-Allow-Headers"] = "Content-Type, X-Core-Agent-Key, Idempotency-Key, X-Request-ID";
     result.Vary = "Origin";
   }
   return result;
@@ -197,6 +197,7 @@ export class ReviewService {
       ["run:" + record.run_id]: record,
       ["task:" + record.task_id]: record.run_id
     };
+    if (record.idempotency_key) entries["idempotency:" + record.idempotency_key] = record.run_id;
     // One atomic storage operation commits both the simulation receipt and its allocation.
     for (const plan of fundingPlans?.plans.values() || []) entries["funding:" + plan.plan_id] = plan;
     await this.storage.put(entries);
@@ -210,6 +211,12 @@ export class ReviewService {
 
   async lookupTask(taskId) {
     const runId = await this.storage.get("task:" + taskId);
+    return runId ? this.storage.get("run:" + runId) : null;
+  }
+
+  async lookupIdempotency(key) {
+    if (!key) return null;
+    const runId = await this.storage.get("idempotency:" + key);
     return runId ? this.storage.get("run:" + runId) : null;
   }
 
@@ -233,6 +240,10 @@ export class ReviewService {
       if (!body || typeof body !== "object" || Array.isArray(body)) {
         throw new modelReview.ReviewError("INVALID_REVIEW_INPUT", "请求正文必须是 JSON 对象。", { statusCode: 422, stage: "VALIDATION" });
       }
+      if (url.pathname === "/api/review" || url.pathname === "/api/review/legacy") {
+        if (!body.request_id && request.headers.get("X-Request-ID")) body.request_id = request.headers.get("X-Request-ID");
+        if (!body.idempotency_key && request.headers.get("Idempotency-Key")) body.idempotency_key = request.headers.get("Idempotency-Key");
+      }
       if (["/api/funding-demo/plan", "/api/funding-demo/plan/revise"].includes(url.pathname)) {
         await this.loadFundingPlan(fundingPlans, body.plan_id);
         const plan = url.pathname.endsWith("/revise") ? fundingPlans.revise(body) : fundingPlans.create(body);
@@ -245,6 +256,16 @@ export class ReviewService {
         const input = url.pathname === "/api/review/legacy"
           ? legacyReviewAdapter.normalizeLegacyReviewInput(body)
           : modelReview.normalizeReviewInput(body);
+        if (input.idempotency_key) {
+          const existing = await this.lookupIdempotency(input.idempotency_key);
+          if (existing) {
+            const same = existing.request_fingerprint === await fingerprint(input);
+            if (same) return json(request, env, 200, url.pathname === "/api/review/legacy" ? legacyReviewAdapter.mapWorkflowToLegacyResponse(existing) : existing);
+            throw new WorkflowError("IDEMPOTENCY_CONFLICT", "idempotency key is already bound to different review input", {
+              statusCode: 409, stage: "VALIDATION", recovery: "Reuse the original request body or create a new idempotency key.", record: existing
+            });
+          }
+        }
         if (input.task_id && await this.lookupTask(input.task_id)) {
           throw new WorkflowError("TASK_ALREADY_EXISTS", "task_id already exists; load its record or create a new task", {
             statusCode: 409,

@@ -568,3 +568,9 @@ DOCX 版式验收未完成：两仓库日报与联调手册均实际运行 rende
 - 团队简报：core-agent-team-brief-2026-10-16.md；统一错误 Contract：../contracts/core-agent-error.v1.schema.json；公网证据：public-error-contract-verification-2026-10-16.json；记事本日志：../logs/Core-Agent-统一错误Contract公网验证-2026-10-16.txt。
 
 正式 Risk/审批身份和真实执行网关仍待联合验收；本轮未改 Quant、Memory，真实执行保持关闭。
+
+## 2026-10-16：Finance Lab 集成评审跟进
+
+按 `Finance_Lab_Integration_Review_2026-10-13(1).pdf` 补齐 `model-review.v1`、`risk-handoff.v1` 和 `review-workflow.v1` 的统一字段与状态保护：schema/data/execution/capability、session/plan/policy、幂等键、审批有效期、Memory 写入状态和统一 trace。模型仍只生成提议，Risk 和必要审批仍是执行前置条件，真实 Gateway 继续关闭。
+
+新增 T01-T14 评审门禁测试，覆盖输入缺失、Risk、审批、模拟执行、Memory、Audit、hash 篡改、回调串单、降级、过期、幂等和模型失败。当前完整本地测试为 129/129 通过，`npm run check` 通过。详细记录见 `finance-lab-integration-review-followup-2026-10-16.md` 和 `core-agent-daily-update-2026-10-16-integration-review.md`。

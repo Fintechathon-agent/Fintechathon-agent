@@ -16,7 +16,6 @@ const { randomUUID } = require("node:crypto");
 const { MerchantSession, demo: merchantDemo } = require("./merchant/ledger");
 const merchantSessions = new Map();
 const reviewRuns = new Map();
-const reviewWorkflow = new ReviewWorkflowStore();
 
 function merchantFor(request, response) {
   let id = /(?:^|;\s*)merchant_session=([a-z0-9-]+)/.exec(request.headers.cookie || "")?.[1];
@@ -31,6 +30,9 @@ function merchantFor(request, response) {
 const root = __dirname;
 const port = Number(process.env.PORT || 4175);
 const harness = new Harness({ toolset: tools });
+const reviewWorkflow = new ReviewWorkflowStore({
+  memoryWriter: (sessionId, record) => harness.memory.save(sessionId, record)
+});
 const publicAccessEnabled = () => process.env.PUBLIC_ACCESS === "true";
 const corsOrigins = new Set((process.env.CORS_ORIGINS || "").split(",").map(value => value.trim()).filter(Boolean));
 const mime = {
@@ -55,7 +57,7 @@ function applyCors(request, response) {
   if (!origin || (!corsOrigins.has("*") && !corsOrigins.has(origin))) return false;
   response.setHeader("Access-Control-Allow-Origin", corsOrigins.has("*") ? "*" : origin);
   response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Core-Agent-Key");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Core-Agent-Key, Idempotency-Key, X-Request-ID");
   response.setHeader("Vary", "Origin");
   return true;
 }
@@ -169,6 +171,13 @@ async function handleApi(request, response, pathname, url) {
   let body = {};
   if (method === "POST") body = await parseBody(request);
   if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("JSON body must be an object");
+  if (method === "POST" && (pathname === "/api/review" || pathname === "/api/review/legacy")) {
+    body = {
+      ...body,
+      ...(body.request_id || !request.headers["x-request-id"] ? {} : { request_id: request.headers["x-request-id"] }),
+      ...(body.idempotency_key || !request.headers["idempotency-key"] ? {} : { idempotency_key: request.headers["idempotency-key"] })
+    };
+  }
   if (method === "POST" && ["/api/funding-demo/plan", "/api/funding-demo/plan/revise"].includes(pathname)) {
     requireReviewApiKey(request);
     sendJson(response, 200, pathname.endsWith("/revise") ? reviewWorkflow.fundingPlans.revise(body) : reviewWorkflow.fundingPlans.create(body));

@@ -21,15 +21,28 @@
       "additionalProperties": false,
       "required": ["kind", "text"],
       "properties": {
+        "schema_version": { "const": "model-review.v1" },
         "request_id": { "type": ["string", "null"] },
         "task_id": { "type": ["string", "null"] },
+        "session_id": { "type": ["string", "null"] },
+        "source_task_id": { "type": ["string", "null"] },
         "kind": { "type": "string", "enum": ["bill", "news", "combined"] },
         "source": { "type": ["string", "null"] },
         "text": { "type": "string", "minLength": 1, "maxLength": 20000 },
         "requested_action": { "type": ["string", "null"] },
         "action_parameters": { "type": "object" },
         "context": { "type": "object" },
-        "allow_rule_fallback": { "type": "boolean" }
+        "allow_rule_fallback": { "type": "boolean" },
+        "data_mode": { "type": "string", "enum": ["FIXTURE", "LIVE", "SYNTHETIC_REPLAY", "REFERENCE_FIXTURE"] },
+        "execution_mode": { "const": "PAPER" },
+        "capability": { "type": "string", "enum": ["REVIEW_ONLY", "SIMULATION_ONLY"] },
+        "portfolio_snapshot_id": { "type": ["string", "null"] },
+        "risk_profile_version": { "type": ["string", "null"] },
+        "plan_id": { "type": ["string", "null"] },
+        "plan_hash": { "type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$" },
+        "policy_version": { "type": ["string", "null"] },
+        "idempotency_key": { "type": ["string", "null"] },
+        "memory_consent": { "type": "boolean" }
       }
     },
     "WorkflowRecord": {
@@ -37,10 +50,24 @@
       "required": ["workflow_version", "task_id", "request_id", "run_id", "status", "model", "proposed_action", "risk_handoff", "risk_decision", "approval", "execution", "audit"],
       "properties": {
         "workflow_version": { "const": "review-workflow.v1" },
+        "schema_version": { "const": "model-review.v1" },
         "task_id": { "type": "string" },
         "request_id": { "type": "string" },
         "run_id": { "type": "string" },
-        "status": { "type": "string", "enum": ["PENDING_RISK", "PENDING_APPROVAL", "READY_FOR_SIMULATION", "SIMULATED", "REJECTED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"] },
+        "session_id": { "type": ["string", "null"] },
+        "source_task_id": { "type": ["string", "null"] },
+        "data_mode": { "type": "string" },
+        "execution_mode": { "const": "PAPER" },
+        "capability": { "type": "string" },
+        "portfolio_snapshot_id": { "type": ["string", "null"] },
+        "risk_profile_version": { "type": ["string", "null"] },
+        "plan_id": { "type": ["string", "null"] },
+        "plan_hash": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "policy_version": { "type": ["string", "null"] },
+        "idempotency_key": { "type": ["string", "null"] },
+        "memory_consent": { "type": "boolean" },
+        "memory_write_status": { "type": "string", "enum": ["NOT_REQUESTED", "PENDING", "WRITTEN", "UNAVAILABLE", "FAILED"] },
+        "status": { "type": "string", "enum": ["PENDING_RISK", "PENDING_APPROVAL", "READY_FOR_SIMULATION", "SIMULATED", "REJECTED", "EXPIRED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"] },
         "model": {
           "type": "object",
           "properties": {
@@ -55,7 +82,10 @@
               "type": "object",
               "properties": {
                 "attempt_count": { "type": "integer", "minimum": 1 },
-                "retry_count": { "type": "integer", "minimum": 0 }
+                "retry_count": { "type": "integer", "minimum": 0 },
+                "data_mode": { "type": "string" },
+                "execution_mode": { "const": "PAPER" },
+                "capability": { "type": "string" }
               }
             }
           }
@@ -101,16 +131,17 @@
     },
     "ApprovalState": {
       "type": "object",
-      "required": ["approval_id", "task_id", "required", "status", "proposal_sha256"],
+      "required": ["approval_id", "task_id", "required", "status", "proposal_sha256", "expires_at"],
       "properties": {
         "approval_id": { "type": "string" },
         "task_id": { "type": "string" },
         "required": { "type": "boolean" },
-        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED", "BLOCKED", "NOT_REQUIRED"] },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED", "EXPIRED", "BLOCKED", "NOT_REQUIRED"] },
         "decision": { "type": ["string", "null"] },
         "proposal_sha256": { "type": ["string", "null"] },
         "approver": { "type": ["string", "null"] },
         "decided_at": { "type": ["string", "null"] }
+        ,"expires_at": { "type": ["string", "null"] }
       }
     },
     "ExecutionState": {

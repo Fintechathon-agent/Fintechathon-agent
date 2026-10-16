@@ -1,0 +1,25 @@
+Core Agent 集成评审公网验证
+日期：2026-10-16
+
+公网地址：
+https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev
+
+Cloudflare Worker 版本：
+5b81c8c3-d1f5-4123-8c35-ed0472cab5a6
+
+验证结果：
+- /health：通过，返回 ok
+- /docs：HTTP 200
+- /api/review 首次请求：HTTP 200
+- 相同 Idempotency-Key、相同输入重放：HTTP 200，复用同一个 task_id
+- 相同 Idempotency-Key、改变投入金额：HTTP 409，错误码 IDEMPOTENCY_CONFLICT
+- schema_version：model-review.v1
+- data_mode：SYNTHETIC_REPLAY
+- execution_mode：PAPER
+- execution.status：BLOCKED
+- 真实执行：未开启
+
+测试边界：
+- 使用合成持仓和合成计划，没有使用真实个人、账户或交易资料。
+- 本次验证证明统一模型复核入口、幂等保护和执行阻断已在公网版本生效。
+- 尚不能据此宣称正式 Risk、正式审批、Safety Action Gateway 或真实交易已完成联合验收。

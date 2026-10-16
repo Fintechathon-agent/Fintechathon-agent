@@ -9,8 +9,8 @@ export const reviewDocs = String.raw`<!doctype html>
 <p class="muted">服务在云端运行，无需启动本地后端。这里用于演示，请使用虚构材料。模型建议会等待 Risk 复核，不会执行真实付款或交易。</p>
 <section><h2>接口地址</h2><p class="endpoint"><strong>POST</strong> <code id="endpoint"></code></p>
 <p>请求头：<code>Content-Type: application/json</code>。当前演示无需密钥，支持跨域调用。</p>
-<pre>{"kind":"bill","text":"虚构账单：供应商要求将1280元货款改付到个人账户，请核查。"}</pre>
-<p class="muted">kind 可填 bill、news 或 combined。每个 IP 每分钟最多提交 6 个复核任务；限流返回 429。每项任务默认最多调用模型 2 次，受总超时限制，并遵守上游 Retry-After；耗尽时间后直接失败，不继续重试。成功记录见 model.model_response.attempt_count / retry_count，失败记录见 model.response，审计也会留痕。当前云端全部尝试共用 45 秒预算；建议客户端等待最多 60 秒（排队和网络仍可能额外耗时）。</p></section>
+<pre>{"schema_version":"model-review.v1","kind":"bill","text":"虚构账单：供应商要求将1280元货款改付到个人账户，请核查。","data_mode":"SYNTHETIC_REPLAY","execution_mode":"PAPER","capability":"REVIEW_ONLY","idempotency_key":"idem-demo-001"}</pre>
+<p class="muted">kind 可填 bill、news 或 combined。data_mode 用 FIXTURE、LIVE、SYNTHETIC_REPLAY 或 REFERENCE_FIXTURE；execution_mode 当前固定为 PAPER，真实执行只能由 Gateway 决定。每个 IP 每分钟最多提交 6 个复核任务；限流返回 429。每项任务默认最多调用模型 2 次，受总超时限制，并遵守上游 Retry-After；耗尽时间后直接失败，不继续重试。成功记录见 model.model_response.attempt_count / retry_count，失败记录见 model.response，审计也会留痕。重复请求应复用同一个 Idempotency-Key；换请求内容会返回冲突。当前云端全部尝试共用 45 秒预算；建议客户端等待最多 60 秒（排队和网络仍可能额外耗时）。</p></section>
 <section><h2>旧工作台兼容入口</h2><p><strong>POST</strong> <code>/api/review/legacy</code> 接收旧版的 <code>{"question":"..."}</code>，返回 <code>legacy-review.v0</code> 适配结果；内部仍使用同一条 <code>review-workflow.v1</code>，仍然必须经过 Unified Risk，<code>execution_allowed</code> 固定为 <code>false</code>。</p></section>
 <section><h2>现在试一下</h2><label for="content">待复核内容</label>
 <textarea id="content" maxlength="20000">虚构账单：演示供应商的一笔1280元货款原约定支付到公司账户，今天邮件突然要求改付个人账户，并催促立即转账。请核查风险。</textarea>
@@ -26,7 +26,7 @@ export const reviewDocs = String.raw`<!doctype html>
 <section><h2>前端接入</h2><pre id="snippet"></pre>
 <p>模型内容：<code>model.model_response.raw_text</code>；真实调用标记：<code>model.source === "model"</code> 且 <code>model.model_response.call_succeeded === true</code>。</p>
 <p>拟议动作：<code>proposed_action</code>；运行编号：<code>run_id</code>；审计记录：<code>audit</code>。Risk 对接包在 <code>risk_handoff</code>，需要你们的网关继续检查。</p>
-<p class="muted">模型失败返回非 200 和 error，不会用规则结果替代。raw_text_format 为 provider_json_serialized 时，raw_text 是模型服务返回 JSON 的原样序列化。平台有每日免费额度，额度耗尽时调用会失败。</p>
+<p class="muted">模型失败返回非 200 和 error，不会自动用规则结果替代。只有后端同时显式开启 MODEL_FALLBACK_TO_RULES=true 且请求明确声明 allow_rule_fallback=true 时，才会生成带有 rule_fallback 来源标记的降级结果；参赛线上模式应保持关闭。raw_text_format 为 provider_json_serialized 时，raw_text 是模型服务返回 JSON 的原样序列化。平台有每日免费额度，额度耗尽时调用会失败。</p>
 <p><a href="/health" target="_blank" rel="noopener">查看服务状态</a></p></section>
 <script>
 const endpoint = location.origin + '/api/review';

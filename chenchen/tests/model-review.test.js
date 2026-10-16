@@ -96,7 +96,7 @@ test("model failure is explicit unless rule fallback is requested", async () => 
     }
   );
 
-  const fallback = await runReview({ kind: "news", text: "这条内容提到疑似诈骗，需要核查。", allow_rule_fallback: true }, {}, {
+  const fallback = await runReview({ kind: "news", text: "这条内容提到疑似诈骗，需要核查。", allow_rule_fallback: true }, { MODEL_FALLBACK_TO_RULES: "true" }, {
     fetchImpl: async () => { throw new Error("should not be called without configuration"); }
   });
   assert.equal(fallback.source, "rule_fallback");

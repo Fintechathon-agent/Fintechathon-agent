@@ -22,11 +22,19 @@
         "handoff_version",
         "contract_version",
         "workflow_version",
+        "schema_version",
         "handoff_id",
         "task_id",
         "request_id",
+        "session_id",
         "run_id",
         "audit_id",
+        "data_mode",
+        "execution_mode",
+        "capability",
+        "plan_id",
+        "plan_hash",
+        "policy_version",
         "owner",
         "record_endpoint",
         "workflow_status",
@@ -40,6 +48,8 @@
         "evidence",
         "approval",
         "audit",
+        "memory_write_status",
+        "trace",
         "callback"
       ],
       "properties": {
@@ -55,6 +65,9 @@
         },
         "workflow_version": {
           "const": "review-workflow.v1"
+        },
+        "schema_version": {
+          "const": "model-review.v1"
         },
         "handoff_id": {
           "type": "string",
@@ -74,6 +87,7 @@
           "maxLength": 500,
           "pattern": "\\S"
         },
+        "session_id": { "type": ["string", "null"] },
         "run_id": {
           "type": "string",
           "minLength": 1,
@@ -86,6 +100,14 @@
           "maxLength": 500,
           "pattern": "\\S"
         },
+        "data_mode": { "type": "string" },
+        "execution_mode": { "const": "PAPER" },
+        "capability": { "type": "string" },
+        "portfolio_snapshot_id": { "type": ["string", "null"] },
+        "risk_profile_version": { "type": ["string", "null"] },
+        "plan_id": { "type": ["string", "null"] },
+        "plan_hash": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "policy_version": { "type": ["string", "null"] },
         "owner": {
           "type": "string",
           "minLength": 1,
@@ -107,6 +129,7 @@
             "FUNDING_BLOCKED",
             "CANCELLED",
             "REJECTED",
+            "EXPIRED",
             "MODEL_FAILED"
           ]
         },
@@ -169,6 +192,9 @@
             "call_succeeded": {
               "type": "boolean"
             },
+            "data_mode": { "type": "string" },
+            "execution_mode": { "const": "PAPER" },
+            "capability": { "type": "string" },
             "attempt_count": {
               "type": "integer",
               "minimum": 1
@@ -208,11 +234,28 @@
                 "string",
                 "null"
               ]
-            }
+            },
+            "plan_id": { "type": ["string", "null"] },
+            "plan_hash": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+            "policy_version": { "type": ["string", "null"] }
           }
         },
         "approval": {
           "$ref": "model-review.v1.schema.json#/$defs/ApprovalState"
+        },
+        "memory_write_status": { "type": "string", "enum": ["NOT_REQUESTED", "PENDING", "WRITTEN", "UNAVAILABLE", "FAILED"] },
+        "trace": {
+          "type": "object",
+          "required": ["schema_version", "request_id", "task_id", "session_id", "run_id", "audit_id", "handoff_id"],
+          "properties": {
+            "schema_version": { "const": "model-review.v1" },
+            "request_id": { "type": "string" },
+            "task_id": { "type": "string" },
+            "session_id": { "type": ["string", "null"] },
+            "run_id": { "type": "string" },
+            "audit_id": { "type": "string" },
+            "handoff_id": { "type": "string" }
+          }
         },
         "audit": {
           "type": "object",

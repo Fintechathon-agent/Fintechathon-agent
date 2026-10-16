@@ -80,10 +80,24 @@ PowerShell 调用示例：
 
 待确认的兼容缺口（记录问题，不修改实现）：
 
-- RiskHandoff 内无 request_id，消费必须保留父 Response.trace/audit_evidence 或 bridge.source；Risk Owner 需确认接收及 review_status/rejection_reason/decision 回写 Contract，当前回写未冻结。
+- 旧版基础响应的 RiskHandoff 字段仍需按父 Response.trace/audit_evidence 兼容读取；`risk-handoff.v1` 已补齐 request/task/session、plan/policy、Memory 状态和统一 trace，但 Risk Owner 仍需确认正式签名、权限及 review_status/rejection_reason/decision 回写 Contract。
 - Schema 未强制跨对象 ID 相等、checkpoint 引用有效及条件 evidence 完整；本轮检查验证成功路径，不代表所有输入均由 Schema 保护。Backend Owner 需确定语义校验层。
 - Contract 任务的工具失败现在会先把 request_id 绑定到 TaskState；失败信封带 task/session/audit trace，审计事件 payload 逐条保留当次 request_id。Schema 校验尚未创建任务，部分 404/503 非 Contract 路由仍使用简化错误。
 - 同 task 续跑 audit_id 保持不变，审计信封 request_id 更新为最新请求；历史事件仍保留各自的 request_id。跨请求的顶层审计读取仍表示最近一次请求，这是读取语义，不覆盖历史事件归因。
 - Session、TaskState、AuditEvidence 目前驻留内存。长期 checkpoint/audit 存储和跨进程恢复尚未实现；不得混用 Memory 生命周期规则。
 
 证据：investment-agent.v1.schema.json、investment-contract.js、../core/harness.js、../integrations/risk-workbench-adapter.js、../tests/contracts.test.js、../tests/http.test.js、../docs/core-agent-verification-2026-10-10.md。
+
+## 2026-10-16 集成评审补齐项
+
+`review-workflow.v1` 现在把模型复核、Risk Handoff、审批、模拟执行和审计放在同一个 task/session/run/audit 关联下，并固定以下边界：
+
+- `schema_version=model-review.v1`、`data_mode`、`execution_mode=PAPER`、`capability`、`risk_profile_version`、`plan_id/plan_hash`、`policy_version` 会随任务保存并进入 Handoff。模型只生成拟议动作，`execution_allowed` 始终为 `false`。
+- `Idempotency-Key` 或请求体 `idempotency_key` 会绑定原始任务。相同键和相同输入返回原任务；相同键换输入返回 `IDEMPOTENCY_CONFLICT`，不会新建第二个任务。
+- Risk 通过后，审批记录带 `expires_at`；过期会进入 `EXPIRED`，模拟执行和后续审批均停止。审批、Risk 和模拟执行必须使用同一个 `plan_hash/proposal_sha256`。
+- Memory 仍遵守原有的显式同意规则。没有同意时状态为 `NOT_REQUESTED`；有同意但没有写入器时明确记录 `UNAVAILABLE`，不会伪造持久化成功。成功写入会记录 `memory_id` 和审计事件。
+- 模型失败默认直接返回统一错误并写入阻断记录。规则降级必须同时由后端配置和请求显式开启，线上参赛模式保持关闭。
+
+对应的 T01-T14 验收位于 `tests/finance-lab-review-gate.test.js`，覆盖缺字段、契约绑定、Risk、审批、执行阻断、Memory、审计追踪、篡改、回调串单、降级、超时审批、幂等和模型失败。
+
+公网验证：Cloudflare Worker 版本 `5b81c8c3-d1f5-4123-8c35-ed0472cab5a6` 已通过健康检查、文档入口、同幂等键重放和换内容冲突检查。公网验证只使用合成数据；任务保持 `execution.status=BLOCKED`，没有开启真实执行。详见 `docs/public-integration-review-verification-2026-10-16.json` 和 `logs/Core-Agent-集成评审公网验证-2026-10-16.txt`。

@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-16",
+  "public_url": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+  "worker_version": "5b81c8c3-d1f5-4123-8c35-ed0472cab5a6",
+  "scope": "synthetic public contract verification",
+  "checks": {
+    "health": "ok",
+    "docs_status": 200,
+    "review_status": 200,
+    "replay_status": 200,
+    "same_task_on_replay": true,
+    "changed_input_status": 409,
+    "changed_input_error_code": "IDEMPOTENCY_CONFLICT",
+    "schema_version": "model-review.v1",
+    "data_mode": "SYNTHETIC_REPLAY",
+    "execution_mode": "PAPER",
+    "execution_status": "BLOCKED",
+    "real_execution_enabled": false
+  },
+  "evidence": {
+    "idempotency_key": "review-gate-public-20261016-005",
+    "portfolio_snapshot_id": "synthetic-portfolio-20261016",
+    "plan_id": "plan-public-001",
+    "risk_profile_version": "risk-profile.v1",
+    "policy_version": "policy.v1"
+  },
+  "limitations": [
+    "本次只使用合成数据，不代表真实用户或真实行情验收。",
+    "公网请求通过本地代理完成，网络路径本身未作为验收对象。",
+    "正式 Risk 身份、审批身份、Safety Action Gateway 和跨进程持久化仍需其他 Owner 联合验收。"
+  ]
+}
