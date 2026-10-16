@@ -268,6 +268,8 @@ class ReviewWorkflowStore {
       data_mode: modelInput.data_mode,
       execution_mode: modelInput.execution_mode,
       capability: modelInput.capability,
+      scenario: modelInput.scenario,
+      output_contract: clone(review.output_contract),
       portfolio_snapshot_id: modelInput.portfolio_snapshot_id,
       risk_profile_version: modelInput.risk_profile_version,
       plan_id: planId,

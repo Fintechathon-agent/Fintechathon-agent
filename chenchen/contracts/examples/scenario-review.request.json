@@ -1,0 +1,25 @@
+{
+  "schema_version": "model-review.v1",
+  "request_id": "req-double11-demo-001",
+  "session_id": "session-double11-demo-001",
+  "data_mode": "SYNTHETIC_REPLAY",
+  "execution_mode": "PAPER",
+  "capability": "REVIEW_ONLY",
+  "idempotency_key": "idem-double11-demo-001",
+  "memory_consent": false,
+  "kind": "combined",
+  "scenario": "DOUBLE11_COMPARE",
+  "source": "team-demo",
+  "text": "虚构双十一商品优惠和日常订阅账单，请比较优惠，并判断是否会挤占本月生活预算。",
+  "requested_action": "整理优惠信息并检查资金用途冲突",
+  "output_formats": ["json", "xlsx", "chart"],
+  "action_parameters": {
+    "amount": 399,
+    "currency": "CNY",
+    "synthetic": true
+  },
+  "context": {
+    "user_goal": "在不影响房租和日常生活的前提下判断是否购买",
+    "synthetic": true
+  }
+}

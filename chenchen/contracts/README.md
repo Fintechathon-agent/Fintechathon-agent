@@ -105,5 +105,7 @@ PowerShell 调用示例：
 ## 2026-10-16 Owner Bridge 补齐项
 
 - `owner-bridge.v1` 为独立 Risk Owner 提供签名交接、上游响应和失败留痕；`POST /api/review/risk-dispatch` 未配置地址或 HMAC secret 时返回 `RISK_OWNER_NOT_CONFIGURED`，任务保留 `risk.handoff.dispatch_failed`，不会假装送达。
+- `scenario` 为统一对话的场景标记，当前支持 `GENERAL_REVIEW`、`FUNDING_CONFLICT`、`DOUBLE11_COMPARE`、`SUBSCRIPTION_REVIEW`；它只帮助 Core Agent 分流，不改变 Quant 计算或 Memory 规则。
+- `agent-output.v1` 约定下游转换接口的格式请求。Core Agent 当前直接提供 JSON；请求 PDF、PPTX、DOCX、XLSX 或图形时返回 `PENDING_CONVERTER`，不会伪造文件已经生成。
 - `RISK_SERVICE_HMAC_SECRET` 配置后，Risk 决策/回调必须携带 `X-Risk-Signature`；`APPROVAL_SERVICE_HMAC_SECRET` 配置后，审批必须携带 `X-Approval-Signature`。当前未配置时仅标记 `DEMO_UNVERIFIED`，不把演示身份描述为正式认证。
 - Owner 地址、密钥和权限仍属于对应 Owner 的部署责任；Safety Action Gateway 未接入前，`execution_allowed=false` 和 `/api/paper-trade/execute` 的阻断继续保留。

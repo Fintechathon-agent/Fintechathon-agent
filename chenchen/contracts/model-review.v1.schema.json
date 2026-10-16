@@ -27,6 +27,7 @@
         "session_id": { "type": ["string", "null"] },
         "source_task_id": { "type": ["string", "null"] },
         "kind": { "type": "string", "enum": ["bill", "news", "combined"] },
+        "scenario": { "type": "string", "enum": ["GENERAL_REVIEW", "FUNDING_CONFLICT", "DOUBLE11_COMPARE", "SUBSCRIPTION_REVIEW"] },
         "source": { "type": ["string", "null"] },
         "text": { "type": "string", "minLength": 1, "maxLength": 20000 },
         "requested_action": { "type": ["string", "null"] },
@@ -43,6 +44,7 @@
         "policy_version": { "type": ["string", "null"] },
         "idempotency_key": { "type": ["string", "null"] },
         "memory_consent": { "type": "boolean" }
+        ,"output_formats": { "type": "array", "items": { "enum": ["json", "pdf", "pptx", "docx", "xlsx", "chart"] }, "minItems": 1, "uniqueItems": true }
       }
     },
     "WorkflowRecord": {
@@ -56,6 +58,7 @@
         "run_id": { "type": "string" },
         "session_id": { "type": ["string", "null"] },
         "source_task_id": { "type": ["string", "null"] },
+        "scenario": { "type": "string", "enum": ["GENERAL_REVIEW", "FUNDING_CONFLICT", "DOUBLE11_COMPARE", "SUBSCRIPTION_REVIEW"] },
         "data_mode": { "type": "string" },
         "execution_mode": { "const": "PAPER" },
         "capability": { "type": "string" },
@@ -65,6 +68,7 @@
         "plan_hash": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
         "policy_version": { "type": ["string", "null"] },
         "idempotency_key": { "type": ["string", "null"] },
+        "output_contract": { "$ref": "agent-output.v1.schema.json#/$defs/OutputContract" },
         "memory_consent": { "type": "boolean" },
         "memory_write_status": { "type": "string", "enum": ["NOT_REQUESTED", "PENDING", "WRITTEN", "UNAVAILABLE", "FAILED"] },
         "status": { "type": "string", "enum": ["PENDING_RISK", "PENDING_APPROVAL", "READY_FOR_SIMULATION", "SIMULATED", "REJECTED", "EXPIRED", "MODEL_FAILED", "FUNDING_BLOCKED", "CANCELLED"] },

@@ -29,6 +29,8 @@ function buildRiskHandoffPackage(record) {
     data_mode: record.data_mode || "FIXTURE",
     execution_mode: record.execution_mode || "PAPER",
     capability: record.capability || "REVIEW_ONLY",
+    ...(record.scenario ? { scenario: record.scenario } : {}),
+    ...(record.output_contract ? { output_contract: record.output_contract } : {}),
     portfolio_snapshot_id: record.portfolio_snapshot_id || null,
     risk_profile_version: record.risk_profile_version || null,
     plan_id: record.plan_id || null,

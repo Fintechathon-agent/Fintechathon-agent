@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/agent-output.v1.schema.json",
+  "title": "Core Agent output conversion contract",
+  "description": "A shared declaration for downstream renderers. JSON is the only Core Agent output currently available; other formats stay explicitly pending until a converter is connected.",
+  "type": "object",
+  "$defs": {
+    "OutputContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_version", "requested_formats", "available_formats", "status", "pending_formats", "side_effects"],
+      "properties": {
+        "contract_version": { "const": "agent-output.v1" },
+        "requested_formats": { "type": "array", "items": { "enum": ["json", "pdf", "pptx", "docx", "xlsx", "chart"] }, "minItems": 1, "uniqueItems": true },
+        "available_formats": { "type": "array", "items": { "enum": ["json", "pdf", "pptx", "docx", "xlsx", "chart"] }, "minItems": 1, "uniqueItems": true },
+        "status": { "enum": ["READY", "PENDING_CONVERTER"] },
+        "pending_formats": { "type": "array", "items": { "enum": ["pdf", "pptx", "docx", "xlsx", "chart"] }, "uniqueItems": true },
+        "side_effects": { "const": false }
+      }
+    }
+  }
+}

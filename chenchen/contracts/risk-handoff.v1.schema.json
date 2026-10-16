@@ -117,6 +117,8 @@
         "data_mode": { "type": "string" },
         "execution_mode": { "const": "PAPER" },
         "capability": { "type": "string" },
+        "scenario": { "type": "string", "enum": ["GENERAL_REVIEW", "FUNDING_CONFLICT", "DOUBLE11_COMPARE", "SUBSCRIPTION_REVIEW"] },
+        "output_contract": { "$ref": "agent-output.v1.schema.json#/$defs/OutputContract" },
         "portfolio_snapshot_id": { "type": ["string", "null"] },
         "risk_profile_version": { "type": ["string", "null"] },
         "plan_id": { "type": ["string", "null"] },

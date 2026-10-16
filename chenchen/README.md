@@ -186,6 +186,10 @@ Invoke-RestMethod `
 
 Cloudflare Worker 需要额外配置 `MODEL_API_KEY` Secret；`MODEL_API_URL`、`MODEL_API_STYLE` 和 `MODEL_NAME` 可以作为 Worker Variables 配置。若设置了 `CORE_AGENT_API_KEY`，调用方还必须携带 `X-Core-Agent-Key`。
 
+国内模型配置：Core Agent 使用同一套 `model-review.v1` 请求和 Risk/审批边界，也支持 DeepSeek 的 OpenAI 兼容接口。后端配置 `MODEL_PROVIDER=deepseek`、`MODEL_API_KEY`、`MODEL_NAME=deepseek-chat` 即可；默认地址为 `https://api.deepseek.com/chat/completions`，默认输出格式为 JSON。密钥只放在部署平台 Secret 中，不提交到 GitHub。当前公网演示继续使用已验证的 Workers AI，切换模型只改变后端配置，不改变主链路。
+
+场景和输出约定：`scenario` 支持 `GENERAL_REVIEW`、`FUNDING_CONFLICT`、`DOUBLE11_COMPARE`、`SUBSCRIPTION_REVIEW`，用于让 Core Agent 把统一对话分流给对应业务模块。`output_formats` 支持 `json`、`pdf`、`pptx`、`docx`、`xlsx`、`chart`；本轮 Core Agent 只直接提供 JSON，其余格式会返回 `agent-output.v1` 的 `PENDING_CONVERTER`，等待统一转换模块接入，不会把未生成的文件显示为成功。
+
 投资健康检查使用 contracts/investment-agent.v1.schema.json 定义的统一信封；请求示例和响应示例分别在 contracts/examples/health-check.request.json、contracts/examples/health-check.response.json。Agent 只发送 contract_version、request_id、operation、context、input；Backend 校验后返回 task_state、artifacts、tool_results 和 risk_handoff。请求可以附带 data/market-brief-2026-10-08.json 这类市场上下文，Core Agent 只传递和标记异常，不重新计算 Quant。Risk 只消费 risk_handoff.evidence，且 execution_allowed 固定为 false。缺少版本或使用旧的裸字段请求会返回 422 INVALID_CONTRACT。完整字段说明见 contracts/README.md。
 
 所有新文件与变更均限定在 chenchen/。

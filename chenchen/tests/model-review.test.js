@@ -5,6 +5,7 @@ const test = require("node:test");
 const {
   buildModelRequest,
   buildReviewError,
+  buildOutputContract,
   normalizeReviewInput,
   resolveModelConfig,
   runReview
@@ -169,6 +170,34 @@ test("attempt configuration is bounded and fractional configuration cannot skip 
   }
   assert.equal(resolveModelConfig({ MODEL_MAX_ATTEMPTS: "1" }).maxAttempts, 1);
   assert.equal(resolveModelConfig({ MODEL_MAX_ATTEMPTS: "50" }).maxAttempts, 3);
+});
+
+test("DeepSeek uses the domestic chat endpoint and keeps the shared JSON contract", () => {
+  const config = resolveModelConfig({ MODEL_PROVIDER: "deepseek", MODEL_API_KEY: "deepseek-test", MODEL_NAME: "deepseek-chat" });
+  assert.equal(config.provider, "deepseek");
+  assert.equal(config.endpoint, "https://api.deepseek.com/chat/completions");
+  assert.equal(config.style, "chat_completions");
+  assert.equal(config.responseFormat, "json_object");
+  assert.equal(config.model, "deepseek-chat");
+});
+
+test("scenario routing and output conversion stay explicit", () => {
+  const input = normalizeReviewInput({
+    kind: "combined",
+    scenario: "DOUBLE11_COMPARE",
+    output_formats: ["json", "xlsx", "chart"],
+    text: "虚构双十一商品和订阅账单，请比较优惠并检查是否挤占生活预算。"
+  });
+  assert.equal(input.scenario, "DOUBLE11_COMPARE");
+  assert.deepEqual(input.output_formats, ["json", "xlsx", "chart"]);
+  assert.deepEqual(buildOutputContract(input), {
+    contract_version: "agent-output.v1",
+    requested_formats: ["json", "xlsx", "chart"],
+    available_formats: ["json"],
+    status: "PENDING_CONVERTER",
+    pending_formats: ["xlsx", "chart"],
+    side_effects: false
+  });
 });
 
 test("persistent transient failures stop at the cap and retain retry evidence", async () => {

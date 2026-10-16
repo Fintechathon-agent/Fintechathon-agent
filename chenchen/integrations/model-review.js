@@ -2,12 +2,16 @@
 
 const ACTIONS = ["NO_ACTION", "REQUEST_MORE_INFO", "HOLD_FOR_REVIEW", "FLAG_FOR_RISK"];
 const KINDS = ["bill", "news", "combined"];
+const SCENARIOS = ["GENERAL_REVIEW", "FUNDING_CONFLICT", "DOUBLE11_COMPARE", "SUBSCRIPTION_REVIEW"];
+const OUTPUT_FORMATS = ["json", "pdf", "pptx", "docx", "xlsx", "chart"];
 const REVIEW_VERSION = "model-review.v1";
+const OUTPUT_CONTRACT_VERSION = "agent-output.v1";
 const MAX_TEXT_LENGTH = 20000;
 const MAX_CONTEXT_LENGTH = 12000;
 const DEFAULT_MODEL = "gpt-5.6-terra";
 const DEFAULT_RESPONSES_URL = "https://api.openai.com/v1/responses";
 const DEFAULT_CHAT_URL = "https://api.openai.com/v1/chat/completions";
+const DEFAULT_DEEPSEEK_CHAT_URL = "https://api.deepseek.com/chat/completions";
 const DATA_MODES = ["FIXTURE", "LIVE", "SYNTHETIC_REPLAY", "REFERENCE_FIXTURE"];
 const EXECUTION_MODES = ["PAPER"];
 const CAPABILITIES = ["REVIEW_ONLY", "SIMULATION_ONLY"];
@@ -96,6 +100,35 @@ function objectValue(value, field) {
   return clone(value);
 }
 
+function outputFormatsValue(value) {
+  if (value === undefined || value === null) return ["json"];
+  if (!Array.isArray(value) || value.length === 0 || value.length > OUTPUT_FORMATS.length) {
+    throw new ReviewError("INVALID_REVIEW_INPUT", "output_formats must be a non-empty array of supported formats", {
+      statusCode: 422, stage: "VALIDATION", recovery: "Use one or more of json, pdf, pptx, docx, xlsx, or chart."
+    });
+  }
+  const normalized = [...new Set(value.map(item => typeof item === "string" ? item.trim().toLowerCase() : item))];
+  if (normalized.some(item => !OUTPUT_FORMATS.includes(item))) {
+    throw new ReviewError("INVALID_REVIEW_INPUT", "output_formats contains an unsupported format", {
+      statusCode: 422, stage: "VALIDATION", recovery: "Use one or more of json, pdf, pptx, docx, xlsx, or chart.",
+      details: { supported: OUTPUT_FORMATS }
+    });
+  }
+  return normalized;
+}
+
+function buildOutputContract(input) {
+  const pendingFormats = input.output_formats.filter(format => format !== "json");
+  return {
+    contract_version: OUTPUT_CONTRACT_VERSION,
+    requested_formats: [...input.output_formats],
+    available_formats: ["json"],
+    status: pendingFormats.length ? "PENDING_CONVERTER" : "READY",
+    pending_formats: pendingFormats,
+    side_effects: false
+  };
+}
+
 function normalizeReviewInput(input = {}) {
   if (!input || typeof input !== "object" || Array.isArray(input)) throw new ReviewError("INVALID_REVIEW_INPUT", "review body must be a JSON object", { statusCode: 422, stage: "VALIDATION", recovery: "Send a JSON object with kind and text." });
   const body = input.input && typeof input.input === "object" && !Array.isArray(input.input) ? { ...input, ...input.input } : input;
@@ -136,6 +169,12 @@ function normalizeReviewInput(input = {}) {
       statusCode: 422, stage: "VALIDATION", recovery: "Use the hash of the proposed plan or omit it before planning."
     });
   }
+  const scenario = stringValue(body.scenario ?? body.context?.scenario, "scenario", { max: 60 }) || "GENERAL_REVIEW";
+  if (!SCENARIOS.includes(scenario)) {
+    throw new ReviewError("INVALID_REVIEW_INPUT", "scenario is not supported", {
+      statusCode: 422, stage: "VALIDATION", recovery: "Use GENERAL_REVIEW, FUNDING_CONFLICT, DOUBLE11_COMPARE, or SUBSCRIPTION_REVIEW."
+    });
+  }
   return {
     schema_version: schemaVersion,
     request_id: stringValue(body.request_id, "request_id", { max: 200 }),
@@ -158,7 +197,9 @@ function normalizeReviewInput(input = {}) {
     plan_hash: planHash,
     policy_version: stringValue(body.policy_version, "policy_version", { max: 100 }) || DEFAULT_POLICY_VERSION,
     idempotency_key: stringValue(body.idempotency_key, "idempotency_key", { max: 200 }),
-    memory_consent: body.memory_consent === true
+    memory_consent: body.memory_consent === true,
+    scenario,
+    output_formats: outputFormatsValue(body.output_formats ?? body.context?.output_formats)
   };
 }
 
@@ -171,16 +212,18 @@ function envString(env, keys, fallback = "") {
 }
 
 function resolveModelConfig(env = {}) {
-  const workersAI = envString(env, ["MODEL_PROVIDER"]) === "workers_ai";
+  const providerName = envString(env, ["MODEL_PROVIDER"], "").toLowerCase();
+  const workersAI = providerName === "workers_ai";
+  const deepseek = providerName === "deepseek";
   const styleFromEnv = envString(env, ["MODEL_API_STYLE"], "").toLowerCase();
   const rawUrl = envString(env, ["MODEL_API_URL", "OPENAI_BASE_URL"], "");
   const style = styleFromEnv || (rawUrl.includes("/responses") ? "responses" : "chat_completions");
-  const endpoint = rawUrl || (style === "responses" ? DEFAULT_RESPONSES_URL : DEFAULT_CHAT_URL);
+  const endpoint = rawUrl || (deepseek ? DEFAULT_DEEPSEEK_CHAT_URL : style === "responses" ? DEFAULT_RESPONSES_URL : DEFAULT_CHAT_URL);
   const responseFormat = envString(env, ["MODEL_RESPONSE_FORMAT"], style === "responses" ? "json_schema" : "json_object").toLowerCase();
   const timeoutMs = Number(envString(env, ["MODEL_TIMEOUT_MS"], "30000"));
   const maxAttempts = Number(envString(env, ["MODEL_MAX_ATTEMPTS"], "2"));
   return {
-    provider: workersAI ? "cloudflare_workers_ai" : "http",
+    provider: workersAI ? "cloudflare_workers_ai" : deepseek ? "deepseek" : providerName || "http",
     apiKey: envString(env, ["MODEL_API_KEY", "OPENAI_API_KEY"]),
     endpoint: workersAI ? "cloudflare:AI" : endpoint,
     model: envString(env, ["MODEL_NAME", "OPENAI_MODEL"], workersAI ? "@cf/meta/llama-3.3-70b-instruct-fp8-fast" : DEFAULT_MODEL),
@@ -213,10 +256,12 @@ function buildUserPrompt(input) {
     "Return only the JSON object requested by the system instructions.",
     JSON.stringify({
       kind: input.kind,
+      scenario: input.scenario,
       source: input.source,
       requested_action: input.requested_action,
       action_parameters: input.action_parameters,
       context: input.context,
+      requested_output_formats: input.output_formats,
       untrusted_content: input.text
     })
   ].join("\n");
@@ -374,6 +419,8 @@ function gatewayCheck(proposal, input) {
     data_mode: input.data_mode,
     execution_mode: input.execution_mode,
     capability: input.capability,
+    scenario: input.scenario,
+    output_contract_version: OUTPUT_CONTRACT_VERSION,
     execution_allowed: false,
     checks: [
       { name: "proposal_schema", passed: true },
@@ -386,6 +433,7 @@ function gatewayCheck(proposal, input) {
 
 async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {}) {
   const normalized = normalizeReviewInput(input);
+  const outputContract = buildOutputContract(normalized);
   const runId = randomId("review-");
   const auditId = randomId("audit-");
   const createdAt = new Date().toISOString();
@@ -476,6 +524,8 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
           data_mode: normalized.data_mode,
           execution_mode: normalized.execution_mode,
           capability: normalized.capability,
+          scenario: normalized.scenario,
+          output_formats: normalized.output_formats,
           portfolio_snapshot_id: normalized.portfolio_snapshot_id,
           risk_profile_version: normalized.risk_profile_version,
           plan_id: normalized.plan_id,
@@ -514,6 +564,8 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
     run_id: runId,
     request_id: normalized.request_id,
     task_id: normalized.task_id,
+    scenario: normalized.scenario,
+    output_contract: outputContract,
     status: source === "model" ? "PROPOSED" : "DEGRADED_RULE_FALLBACK",
     source,
     created_at: createdAt,
@@ -527,6 +579,8 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
       data_mode: normalized.data_mode,
       execution_mode: normalized.execution_mode,
       capability: normalized.capability,
+      scenario: normalized.scenario,
+      output_formats: normalized.output_formats,
       portfolio_snapshot_id: normalized.portfolio_snapshot_id,
       risk_profile_version: normalized.risk_profile_version,
       plan_id: normalized.plan_id,
@@ -540,6 +594,7 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
       data_mode: normalized.data_mode,
       execution_mode: normalized.execution_mode,
       capability: normalized.capability,
+      scenario: normalized.scenario,
       endpoint: config.endpoint,
       api_style: config.style,
       response_format: config.responseFormat,
@@ -598,6 +653,9 @@ function buildReviewError(error) {
 module.exports = {
   ACTIONS,
   KINDS,
+  SCENARIOS,
+  OUTPUT_FORMATS,
+  OUTPUT_CONTRACT_VERSION,
   DATA_MODES,
   EXECUTION_MODES,
   CAPABILITIES,
@@ -605,6 +663,7 @@ module.exports = {
   REVIEW_SCHEMA,
   ReviewError,
   normalizeReviewInput,
+  buildOutputContract,
   resolveModelConfig,
   buildModelRequest,
   normalizeProposal,
