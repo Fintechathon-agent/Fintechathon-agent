@@ -32,6 +32,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--config", default="", help="配置文件路径（默认自动选择）")
+    parser.add_argument(
+        "--cors-origin",
+        default=os.environ.get("FINANCE_LAB_CORS_ORIGIN", ""),
+        help="可选：允许 Preview 静态站点访问 API 的精确 Origin",
+    )
     parser.add_argument("--no-open", action="store_true", help="不自动打开浏览器")
     parser.add_argument("--no-key", action="store_true", help="不注入本机凭据，强制规则决策")
     args = parser.parse_args(argv)
@@ -44,6 +49,8 @@ def main(argv: list[str] | None = None) -> int:
     config = args.config or str(ROOT / "config.fund.yaml")
 
     serve_argv = ["--host", args.host, "--port", str(args.port), "--config", config]
+    if args.cors_origin:
+        serve_argv.extend(["--cors-origin", args.cors_origin])
     if not args.no_open:
         serve_argv.append("--open")
 

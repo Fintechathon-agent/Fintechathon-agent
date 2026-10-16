@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 import threading
 import time
@@ -26,7 +27,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Optional
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 _ROOT = Path(__file__).resolve().parent.parent
 if str(_ROOT) not in sys.path:
@@ -49,6 +50,11 @@ from web.demo_data import (                              # noqa: E402
     recompute_portfolio,
     response_dict,
     tier_of,
+)
+from web.preview_contract import (                       # noqa: E402
+    error_response as preview_error_response,
+    health_check_response,
+    portfolio_contract_from_dict,
 )
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -168,6 +174,7 @@ class DemoApp:
             last_health=None,
             last_review=None,
             approval_meta={},
+            preview_tasks={},
             lock=threading.RLock(),
         )
 
@@ -835,6 +842,35 @@ class DemoApp:
             out.append(item)
         return out
 
+    # ---- isolated public Preview contract ----
+
+    def preview_portfolio(self) -> dict:
+        """Return the read-only portfolio shape consumed by the Pages Preview."""
+        with self.state.lock:
+            return {
+                "contract_version": "investment-agent.v1",
+                "data_mode": "SYNTHETIC_REPLAY",
+                "output": {"snapshot": portfolio_contract_from_dict(portfolio_dict(self.state.portfolio))},
+            }
+
+    def preview_health_check(self, payload: dict) -> dict:
+        """Run the Preview adapter and retain the task for process-local replay."""
+        with self.state.lock:
+            response = health_check_response(payload, portfolio_contract_from_dict(portfolio_dict(self.state.portfolio)))
+            task = response.get("task_state", {})
+            task_id = task.get("task_id")
+            if task_id:
+                self.state.preview_tasks[task_id] = response
+            return response
+
+    def preview_task(self, task_id: str) -> dict | None:
+        with self.state.lock:
+            return self.state.preview_tasks.get(task_id)
+
+    def preview_audit(self, task_id: str) -> dict | None:
+        task = self.preview_task(task_id)
+        return task.get("audit_evidence") if task else None
+
     def trades(self, limit: int = 100) -> list[dict]:
         d = Path(self.cfg.paper_trade_dir)
         rows: list[dict] = []
@@ -875,6 +911,15 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        # The isolated Pages Preview can be pointed at a separately hosted
+        # backend during integration.  CORS stays opt-in and origin-bound.
+        cors_origin = getattr(self.server, "cors_origin", "")
+        request_origin = self.headers.get("Origin", "")
+        if cors_origin and request_origin == cors_origin:
+            self.send_header("Access-Control-Allow-Origin", cors_origin)
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type")
+            self.send_header("Vary", "Origin")
         self.end_headers()
         try:
             self.wfile.write(body)
@@ -927,6 +972,9 @@ class Handler(BaseHTTPRequestHandler):
 
     # ---- 路由 ----
 
+    def do_OPTIONS(self) -> None:      # noqa: N802
+        self._send(204, b"", "text/plain; charset=utf-8")
+
     def do_GET(self) -> None:      # noqa: N802
         path = urlparse(self.path).path
         try:
@@ -950,6 +998,22 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"trades": self.app.trades()})
             if path == "/api/brief":
                 return self._json(self.app.brief())
+            if path == "/api/demo/portfolio":
+                return self._json(self.app.preview_portfolio())
+            if path.startswith("/api/task/"):
+                task_id = unquote(path[len("/api/task/"):])
+                if task_id.endswith("/export"):
+                    task_id = task_id[:-len("/export")].rstrip("/")
+                task = self.app.preview_task(task_id)
+                if task is None:
+                    return self._json(preview_error_response("任务不存在或已随本地服务重启清除。", "TASK_NOT_FOUND"), 404)
+                return self._json(task)
+            if path.startswith("/api/audit/"):
+                task_id = unquote(path[len("/api/audit/"):]).strip("/")
+                audit = self.app.preview_audit(task_id)
+                if audit is None:
+                    return self._json(preview_error_response("任务审计记录不存在或已随本地服务重启清除。", "AUDIT_NOT_FOUND"), 404)
+                return self._json(audit)
             if path == "/api/scenarios/boot":
                 from web.banking_service import scenario_overview
                 return self._json(scenario_overview())
@@ -966,6 +1030,10 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path == "/api/review":
                 return self._json(self.app.review(str(body.get("question", ""))))
+            if path == "/api/health-check/run":
+                if body.get("contract_version") != "investment-agent.v1" or body.get("operation") != "PORTFOLIO_HEALTH_CHECK":
+                    return self._json(preview_error_response("不支持的 Preview 请求契约。", "CONTRACT_UNSUPPORTED"), 400)
+                return self._json(self.app.preview_health_check(body))
             if path == "/api/decide":
                 return self._json(self.app.decide(body))
             if path == "/api/breaker/reset":
@@ -993,9 +1061,10 @@ class Server(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
 
-    def __init__(self, addr, handler, app: DemoApp):
+    def __init__(self, addr, handler, app: DemoApp, cors_origin: str = ""):
         super().__init__(addr, handler)
         self.app = app
+        self.cors_origin = cors_origin.strip()
 
 
 # ============================================================
@@ -1013,6 +1082,11 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765, help="起始端口，被占用则自动顺延")
     parser.add_argument("--config", default="", help="config.fund.yaml 路径")
+    parser.add_argument(
+        "--cors-origin",
+        default=os.environ.get("FINANCE_LAB_CORS_ORIGIN", ""),
+        help="可选：允许 Preview 静态站点访问 API 的精确 Origin",
+    )
     parser.add_argument(
         "--mode",
         choices=["demo", "live"],
@@ -1033,7 +1107,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     httpd: Optional[Server] = None
     for port in range(args.port, args.port + 20):
         try:
-            httpd = Server((args.host, port), Handler, app)
+            httpd = Server((args.host, port), Handler, app, cors_origin=args.cors_origin)
             break
         except OSError:
             continue

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>每日市场简报 · 2026-10-16</title>
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --bg: #FBFAF8;
+  --card: #FFFFFF;
+  --hero-bg: #F1EDE4;
+  --hero-tab: #F7F3EA;
+  --ink: #141413;
+  --text: #333331;
+  --text-2: #7A7A76;
+  --border: #E7E4DD;
+  --hair: #EFEDE8;
+  --primary: #2563EB;
+  --accent: #1E3A5F;
+  --up: #B4453A;
+  --down: #2D6A4F;
+  --code-bg: #F0EEE7;
+  --note-bg: #F7F5EF;
+  --serif: "Source Han Serif SC", "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --sans: "PingFang SC", "MiSans", "HarmonyOS Sans SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151514;
+    --card: #1D1D1B;
+    --hero-bg: #221F1A;
+    --hero-tab: #2A2620;
+    --ink: #ECEAE4;
+    --text: #CFCDC7;
+    --text-2: #8E8C86;
+    --border: #2E2D2A;
+    --hair: #262522;
+    --primary: #8AB0FF;
+    --accent: #A9C3E8;
+    --up: #DE857C;
+    --down: #7FBF9E;
+    --code-bg: #262623;
+    --note-bg: #201F1C;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 16px/1.75 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 56px 28px 88px;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 64px;
+  align-items: start;
+}
+/* ---------- 左侧目录 ---------- */
+.rail { position: sticky; top: 48px; }
+.rail-title {
+  font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--text-2); margin: 0 0 12px 14px;
+}
+.rail a {
+  display: flex; gap: 10px; align-items: baseline;
+  padding: 7px 0 7px 14px;
+  border-left: 2px solid transparent;
+  color: var(--text-2); text-decoration: none;
+  font-size: 13.5px; line-height: 1.5;
+  transition: color .15s ease, border-color .15s ease;
+}
+.rail a .n { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.rail a:hover,
+.rail a.on { color: var(--ink); border-left-color: var(--primary); }
+.rail a.on .n { color: var(--primary); }
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  background: var(--hero-bg);
+  border-radius: 20px;
+  padding: 30px 34px 26px;
+  box-shadow: 0 1px 2px rgba(20,20,19,.04), 0 10px 32px rgba(20,20,19,.05);
+}
+.hero::before {
+  content: "";
+  position: absolute; top: -9px; left: -9px; width: 150px; height: 46px;
+  background: var(--hero-tab); border-radius: 14px; z-index: 0;
+}
+.hero > * { position: relative; z-index: 1; }
+.hero-bar {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  margin-bottom: 12px;
+}
+.kicker {
+  font-size: 11px; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--primary);
+}
+.hero-read { font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
+.hero h1 {
+  margin: 4px 0 10px;
+  font-family: var(--serif); font-weight: 800;
+  font-size: clamp(34px, 5vw, 46px); line-height: 1.15; letter-spacing: .01em;
+  color: var(--ink);
+}
+.hero-sub { margin: 0; font-size: 14px; color: var(--text-2); }
+.hero-foot {
+  margin-top: 18px; padding-top: 14px;
+  border-top: 1px solid rgba(20,20,19,.08);
+  font-size: 12.5px; color: var(--text-2);
+}
+.hero-foot a { color: var(--primary); text-decoration: none; }
+.hero-foot a:hover { text-decoration: underline; }
+@media (prefers-color-scheme: dark) {
+  .hero-foot { border-top-color: rgba(236,234,228,.1); }
+}
+/* ---------- 区块 ---------- */
+.sec { margin-top: 64px; }
+.sec h2 {
+  margin: 8px 0 22px;
+  font-family: var(--serif); font-weight: 700;
+  font-size: 27px; line-height: 1.3; letter-spacing: .01em; color: var(--ink);
+}
+/* ---------- 表格 ---------- */
+.tbl-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 6px 8px;
+  overflow-x: auto;
+}
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tbl th {
+  text-align: left; font-weight: 500; font-size: 12.5px; color: var(--text-2);
+  padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.tbl td { padding: 11px 12px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl .asset { font-weight: 600; color: var(--ink); white-space: nowrap; }
+.tbl .val { color: var(--text); white-space: nowrap; }
+.tbl .chg { font-weight: 600; white-space: nowrap; }
+.tbl .up { color: var(--up); }
+.tbl .dn { color: var(--down); }
+.tbl .fl { color: var(--text-2); font-weight: 400; }
+.tbl .when { color: var(--text-2); font-size: 13px; }
+.mapping .l2 { white-space: nowrap; }
+.mapping .l2 code, .mapping .l3 code { white-space: nowrap; }
+/* ---------- 提示块 ---------- */
+.note {
+  margin: 16px 0 0;
+  background: var(--note-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px; line-height: 1.8; color: var(--text);
+}
+.note strong { color: var(--accent); font-weight: 600; }
+/* ---------- 异常波动 ---------- */
+.moves { list-style: none; margin: 0; padding: 0; }
+.moves li { padding: 18px 0; border-bottom: 1px solid var(--hair); }
+.moves li:last-child { border-bottom: 0; }
+.mv-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.mv-name { font-size: 15px; font-weight: 600; color: var(--ink); }
+.mv-pct { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.mv-pct.up { color: var(--up); }
+.mv-pct.dn { color: var(--down); }
+.mv-note { margin-top: 5px; font-size: 13.5px; line-height: 1.7; color: var(--text-2); }
+/* ---------- 财报 ---------- */
+.earn { margin: 0; padding: 0; }
+.earn-item { padding: 16px 0; border-bottom: 1px solid var(--hair); }
+.earn-item:last-child { border-bottom: 0; }
+.earn-item > p {
+  margin: 0; font-family: var(--serif);
+  font-size: 15.5px; line-height: 1.85; color: var(--text);
+}
+.earn-item > p::before {
+  content: ""; display: inline-block;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--primary); margin: 0 12px 3px 2px;
+}
+.earn .sub { list-style: none; margin: 10px 0 0; padding: 0 0 0 19px; }
+.earn .sub li {
+  position: relative; padding: 4px 0 4px 14px;
+  font-size: 13.5px; line-height: 1.8; color: var(--text-2);
+}
+.earn .sub li::before {
+  content: ""; position: absolute; left: 0; top: 15px;
+  width: 7px; height: 1px; background: var(--text-2);
+}
+/* ---------- 新闻 ---------- */
+.news { list-style: none; margin: 0; padding: 0; }
+.news li { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--hair); }
+.news li:last-child { border-bottom: 0; }
+.news .num {
+  flex: none; width: 24px; padding-top: 5px;
+  font-size: 12px; font-variant-numeric: tabular-nums; color: var(--text-2);
+}
+.news .txt { margin: 0; font-family: var(--serif); font-size: 15.5px; line-height: 1.85; }
+/* ---------- 一句解释 ---------- */
+.explain p {
+  margin: 0 0 20px; font-family: var(--serif);
+  font-size: 16px; line-height: 1.95; color: var(--text);
+}
+.explain p:last-child { margin-bottom: 0; }
+.explain strong, .news strong, .earn strong, .q-lead strong { color: var(--accent); font-weight: 600; }
+/* ---------- 今日问题 ---------- */
+.q-lead { margin: 0 0 10px; font-family: var(--serif); font-size: 16px; line-height: 1.95; }
+.q-lead:last-of-type { margin-bottom: 20px; }
+.opts { display: grid; gap: 12px; margin: 0 0 20px; }
+.opt {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 13px 16px;
+}
+.opt .k {
+  flex: none; width: 26px; height: 26px; margin-top: 1px;
+  display: grid; place-items: center;
+  background: var(--note-bg); border-radius: 8px;
+  font-size: 13px; font-weight: 700; color: var(--accent);
+}
+.opt p { margin: 0; font-size: 14.5px; line-height: 1.7; }
+.why {
+  background: var(--note-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 18px; font-size: 14px; line-height: 1.8;
+}
+.why b { color: var(--accent); font-weight: 600; }
+.why code, code {
+  font-family: var(--mono); font-size: 12.5px;
+  background: var(--code-bg); border-radius: 6px; padding: 1px 6px; color: #3A3A38;
+}
+@media (prefers-color-scheme: dark) { .why code, code { color: #C9C7C2; } }
+/* ---------- 页脚 ---------- */
+.foot {
+  margin-top: 72px; padding-top: 22px;
+  border-top: 1px solid var(--border);
+  font-size: 12.5px; line-height: 1.8; color: var(--text-2);
+}
+.foot p { margin: 0 0 6px; }
+/* ---------- 响应式 ---------- */
+@media (max-width: 1023px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); max-width: 720px; padding: 36px 20px 64px; }
+  .rail { display: none; }
+  .sec { margin-top: 52px; }
+  .hero { padding: 24px 22px 22px; }
+  .tbl { min-width: 560px; }
+}
+@page { size: A4; margin: 14mm 12mm; }
+@media print {
+  /* 打印/导出 PDF 一律锁定浅色：深色模式偏好会把变量染成浅字，落纸即不可读 */
+  :root {
+    --bg: #FBFAF8; --card: #FFFFFF; --hero-bg: #F1EDE4; --hero-tab: #F7F3EA;
+    --ink: #141413; --text: #333331; --text-2: #7A7A76;
+    --border: #E7E4DD; --hair: #EFEDE8;
+    --primary: #2563EB; --accent: #1E3A5F;
+    --up: #B4453A; --down: #2D6A4F;
+    --code-bg: #F0EEE7; --note-bg: #F7F5EF;
+  }
+  .rail { display: none; }
+  .wrap { display: block; max-width: none; padding: 0; }
+  body { background: #fff; }
+  .hero { box-shadow: none; border: 1px solid var(--border); }
+  .moves li, .news li, .earn-item, .opt { break-inside: avoid; }
+  /* 模块标题不单独落在页脚：标题+首个内容块至少同页可见 */
+  .sec { break-inside: auto; }
+  .sec > .kicker, .sec > h2 { break-after: avoid; }
+  /* 今日问题：题干与 A/B/C 选项必须同页，避免拆读 */
+  #s7 { break-inside: avoid; }
+  h2 { break-after: avoid; }
+  .tbl-card { break-inside: auto; }
+  .tbl thead { display: table-header-group; }
+  .tbl tr { break-inside: avoid; }
+  .note, .why, .opts { break-inside: avoid; }
+  .sec { margin-top: 40px; }
+  .foot { margin-top: 40px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="rail" aria-label="目录">
+    <p class="rail-title">目录 · Contents</p>
+    <a href="#s1"><span class="n">01</span><span>市场行情</span></a><a href="#s2"><span class="n">02</span><span>异常波动</span></a><a href="#s3"><span class="n">03</span><span>重要财报</span></a><a href="#s4"><span class="n">04</span><span>重大新闻</span></a><a href="#s5"><span class="n">05</span><span>一句解释</span></a><a href="#s6"><span class="n">06</span><span>Agent 映射</span></a><a href="#s7"><span class="n">07</span><span>今日问题</span></a>
+  </aside>
+  <main>
+    <header class="hero">
+      <div class="hero-bar">
+        <span class="kicker">Daily Briefing · 2026/10/16</span>
+        <span class="hero-read">约 7 分钟阅读 · 14 项行情</span>
+      </div>
+      <h1>每日市场简报</h1>
+      <p class="hero-sub">2026-10-16（周五）</p>
+      <p class="hero-foot">Personal AI Fund Manager · 每日 18:00 发布 · 数据经双源核验</p>
+    </header>
+<section class="sec" id="s1"><div class="kicker">01 · MARKET</div><h2>市场行情</h2><div class="tbl-card"><table class="tbl market"><thead><tr><th>资产</th><th>最新</th><th>涨跌</th><th>数据时间</th></tr></thead><tbody><tr><td class="asset">沪深300</td><td class="val">4170.6131</td><td class="chg up">+0.11%</td><td class="when">2026-10-16 15:35:39</td></tr><tr><td class="asset">上证指数</td><td class="val">3716.2842</td><td class="chg up">+0.24%</td><td class="when">2026-10-16 15:35:27</td></tr><tr><td class="asset">创业板指</td><td class="val">2772.384</td><td class="chg dn">-0.39%</td><td class="when">2026-10-16 15:00:03</td></tr><tr><td class="asset">恒生指数</td><td class="val">24186.83</td><td class="chg up">+0.52%</td><td class="when">2026-10-16 16:08:38</td></tr><tr><td class="asset">道琼斯</td><td class="val">52177.6914</td><td class="chg up">+1.08%</td><td class="when">2026-10-16 04:34:25</td></tr><tr><td class="asset">纳斯达克</td><td class="val">26713.0262</td><td class="chg up">+0.08%</td><td class="when">2026-10-16 09:49:53</td></tr><tr><td class="asset">标普500</td><td class="val">7744.0601</td><td class="chg up">+0.33%</td><td class="when">2026-10-16 04:34:03</td></tr><tr><td class="asset">COMEX黄金</td><td class="val">4203.51</td><td class="chg up">+0.80%</td><td class="when">2026-10-16 17:36:38</td></tr><tr><td class="asset">NYMEX原油</td><td class="val">97.006</td><td class="chg dn">-0.98%</td><td class="when">2026-10-16 17:35:51</td></tr><tr><td class="asset">COMEX白银</td><td class="val">57.974</td><td class="chg up">+1.43%</td><td class="when">2026-10-16 17:36:40</td></tr><tr><td class="asset">NYMEX天然气</td><td class="val">3.892</td><td class="chg dn">-0.71%</td><td class="when">2026-10-16 17:35:21</td></tr><tr><td class="asset">离岸人民币</td><td class="val">6.6857</td><td class="chg dn">-0.04%</td><td class="when">2026-10-16 17:36:29</td></tr><tr><td class="asset">美债10Y</td><td class="val">5.1%</td><td class="chg fl">—</td><td class="when">2026-10-15（美国财政部官方）</td></tr><tr><td class="asset">美债30Y</td><td class="val">5.43%</td><td class="chg fl">—</td><td class="when">2026-10-15（美国财政部官方）</td></tr></tbody></table></div></section><section class="sec" id="s2"><div class="kicker">02 · MOVERS</div><h2>异常波动</h2><ul class="moves"><li><div class="mv-note">今日无单项超 ±2.0% 的资产；相对极值：道琼斯 <strong>+1.08%</strong> 领涨权益（纳指仅 +0.08%）；COMEX 白银 <strong>+1.43%</strong> 领涨商品</div></li><li><div class="mv-note">美债 10Y 单日回落 <strong>14bp</strong>（5.24% → 5.10%，10-15 财政部官方值），为近期较大单日下行</div></li><li><div class="mv-note">旗舰基金池（10-15 净值）：华夏红利混合 <strong>-1.62%</strong>、天弘沪深300ETF联接 <strong>-1.17%</strong>（对应前一日市场回调）</div></li></ul></section><section class="sec" id="s3"><div class="kicker">03 · EARNINGS</div><h2>重要财报</h2><div class="earn"><div class="earn-item"><p>A 股业绩预告（报告期 20260930）：已披露 453 家，预喜 371 家、报忧 68 家、减亏 12 家、不确定 2 家（来源：东财数据中心官方分类）</p><ul class="sub"><li>明细：{'减亏': 12, '预减': 26, '预增': 232, '略减': 22, '扭亏': 22, '略增': 102, '首亏': 15, '续盈': 15, '不确定': 2, '续亏': 5}</li></ul></div><div class="earn-item"><p>新锐股份：预计2026年前三季度净利润同比增长318%-355%（17:29）</p></div><div class="earn-item"><p>腾景科技：预计第三季度净利润同比增长61.68%-76.38%（17:17）</p></div><div class="earn-item"><p>生益科技：前三季度净利润同比预增164%-181% 覆铜板销量上升（17:09）</p></div></div></section><section class="sec" id="s4"><div class="kicker">04 · NEWS</div><h2>重大新闻</h2><ol class="news"><li><span class="num">01</span><p class="txt">日本或被欧洲制造优待政策排除在外 英国有望纳入范围（17:25，policy）</p></li><li><span class="num">02</span><p class="txt">证监会同意朗高电机创业板IPO注册（17:22，policy）</p></li><li><span class="num">03</span><p class="txt">央行拟规定：承销机构不得以低价包销或变相包销等不正当竞争方式获取客户（17:20，macro）</p></li><li><span class="num">04</span><p class="txt">遏制利用团体标准乱收费等 市场监管总局公开征求意见（17:17，policy）</p></li><li><span class="num">05</span><p class="txt">美国银行援引EPFR数据：截至周三的一周内 美国国债录得36亿美元资金流入（17:12，macro）</p></li></ol></section><section class="sec" id="s5"><div class="kicker">05 · EXPLAIN</div><h2>一句解释</h2><div class="explain"><p>美债收益率显著回落（10Y 5.24%→5.10%，14bp）：沃勒"收益率=紧缩"表态后利率下行，压制成长股的估值因素边际缓解（推断）——但 A 股创业板今日仍 -0.39% 弱于上证 +0.24%，风格分化延续。</p><p>道指 +1.08% 与纳指 +0.08% 的差距：资金偏好从高估值科技切向价值/顺周期（推断），与里昂"25 年来首次偏好债券胜过股票"同属风险偏好变化信号。</p><p>原油 97 美元 -0.98%：延续本周"地缘溢价向基本面收敛"叙事（10-13 起），但价格仍在 90 上方，供给端担忧未完全消退（推断）。</p><p>业绩预告进入收官密集期：453 家（较 10-13 的 243 家 +210），预喜率稳定在 82%，海康威视 Q3 归母净利 +36.97% 等龙头验证景气。</p></div></section><section class="sec" id="s6"><div class="kicker">06 · MAPPING</div><h2>Agent 映射</h2><p>美债 10Y 回落 14bp → <strong>Data + Research</strong>：rates 序列更新；"利率下行 → 成长股估值修复"作为待验证假设入库（观察创业板滞后反应）</p><p>道指/纳指分化 → <strong>Research</strong>：风格轮动因子（价值 vs 成长）周度样本</p><p>原油高位回落 → <strong>Data</strong>：商品序列；"背离→收敛"叙事进入第 4 天标注（10-13 起）</p><p>业绩预告 453 家/预增 232 → <strong>Memory（时序）+ Data</strong>：行业景气度；海康威视、生益科技等龙头样本</p><p>央行承销规则、团标收费治理 → <strong>Policy</strong>：监管事件链打标</p><p>美债周度资金流入 36 亿美元（EPFR）→ <strong>Data</strong>：资金流因子，与美债收益率序列关联</p></section><section class="sec" id="s7"><div class="kicker">07 · QUESTION</div><h2>今日问题</h2><p class="q-lead">美债 10Y 从 5.24% 回落到 5.10%（14bp），但 A 股创业板今日仍 -0.39%、弱于上证 +0.24%。当利率开始回落时，成长股的估值修复是否必然随后发生：</p><div class="opts"><div class="opt"><span class="k">A</span><p>是——利率是主导变量，成长股将补涨</p></div><div class="opt"><span class="k">B</span><p>否——还有产业/政策等其他变量（如出口退税下调预期），利率回落不足以扭转</p></div><div class="opt"><span class="k">C</span><p>分市场、分行业看——先把"利率→成长股"作为假设入库，跟踪相关性再下结论</p></div></div><div class="why"><b>为什么？</b> （提示：Hindsight 的"假设-验证"正是为此设计——把相关性作为假设记录，用后续数据验证，而不是当天就下结论）</div></section>
+    <footer class="foot">
+      <p>数据留档：<code>brief/out/market_2026-10-16.json</code>（17:36 采集）＋<code>fund_2026-10-16.json</code>（旗舰池 5 只）＋<code>fund_all_2026-10-16.json</code>（全市场 24,242 只）｜核验：美债=财政部官网（10-15 官方值）；业绩预告=东财数据中心官方分类｜生成时间：2026-10-16 17:36</p>
+      <p>仅为信息整理，不构成投资建议。</p>
+    </footer>
+  </main>
+</div>
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.rail a'));
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var byHref = {};
+  links.forEach(function (a) { byHref[a.getAttribute('href')] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove('on'); });
+      var a = byHref['#' + e.target.id];
+      if (a) a.classList.add('on');
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  document.querySelectorAll('main .sec').forEach(function (s) { io.observe(s); });
+})();
+</script>
+</body>
+</html>

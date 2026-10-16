@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>金融 AI 安全任务台 · 给队友口播稿 2026-10-16</title>
+<style>
+:root {
+  --ink: #2e2b27; --muted: #6f6a63; --paper: #ffffff; --line: #e5e1dc;
+  --accent: #ed7627; --accent-wash: #fdf1e7; --wash: #f8f6f3;
+}
+* { box-sizing: border-box; }
+@page { size: A4; margin: 16mm 15mm 18mm; }
+html, body { margin: 0; padding: 0; background: var(--paper); }
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "HarmonyOS Sans", "MiSans", sans-serif;
+  color: var(--ink); font-size: 10.5pt; line-height: 1.8; line-break: strict;
+  -webkit-font-smoothing: antialiased;
+}
+h1 {
+  font-size: 21pt; line-height: 1.35; margin: 0 0 6mm; letter-spacing: 0.02em;
+}
+h1::after {
+  content: ""; display: block; width: 18mm; height: 1.4mm; margin-top: 4mm;
+  background: var(--accent); border-radius: 1mm;
+}
+h2 {
+  font-size: 14pt; margin: 9mm 0 3mm; padding-top: 3mm; page-break-after: avoid;
+  border-top: 1px solid var(--line);
+}
+h3 { font-size: 11.5pt; margin: 6mm 0 2mm; page-break-after: avoid; }
+p { margin: 0 0 3mm; }
+strong { color: #191612; }
+blockquote {
+  margin: 0 0 3mm; padding: 3mm 5mm; background: var(--accent-wash);
+  border-left: 1.2mm solid var(--accent); border-radius: 1.5mm; color: #4c4038;
+  font-size: 9.8pt;
+}
+blockquote p { margin: 0 0 1.5mm; }
+blockquote p:last-child { margin-bottom: 0; }
+hr { border: 0; border-top: 1px dashed var(--line); margin: 7mm 0; }
+ul, ol { margin: 0 0 3mm; padding-left: 6mm; }
+li { margin-bottom: 1.2mm; }
+table {
+  width: 100%; border-collapse: collapse; margin: 0 0 4mm; font-size: 9.6pt;
+  page-break-inside: auto;
+}
+th, td {
+  border: 1px solid var(--line); padding: 2mm 3mm; text-align: left;
+  vertical-align: top; line-height: 1.7;
+}
+th { background: var(--wash); font-weight: 600; white-space: nowrap; }
+tr { page-break-inside: avoid; }
+code {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-size: 9pt; background: var(--wash); border-radius: 1mm; padding: 0 1mm;
+  word-break: break-all;
+}
+.doc-meta {
+  background: var(--wash); border: 1px solid var(--line); border-radius: 2mm;
+  padding: 3.5mm 4.5mm; margin: 0 0 6mm; font-size: 9.8pt; color: var(--muted);
+}
+.doc-meta p { margin: 0 0 1mm; }
+.doc-meta p:last-child { margin-bottom: 0; }
+</style>
+</head>
+<body>
+<h1>给队友的口播稿 · 2026-10-16</h1>
+<div class="doc-meta"><p>用途：团队群里发一段语音，或小会上照着念（约 2 分钟）</p><p>讲话人：七七｜一句话原则：<strong>已经稳的三句带过；要你们接手的四件点名说；最后两条提醒。</strong></p><p>全稿没有技术词，人人能听懂；名字后面的黑体是"什么叫做完"。</p></div>
+<hr>
+<h2>开场（约 15 秒）</h2>
+<p><strong>各位，我是七七。先说一句总的：产品现在能演示、能回放、数字经得起核对；但有几件事卡在你们手上——我今天点名说清楚，谁做什么、做到什么样算完。</strong></p>
+<hr>
+<h2>一、已经稳的（约 30 秒，带过就行）</h2>
+<p><strong>自动检查 118 项全过；54 句骗人的话全部拦下，20 句正常话一句都没误伤；拿真实行情逐日核对，14 个交易日一处不差，还顺手抓出并修掉一个差了十几倍的价格错误；每日简报出到第 8 期——10 月 14、15 号机器没跑起来的两天，我们如实记了"缺"，没有编数字。</strong></p>
+<hr>
+<h2>二、没干完的、需要你们接手的（重点，约 70 秒）</h2>
+<p><strong>1. 李想，两件事。</strong></p>
+<ul><li><strong>手机上那个排版修复，现在只在预览网站上好用，源仓库里还是旧的——请把它搬回源分支。</strong></li><li><strong>发布记录里写的"来源提交编号"是错的，在团队仓库里根本查不到——请把生成这段记录的脚本修掉。</strong> 不然别人没法追溯"这个版本是从哪次改动来的"。</li></ul>
+<p><strong>2. chenchen，两件事。</strong></p>
+<ul><li><strong>预览网站现在点一下会显示"服务暂不可用"，就差一个能对外访问的后台网址。</strong> 本地这条通道我已经搭好、也测通了（组合、体检、任务回看、操作记录都能读），地址配上、再部署一次，整条就能跑通。</li><li><strong>合并的时候盯一下 3 个文件：资金相关的样式，加上风控工作台的两个文件。</strong> 主线上新改过、界面这条线没跟上——合的时候逐个看一眼，别把新改动盖掉。</li></ul>
+<p><strong>3. 林粹，两件事。</strong></p>
+<ul><li><strong>请把真实模型服务接到"真实模式"上。</strong> 交接文档在团队仓库里；演示和真实已经分开了，连不上就直接报错，不会假装成功。</li><li><strong>按"真实数据清单"开始接真实数据，先跑通一天账单的小样本，口径照清单来。</strong> 私有库只在本机、不上网，这条红线别破。</li></ul>
+<p><strong>4. 所有人，一件最省力的。</strong></p>
+<ul><li><strong>真实用户访谈我写好了，就三个问题，微信直接转发。请大家这周各自转给两三个亲戚朋友，把回答截图发我。</strong></li><li>这一步是补"普通人到底会不会用"最大的空白，也是评委最认的东西。</li></ul>
+<hr>
+<h2>三、两条提醒（约 30 秒）</h2>
+<p><strong>第一，演示前先跑自动检查、再打开演示网站；演示进行当中别跑检查。</strong> 两边共用一份现场数据，一起动会打架（今天我就踩了一次）。</p>
+<p><strong>第二，11 月 2 日封版。</strong> 之后所有材料——演示文稿、视频、说明文档——从同一个存档点出，数字全部由测试记录现场生成。<strong>别在封版后改数字，也别手抄数字。</strong></p>
+<hr>
+<h2>收尾（约 15 秒）</h2>
+<p><strong>我这边继续把理财那条深度链路和每日简报做扎实。你们上面四件事有进展，随时在群里说一声；缺数据的找我要，我这边都有。</strong></p>
+<hr>
+<h2>附 · 一句话版（可直接转发/发语音）</h2>
+<div class="doc-meta"><p>各位同步下：能演示、能回放、数字经得起核对，这些都稳了（118 项自动检查全过、54 句骗人的话全拦、真实行情逐日核对零差异）。没干完的有四件，点名说：<strong>李想</strong>——手机排版修复搬回源仓库，发布记录的来源编号修一下；<strong>chenchen</strong>——预览网站就差一个公开的后台网址，配上就能整条跑通，另外合并时 3 个文件（资金样式 + 风控工作台）别盖掉新改动；<strong>林粹</strong>——把真实模型接到"真实模式"，再按数据清单先跑通一天账单的小样本；<strong>请大家</strong>帮我转发三个问题的访谈，转给两三个亲友就行。两条提醒：演示前先跑检查再开站、别在演示中跑检查；11 月 2 日封版，数字统一由测试记录生成。缺数据的找我要。</p></div>
+</body>
+</html>
