@@ -19,6 +19,14 @@
 - Cloudflare Worker 公网版本 `5b81c8c3-d1f5-4123-8c35-ed0472cab5a6` 已完成健康检查和 `/docs` 检查；同一幂等键重放返回同一任务，换内容返回 `409 IDEMPOTENCY_CONFLICT`。
 - 公网验证任务使用合成数据，固定为 `SYNTHETIC_REPLAY + PAPER`，执行状态为 `BLOCKED`；这证明了接入边界和阻断语义，不能作为正式 Risk 或真实执行的联合验收。
 
+## 本轮继续迭代
+
+- 新增 `owner-bridge.v1` 和 `POST /api/review/risk-dispatch`，把独立 Risk Owner 的发送地址、HMAC 签名、上游响应和失败重试纳入同一条审计链。
+- Risk 决策/回调和 Approval 支持服务端 HMAC 身份验证；未配置密钥时只标记 `DEMO_UNVERIFIED`，不会冒充正式身份。
+- 未配置外部 Risk 服务时，HTTP 明确返回 `503 RISK_OWNER_NOT_CONFIGURED`，任务保持 `PENDING_RISK`，并记录 `risk.handoff.dispatch_failed`；真实执行继续阻断。
+- 本轮完整回归达到 **137/137**，Worker 专项为 **16/16**，Wrangler dry-run 打包通过。
+- 公网 Worker 已更新为 `eff5cc9a-4d9c-47b5-a70a-a9f1adbb2790`；复核 HTTP 200，未配置正式 Risk 时 `risk-dispatch` 返回 `503 RISK_OWNER_NOT_CONFIGURED`，失败记录和执行阻断均可查。
+
 ## 需要其他 Owner 配合的阻塞项
 
 - Risk：提供正式服务身份、签名/权限、回写接口和联合验收数据。
@@ -35,6 +43,8 @@
 - T01-T14：`tests/finance-lab-review-gate.test.js`
 - 接口说明：线上 `/docs` 与 `docs/core-agent-integration-guide-2026-10-15.md`
 - 公网验证：`docs/public-integration-review-verification-2026-10-16.json`、`logs/Core-Agent-集成评审公网验证-2026-10-16.txt`
+- Owner Bridge 记录：`docs/core-agent-owner-bridge-iteration-2026-10-16.md`、`logs/Core-Agent-OwnerBridge联调-2026-10-16.txt`
+- 公网 Owner Bridge 证据：`docs/public-owner-bridge-verification-2026-10-16.json`、`logs/Core-Agent-OwnerBridge公网验证-2026-10-16.txt`
 
 ## 结论
 

@@ -54,6 +54,7 @@ function buildRiskHandoffPackage(record) {
     },
     evidence: record.risk_handoff.evidence,
     approval: record.approval,
+    ...(record.risk_dispatch ? { risk_dispatch: record.risk_dispatch } : {}),
     memory_write_status: record.memory_write_status || "NOT_REQUESTED",
     trace: {
       schema_version: record.schema_version || REVIEW_VERSION,

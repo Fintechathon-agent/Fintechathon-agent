@@ -260,6 +260,22 @@ test("handoff reads and callbacks use the same configured API authentication", a
   }
 });
 
+test("Risk dispatch fails closed and persists the Owner configuration failure", async () => {
+  const app = setup();
+  const created = await worker.fetch(req("/api/review", { text: "Synthetic Risk dispatch" }), app.env).then(r => r.json());
+  const response = await worker.fetch(req("/api/review/risk-dispatch", {
+    task_id: created.task_id,
+    proposal_sha256: created.proposed_action.proposal_sha256
+  }), app.env);
+  assert.equal(response.status, 503);
+  assert.equal((await response.json()).error.code, "RISK_OWNER_NOT_CONFIGURED");
+  app.restart();
+  const record = await worker.fetch(req("/api/review/task/" + created.task_id), app.env).then(r => r.json());
+  assert.equal(record.risk_dispatch.status, "FAILED");
+  assert.ok(record.audit.events.some(event => event.event_type === "risk.handoff.dispatch_failed"));
+  assert.equal(record.execution.execution_allowed, false);
+});
+
 const fundingDefinition = { confirmed: true, synthetic: true, currency: "CNY", cash_minor: 1000000,
   protected_purposes: [{ purpose_id: "rent", label: "房租", amount_minor: 400000 }] };
 async function fundingTask(app, plan, amount = 4000) {

@@ -93,6 +93,7 @@
         "proposed_action": { "anyOf": [{ "$ref": "#/$defs/ProposedAction" }, { "type": "null" }] },
         "risk_handoff": { "$ref": "#/$defs/RiskHandoff" },
         "risk_decision": { "type": ["object", "null"] },
+        "risk_dispatch": { "$ref": "owner-bridge.v1.schema.json#/$defs/RiskDispatchState" },
         "approval": { "$ref": "#/$defs/ApprovalState" },
         "execution": { "$ref": "#/$defs/ExecutionState" },
         "audit": { "$ref": "#/$defs/Audit" },
@@ -140,7 +141,8 @@
         "decision": { "type": ["string", "null"] },
         "proposal_sha256": { "type": ["string", "null"] },
         "approver": { "type": ["string", "null"] },
-        "decided_at": { "type": ["string", "null"] }
+        "decided_at": { "type": ["string", "null"] },
+        "auth": { "$ref": "owner-bridge.v1.schema.json#/$defs/ActorAuth" }
         ,"expires_at": { "type": ["string", "null"] }
       }
     },

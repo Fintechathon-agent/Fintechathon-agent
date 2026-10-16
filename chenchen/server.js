@@ -11,6 +11,7 @@ const { buildRiskWorkbenchHandoff } = require("./integrations/risk-workbench-ada
 const modelReview = require("./integrations/model-review");
 const legacyReviewAdapter = require("./integrations/legacy-review-adapter");
 const riskHandoff = require("./integrations/risk-handoff");
+const ownerBridge = require("./integrations/owner-bridge");
 const { ReviewWorkflowStore, WorkflowError } = require("./integrations/review-workflow");
 const { randomUUID } = require("node:crypto");
 const { MerchantSession, demo: merchantDemo } = require("./merchant/ledger");
@@ -57,7 +58,7 @@ function applyCors(request, response) {
   if (!origin || (!corsOrigins.has("*") && !corsOrigins.has(origin))) return false;
   response.setHeader("Access-Control-Allow-Origin", corsOrigins.has("*") ? "*" : origin);
   response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Core-Agent-Key, Idempotency-Key, X-Request-ID");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Core-Agent-Key, Idempotency-Key, X-Request-ID, X-Risk-Signature, X-Approval-Signature");
   response.setHeader("Vary", "Origin");
   return true;
 }
@@ -202,18 +203,26 @@ async function handleApi(request, response, pathname, url) {
   }
   if (method === "POST" && pathname === "/api/review/risk-decision") {
     requireReviewApiKey(request);
-    sendJson(response, 200, await reviewWorkflow.decideRisk(body));
+    const actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "risk", body, headers: request.headers, env: process.env });
+    sendJson(response, 200, await reviewWorkflow.decideRisk(body, actorAuth));
     return true;
   }
   if (method === "POST" && pathname === "/api/review/risk-callback") {
     requireReviewApiKey(request);
-    const result = await reviewWorkflow.receiveRiskCallback(body);
+    const actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "risk", body, headers: request.headers, env: process.env });
+    const result = await reviewWorkflow.receiveRiskCallback(body, actorAuth);
     sendJson(response, 200, { callback_version: riskHandoff.CALLBACK_VERSION, ...result, handoff: riskHandoff.buildRiskHandoffPackage(result.workflow) });
     return true;
   }
   if (method === "POST" && pathname === "/api/review/approval") {
     requireReviewApiKey(request);
-    sendJson(response, 200, await reviewWorkflow.decideApproval(body));
+    const actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "approval", body, headers: request.headers, env: process.env });
+    sendJson(response, 200, await reviewWorkflow.decideApproval(body, actorAuth));
+    return true;
+  }
+  if (method === "POST" && pathname === "/api/review/risk-dispatch") {
+    requireReviewApiKey(request);
+    sendJson(response, 202, await reviewWorkflow.dispatchRiskHandoff(body, handoff => ownerBridge.dispatchRiskHandoff(handoff, process.env)));
     return true;
   }
   if (method === "POST" && pathname === "/api/review/simulate") {
@@ -377,7 +386,7 @@ function serveStatic(response, pathname) {
   const routes = { "/": "versions/investment.html", "/index.html": "versions/investment.html", "/catalog": "versions/home.html", "/investment": "versions/investment.html", "/investment-v0.10": "versions/investment-legacy.html", "/merchant": "versions/merchant.html", "/risk-workbench": "versions/risk-workbench.html" };
   const relativePath = routes[decodedPath] || decodedPath.replace(/^\/+/, "");
   const allowed = new Set(["versions/home.html", "versions/investment.html", "versions/merchant.html", "versions/risk-workbench.html",
-    "contracts/risk-handoff.v1.schema.json", "contracts/examples/risk-callback.request.json",
+    "contracts/risk-handoff.v1.schema.json", "contracts/owner-bridge.v1.schema.json", "contracts/examples/risk-callback.request.json",
     "contracts/funding-plan-demo.v1.schema.json", "contracts/examples/funding-plan.request.json",
     "versions/style.css", "versions/product-overrides.css", "versions/presentation.mjs", "versions/investment.js", "versions/investment-legacy.js", "versions/investment-legacy.html", "versions/merchant.js", "versions/risk-workbench.js", "versions/common.js",
     "contracts/investment-agent.v1.schema.json", "contracts/core-agent-error.v1.schema.json", "contracts/model-review.v1.schema.json", "contracts/examples/health-check.request.json", "contracts/examples/health-check.response.json", "contracts/examples/core-agent-error.response.json", "contracts/examples/model-review.request.json", "contracts/examples/model-review.response.json", "contracts/examples/risk-decision.request.json", "contracts/examples/approval.request.json", "contracts/examples/simulation.request.json",

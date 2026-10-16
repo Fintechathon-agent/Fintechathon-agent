@@ -98,6 +98,25 @@ test("HTTP model-to-Risk-to-approval-to-simulation chain is queryable", async t 
   assert.equal((await mismatch.json()).error.code, "RISK_HANDOFF_MISMATCH");
   const unchanged = await fetch(base + "/api/review/" + created.run_id).then(r => r.json());
   assert.equal(unchanged.status, "SIMULATED");
+  await t.test("Risk dispatch fails closed and leaves an auditable failure when no Owner is configured", async () => {
+    const previousUrl = process.env.RISK_SERVICE_URL;
+    const previousSecret = process.env.RISK_SERVICE_HMAC_SECRET;
+    delete process.env.RISK_SERVICE_URL;
+    delete process.env.RISK_SERVICE_HMAC_SECRET;
+    try {
+      const task = await fetch(base + "/api/review", { method: "POST", headers, body: JSON.stringify({ kind: "bill", text: "Synthetic dispatch configuration test" }) }).then(r => r.json());
+      const dispatch = await fetch(base + "/api/review/risk-dispatch", { method: "POST", headers, body: JSON.stringify({ task_id: task.task_id, proposal_sha256: task.proposed_action.proposal_sha256 }) });
+      assert.equal(dispatch.status, 503);
+      assert.equal((await dispatch.json()).error.code, "RISK_OWNER_NOT_CONFIGURED");
+      const record = await fetch(base + "/api/review/task/" + task.task_id).then(r => r.json());
+      assert.equal(record.risk_dispatch.status, "FAILED");
+      assert.ok(record.audit.events.some(event => event.event_type === "risk.handoff.dispatch_failed"));
+      assert.equal(record.execution.execution_allowed, false);
+    } finally {
+      if (previousUrl === undefined) delete process.env.RISK_SERVICE_URL; else process.env.RISK_SERVICE_URL = previousUrl;
+      if (previousSecret === undefined) delete process.env.RISK_SERVICE_HMAC_SECRET; else process.env.RISK_SERVICE_HMAC_SECRET = previousSecret;
+    }
+  });
   await t.test("HTTP retries require exact approval evidence and return traceable conflicts", async () => {
     const post = (path, body) => fetch(base + path, { method: "POST", headers, body: JSON.stringify(body) });
     const task = await post("/api/review", { kind: "bill", text: "Synthetic retry test" }).then(r => r.json());

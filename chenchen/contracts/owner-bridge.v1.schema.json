@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/owner-bridge.v1.schema.json",
+  "title": "Core Agent Owner Bridge Contract",
+  "type": "object",
+  "$defs": {
+    "ActorAuth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "actor", "mode", "verified", "signature_header"],
+      "properties": {
+        "owner": { "enum": ["risk", "approval"] },
+        "actor": { "type": ["string", "null"] },
+        "mode": { "enum": ["HMAC_SHA256", "DEMO_UNVERIFIED"] },
+        "verified": { "type": "boolean" },
+        "signature_header": { "type": "string" }
+      }
+    },
+    "RiskDispatchState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dispatch_id", "status", "attempts"],
+      "properties": {
+        "dispatch_id": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["SENT", "FAILED"] },
+        "attempts": { "type": "integer", "minimum": 1 },
+        "sent_at": { "type": "string" },
+        "failed_at": { "type": "string" },
+        "upstream_status": { "type": ["integer", "null"] },
+        "error_code": { "type": "string" }
+      }
+    },
+    "RiskDispatchEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter_version", "contract_version", "operation", "sent_at", "trace", "handoff"],
+      "properties": {
+        "adapter_version": { "const": "owner-bridge.v1" },
+        "contract_version": { "const": "risk-handoff.v1" },
+        "operation": { "const": "RISK_HANDOFF" },
+        "sent_at": { "type": "string" },
+        "trace": { "$ref": "risk-handoff.v1.schema.json#/$defs/Trace" },
+        "handoff": { "$ref": "risk-handoff.v1.schema.json#/$defs/HandoffPackage" }
+      }
+    }
+  }
+}

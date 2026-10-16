@@ -1,0 +1,21 @@
+Core Agent Owner Bridge 联调记录
+日期：2026-10-16
+
+本轮结果：
+- Owner Bridge Contract：owner-bridge.v1
+- Risk 派发接口：POST /api/review/risk-dispatch
+- Risk 身份签名：X-Risk-Signature
+- Approval 身份签名：X-Approval-Signature
+- 未配置外部 Risk 地址或密钥：503 RISK_OWNER_NOT_CONFIGURED
+- 失败任务：保留 risk.handoff.dispatch_failed 审计事件
+- 真实执行：继续阻断，execution_allowed=false
+
+测试：
+- 完整回归 137/137 通过
+- Cloudflare Worker 专项 16/16 通过
+- Wrangler dry-run 打包通过
+- 本地 HTTP 未配置 Owner 场景通过
+
+边界：
+- 当前公网环境没有正式 Risk/Approval 地址和密钥，因此没有伪造外部服务已接通。
+- HMAC、超时、拒绝和失败重试适配层已准备好，待对应 Owner 提供正式配置后再做跨服务联合验收。

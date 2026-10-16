@@ -5,6 +5,7 @@ import adapterModule from "../integrations/risk-workbench-adapter.js";
 import modelReviewModule from "../integrations/model-review.js";
 import legacyReviewAdapterModule from "../integrations/legacy-review-adapter.js";
 import riskHandoffModule from "../integrations/risk-handoff.js";
+import ownerBridgeModule from "../integrations/owner-bridge.js";
 import reviewWorkflowModule from "../integrations/review-workflow.js";
 import fundingPlanModule from "../integrations/funding-plan.js";
 import coreErrorModule from "../contracts/core-agent-error.js";
@@ -17,6 +18,7 @@ const { buildRiskWorkbenchHandoff } = adapterModule;
 const modelReview = modelReviewModule;
 const legacyReviewAdapter = legacyReviewAdapterModule;
 const riskHandoff = riskHandoffModule;
+const ownerBridge = ownerBridgeModule;
 const { ReviewWorkflowStore, WorkflowError, fingerprint } = reviewWorkflowModule;
 const { FundingPlanStore } = fundingPlanModule;
 const coreError = coreErrorModule;
@@ -40,7 +42,7 @@ function headers(request, env, contentType = "application/json; charset=utf-8") 
   if (origin) {
     result["Access-Control-Allow-Origin"] = origin;
     result["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS";
-    result["Access-Control-Allow-Headers"] = "Content-Type, X-Core-Agent-Key, Idempotency-Key, X-Request-ID";
+    result["Access-Control-Allow-Headers"] = "Content-Type, X-Core-Agent-Key, Idempotency-Key, X-Request-ID, X-Risk-Signature, X-Approval-Signature";
     result.Vary = "Origin";
   }
   return result;
@@ -289,18 +291,30 @@ export class ReviewService {
         if (record) workflow.save(record);
         await this.loadFundingPlan(fundingPlans, record?.proposed_action?.funding?.plan_id);
         if (url.pathname === "/api/review/risk-callback") {
-          const callback = await workflow.receiveRiskCallback(body);
+          const actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "risk", body, headers: request.headers, env });
+          const callback = await workflow.receiveRiskCallback(body, actorAuth);
           await this.persist(callback.workflow);
           return json(request, env, 200, { callback_version: riskHandoff.CALLBACK_VERSION, ...callback, handoff: riskHandoff.buildRiskHandoffPackage(callback.workflow) });
         }
-        const method = {
+        let method = {
           "/api/review/risk-decision": "decideRisk",
           "/api/review/approval": "decideApproval",
+          "/api/review/risk-dispatch": "dispatchRiskHandoff",
           "/api/review/simulate": "simulate",
           "/api/review/cancel": "cancel"
         }[url.pathname];
+        if (url.pathname === "/api/review/risk-decision") {
+          const actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "risk", body, headers: request.headers, env });
+          result = await workflow.decideRisk(body, actorAuth);
+        } else if (url.pathname === "/api/review/approval") {
+          const actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "approval", body, headers: request.headers, env });
+          result = await workflow.decideApproval(body, actorAuth);
+        } else if (url.pathname === "/api/review/risk-dispatch") {
+          result = await workflow.dispatchRiskHandoff(body, handoff => ownerBridge.dispatchRiskHandoff(handoff, env));
+        } else if (method) {
+          result = await workflow[method](body);
+        }
         if (!method) return json(request, env, 404, errorPayload(routeNotFoundFailure()));
-        result = await workflow[method](body);
       }
       await this.persist(result, fundingPlans);
       return json(request, env, 200, url.pathname === "/api/review/legacy"
@@ -353,7 +367,7 @@ export default {
     const isReviewRead = request.method === "GET" && (url.pathname.startsWith("/api/review/") || url.pathname.startsWith("/api/funding-demo/plan/"));
     const isKnownPost = request.method === "POST" && [
       "/api/health-check/run", "/api/risk-workbench/handoff", "/api/review", "/api/review/legacy",
-      "/api/review/risk-decision", "/api/review/risk-callback", "/api/review/approval", "/api/review/simulate", "/api/review/cancel",
+      "/api/review/risk-decision", "/api/review/risk-callback", "/api/review/approval", "/api/review/risk-dispatch", "/api/review/simulate", "/api/review/cancel",
       "/api/funding-demo/plan", "/api/funding-demo/plan/revise"
     ].includes(url.pathname);
     if (!isKnownPost && !isReviewRead) {

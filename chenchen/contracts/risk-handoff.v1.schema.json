@@ -15,6 +15,20 @@
     }
   ],
   "$defs": {
+    "Trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "request_id", "task_id", "session_id", "run_id", "audit_id", "handoff_id"],
+      "properties": {
+        "schema_version": { "const": "model-review.v1" },
+        "request_id": { "type": "string" },
+        "task_id": { "type": "string" },
+        "session_id": { "type": ["string", "null"] },
+        "run_id": { "type": "string" },
+        "audit_id": { "type": "string" },
+        "handoff_id": { "type": "string" }
+      }
+    },
     "HandoffPackage": {
       "type": "object",
       "additionalProperties": false,
@@ -243,20 +257,11 @@
         "approval": {
           "$ref": "model-review.v1.schema.json#/$defs/ApprovalState"
         },
-        "memory_write_status": { "type": "string", "enum": ["NOT_REQUESTED", "PENDING", "WRITTEN", "UNAVAILABLE", "FAILED"] },
-        "trace": {
-          "type": "object",
-          "required": ["schema_version", "request_id", "task_id", "session_id", "run_id", "audit_id", "handoff_id"],
-          "properties": {
-            "schema_version": { "const": "model-review.v1" },
-            "request_id": { "type": "string" },
-            "task_id": { "type": "string" },
-            "session_id": { "type": ["string", "null"] },
-            "run_id": { "type": "string" },
-            "audit_id": { "type": "string" },
-            "handoff_id": { "type": "string" }
-          }
+        "risk_dispatch": {
+          "$ref": "owner-bridge.v1.schema.json#/$defs/RiskDispatchState"
         },
+        "memory_write_status": { "type": "string", "enum": ["NOT_REQUESTED", "PENDING", "WRITTEN", "UNAVAILABLE", "FAILED"] },
+        "trace": { "$ref": "#/$defs/Trace" },
         "audit": {
           "type": "object",
           "additionalProperties": false,

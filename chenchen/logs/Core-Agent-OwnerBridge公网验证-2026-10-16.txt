@@ -1,0 +1,20 @@
+Core Agent Owner Bridge 公网验证
+日期：2026-10-16
+公网地址：https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev
+Worker 版本：eff5cc9a-4d9c-47b5-a70a-a9f1adbb2790
+
+验证：
+- /health：ok
+- /api/review：HTTP 200
+- schema_version：model-review.v1
+- data_mode：SYNTHETIC_REPLAY
+- execution_mode：PAPER
+- /api/review/risk-dispatch：HTTP 503
+- error.code：RISK_OWNER_NOT_CONFIGURED
+- 任务 risk_dispatch.status：FAILED
+- 审计事件：risk.handoff.dispatch_failed，已存在
+- execution.status：BLOCKED
+- execution_allowed：false
+
+结论：
+没有正式 Risk Owner 地址和密钥时，公网版本不会伪造交接成功，也不会进入审批或执行。正式地址、HMAC secret 和回写服务仍需 Risk Owner 提供。

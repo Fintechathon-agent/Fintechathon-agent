@@ -101,3 +101,9 @@ PowerShell 调用示例：
 对应的 T01-T14 验收位于 `tests/finance-lab-review-gate.test.js`，覆盖缺字段、契约绑定、Risk、审批、执行阻断、Memory、审计追踪、篡改、回调串单、降级、超时审批、幂等和模型失败。
 
 公网验证：Cloudflare Worker 版本 `5b81c8c3-d1f5-4123-8c35-ed0472cab5a6` 已通过健康检查、文档入口、同幂等键重放和换内容冲突检查。公网验证只使用合成数据；任务保持 `execution.status=BLOCKED`，没有开启真实执行。详见 `docs/public-integration-review-verification-2026-10-16.json` 和 `logs/Core-Agent-集成评审公网验证-2026-10-16.txt`。
+
+## 2026-10-16 Owner Bridge 补齐项
+
+- `owner-bridge.v1` 为独立 Risk Owner 提供签名交接、上游响应和失败留痕；`POST /api/review/risk-dispatch` 未配置地址或 HMAC secret 时返回 `RISK_OWNER_NOT_CONFIGURED`，任务保留 `risk.handoff.dispatch_failed`，不会假装送达。
+- `RISK_SERVICE_HMAC_SECRET` 配置后，Risk 决策/回调必须携带 `X-Risk-Signature`；`APPROVAL_SERVICE_HMAC_SECRET` 配置后，审批必须携带 `X-Approval-Signature`。当前未配置时仅标记 `DEMO_UNVERIFIED`，不把演示身份描述为正式认证。
+- Owner 地址、密钥和权限仍属于对应 Owner 的部署责任；Safety Action Gateway 未接入前，`execution_allowed=false` 和 `/api/paper-trade/execute` 的阻断继续保留。

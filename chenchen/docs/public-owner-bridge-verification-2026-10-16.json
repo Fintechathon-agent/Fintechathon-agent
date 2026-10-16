@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-16",
+  "public_url": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+  "worker_version": "eff5cc9a-4d9c-47b5-a70a-a9f1adbb2790",
+  "scope": "public Owner Bridge fail-closed verification",
+  "task_id": "review-task-ddf9c03d-a6b5-4532-8747-eb784796d8a5",
+  "checks": {
+    "health": "ok",
+    "review_status": 200,
+    "schema_version": "model-review.v1",
+    "data_mode": "SYNTHETIC_REPLAY",
+    "execution_mode": "PAPER",
+    "risk_dispatch_status": 503,
+    "risk_dispatch_error_code": "RISK_OWNER_NOT_CONFIGURED",
+    "risk_dispatch_record_status": "FAILED",
+    "audit_contains_dispatch_failed": true,
+    "execution_status": "BLOCKED",
+    "execution_allowed": false
+  },
+  "interpretation": "公网版本没有正式 Risk Owner 地址和密钥时拒绝假装送达；失败写回同一任务并保留审计，未进入审批或执行。",
+  "limitations": [
+    "本次只使用合成输入。",
+    "尚未提供正式 Risk Owner 的 HTTPS 地址、HMAC secret 和回写部署证据，因此没有宣称跨服务联合验收。"
+  ]
+}

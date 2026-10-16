@@ -399,7 +399,7 @@ class ReviewWorkflowStore {
     }
   }
 
-  async receiveRiskCallback(input = {}) {
+  async receiveRiskCallback(input = {}, actorAuth = null) {
     const record = this.requireRecord(requiredString(input.task_id, "task_id"));
     let callback;
     try {
@@ -421,8 +421,8 @@ class ReviewWorkflowStore {
     const { task_id, proposal_sha256, decision, reviewer, reason } = callback;
     // Do not yield between recording Risk and its callback receipt. A cancellation
     // or duplicate callback must observe both changes, never an intermediate state.
-    const result = this.applyRiskDecision({ task_id, proposal_sha256, decision, reviewer, reason });
-    result.risk_callback = { callback_version: riskHandoff.CALLBACK_VERSION, request: callback, received_at: now() };
+    const result = this.applyRiskDecision({ task_id, proposal_sha256, decision, reviewer, reason }, actorAuth);
+    result.risk_callback = { callback_version: riskHandoff.CALLBACK_VERSION, request: callback, received_at: now(), ...(actorAuth ? { auth: clone(actorAuth) } : {}) };
     event(result, "risk.callback.recorded", {
       handoff_id: callback.handoff_id, audit_id: callback.audit_id,
       proposal_sha256, decision, risk_decision_id: result.risk_decision.risk_decision_id
@@ -430,11 +430,57 @@ class ReviewWorkflowStore {
     return { callback_status: "RECORDED", workflow: this.save(result) };
   }
 
-  async decideRisk(input = {}) {
-    return this.applyRiskDecision(input);
+  async dispatchRiskHandoff(input = {}, sender) {
+    const taskId = requiredString(input.task_id, "task_id");
+    const record = this.requireRecord(taskId);
+    if (!record.proposed_action) throw new WorkflowError("RISK_BLOCKED", "model failure cannot be dispatched to Risk", { stage: "RISK_DISPATCH", record });
+    this.checkInput(record, input, ["task_id", "proposal_sha256"], "RISK_DISPATCH");
+    if (record.risk_dispatch?.status === "SENT") return record;
+    if (record.status !== "PENDING_RISK") {
+      this.deny(record, "RISK_DISPATCH_BLOCKED", "only a task waiting for Risk can be dispatched", "RISK_DISPATCH", "Read the current task state and create a new task if the proposal changed.");
+    }
+    if (typeof sender !== "function") {
+      this.deny(record, "RISK_OWNER_NOT_CONFIGURED", "Risk Owner adapter is not configured", "RISK_DISPATCH", "Configure the Risk service address and HMAC secret before dispatching.", 503);
+    }
+    try {
+      const handoff = riskHandoff.buildRiskHandoffPackage(record);
+      const result = await sender(handoff, record);
+      record.risk_dispatch = {
+        dispatch_id: record.risk_dispatch?.dispatch_id || id("risk-dispatch-"),
+        status: "SENT",
+        attempts: (record.risk_dispatch?.attempts || 0) + 1,
+        sent_at: now(),
+        upstream_status: result?.upstream_status || null
+      };
+      event(record, "risk.handoff.dispatched", { dispatch_id: record.risk_dispatch.dispatch_id, upstream_status: record.risk_dispatch.upstream_status }, "risk-gateway");
+      return this.save(record);
+    } catch (error) {
+      record.risk_dispatch = {
+        dispatch_id: record.risk_dispatch?.dispatch_id || id("risk-dispatch-"),
+        status: "FAILED",
+        attempts: (record.risk_dispatch?.attempts || 0) + 1,
+        failed_at: now(),
+        error_code: error.code || "RISK_DISPATCH_FAILED"
+      };
+      event(record, "risk.handoff.dispatch_failed", { dispatch_id: record.risk_dispatch.dispatch_id, code: record.risk_dispatch.error_code }, "risk-gateway");
+      const wrapped = error instanceof WorkflowError ? error : new WorkflowError(error.code || "RISK_DISPATCH_FAILED", error.message || "Risk Handoff dispatch failed", {
+        statusCode: error.statusCode || 503,
+        retryable: Boolean(error.retryable),
+        stage: error.stage || "RISK_DISPATCH",
+        recovery: error.recovery || "确认 Risk Owner 服务状态后重试。",
+        details: error.details || null,
+        record: this.save(record)
+      });
+      wrapped.workflowRecord = this.save(record);
+      throw wrapped;
+    }
   }
 
-  applyRiskDecision(input = {}) {
+  async decideRisk(input = {}, actorAuth = null) {
+    return this.applyRiskDecision(input, actorAuth);
+  }
+
+  applyRiskDecision(input = {}, actorAuth = null) {
     const taskId = requiredString(input.task_id, "task_id");
     const record = this.requireRecord(taskId);
     if (!record.proposed_action) throw new WorkflowError("RISK_BLOCKED", "model failure cannot be approved", { stage: "RISK", record });
@@ -455,7 +501,8 @@ class ReviewWorkflowStore {
       reviewer,
       reason,
       proposal_sha256: record.proposed_action.proposal_sha256,
-      decided_at: now()
+      decided_at: now(),
+      ...(actorAuth ? { auth: clone(actorAuth) } : {})
     };
     record.risk_handoff.status = record.risk_decision.status === "APPROVED" ? "APPROVED" : record.risk_decision.status === "REJECTED" ? "REJECTED" : "PENDING_REVIEW";
     record.risk_handoff.decision = decision;
@@ -484,7 +531,7 @@ class ReviewWorkflowStore {
     return this.save(record);
   }
 
-  async decideApproval(input = {}) {
+  async decideApproval(input = {}, actorAuth = null) {
     const taskId = requiredString(input.task_id, "task_id");
     const record = this.requireRecord(taskId);
     if (!record.proposed_action) throw new WorkflowError("APPROVAL_BLOCKED", "model failure cannot be approved", { stage: "APPROVAL", record });
@@ -509,6 +556,7 @@ class ReviewWorkflowStore {
     record.approval.reason = reason;
     record.approval.approver = approver;
     record.approval.decided_at = now();
+    if (actorAuth) record.approval.auth = clone(actorAuth);
     record.approval.status = decision === "APPROVE" ? "APPROVED" : "REJECTED";
     if (decision === "REJECT") {
       record.status = "REJECTED";
