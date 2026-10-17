@@ -1,0 +1,532 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/risk-draft/common.schema.json",
+  "$defs": {
+    "Binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "handoff_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "user_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proposal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proposal_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "plan_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plan_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "profile_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraints_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trading_rules_version": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rules_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "request_id",
+        "handoff_id",
+        "task_id",
+        "session_id",
+        "user_id",
+        "proposal_id",
+        "proposal_hash",
+        "plan_version",
+        "plan_hash",
+        "profile_version",
+        "constraints_version",
+        "data_version",
+        "trading_rules_version",
+        "rules_version"
+      ]
+    },
+    "Measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actual": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unit": {
+          "enum": [
+            "RATIO",
+            "CNY",
+            "SHARE",
+            "COUNT",
+            "CORRELATION"
+          ]
+        },
+        "basis": {
+          "enum": [
+            "TOTAL_ASSETS",
+            "INVESTED_ASSETS",
+            "SAMPLE",
+            "CASH",
+            "POSITION",
+            "NONE"
+          ]
+        },
+        "denominator": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operator": {
+          "enum": [
+            "GT",
+            "GTE",
+            "LT",
+            "LTE",
+            "EQ",
+            "NONE"
+          ]
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "actual",
+        "unit",
+        "basis",
+        "denominator",
+        "operator",
+        "threshold"
+      ]
+    },
+    "Reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reason_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_id": {
+          "enum": [
+            "R01",
+            "R02",
+            "R03",
+            "R04",
+            "R05",
+            "R06",
+            "R07",
+            "R08",
+            "R09",
+            "R10"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision": {
+          "enum": [
+            "REVIEW",
+            "BLOCK",
+            "ERROR"
+          ]
+        },
+        "message_zh": {
+          "type": "string",
+          "minLength": 1
+        },
+        "measurements": {
+          "type": "array",
+          "items": {
+            "$ref": "https://fintechathon-agent.github.io/contracts/risk-draft/common.schema.json#/$defs/Measurement"
+          },
+          "minItems": 0
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "acceptance_allowed": {
+          "type": "boolean"
+        },
+        "recovery": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "enum": [
+                "ACCEPT_RISK",
+                "SUPPLY_INFORMATION",
+                "REFRESH_DATA",
+                "REVISE_PLAN",
+                "RECHECK",
+                "RECONFIRM",
+                "RECONCILE_EXECUTION",
+                "RESTORE_AUDIT",
+                "DENY_ACTION"
+              ]
+            },
+            "owner": {
+              "enum": [
+                "USER",
+                "ORCHESTRATOR",
+                "CORE_MEMORY",
+                "TOOLS",
+                "RISK",
+                "FRONTEND"
+              ]
+            },
+            "message_zh": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "action",
+            "owner",
+            "message_zh"
+          ]
+        }
+      },
+      "required": [
+        "reason_id",
+        "rule_id",
+        "code",
+        "decision",
+        "message_zh",
+        "measurements",
+        "evidence_refs",
+        "acceptance_allowed",
+        "recovery"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "decision": {
+                "enum": [
+                  "BLOCK",
+                  "ERROR"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "acceptance_allowed": {
+                "const": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reason_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk_check_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "user_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accepted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "binding": {
+          "$ref": "https://fintechathon-agent.github.io/contracts/risk-draft/common.schema.json#/$defs/Binding"
+        }
+      },
+      "required": [
+        "reason_id",
+        "risk_check_id",
+        "user_id",
+        "accepted_at",
+        "binding"
+      ]
+    },
+    "Approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "UNCONFIRMED",
+            "CONFIRMED",
+            "REJECTED",
+            "REVOKED",
+            "INVALIDATED",
+            "EXPIRED"
+          ]
+        },
+        "approval_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confirmed_by": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confirmed_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "risk_check_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "binding": {
+          "anyOf": [
+            {
+              "$ref": "https://fintechathon-agent.github.io/contracts/risk-draft/common.schema.json#/$defs/Binding"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accepted_risks": {
+          "type": "array",
+          "items": {
+            "$ref": "https://fintechathon-agent.github.io/contracts/risk-draft/common.schema.json#/$defs/Acceptance"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "status",
+        "approval_id",
+        "confirmed_by",
+        "confirmed_at",
+        "expires_at",
+        "risk_check_id",
+        "binding",
+        "accepted_risks"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "CONFIRMED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "approval_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "confirmed_by": {
+                "type": "string",
+                "minLength": 1
+              },
+              "confirmed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "expires_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "risk_check_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "binding": {
+                "$ref": "https://fintechathon-agent.github.io/contracts/risk-draft/common.schema.json#/$defs/Binding"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "NOT_STARTED",
+            "RUNNING",
+            "SUCCEEDED",
+            "FAILED",
+            "UNKNOWN",
+            "ABORTED"
+          ]
+        },
+        "execution_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "idempotency_key": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "content_hash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "previous_result_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "execution_id",
+        "idempotency_key",
+        "content_hash",
+        "previous_result_ref"
+      ]
+    }
+  }
+}
