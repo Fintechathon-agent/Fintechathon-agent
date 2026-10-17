@@ -1,0 +1,7 @@
+{
+  "name": "safety-risk-eval",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": { "start": "node server.cjs", "test": "node --test test/*.test.cjs", "eval": "node scripts/evaluate.cjs" },
+  "engines": { "node": ">=22" }
+}

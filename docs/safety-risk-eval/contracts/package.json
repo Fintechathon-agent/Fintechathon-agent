@@ -1,0 +1,9 @@
+{
+  "name": "risk-contract-draft",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Draft Risk contracts and offline contract validation only",
+  "scripts": { "test": "node --test tests/*.test.cjs", "check": "node validate.cjs" },
+  "devDependencies": { "ajv": "8.17.1", "ajv-formats": "3.0.1" },
+  "engines": { "node": ">=22" }
+}
