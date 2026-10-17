@@ -1,0 +1,28 @@
+[
+  {
+    "url": "https://fintechathon.g-ican.com/",
+    "http_status": 200,
+    "content_type": "text/html",
+    "size": 3274,
+    "script_sources": []
+  },
+  {
+    "url": "https://lixjanus526-art.github.io/finance-lab-ui-preview/",
+    "http_status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "size": 524
+  },
+  {
+    "url": "https://lixjanus526-art.github.io/finance-lab-ui-preview/build-info.json",
+    "http_status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "size": 131,
+    "body": "{\n  \"mode\": \"STATIC_UI_ONLY\",\n  \"apiMocks\": false,\n  \"backend\": \"Not included. Service calls must fail visibly when unavailable.\"\n}"
+  },
+  {
+    "url": "https://lixjanus526-art.github.io/finance-lab-ui-preview/api/demo/portfolio",
+    "http_status": 404,
+    "content_type": "text/html; charset=utf-8",
+    "size": 9379
+  }
+]

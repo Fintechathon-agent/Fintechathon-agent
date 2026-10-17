@@ -42,9 +42,11 @@ def find_card_ref(text: str, cards: list[BankCard]) -> bool:
 
 def parse_card_operation(text: str) -> tuple[str, float | None]:
     """识别卡片操作与额度参数。"""
-    if re.search(r"(挂失|丢了|不见了|被盗|被偷)", text):
+    if re.search(r"解挂|解除挂失|取消挂失", text):
+        op = "loss_release"
+    elif re.search(r"(挂失|丢了|不见了|被盗|被偷)", text):
         op = "loss_report"
-    elif re.search(r"解锁|解挂|恢复使用", text):
+    elif re.search(r"解锁|恢复使用", text):
         op = "unlock"
     elif re.search(r"锁定|锁卡|冻结|暂时停用|锁一下|锁", text):
         op = "lock"
@@ -64,6 +66,11 @@ def parse_card_operation(text: str) -> tuple[str, float | None]:
     return op, new_limit
 
 
+def normalize_card_operation(card: BankCard | None, op: str) -> str:
+    # Any way of restoring a lost card is a loss release, including older queued unlocks.
+    return "loss_release" if card is not None and card.status == "lost" and op == "unlock" else op
+
+
 def handle_card_action(
     text: str,
     cards: list[BankCard],
@@ -77,6 +84,7 @@ def handle_card_action(
     """
     card = find_card(cards, text)
     op, new_limit = parse_card_operation(text)
+    op = normalize_card_operation(card, op)
     if card is None and not find_card_ref(text, cards):
         if op == "query":
             summary = "；".join(
@@ -118,7 +126,7 @@ def handle_card_action(
         )
 
     op_label = {
-        "lock": "锁卡", "unlock": "解锁", "limit_adjust": "额度调整", "loss_report": "挂失",
+        "lock": "锁卡", "unlock": "解锁", "limit_adjust": "额度调整", "loss_report": "挂失", "loss_release": "解除挂失",
     }.get(op, op)
     if op == "limit_adjust":
         detail = f"额度调整为 {new_limit:,.0f} 元"
@@ -127,6 +135,7 @@ def handle_card_action(
             "lock": "锁定卡片，暂停交易",
             "unlock": "恢复卡片使用",
             "loss_report": "挂失并立即冻结卡片（不可撤销，需强验证）",
+            "loss_release": "解除挂失并恢复使用（需强验证）",
         }[op]
     return CardActionResult(
         card_id=card.card_id, operation=op, tier=tier, status="pending_confirmation",
@@ -143,7 +152,7 @@ def apply_card_action(cards: list[BankCard], card_id: str, op: str, new_limit: f
             continue
         if op == "lock" or op == "loss_report":
             c.status = "lost" if op == "loss_report" else "locked"
-        elif op == "unlock":
+        elif op in ("unlock", "loss_release"):
             c.status = "normal"
         elif op == "limit_adjust" and new_limit:
             c.credit_limit = new_limit

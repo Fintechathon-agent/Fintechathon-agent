@@ -465,7 +465,8 @@
 
   function renderBankingPending(res) {
     const box = $('#banking-pending');
-    const pending = (res && res.pending) || [];
+    const pending = [...((res && res.pending) || []), ...((res && res.scheduled) || [])
+      .filter((task) => task.status === 'waiting_due').map((task) => ({ ...task.item, scheduled_at: task.scheduled_at }))];
     if (!pending.length) { box.innerHTML = ''; return; }
     box.innerHTML = `
       <div class="card-head"><h2>六场景 · 待确认事项</h2><span class="tag">黄=确认 ｜ 红=强验证</span></div>
@@ -474,10 +475,10 @@
           <div class="pend-main">
             ${tierBadge(p.tier, p.tier === 'red' ? '红色权限' : '黄色权限')}
             <span class="pend-msg">${esc(p.message || '')}</span>
-            <span class="muted">${esc(tShort(p.created_at))} · 有效至 ${esc(tShort(p.expires_at))}</span>
+            <span class="muted">${esc(tShort(p.created_at))} · ${p.scheduled_at ? '预约时间' : '有效至'} ${esc(tShort(p.scheduled_at || p.expires_at))}</span>
           </div>
           <div class="pend-actions">
-            ${p.tier === 'red' ? renderVerifyForm(p.id) : `
+            ${p.scheduled_at ? '<span class="muted">预约等待中，到期后重新确认</span>' : p.tier === 'red' ? renderVerifyForm(p.id) : `
               <button class="btn btn-sm" data-confirm="${esc(p.id)}">确认执行</button>`}
             <button class="btn btn-sm btn-ghost" data-reject="${esc(p.id)}">拒绝</button>
           </div>
@@ -513,7 +514,7 @@
         method: 'POST', body: { id, verification },
       });
       toast(res.message || '已确认');
-      feedback(res.message || '已确认，操作完成。', 'success');
+      feedback(res.message || (res.success ? '已确认，操作完成。' : '尚未执行，请核对提示。'), res.success ? 'success' : 'error');
       renderBankingPending(res);
       if (res.breaker) renderBreaker(res.breaker);
       if (typeof reloadData === 'function') reloadData();

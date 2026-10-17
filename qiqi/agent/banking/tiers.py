@@ -48,7 +48,7 @@ def tier_of_operation(scenario: str, operation: str, amount: float = 0.0,
 
     if scenario == "card":
         op = operation.replace("card_", "")
-        if op == "loss_report":
+        if op in ("loss_report", "loss_release"):
             return "red"
         if op in ("limit_adjust", "lock", "unlock"):
             return "yellow"

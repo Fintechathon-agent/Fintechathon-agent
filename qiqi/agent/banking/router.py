@@ -73,6 +73,7 @@ def route(
     balance: float = 0.0,
     daily_cumulative: float = 0.0,
     user_id: str = "demo_user",
+    cancelled_subs: set[str] | None = None,
 ) -> ScenarioResult:
     """统一入口：检测 → 路由 → 场景执行 → 审计。"""
     question = (text or "").strip()[:500]
@@ -89,6 +90,7 @@ def route(
     injection_reason = check_content(question)
     if injection_reason or _PRIVILEGE_BYPASS_RE.search(question):
         reason = injection_reason or "检测到绕过确认、验证或风控的请求"
+        get_breaker().record_failure("suspicious_request", {"reason": reason}, user_id)
         log_action("banking_request_blocked", user_id, "", {
             "question": question, "reason": reason,
         }, "failure")
@@ -145,7 +147,7 @@ def route(
     elif scenario == "bill":
         result = _run_bill(question, bills_data or [], plan, label)
     elif scenario == "subscription":
-        result = _run_subscription(question, bills_data or [], plan, label)
+        result = _run_subscription(question, bills_data or [], plan, label, cancelled_subs or set())
     elif scenario == "card":
         result = _run_card(question, cards_data or [], plan, label)
     elif scenario == "cross_scene":
@@ -257,6 +259,8 @@ def _run_transfer(question, contacts, balance, daily_cumulative, plan, label) ->
         finish_plan(plan, "scheduled")
     elif res.tier == "blocked":
         finish_plan(plan, "skipped")
+    elif res.status in ("pending_confirmation", "needs_clarification"):
+        finish_plan(plan, "waiting")
     else:
         finish_plan(plan, "done")
     return ScenarioResult(
@@ -272,6 +276,7 @@ def _run_transfer(question, contacts, balance, daily_cumulative, plan, label) ->
             "request": {
                 "payee": res.request.payee, "amount": res.request.amount,
                 "memo": res.request.memo, "scheduled_at": res.request.scheduled_at,
+                "operation": "aa_collect" if res.aa_items else "transfer",
                 "matched_contact": (
                     {"name": res.matched_contact.name, "phone": res.matched_contact.phone}
                     if res.matched_contact else None
@@ -321,15 +326,18 @@ def _run_bill(question, bills_data, plan, label) -> ScenarioResult:
     )
 
 
-def _run_subscription(question, bills_data, plan, label) -> ScenarioResult:
+def _run_subscription(question, bills_data, plan, label, cancelled_subs=None) -> ScenarioResult:
     subs = subscriptions.detect_subscriptions(bills_data)
+    for sub in subs:
+        if sub.sub_id in (cancelled_subs or set()):
+            sub.status = "cancelled"
     active = [s for s in subs if s.status == "active"]
     reminders = subscriptions.renewal_reminders(active)
     mark_plan(plan, "validate", "done")
     mark_plan(plan, "detect", "done")
     mark_plan(plan, "remind", "done")
 
-    cancel_target = subscriptions.find_subscription(active, question) \
+    cancel_target = subscriptions.find_subscription(subs, question) \
         if re.search(r"(取消|退订|停止|关了|不要了)", question) else None
     if cancel_target:
         from agent.banking.gates import check_subscription_cancel
@@ -355,7 +363,7 @@ def _run_subscription(question, bills_data, plan, label) -> ScenarioResult:
                     "question": question, "slots": {"cancel": cancel_target.merchant}},
             plan=plan, tier="yellow", status="pending_confirmation",
             data={
-                "target": {"merchant": cancel_target.merchant,
+                "target": {"sub_id": cancel_target.sub_id, "merchant": cancel_target.merchant,
                            "amount": cancel_target.amount,
                            "next_charge_at": cancel_target.next_charge_at},
                 "gate_checks": checks,
@@ -429,7 +437,8 @@ def _run_card(question, cards_data, plan, label) -> ScenarioResult:
     mark_plan(plan, "locate", "blocked" if res.tier == "blocked" else "done")
     mark_plan(plan, "gate", "blocked" if res.tier == "blocked" else "done")
     mark_plan(plan, "tier", "blocked" if res.tier == "blocked" else "done")
-    finish_plan(plan, "done" if res.tier != "blocked" else "skipped")
+    finish_plan(plan, "waiting" if res.status == "pending_confirmation" else
+                "done" if res.tier != "blocked" else "skipped")
     card = cards.find_card(cards_data, question)
     return ScenarioResult(
         scenario="card", scenario_label=label,
@@ -440,7 +449,7 @@ def _run_card(question, cards_data, plan, label) -> ScenarioResult:
         data={
             "operation": res.operation,
             "new_limit": new_limit,
-            "card": ({"last4": card.last4, "bank": card.bank, "card_type": card.card_type,
+            "card": ({"card_id": card.card_id, "last4": card.last4, "bank": card.bank, "card_type": card.card_type,
                       "status": card.status, "credit_limit": card.credit_limit,
                       "daily_txn_limit": card.daily_txn_limit} if card else None),
             "gate_checks": res.gate_checks,

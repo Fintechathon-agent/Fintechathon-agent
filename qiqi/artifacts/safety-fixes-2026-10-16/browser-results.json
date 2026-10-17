@@ -1,0 +1,56 @@
+[
+  {
+    "view": "main",
+    "width": 1440,
+    "upgradedMfa": true,
+    "schedulePersistedAndCancelled": true,
+    "aaDidNotDebit": true,
+    "errors": [],
+    "screenshot": "D:\\黑客松大赛冲刺版\\artifacts\\safety-fixes-2026-10-16\\main-1440.png"
+  },
+  {
+    "view": "main",
+    "width": 390,
+    "upgradedMfa": true,
+    "schedulePersistedAndCancelled": true,
+    "aaDidNotDebit": true,
+    "errors": [],
+    "screenshot": "D:\\黑客松大赛冲刺版\\artifacts\\safety-fixes-2026-10-16\\main-390.png"
+  },
+  {
+    "view": "v2",
+    "width": 1440,
+    "upgradedMfa": true,
+    "schedulePersistedAndCancelled": true,
+    "aaDidNotDebit": true,
+    "errors": [],
+    "screenshot": "D:\\黑客松大赛冲刺版\\artifacts\\safety-fixes-2026-10-16\\v2-1440.png"
+  },
+  {
+    "view": "v2",
+    "width": 390,
+    "upgradedMfa": true,
+    "schedulePersistedAndCancelled": true,
+    "aaDidNotDebit": true,
+    "errors": [],
+    "screenshot": "D:\\黑客松大赛冲刺版\\artifacts\\safety-fixes-2026-10-16\\v2-390.png"
+  },
+  {
+    "view": "compare",
+    "width": 1440,
+    "upgradedMfa": true,
+    "schedulePersistedAndCancelled": true,
+    "aaDidNotDebit": true,
+    "errors": [],
+    "screenshot": "D:\\黑客松大赛冲刺版\\artifacts\\safety-fixes-2026-10-16\\compare-1440.png"
+  },
+  {
+    "view": "compare",
+    "width": 390,
+    "upgradedMfa": true,
+    "schedulePersistedAndCancelled": true,
+    "aaDidNotDebit": true,
+    "errors": [],
+    "screenshot": "D:\\黑客松大赛冲刺版\\artifacts\\safety-fixes-2026-10-16\\compare-390.png"
+  }
+]

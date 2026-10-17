@@ -149,6 +149,52 @@ function renderHeader(boot) {
   $('#disclaimer').textContent = boot.meta.disclaimer;
 }
 
+function renderRiskWorkbench(payload = {}) {
+  const health = payload.health || {};
+  const risk = payload.risk_report || health.risk_report || {};
+  const score = Number(risk.risk_score);
+  const scoreKnown = Number.isFinite(score);
+  const scoreTone = !scoreKnown ? '' : score >= 70 ? 'is-high' : score >= 40 ? 'is-medium' : '';
+  const scoreLabel = !scoreKnown ? '等待数据' : score >= 70 ? '高风险，建议先处理警告' : score >= 40 ? '中等风险，建议关注集中度' : '风险处于可控区间';
+  const scoreValue = $('#risk-score-value');
+  const scoreCaption = $('#risk-score-caption');
+  const scoreBar = $('#risk-score-bar');
+  if (!scoreValue) return;
+
+  scoreValue.textContent = scoreKnown ? `${score.toFixed(0)} / 100` : '—';
+  scoreValue.className = `risk-score-value ${scoreTone}`.trim();
+  scoreCaption.textContent = scoreLabel;
+  scoreBar.style.width = `${scoreKnown ? Math.max(0, Math.min(100, score)) : 0}%`;
+  scoreBar.className = scoreTone;
+
+  const varValue = Number(risk.var_95);
+  const drawdownValue = Number(risk.max_drawdown);
+  const correlations = risk.avg_correlation;
+  const sectorEntries = Object.entries(risk.sector_concentration || {})
+    .sort((a, b) => Number(b[1]) - Number(a[1]));
+  const topSector = sectorEntries[0];
+  $('#risk-var').textContent = Number.isFinite(varValue) ? `${varValue.toFixed(2)}%` : '—';
+  $('#risk-drawdown').textContent = Number.isFinite(drawdownValue) ? `${drawdownValue.toFixed(2)}%` : '—';
+  $('#risk-concentration').textContent = topSector ? `${esc(topSector[0])} ${(Number(topSector[1]) * 100).toFixed(1)}%` : '—';
+  $('#risk-correlation').textContent = correlations === null || correlations === undefined || !Number.isFinite(Number(correlations))
+    ? '暂不可用' : Number(correlations).toFixed(2);
+
+  const warnings = [...new Set([...(risk.warnings || []), ...(health.risk_warnings || [])])];
+  $('#risk-warning-list').innerHTML = warnings.length
+    ? warnings.slice(0, 4).map((warning) => `<div class="risk-warning ${warning.includes('违规') || warning.includes('超限') ? 'is-blocked' : ''}">⚠ ${esc(warning)}</div>`).join('')
+    : '<div class="risk-warning is-clear">✓ 当前没有需要立即处理的风险提示</div>';
+
+  const nextActions = payload.next_actions || health.next_actions || [];
+  $('#risk-next-actions').innerHTML = nextActions.length
+    ? nextActions.slice(0, 3).map((action) => `<div class="risk-next-action">${esc(action)}</div>`).join('')
+    : '<div class="risk-next-action">先发起一次投资体检，获取针对当前组合的建议。</div>';
+
+  const status = $('#risk-workbench-status');
+  status.textContent = scoreKnown ? (score >= 70 ? '需要关注' : score >= 40 ? '持续观察' : '风险可控') : '等待评估';
+  status.className = `tag ${score >= 70 ? 'tag-danger' : score >= 40 ? 'tag-warn' : 'tag-live'}`;
+  $('#risk-generated-at').textContent = risk.generated_at ? `评估时间：${String(risk.generated_at).slice(0, 16).replace('T', ' ')}` : '评估时间：—';
+}
+
 function renderStats(boot) {
   const pf = boot.portfolio, h = boot.health;
   const tiles = [
@@ -182,6 +228,7 @@ function renderStats(boot) {
     ${warns ? `<div class="warns">${warns}</div>` : ''}`;
 
   $('#assets-date').textContent = `${pf.date} · ${boot.meta.data_tag}`;
+  renderRiskWorkbench({ health: h, risk_report: h.risk_report });
 }
 
 function renderPositions(pf) {
@@ -375,6 +422,7 @@ async function runReview() {
 function renderRecommendation(data) {
   const r = data.recommendation;
   const area = $('#rec-area');
+  renderRiskWorkbench(data);
   renderGate(data.gate);
   renderWhatIf(data.whatif);
 

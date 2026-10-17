@@ -17,6 +17,9 @@ async function check(viewport, name) {
   page.on('pageerror', (error) => errors.push(error.message));
 
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
+  await page.locator('#risk-workbench').waitFor();
+  if ((await page.locator('#risk-score-value').innerText()) === '—') throw new Error(`${name}: embedded risk score did not load`);
+  if (await page.locator('a[href^="https://"]').filter({ hasText: '风险' }).count()) throw new Error(`${name}: external risk workbench link remains`);
   await page.locator('#nl-question').fill('平安银行卖出 30%');
   await page.locator('#btn-review').click();
   await page.locator('#intent-area').getByText('意图：理财操作').waitFor();

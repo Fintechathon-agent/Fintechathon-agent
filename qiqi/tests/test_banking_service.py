@@ -1,6 +1,12 @@
 from __future__ import annotations
 
 import unittest
+import tempfile
+from pathlib import Path
+from unittest.mock import patch
+
+from agent.risk.circuit_breaker import init_breaker
+from agent.risk.audit import init_audit_logger
 
 from web.banking_demo import get_banking_state
 from web.banking_service import (
@@ -8,13 +14,25 @@ from web.banking_service import (
 )
 
 
-class BankingServiceFlowTests(unittest.TestCase):
+class IsolatedBankingCase(unittest.TestCase):
     def setUp(self):
+        temp = tempfile.TemporaryDirectory(prefix="banking-service-")
+        self.addCleanup(temp.cleanup)
+        root = Path(temp.name)
+        for target, value in (("web.banking_demo.STATE_DIR", root / "banking"),
+                              ("web.banking_demo._state", None),
+                              ("agent.risk.circuit_breaker._breaker", None),
+                              ("agent.risk.audit._audit_logger", None)):
+            patcher = patch(target, value)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        init_breaker(root / "breaker")
+        init_audit_logger(root / "audit")
         self.state = get_banking_state()
         self.state.reset()
 
-    def tearDown(self):
-        self.state.reset()
+
+class BankingServiceFlowTests(IsolatedBankingCase):
 
     def test_cross_scene_funding_confirmation_is_queued_and_consumed(self):
         result = run_scenario("我爱人10月25日生日，锁定1000元活期")
@@ -62,15 +80,8 @@ class BankingServiceFlowTests(unittest.TestCase):
         self.assertIn("不会发生真实", result["provenance"]["simulation_notice"])
 
 
-class SeedDemoQueueTests(unittest.TestCase):
+class SeedDemoQueueTests(IsolatedBankingCase):
     """第三版任务台「预置演示数据」：队列与审计基线都真实走规则引擎。"""
-
-    def setUp(self):
-        self.state = get_banking_state()
-        self.state.reset()
-
-    def tearDown(self):
-        self.state.reset()
 
     def test_seed_creates_five_flagged_pending_items(self):
         result = seed_demo_queue()

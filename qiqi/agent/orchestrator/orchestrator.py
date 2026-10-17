@@ -302,6 +302,7 @@ class Orchestrator:
         audit_logger: AuditLogger,
         approval_manager: ApprovalManager,
         decision_maker: DecisionMaker,
+        paper_trader: PaperTradingTool | None = None,
     ):
         self.loop = agent_loop
         self.memory = memory_store
@@ -309,6 +310,7 @@ class Orchestrator:
         self.audit = audit_logger
         self.approvals = approval_manager
         self.decision_maker = decision_maker
+        self.paper_trader = paper_trader
         self.portfolio_analyzer = PortfolioAnalyzer()
 
     def handle_review_request(
@@ -362,46 +364,58 @@ class Orchestrator:
         approval_id: str,
         approved: bool,
         comment: str = "",
+        portfolio: Portfolio | None = None,
     ) -> dict:
-        """处理用户对审批请求的响应"""
-        if approved:
-            ok = self.approvals.approve(approval_id, comment)
-        else:
-            ok = self.approvals.reject(approval_id, comment)
-
-        if not ok:
-            return {"success": False, "message": f"审批ID {approval_id} 不存在"}
-
-        request = self.approvals.get(approval_id)
-        if not request:
-            return {"success": False, "message": "审批请求未找到"}
-
-        if approved and request.recommendation:
-            from ..tools.paper_trade import get_paper_trader
-            trader = get_paper_trader()
-            result = trader.execute(request.recommendation, approval_id)
+        """Consume a pending approval once; a failed executor never means a fill."""
+        trader = self.paper_trader
+        if trader is None:
+            return {"success": False, "executed": False, "message": "未配置本应用的成交记录存储"}
+        with self.approvals.lock:
+            request = self.approvals.get(approval_id)
+            if not request:
+                return {"success": False, "executed": False, "message": "审批请求未找到"}
+            if request.status == "executed":
+                return {**request.execution_result, "replayed": True}
+            if request.status in ("executing", "approved"):
+                receipts = trader.get_trade_history(approval_id)
+                if len(receipts) == 1:
+                    result = {"success": True, "executed": True, "replayed": True,
+                              "message": "已恢复原成交回执，未重复执行",
+                              "trade_record": receipts[0].__dict__}
+                    self.approvals.finish(approval_id, result)
+                    return result
+                return {"success": False, "executed": False, "needs_manual_review": True,
+                        "message": "审批执行结果待人工核实，已暂停重试以防重复成交"}
+            if request.status != "pending":
+                return {"success": False, "executed": False,
+                        "message": f"审批已{request.status}，不能再次执行，请重新发起业务"}
+            if not approved:
+                ok = self.approvals.reject(approval_id, comment)
+                return {"success": ok, "executed": False,
+                        "message": "审批已拒绝" if ok else "审批已失效"}
+            if not self.approvals.approve(approval_id, comment):
+                return {"success": False, "executed": False, "message": "审批已处理或过期"}
+            try:
+                execution = trader.execute_once(request.recommendation, approval_id, portfolio)
+                filled = bool(execution.success and execution.trade_record)
+                result = {
+                    "success": filled, "executed": filled, "replayed": False,
+                    "message": "审批已通过并执行" if filled else "执行失败，资金与持仓未变更",
+                    "trade_result": execution.message,
+                    "trade_record": execution.trade_record.__dict__ if filled else None,
+                }
+            except Exception as exc:
+                result = {"success": False, "executed": False, "replayed": False,
+                          "message": f"执行失败，需人工核实：{exc}"}
+            self.approvals.finish(approval_id, result)
             self.audit.log(
-                action="paper_trade_execution",
-                # user_id 取审批归属用户；旧记录可能为空串，退回 "unknown"
-                # 而非证券代码（此前误把 symbol 写进 user_id，污染了审计过滤）
-                user_id=request.user_id or "unknown",
+                action="paper_trade_execution", user_id=request.user_id or "unknown",
                 session_id=approval_id,
-                detail={
-                    "action": request.recommendation.action.value,
-                    "symbol": request.recommendation.symbol,
-                    "quantity": request.recommendation.quantity,
-                    "approver_comment": comment,
-                    "result": "success" if result.success else "failure",
-                },
-                result="success" if result.success else "failure",
+                detail={"symbol": request.recommendation.symbol,
+                        "quantity": request.recommendation.quantity, "execution_result": result},
+                result="success" if result["executed"] else "failure",
             )
-            return {
-                "success": True,
-                "message": "审批已通过并执行",
-                "trade_result": result.message,
-            }
-
-        return {"success": True, "message": f"审批已{'通过' if approved else '拒绝'}"}
+            return result
 
     def get_portfolio_health(
         self,
@@ -544,6 +558,7 @@ def build_orchestrator(
         audit_logger=audit,
         approval_manager=approvals,
         decision_maker=decision_maker,
+        paper_trader=paper_trader,
     )
 
 

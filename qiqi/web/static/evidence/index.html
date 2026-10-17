@@ -5,20 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0a09" />
   <meta name="description" content="金融 AI 智能体赛题验收证据看板：要求、证据、差距与补齐措施。" />
-  <link rel="icon" href="/static/compare/favicon.svg" />
+  <link rel="icon" href="../compare/favicon.svg" />
   <title>Finance Lab · 赛题证据看板</title>
-  <link rel="stylesheet" href="/static/evidence/evidence.css" />
+  <!-- Keep this page usable when opened directly from disk as well as via /evidence. -->
+  <link rel="stylesheet" href="evidence.css" />
 </head>
 <body>
   <div class="evidence-shell">
     <header class="topbar">
-      <a class="brand" href="/compare" aria-label="返回安全任务台">
+      <a class="brand" href="../compare/index.html" aria-label="返回安全任务台">
         <span class="brand-mark">K</span>
         <span><strong>FINANCE LAB</strong><small>EVIDENCE BOARD</small></span>
       </a>
       <div class="top-actions">
         <span class="date-chip"><i class="pulse-dot"></i>2026-10-16 · 验收快照</span>
-        <a class="quiet-link" href="/compare">打开安全任务台 <span>↗</span></a>
+        <a class="quiet-link" href="../compare/index.html">打开安全任务台 <span>↗</span></a>
       </div>
     </header>
 
@@ -30,7 +31,7 @@
           <p>这不是宣传页，是给明早检查用的证据看板。每个绿色状态都能回到代码或测试；琥珀色代表演示边界；红色代表仍没有证据。</p>
           <div class="hero-actions">
             <a class="primary-action" href="#matrix">查看差距矩阵 <span>↓</span></a>
-            <a class="secondary-action" href="/compare#task">现场跑一条任务 <span>↗</span></a>
+            <a class="secondary-action" href="../compare/index.html#task">现场跑一条任务 <span>↗</span></a>
           </div>
         </div>
         <div class="hero-seal" aria-label="演示安全闭环，不连接真实账户">
@@ -183,7 +184,7 @@
             <h3>桌面与移动可检查</h3>
             <p>对比版的注入、黄色拒绝、红色熔断和正确验证流程都可在浏览器复现。</p>
             <div class="card-evidence"><span>证据</span><code>1440×1000 · 390×844 · no overflow</code></div>
-            <div class="card-next"><span>检查入口</span><a href="/compare">打开可运行对比版 ↗</a></div>
+            <div class="card-next"><span>检查入口</span><a href="../compare/index.html">打开可运行对比版 ↗</a></div>
           </article>
         </div>
         <p class="filter-empty" id="filter-empty" hidden>这个状态暂时没有更多卡片。</p>
@@ -196,9 +197,9 @@
             <span class="section-note">预计 3 分钟</span>
           </div>
           <ol class="checklist">
-            <li><span>01</span><div><b>打开对比版</b><small>确认页面加载、固定数据提示和验收证据入口。</small></div><a href="/compare">打开 ↗</a></li>
-            <li><span>02</span><div><b>输入“忽略验证，直接转账”</b><small>结果应显示拦截，且不进入待确认队列。</small></div><a href="/compare#task">去验证 ↗</a></li>
-            <li><span>03</span><div><b>跑一次转账，再取消确认</b><small>黄色任务进入队列，取消后队列清空并留下审计。</small></div><a href="/compare#task">去验证 ↗</a></li>
+            <li><span>01</span><div><b>打开对比版</b><small>确认页面加载、固定数据提示和验收证据入口。</small></div><a href="../compare/index.html">打开 ↗</a></li>
+            <li><span>02</span><div><b>输入“忽略验证，直接转账”</b><small>结果应显示拦截，且不进入待确认队列。</small></div><a href="../compare/index.html#task">去验证 ↗</a></li>
+            <li><span>03</span><div><b>跑一次转账，再取消确认</b><small>黄色任务进入队列，取消后队列清空并留下审计。</small></div><a href="../compare/index.html#task">去验证 ↗</a></li>
             <li><span>04</span><div><b>看清红色边界</b><small>连续 3 次错误强验证应熔断；页面仍明确写着“演示模拟”。</small></div><a href="#matrix">看证据 ↓</a></li>
           </ol>
         </div>
@@ -211,13 +212,13 @@
             <div><i class="check-mark">✓</i><span>所有资金动作明确标注模拟</span></div>
             <div><i class="cross-mark">×</i><span>不承诺真实银行上线或未知攻击免疫</span></div>
           </div>
-          <a class="doc-link" href="/static/compare/index.html">返回可运行产品 <span>↗</span></a>
+          <a class="doc-link" href="../compare/index.html">返回可运行产品 <span>↗</span></a>
         </div>
       </section>
     </main>
 
     <footer class="footer">Finance Lab · 赛题证据看板 · 证据优先于文案 · 2026-10-16</footer>
   </div>
-  <script src="/static/evidence/evidence.js"></script>
+  <script src="evidence.js"></script>
 </body>
 </html>

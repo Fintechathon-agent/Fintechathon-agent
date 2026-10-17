@@ -48,6 +48,7 @@ from web.demo_data import (                              # noqa: E402
     portfolio_dict,
     rec_dict,
     recompute_portfolio,
+    risk_dict,
     response_dict,
     tier_of,
 )
@@ -206,47 +207,22 @@ class DemoApp:
                     for line in f.read_text(encoding="utf-8").splitlines():
                         if line.strip():
                             rows.append(json.loads(line))
-                except (OSError, json.JSONDecodeError):
-                    continue
+                except (OSError, json.JSONDecodeError) as exc:
+                    raise ValueError(f"成交记录无法读取，须人工核实：{f.name}") from exc
         if not rows:
             return pf
 
         rows.sort(key=lambda r: r.get("timestamp", ""))
-        fixture_names = {p.symbol: p.name for p in pf.positions}
-        for r in rows:
-            action = r.get("action", "")
-            sym = r.get("symbol", "")
-            qty = float(r.get("quantity", 0) or 0)
-            price = float(r.get("price", 0) or 0)
-            if not sym or qty <= 0 or price <= 0:
+        from agent.tools.paper_trade import TradeRecord, apply_trade_record
+        seen = set()
+        for row in rows:
+            if row.get("id") in seen:
                 continue
-            if action == ActionType.SELL.value:
-                for i, p in enumerate(pf.positions):
-                    if p.symbol != sym:
-                        continue
-                    sold = min(p.quantity, qty)
-                    p.quantity -= sold
-                    pf.cash += round(sold * price, 2)
-                    if p.quantity <= 0:
-                        pf.positions.pop(i)
-                    break
-            elif action == ActionType.BUY.value:
-                cost = round(qty * price, 2)
-                if cost > pf.cash:
-                    continue
-                pf.cash -= cost
-                for p in pf.positions:
-                    if p.symbol == sym:
-                        total = p.avg_cost * p.quantity + price * qty
-                        p.quantity += qty
-                        p.avg_cost = total / p.quantity
-                        break
-                else:
-                    pf.positions.append(Position(
-                        symbol=sym, name=fixture_names.get(sym, sym), quantity=qty,
-                        avg_cost=price, current_price=price, market_value=price * qty,
-                        return_pct=0.0, sector="未分类",
-                    ))
+            seen.add(row.get("id"))
+            try:
+                apply_trade_record(pf, TradeRecord(**row))
+            except (ValueError, TypeError) as exc:
+                raise ValueError(f"成交记录 {row.get('id')} 无法重放，须人工核实") from exc
         recompute_portfolio(pf)
         logger.info("已按 %d 笔历史纸交易还原组合", len(rows))
         return pf
@@ -339,6 +315,11 @@ class DemoApp:
         recompute_portfolio(self.state.portfolio)
         snapshot = demo_market(self.state.portfolio)
         raw = self.orch.get_portfolio_health(self.state.portfolio, snapshot)
+        # 风险工作台与投资主链路共用同一个 RiskEngine，避免页面展示与
+        # 体检 / 闸门使用不同口径。这里不写记忆，只计算当前组合快照。
+        risk_report = self.orch.loop.risk_engine(
+            self.state.portfolio, demo_user(), snapshot
+        )
         names = {p.symbol: p.name for p in self.state.portfolio.positions}
         health = {
             "total_value": round(raw["total_value"], 2),
@@ -361,6 +342,7 @@ class DemoApp:
             "risk_warnings": list(raw["risk_warnings"]),
             "reasoning": raw["reasoning"],
             "next_actions": list(raw["next_actions"]),
+            "risk_report": risk_dict(risk_report),
         }
         self.state.last_health = health
         return health
@@ -568,11 +550,15 @@ class DemoApp:
             logger.warning("取代旧审批失败 %s：%s", approval_id, exc)
 
     def decide(self, payload: dict) -> dict:
+        with self.state.lock:
+            return self._decide_locked(payload)
+
+    def _decide_locked(self, payload: dict) -> dict:
         """用户对建议的最终裁决：确认执行（含红色权限强验证）或拒绝"""
         approval_id = str(payload.get("id", "")).strip()
         if not approval_id:
             return {"success": False, "message": "缺少审批 ID"}
-        approved = bool(payload.get("approved"))
+        approved = payload.get("approved") is True
         comment = str(payload.get("comment", "")).strip()
 
         # 熔断锁定期间拒绝一切裁决（fail-closed，需先人工恢复）
@@ -582,6 +568,25 @@ class DemoApp:
                 "message": "⛔ 系统熔断锁定中：连续安全事件超过阈值，已暂停执行链路，请先人工确认恢复。",
             }
 
+        # A prior request may have persisted a fill before its response failed.
+        # Reconcile the ledger before checking capacity for any next approval.
+        self.state.portfolio = self._rehydrate_portfolio()
+        request = self.orch.approvals.get(approval_id)
+        if request is None:
+            return {"success": False, "executed": False, "message": "审批请求不存在"}
+        if request.status != "pending":
+            result = self.orch.handle_approval_response(approval_id, approved, comment, self.state.portfolio)
+            if result.get("executed"):
+                self._apply_fill(approval_id)
+            return {**result, "portfolio": portfolio_dict(self.state.portfolio), "trades": self.trades(limit=10)}
+        if approved:
+            from agent.risk.gate import RiskGate
+            gate = RiskGate().check(request.recommendation, self.state.portfolio, demo_user(), demo_market(self.state.portfolio))
+            if not gate.passed:
+                self.orch.approvals.reject(approval_id, "确认时重新检查未通过")
+                get_breaker().record_failure("gate_block", {"approval_id": approval_id}, USER_ID)
+                return {"success": False, "executed": False, "message": "确认时风控检查未通过：" + "；".join(gate.blocked_reasons)}
+
         meta = self.state.approval_meta.get(approval_id, {})
         tier = meta.get("tier", "red")
 
@@ -590,14 +595,15 @@ class DemoApp:
             self._mark_feedback(meta.get("session_id", ""), False, comment)
             self._log("approval_rejected", approval_id,
                       {"reason": comment or "用户拒绝该建议", "tier": tier})
-            meta.pop(approval_id, None)
+            self.state.approval_meta.pop(approval_id, None)
             return {**result, "tier": tier, "executed": False}
 
         # 红色权限：多因子强验证（短信 + 人脸，演示为 Mock）
         if tier == "red":
-            sms = str(payload.get("verification", {}).get("sms_code", "")).strip()
-            face = bool(payload.get("verification", {}).get("face_verified"))
-            sms_ok = len(sms) == 6 and sms.isdigit()
+            verification = payload.get("verification") or {}
+            sms = str(verification.get("sms_code", "")).strip()
+            face = verification.get("face_verified") is True
+            sms_ok = len(sms) == 6 and sms.isascii() and sms.isdigit()
             passed = sms_ok and face
             self._log(
                 "strong_verification", approval_id,
@@ -623,12 +629,12 @@ class DemoApp:
             self._log("user_confirmation", approval_id,
                       {"tier": "red", "note": "用户确认执行，强验证通过（演示）"})
 
-        result = self.orch.handle_approval_response(approval_id, True, comment)
-        executed = bool(result.get("success"))
+        result = self.orch.handle_approval_response(approval_id, True, comment, self.state.portfolio)
+        executed = bool(result.get("executed"))
         if executed:
             self._apply_fill(approval_id)
             self._mark_feedback(meta.get("session_id", ""), True, comment)
-            meta.pop(approval_id, None)
+            self.state.approval_meta.pop(approval_id, None)
         return {
             **result,
             "tier": tier,
@@ -686,57 +692,10 @@ class DemoApp:
             else ActionType.BUY.value
 
     def _apply_fill(self, approval_id: str) -> None:
-        """把成交结果落到演示组合上（Golden Path：Portfolio 与长期 Memory 更新）"""
-        meta = self.state.approval_meta.get(approval_id) or {}
-        rec = meta.get("recommendation") or {}
-        raw_action = rec.get("action", "")
-        sym = rec.get("symbol", "")
-        pf = self.state.portfolio
-        action = self._resolve_direction(raw_action, rec, pf)
-        if action != raw_action:
-            self._log("direction_resolved", approval_id, {
-                "原始动作": raw_action or "（空）",
-                "归一方向": action,
-                "说明": "单笔建议必须带明确方向，已按建议文本与持仓关系归一",
-            })
-        qty = float(rec.get("quantity", 0) or 0)
-        price = float(rec.get("price", 0) or 0)
-        if not sym or qty <= 0 or price <= 0:
-            return
-
-        pf = self.state.portfolio
-        if action == ActionType.SELL.value:
-            for i, p in enumerate(pf.positions):
-                if p.symbol != sym:
-                    continue
-                sell_qty = min(p.quantity, qty)
-                p.quantity -= sell_qty
-                pf.cash += round(sell_qty * price, 2)
-                if p.quantity <= 0:
-                    pf.positions.pop(i)
-                break
-        elif action == ActionType.BUY.value:
-            budget = min(pf.cash, qty * price)
-            buy_qty = int(budget / price / 100) * 100     # A 股一手 100 股
-            if buy_qty <= 0:
-                return
-            pf.cash -= round(buy_qty * price, 2)
-            for p in pf.positions:
-                if p.symbol == sym:
-                    total_cost = p.avg_cost * p.quantity + price * buy_qty
-                    p.quantity += buy_qty
-                    p.avg_cost = total_cost / p.quantity
-                    break
-            else:
-                pf.positions.append(Position(
-                    symbol=sym, name=rec.get("name", sym), quantity=buy_qty,
-                    avg_cost=price, current_price=price, market_value=price * buy_qty,
-                    return_pct=0.0, sector="未分类",
-                ))
-        recompute_portfolio(pf)
+        """Rebuild from unique durable receipts, never from a proposed quantity."""
+        self.state.portfolio = self._rehydrate_portfolio()
         self._log("portfolio_updated", approval_id, {
-            "action": action, "symbol": sym, "quantity": qty, "price": price,
-            "note": "组合已按成交结果更新（演示）",
+            "note": "组合已依据持久化成交回执重建（演示）",
         })
 
     def breaker_reset(self) -> dict:
@@ -901,7 +860,7 @@ class Handler(BaseHTTPRequestHandler):
         """浏览器关闭 keep-alive 连接时静默结束，不把正常断连打印成服务异常。"""
         try:
             super().handle()
-        except (BrokenPipeError, ConnectionResetError):
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
             pass
 
     # ---- 基础输出 ----
@@ -923,7 +882,7 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         try:
             self.wfile.write(body)
-        except (BrokenPipeError, ConnectionResetError):
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
             pass
 
     def _json(self, payload: Any, code: int = 200) -> None:
@@ -943,6 +902,7 @@ class Handler(BaseHTTPRequestHandler):
             ".html": "text/html; charset=utf-8",
             ".css": "text/css; charset=utf-8",
             ".js": "application/javascript; charset=utf-8",
+            ".mjs": "application/javascript; charset=utf-8",
             ".svg": "image/svg+xml",
             ".png": "image/png",
             ".ico": "image/x-icon",
@@ -980,10 +940,32 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path in ("/", "/index.html"):
                 return self._file("index.html")
-            if path in ("/compare", "/compare/"):
+            if path in ("/compare", "/compare/", "/compare/index.html"):
                 return self._file("compare/index.html")
-            if path in ("/evidence", "/evidence/"):
+            if path in ("/favicon.svg", "/compare/favicon.svg", "/favicon.ico"):
+                return self._file("compare/favicon.svg")
+            if path in ("/compare.css", "/compare/compare.css"):
+                return self._file("compare/compare.css")
+            if path in ("/compare.js", "/compare/compare.js"):
+                return self._file("compare/compare.js")
+            if path in ("/evidence", "/evidence/", "/evidence/index.html"):
                 return self._file("evidence/index.html")
+            # The evidence board uses relative assets so it also renders when
+            # opened directly as a local HTML file. These aliases keep the
+            # same assets available for both /evidence and /evidence/ URLs.
+            if path in ("/evidence.css", "/evidence/evidence.css"):
+                return self._file("evidence/evidence.css")
+            if path in ("/evidence.js", "/evidence/evidence.js"):
+                return self._file("evidence/evidence.js")
+            # Team public UI Preview, kept under a namespaced route so the
+            # older banking/evidence consoles remain available for regression
+            # tests and historical review.
+            if path in ("/team", "/team/"):
+                return self._file("team-preview/landing.html")
+            if path.startswith("/team/"):
+                rel = path[len("/team/"):].lstrip("/")
+                if rel:
+                    return self._file(f"team-preview/{rel}")
             if path.startswith("/static/"):
                 return self._file(path[len("/static/"):])
             if path == "/api/bootstrap":
@@ -1018,8 +1000,8 @@ class Handler(BaseHTTPRequestHandler):
                 from web.banking_service import scenario_overview
                 return self._json(scenario_overview())
             if path == "/api/scenarios/pending":
-                from web.banking_service import pending_list
-                return self._json({"pending": pending_list()})
+                from web.banking_service import promote_due_scheduled
+                return self._json(promote_due_scheduled())
         except Exception as exc:      # noqa: BLE001
             return self._error(exc)
         self._send(404, "404".encode(), "text/plain; charset=utf-8")
@@ -1065,6 +1047,15 @@ class Server(ThreadingHTTPServer):
         super().__init__(addr, handler)
         self.app = app
         self.cors_origin = cors_origin.strip()
+        from web.banking_demo import get_banking_state
+        get_banking_state()
+
+    def service_actions(self):
+        from web.banking_service import promote_due_scheduled
+        try:
+            promote_due_scheduled()
+        except Exception:
+            logger.exception("预约任务检查失败；未执行资金动作")
 
 
 # ============================================================
@@ -1094,6 +1085,11 @@ def main(argv: Optional[list[str]] = None) -> int:
         help="demo=演示模式（模型失败降级规则决策并标注来源）；live=真实模型联调模式（模型失败即报错，不回退）",
     )
     parser.add_argument("--open", action="store_true", help="启动后自动打开浏览器")
+    parser.add_argument(
+        "--open-path",
+        default="/",
+        help="自动打开浏览器时使用的站内路径（例如 /team/）",
+    )
     args = parser.parse_args(argv)
 
     logging.basicConfig(
@@ -1131,7 +1127,9 @@ def main(argv: Optional[list[str]] = None) -> int:
     print("-" * 62)
 
     if args.open:
-        threading.Timer(0.8, lambda: webbrowser.open(url)).start()
+        open_path = args.open_path if str(args.open_path).startswith("/") else f"/{args.open_path}"
+        open_url = f"{url.rstrip('/')}{open_path}"
+        threading.Timer(0.8, lambda: webbrowser.open(open_url)).start()
 
     try:
         httpd.serve_forever()

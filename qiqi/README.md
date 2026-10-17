@@ -22,6 +22,9 @@ python web/app.py --port 8765        # 纯服务，默认 http://127.0.0.1:8765
 python web/launch.py --no-key        # 强制规则决策引擎（无 key 也能完整演示）
 ```
 
+启动脚本默认打开与队伍公开 Preview 同一套统一界面：`http://127.0.0.1:8765/team/`。
+旧版验收看板仍保留在 `http://127.0.0.1:8765/evidence`，交互安全任务台仍保留在 `http://127.0.0.1:8765/compare`。
+
 验收可视化看板：服务启动后访问 `http://127.0.0.1:8765/evidence`。这里集中展示赛题要求、代码/测试证据、演示边界、差距和明早检查路径；`/compare` 仍是可交互的安全任务台。
 
 看板预览图：[artifacts/evidence-board-preview.png](artifacts/evidence-board-preview.png)。

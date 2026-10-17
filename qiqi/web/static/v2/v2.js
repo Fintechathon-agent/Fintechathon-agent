@@ -10,7 +10,7 @@
     minimumFractionDigits: 2, maximumFractionDigits: 2,
   });
   const shortTime = (value) => String(value || '').replace('T', ' ').slice(0, 16);
-  const state = { pending: [], breaker: null, lastResult: null, running: false, auditRows: [] };
+  const state = { pending: [], scheduled: [], breaker: null, lastResult: null, running: false, auditRows: [] };
 
   const FACT_COPY = {
     source: '来源 = 演示固定数据。它只用于展示流程，不代表已读取你的真实银行账户。',
@@ -141,21 +141,23 @@
       const cls = ['blocked', 'failed'].includes(nodeStatus) ? 'blocked' : ['waiting', 'pending', 'scheduled', 'running'].includes(nodeStatus) ? 'waiting' : 'done';
       return `<div class="track-node ${cls}"><span class="node-dot"></span><span class="node-label">${esc(node.label || node.tool || '任务步骤')}</span><span class="node-tool">${esc(nodeStatus)}</span></div>`;
     }).join('');
-    const pending = result.status === 'pending_confirmation';
-    status.textContent = pending ? '等待确认' : result.status === 'blocked' ? '已拦截' : '已完成';
+    const pending = ['pending_confirmation', 'scheduled', 'needs_clarification'].includes(result.status);
+    status.textContent = result.status === 'scheduled' ? '等待预约到期' : result.status === 'needs_clarification' ? '等待补充信息' : pending ? '等待确认' : result.status === 'blocked' ? '已拦截' : '已完成';
     status.className = `track-status ${pending ? 'pending' : result.status === 'blocked' ? 'blocked' : 'done'}`;
     setStage(result.status === 'blocked' ? 'blocked' : pending ? 'human' : 'receipt');
   }
 
   function renderQueue(items) {
+    items = [...items, ...state.scheduled.filter((task) => task.status === 'waiting_due').map((task) => ({ ...task.item, scheduled_at: task.scheduled_at }))];
     const list = $('#v2-queue-list');
     $('#v2-pending-count').textContent = items.length;
     $('#v2-queue-badge').textContent = items.length;
     if (!items.length) { list.innerHTML = '<div class="queue-empty">暂无需要你点头的操作。</div>'; return; }
     list.innerHTML = items.map((item) => {
-      const red = item.tier === 'red';
+      const scheduled = Boolean(item.scheduled_at);
+      const red = item.tier === 'red' && !scheduled;
       const verification = red ? `<input class="verify-input" maxlength="6" inputmode="numeric" placeholder="6 位验证码" aria-label="6 位验证码" data-sms /><label class="face-label"><input type="checkbox" data-face /> 人脸 Mock</label>` : '';
-      return `<div class="pending-card ${red ? 'red' : ''}" data-pending-id="${esc(item.id)}"><div class="pending-head"><span class="tier-label ${red ? 'red' : 'yellow'}">${red ? '红色强验证' : '黄色确认'}</span><strong>${red ? '不可逆操作' : '确认后执行'}</strong></div><div class="pending-meta">${esc(item.message || '')}<br /><span>有效至 ${esc(shortTime(item.expires_at))} · 演示模拟</span></div><div class="pending-actions">${verification}<button class="small-button confirm" type="button" data-action="confirm">${red ? '验证并执行' : '确认执行'}</button><button class="small-button" type="button" data-action="cancel">拒绝</button></div></div>`;
+      return `<div class="pending-card ${red ? 'red' : ''}" data-pending-id="${esc(item.id)}"><div class="pending-head"><span class="tier-label ${red ? 'red' : 'yellow'}">${red ? '红色强验证' : '黄色确认'}</span><strong>${scheduled ? '预约等待中' : red ? '强验证后执行' : '确认后执行'}</strong></div><div class="pending-meta">${esc(item.message || '')}<br /><span>${scheduled ? '预约时间' : '有效至'} ${esc(shortTime(item.scheduled_at || item.expires_at))} · 演示模拟</span></div><div class="pending-actions">${verification}${scheduled ? '' : `<button class="small-button confirm" type="button" data-action="confirm">${red ? '验证并执行' : '确认执行'}</button>`}<button class="small-button" type="button" data-action="cancel">拒绝</button></div></div>`;
     }).join('');
     $$('.pending-card [data-action="confirm"]', list).forEach((button) => button.addEventListener('click', () => confirmPending(button.closest('.pending-card'))));
     $$('.pending-card [data-action="cancel"]', list).forEach((button) => button.addEventListener('click', () => cancelPending(button.closest('.pending-card'))));
@@ -168,8 +170,10 @@
     const face = $('[data-face]', card);
     try {
       const response = await api('/api/scenarios/confirm', { method: 'POST', body: { id, verification: { sms_code: sms?.value || '', face_verified: Boolean(face?.checked) } } });
+      if (Array.isArray(response.pending)) state.pending = response.pending;
+      if (Array.isArray(response.scheduled)) state.scheduled = response.scheduled;
       if (response.success) {
-        state.pending = response.pending || [];
+        updateStatus(response);
         toast(response.message || '已完成确认');
         setStage('receipt');
       } else toast(response.message || '验证没有通过');
@@ -184,6 +188,7 @@
     try {
       const response = await api('/api/scenarios/cancel', { method: 'POST', body: { id: card.dataset.pendingId } });
       state.pending = response.pending || [];
+      state.scheduled = response.scheduled || state.scheduled;
       renderQueue(state.pending);
       setStage(state.pending.length ? 'human' : 'receipt');
       toast(response.message || '已拒绝该操作');
@@ -251,6 +256,7 @@
         renderResult(response.result, response.provenance);
         renderTrack(response.result);
         state.pending = response.pending || [];
+        state.scheduled = response.scheduled || state.scheduled;
         renderQueue(state.pending);
         if (response.breaker) renderBreaker(response.breaker);
         toast(response.deduplicated ? '相同待确认任务已合并' : (response.result?.message || '任务已完成'));
@@ -292,6 +298,7 @@
     try {
       const response = await api('/api/scenarios/seed-demo', { method: 'POST' });
       state.pending = response.pending || [];
+        state.scheduled = response.scheduled || state.scheduled;
       renderQueue(state.pending);
       await refreshAudit();
       if (!silent) toast(response.message || '演示数据已预置');
@@ -308,6 +315,7 @@
         api('/api/scenarios/boot'), api('/api/scenarios/pending'), api('/api/audit'),
       ]);
       state.pending = pendingData.pending || [];
+      state.scheduled = pendingData.scheduled || overview.scheduled || [];
       updateStatus(overview);
       renderQueue(state.pending);
       renderAudit(audit.entries || []);

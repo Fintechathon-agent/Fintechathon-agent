@@ -1,0 +1,90 @@
+{
+  "agent/risk/approval.py": [
+    {
+      "line": 43,
+      "text": "def approve(self, approval_id: str, comment: str = \"\") -> bool:"
+    },
+    {
+      "line": 48,
+      "text": "req.status = \"approved\""
+    },
+    {
+      "line": 54,
+      "text": "def reject(self, approval_id: str, comment: str = \"\") -> bool:"
+    }
+  ],
+  "agent/orchestrator/orchestrator.py": [
+    {
+      "line": 360,
+      "text": "def handle_approval_response("
+    },
+    {
+      "line": 382,
+      "text": "result = trader.execute(request.recommendation, approval_id)"
+    },
+    {
+      "line": 399,
+      "text": "\"success\": True,"
+    },
+    {
+      "line": 404,
+      "text": "return {\"success\": True, \"message\": f\"审批已{'通过' if approved else '拒绝'}\"}"
+    }
+  ],
+  "web/app.py": [
+    {
+      "line": 577,
+      "text": "def decide(self, payload: dict) -> dict:"
+    },
+    {
+      "line": 634,
+      "text": "executed = bool(result.get(\"success\"))"
+    },
+    {
+      "line": 636,
+      "text": "self._apply_fill(approval_id)"
+    }
+  ],
+  "web/banking_service.py": [
+    {
+      "line": 191,
+      "text": "balance=demo_balance(),"
+    },
+    {
+      "line": 302,
+      "text": "tier = item.get(\"tier\", \"yellow\")"
+    },
+    {
+      "line": 331,
+      "text": "state.record_transfer(amount)"
+    }
+  ],
+  "agent/banking/router.py": [
+    {
+      "line": 89,
+      "text": "injection_reason = check_content(question)"
+    },
+    {
+      "line": 90,
+      "text": "if injection_reason or _PRIVILEGE_BYPASS_RE.search(question):"
+    },
+    {
+      "line": 92,
+      "text": "log_action(\"banking_request_blocked\", user_id, \"\", {"
+    }
+  ],
+  "web/banking_demo.py": [
+    {
+      "line": 133,
+      "text": "def demo_balance() -> float:"
+    },
+    {
+      "line": 213,
+      "text": "def record_transfer(self, amount: float) -> None:"
+    },
+    {
+      "line": 219,
+      "text": "self.daily_cumulative += amount"
+    }
+  ]
+}

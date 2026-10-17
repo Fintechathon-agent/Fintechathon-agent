@@ -16,6 +16,8 @@ from __future__ import annotations
 import json
 import logging
 import threading
+from copy import deepcopy
+from agent.core.storage import atomic_write_json
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -72,19 +74,21 @@ class CircuitBreaker:
                 window_seconds=int(raw.get("window_seconds", self.window_seconds)),
                 events=[dict(e) for e in raw.get("events", [])],
             )
-        except (OSError, json.JSONDecodeError, ValueError):
+        except FileNotFoundError:
             return BreakerState(
                 threshold=self.threshold, window_seconds=self.window_seconds,
             )
+        except (OSError, json.JSONDecodeError, ValueError, TypeError):
+            return BreakerState(locked=True, reason="state_unreadable",
+                                threshold=self.threshold, window_seconds=self.window_seconds)
 
     def _save(self) -> None:
         try:
-            self._path().write_text(
-                json.dumps(asdict(self._state), ensure_ascii=False, indent=2),
-                encoding="utf-8",
-            )
+            atomic_write_json(self._path(), asdict(self._state))
         except OSError as exc:      # pragma: no cover
-            logger.warning("熔断状态落盘失败：%s", exc)
+            self._state.locked = True
+            self._state.reason = "state_write_failed"
+            raise OSError("熔断状态保存失败，执行链路已暂停") from exc
 
     # ---- 事件 ----
 
@@ -127,10 +131,16 @@ class CircuitBreaker:
     def reset(self, note: str = "人工确认恢复") -> dict:
         """人工确认后恢复。"""
         with self._lock:
+            previous = deepcopy(self._state)
             self._state = BreakerState(
                 threshold=self.threshold, window_seconds=self.window_seconds,
             )
-            self._save()
+            try:
+                self._save()
+            except OSError:
+                self._state = previous
+                self._state.locked = True
+                raise
             try:
                 from agent.risk.audit import log_action
                 log_action("breaker_reset", "", "", {"note": note}, "success")

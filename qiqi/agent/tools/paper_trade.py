@@ -5,12 +5,15 @@ from __future__ import annotations
 
 import json
 import uuid
+import math
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime, date
 from pathlib import Path
 from typing import Optional
 
 from contracts.types import Portfolio, Position, Recommendation, ActionType
+from agent.core.storage import atomic_write_text, storage_lock
 
 
 @dataclass
@@ -38,6 +41,44 @@ class PaperTradingResult:
     updated_portfolio: Optional[Portfolio] = None
 
 
+def apply_trade_record(portfolio: Portfolio, record: TradeRecord) -> None:
+    """Apply the persisted fill, including actual fees and OTC units, exactly once."""
+    if record.status != "filled":
+        raise ValueError("非成交回执不能更新持仓")
+    values = (record.quantity, record.price, record.amount, record.commission)
+    if not all(math.isfinite(float(v)) for v in values) or min(values[:3]) <= 0 or not 0 <= record.commission <= record.amount:
+        raise ValueError("成交回执数值无效")
+    position = next((p for p in portfolio.positions if p.symbol == record.symbol), None)
+    if record.action in (ActionType.BUY.value, "申购"):
+        qty = round((record.amount - record.commission) / record.price, 2) if record.action == "申购" else record.quantity
+        if qty <= 0:
+            raise ValueError("成交回执中的费用超过成交金额")
+        cost = round(record.amount + (0 if record.action == "申购" else record.commission), 2)
+        if cost > round(portfolio.cash, 2):
+            raise ValueError("可用资金不足支付成交金额和费用")
+        portfolio.cash = round(portfolio.cash - cost, 2)
+        if position:
+            total_cost = position.avg_cost * position.quantity + cost
+            position.quantity += qty
+            position.avg_cost = total_cost / position.quantity
+        else:
+            portfolio.positions.append(Position(
+                symbol=record.symbol, name=record.name, quantity=qty, avg_cost=cost / qty,
+                current_price=record.price, market_value=qty * record.price, return_pct=0,
+                sector="未分类", asset_type="fund" if record.action == "申购" else "stock",
+            ))
+    elif record.action in (ActionType.SELL.value, "赎回"):
+        if position is None or record.quantity > position.quantity:
+            raise ValueError("可用持仓不足，不能超额卖出")
+        proceeds = record.amount - (0 if record.action == "赎回" else record.commission)
+        portfolio.cash = round(portfolio.cash + proceeds, 2)
+        position.quantity = round(position.quantity - record.quantity, 8)
+        if position.quantity <= 0:
+            portfolio.positions.remove(position)
+    else:
+        raise ValueError("成交回执缺少明确买卖方向")
+
+
 class PaperTradingTool:
     """纸交易执行器——维护虚拟持仓，执行模拟买卖"""
 
@@ -45,11 +86,29 @@ class PaperTradingTool:
         self.storage_dir = Path(storage_dir) if storage_dir else Path("data/paper_trades")
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self._positions: dict[str, dict] = {}  # session_id -> {symbol: Position}
+        self.lock = storage_lock(self.storage_dir)
 
-    def execute(self, rec: Recommendation, session_id: str) -> PaperTradingResult:
+    def execute_once(self, rec: Recommendation, approval_id: str, portfolio: Portfolio | None = None) -> PaperTradingResult:
+        """One durable receipt per approval; never replay an already filled order."""
+        with self.lock:
+            existing = self.get_trade_history(approval_id)
+            if existing:
+                return PaperTradingResult(True, existing[0], "已执行，返回原成交回执")
+            result = self.execute(rec, approval_id, portfolio=portfolio) if portfolio is not None else self.execute(rec, approval_id)
+            # The durable receipt is authoritative even if a later in-memory update failed.
+            receipts = self.get_trade_history(approval_id)
+            if receipts:
+                return PaperTradingResult(True, receipts[0], result.message)
+            if result.success:
+                return PaperTradingResult(False, message="执行器未提供持久化成交回执")
+            return result
+
+    def execute(self, rec: Recommendation, session_id: str, portfolio: Portfolio | None = None) -> PaperTradingResult:
         """执行一笔纸交易"""
         try:
             record = self._do_trade(rec, session_id)
+            if portfolio is not None:
+                apply_trade_record(deepcopy(portfolio), record)
             # 持久化
             self._save_record(record)
             # 更新内存持仓
@@ -112,7 +171,7 @@ class PaperTradingTool:
             action=action_label,
             symbol=rec.symbol,
             name=rec.symbol,  # 实际应从行情获取
-            price=round(exec_price, 2),
+            price=exec_price if is_otc else round(exec_price, 2),
             quantity=rec.quantity,
             amount=round(amount, 2),
             commission=round(commission, 2),
@@ -207,8 +266,9 @@ class PaperTradingTool:
     def _save_record(self, record: TradeRecord) -> None:
         """持久化成交记录"""
         p = self.storage_dir / f"{record.session_id}_trades.jsonl"
-        with open(p, "a", encoding="utf-8") as f:
-            f.write(json.dumps(record.__dict__, ensure_ascii=False) + "\n")
+        with self.lock:
+            previous = p.read_text(encoding="utf-8") if p.exists() else ""
+            atomic_write_text(p, previous + json.dumps(record.__dict__, ensure_ascii=False, allow_nan=False) + "\n")
 
     def get_positions(self, session_id: str) -> list[Position]:
         """获取当前虚拟持仓"""

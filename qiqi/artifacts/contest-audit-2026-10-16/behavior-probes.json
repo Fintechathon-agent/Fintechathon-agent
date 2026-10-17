@@ -1,0 +1,516 @@
+{
+  "cumulative_transfer": {
+    "first_tier": "yellow",
+    "second_tier_at_creation": "yellow",
+    "first_confirmation": {
+      "success": true,
+      "tier": "yellow",
+      "scenario": "transfer",
+      "message": "转账成功（演示模拟）：向 王芳 转出 600.00 元，备注：A。",
+      "daily_cumulative": 600.0,
+      "pending": [
+        {
+          "id": "p_20261016210841599260",
+          "scenario": "transfer",
+          "tier": "yellow",
+          "created_at": "2026-10-16T21:08:41",
+          "expires_at": "2026-10-16T21:18:41",
+          "request_key": "ef87c5c30362cf3a40e7f055",
+          "message": "转账请求已就绪：向 李明 转账 600.00 元（备注：B），权限级别：黄色 · 需确认。",
+          "payload": {
+            "request": {
+              "payee": "李明",
+              "amount": 600.0,
+              "memo": "B",
+              "scheduled_at": "",
+              "matched_contact": {
+                "name": "李明",
+                "phone": "13900002222"
+              }
+            },
+            "gate_checks": [
+              {
+                "name": "收款人有效性",
+                "passed": true,
+                "severity": "block",
+                "detail": "收款人「李明」在通讯录中"
+              },
+              {
+                "name": "金额有效性",
+                "passed": true,
+                "severity": "block",
+                "detail": "金额 600.00 元有效"
+              },
+              {
+                "name": "余额充足性",
+                "passed": true,
+                "severity": "block",
+                "detail": "账户余额 25,680.50 元，转出 600.00 元后剩余 25,080.50 元"
+              },
+              {
+                "name": "大额提示",
+                "passed": true,
+                "severity": "info",
+                "detail": "日累计 600.00 元，未超过 1000 元黄色线"
+              }
+            ],
+            "aa_items": [],
+            "daily_cumulative": 0.0
+          }
+        }
+      ],
+      "breaker": {
+        "locked": false,
+        "consecutive_failures": 0,
+        "locked_at": "",
+        "reason": "",
+        "threshold": 3,
+        "window_seconds": 600,
+        "events": []
+      },
+      "provenance": {
+        "source": "demo_fixture",
+        "source_label": "演示固定数据",
+        "simulation_notice": "演示模拟：不会发生真实资金转移、短信/人脸验证或外部下单。",
+        "as_of": "2026-10-11"
+      }
+    },
+    "second_confirmation_without_verification": {
+      "success": true,
+      "tier": "yellow",
+      "scenario": "transfer",
+      "message": "转账成功（演示模拟）：向 李明 转出 600.00 元，备注：B。",
+      "daily_cumulative": 1200.0,
+      "pending": [],
+      "breaker": {
+        "locked": false,
+        "consecutive_failures": 0,
+        "locked_at": "",
+        "reason": "",
+        "threshold": 3,
+        "window_seconds": 600,
+        "events": []
+      },
+      "provenance": {
+        "source": "demo_fixture",
+        "source_label": "演示固定数据",
+        "simulation_notice": "演示模拟：不会发生真实资金转移、短信/人脸验证或外部下单。",
+        "as_of": "2026-10-11"
+      }
+    }
+  },
+  "lost_card_unlock": {
+    "result": {
+      "scenario": "card",
+      "scenario_label": "卡片管理",
+      "intent": {
+        "name": "card",
+        "label": "卡片管理",
+        "question": "尾号1234的卡解挂",
+        "slots": {
+          "operation": "unlock",
+          "card_last4": "1234"
+        }
+      },
+      "plan": {
+        "intent": "card",
+        "nodes": [
+          {
+            "id": "validate",
+            "label": "校验输入与权限",
+            "tool": "intent_router",
+            "depends_on": [],
+            "status": "done"
+          },
+          {
+            "id": "locate",
+            "label": "定位卡片",
+            "tool": "card_locator",
+            "depends_on": [
+              "validate"
+            ],
+            "status": "done"
+          },
+          {
+            "id": "gate",
+            "label": "卡片操作闸门",
+            "tool": "card_gate",
+            "depends_on": [
+              "locate"
+            ],
+            "status": "done"
+          },
+          {
+            "id": "tier",
+            "label": "权限分级判定",
+            "tool": "tier_router",
+            "depends_on": [
+              "gate"
+            ],
+            "status": "done"
+          },
+          {
+            "id": "execute",
+            "label": "执行/待确认",
+            "tool": "card_executor",
+            "depends_on": [
+              "tier"
+            ],
+            "status": "done"
+          }
+        ]
+      },
+      "tier": "yellow",
+      "tier_label": "黄色权限 · 确认后执行",
+      "status": "pending_confirmation",
+      "message": "已生成解锁请求：尾号 1234 恢复卡片使用。权限级别：黄色 · 需用户确认。",
+      "data": {
+        "operation": "unlock",
+        "new_limit": null,
+        "card": {
+          "last4": "1234",
+          "bank": "工商银行",
+          "card_type": "信用卡",
+          "status": "locked",
+          "credit_limit": 30000.0,
+          "daily_txn_limit": 10000.0
+        },
+        "gate_checks": [
+          {
+            "name": "卡片存在性",
+            "passed": true,
+            "severity": "block",
+            "detail": "卡片尾号 1234（工商银行）"
+          },
+          {
+            "name": "操作合法性",
+            "passed": true,
+            "severity": "block",
+            "detail": "操作「unlock」合法"
+          }
+        ]
+      }
+    },
+    "confirmation_without_verification": {
+      "success": true,
+      "tier": "yellow",
+      "scenario": "card",
+      "message": "卡片操作已生效（演示模拟）：解锁。",
+      "pending": [],
+      "breaker": {
+        "locked": false,
+        "consecutive_failures": 0,
+        "locked_at": "",
+        "reason": "",
+        "threshold": 3,
+        "window_seconds": 600,
+        "events": []
+      },
+      "provenance": {
+        "source": "demo_fixture",
+        "source_label": "演示固定数据",
+        "simulation_notice": "演示模拟：不会发生真实资金转移、短信/人脸验证或外部下单。",
+        "as_of": "2026-10-11"
+      }
+    },
+    "card_final_state": "normal"
+  },
+  "aa_confirmation": {
+    "result": {
+      "scenario": "transfer",
+      "scenario_label": "智能转账",
+      "intent": {
+        "name": "transfer",
+        "label": "智能转账",
+        "question": "聚餐300元AA，3个人",
+        "slots": {
+          "payee": "",
+          "amount": 300.0,
+          "memo": "",
+          "scheduled_at": "",
+          "aa_participants": 3
+        }
+      },
+      "plan": {
+        "intent": "transfer",
+        "nodes": [
+          {
+            "id": "validate",
+            "label": "校验输入与权限",
+            "tool": "intent_router",
+            "depends_on": [],
+            "status": "done"
+          },
+          {
+            "id": "payee",
+            "label": "收款人核验（通讯录）",
+            "tool": "contact_check",
+            "depends_on": [
+              "validate"
+            ],
+            "status": "done"
+          },
+          {
+            "id": "gate",
+            "label": "转账确定性闸门",
+            "tool": "transfer_gate",
+            "depends_on": [
+              "payee"
+            ],
+            "status": "done"
+          },
+          {
+            "id": "tier",
+            "label": "权限分级判定",
+            "tool": "tier_router",
+            "depends_on": [
+              "gate"
+            ],
+            "status": "done"
+          },
+          {
+            "id": "execute",
+            "label": "执行/待确认/定时任务",
+            "tool": "transfer_executor",
+            "depends_on": [
+              "tier"
+            ],
+            "status": "done"
+          }
+        ]
+      },
+      "tier": "yellow",
+      "tier_label": "黄色权限 · 确认后执行",
+      "status": "pending_confirmation",
+      "message": "已生成 3 条 AA 收款请求（每人 100.00 元），等待逐个确认。",
+      "data": {
+        "request": {
+          "payee": "",
+          "amount": 300.0,
+          "memo": "",
+          "scheduled_at": "",
+          "matched_contact": null
+        },
+        "gate_checks": [],
+        "aa_items": [
+          {
+            "id": "tr_20261016210841615770_0",
+            "label": "收款请求 #1",
+            "amount": 100.0,
+            "status": "pending_confirmation"
+          },
+          {
+            "id": "tr_20261016210841615770_1",
+            "label": "收款请求 #2",
+            "amount": 100.0,
+            "status": "pending_confirmation"
+          },
+          {
+            "id": "tr_20261016210841615770_2",
+            "label": "收款请求 #3",
+            "amount": 100.0,
+            "status": "pending_confirmation"
+          }
+        ],
+        "daily_cumulative": 0.0
+      }
+    },
+    "confirmation": {
+      "success": true,
+      "tier": "yellow",
+      "scenario": "transfer",
+      "message": "转账成功（演示模拟）：向  转出 300.00 元。",
+      "daily_cumulative": 300.0,
+      "pending": [],
+      "breaker": {
+        "locked": false,
+        "consecutive_failures": 0,
+        "locked_at": "",
+        "reason": "",
+        "threshold": 3,
+        "window_seconds": 600,
+        "events": []
+      },
+      "provenance": {
+        "source": "demo_fixture",
+        "source_label": "演示固定数据",
+        "simulation_notice": "演示模拟：不会发生真实资金转移、短信/人脸验证或外部下单。",
+        "as_of": "2026-10-11"
+      }
+    }
+  },
+  "scheduled_transfer": {
+    "result": {
+      "scenario": "transfer",
+      "scenario_label": "智能转账",
+      "intent": {
+        "name": "transfer",
+        "label": "智能转账",
+        "question": "明天给王芳转500元",
+        "slots": {
+          "payee": "王芳",
+          "amount": 500.0,
+          "memo": "",
+          "scheduled_at": "明天",
+          "aa_participants": 0
+        }
+      },
+      "plan": {
+        "intent": "transfer",
+        "nodes": [
+          {
+            "id": "validate",
+            "label": "校验输入与权限",
+            "tool": "intent_router",
+            "depends_on": [],
+            "status": "done"
+          },
+          {
+            "id": "payee",
+            "label": "收款人核验（通讯录）",
+            "tool": "contact_check",
+            "depends_on": [
+              "validate"
+            ],
+            "status": "done"
+          },
+          {
+            "id": "gate",
+            "label": "转账确定性闸门",
+            "tool": "transfer_gate",
+            "depends_on": [
+              "payee"
+            ],
+            "status": "done"
+          },
+          {
+            "id": "tier",
+            "label": "权限分级判定",
+            "tool": "tier_router",
+            "depends_on": [
+              "gate"
+            ],
+            "status": "done"
+          },
+          {
+            "id": "execute",
+            "label": "执行/待确认/定时任务",
+            "tool": "transfer_executor",
+            "depends_on": [
+              "tier"
+            ],
+            "status": "scheduled"
+          }
+        ]
+      },
+      "tier": "yellow",
+      "tier_label": "黄色权限 · 确认后执行",
+      "status": "scheduled",
+      "message": "已创建定时转账任务：明天 向 王芳 转账 500.00 元。到点执行前仍需按当前权限确认。",
+      "data": {
+        "request": {
+          "payee": "王芳",
+          "amount": 500.0,
+          "memo": "",
+          "scheduled_at": "明天",
+          "matched_contact": {
+            "name": "王芳",
+            "phone": "13800001111"
+          }
+        },
+        "gate_checks": [
+          {
+            "name": "收款人有效性",
+            "passed": true,
+            "severity": "block",
+            "detail": "收款人「王芳」在通讯录中"
+          },
+          {
+            "name": "金额有效性",
+            "passed": true,
+            "severity": "block",
+            "detail": "金额 500.00 元有效"
+          },
+          {
+            "name": "余额充足性",
+            "passed": true,
+            "severity": "block",
+            "detail": "账户余额 25,680.50 元，转出 500.00 元后剩余 25,180.50 元"
+          },
+          {
+            "name": "大额提示",
+            "passed": true,
+            "severity": "info",
+            "detail": "日累计 500.00 元，未超过 1000 元黄色线"
+          }
+        ],
+        "aa_items": [],
+        "daily_cumulative": 0.0
+      }
+    },
+    "pending_count": 0
+  },
+  "phone_first_amount": {
+    "input": "给13800001111转500元",
+    "parsed_payee": "13800001111",
+    "parsed_amount": 13800001111.0
+  },
+  "duplicate_subscription_cancel": {
+    "first_confirm": {
+      "success": true,
+      "tier": "yellow",
+      "scenario": "subscription",
+      "message": "已取消订阅：超燃健身。历史账单保留，仅停止后续自动扣费（演示模拟）。",
+      "pending": [
+        {
+          "id": "p_20261016210841636707",
+          "scenario": "subscription",
+          "tier": "yellow",
+          "created_at": "2026-10-16T21:08:41",
+          "expires_at": "2026-10-16T21:18:41",
+          "request_key": "191883aa931151302d437ecd",
+          "message": "已生成取消订阅请求：超燃健身（199.00 元/月），下次扣费 2026-10-01。黄色权限：需确认后生效。",
+          "payload": {
+            "target": {
+              "merchant": "超燃健身",
+              "amount": 199.0,
+              "next_charge_at": "2026-10-01"
+            },
+            "gate_checks": [
+              {
+                "name": "订阅存在性",
+                "passed": true,
+                "severity": "block",
+                "detail": "订阅「超燃健身」存在"
+              },
+              {
+                "name": "取消状态",
+                "passed": true,
+                "severity": "block",
+                "detail": "该订阅处于生效中，可取消"
+              }
+            ]
+          }
+        }
+      ],
+      "breaker": {
+        "locked": false,
+        "consecutive_failures": 0,
+        "locked_at": "",
+        "reason": "",
+        "threshold": 3,
+        "window_seconds": 600,
+        "events": []
+      },
+      "provenance": {
+        "source": "demo_fixture",
+        "source_label": "演示固定数据",
+        "simulation_notice": "演示模拟：不会发生真实资金转移、短信/人脸验证或外部下单。",
+        "as_of": "2026-10-11"
+      }
+    },
+    "second_status": "pending_confirmation",
+    "second_pending_count": 1,
+    "overview_cancelled_count": 1
+  }
+}

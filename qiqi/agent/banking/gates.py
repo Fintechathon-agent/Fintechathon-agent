@@ -7,6 +7,7 @@ LLM 只负责把自然语言翻译成结构化请求，放行与否由本模块�
 from __future__ import annotations
 
 import logging
+import math
 from typing import Optional
 
 from contracts.banking import BankCard, Contact, Subscription, TransferRequest
@@ -54,7 +55,7 @@ def check_transfer(
 
     checks.append(_wrap("金额有效性", lambda: {
         "name": "金额有效性",
-        "passed": req.amount > 0 and req.amount == round(req.amount, 2),
+        "passed": math.isfinite(req.amount) and req.amount > 0 and req.amount == round(req.amount, 2),
         "severity": "block",
         "detail": (
             f"金额 {req.amount:.2f} 元有效"
@@ -107,7 +108,7 @@ def check_card_operation(
     }))
 
     if card is not None:
-        valid_ops = {"lock", "unlock", "limit_adjust", "loss_report", "query"}
+        valid_ops = {"lock", "unlock", "limit_adjust", "loss_report", "loss_release", "query"}
         checks.append(_wrap("操作合法性", lambda: {
             "name": "操作合法性",
             "passed": operation in valid_ops,
@@ -118,6 +119,10 @@ def check_card_operation(
             ),
         }))
 
+        if operation == "loss_release" or card.status == "lost":
+            allowed = operation == "query" or (operation == "loss_release" and card.status == "lost")
+            checks.append({"name": "挂失恢复状态", "passed": allowed, "severity": "block",
+                           "detail": "挂失卡仅允许查询或强验证解挂" if card.status == "lost" else "该卡未挂失，无需解挂"})
         # 挂失状态机：已挂失的卡不能再挂失；锁定卡可以解锁
         if operation == "loss_report":
             checks.append(_wrap("挂失状态", lambda: {

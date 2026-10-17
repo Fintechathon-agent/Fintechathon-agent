@@ -11,13 +11,19 @@ from __future__ import annotations
 import json
 import hashlib
 import logging
-import threading
+from copy import deepcopy
+from functools import wraps
+from uuid import uuid4
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
 from agent.banking import route as banking_route
-from agent.banking import detect_scenario, tier_label
+from agent.banking import tier_label
+from agent.banking.tiers import tier_of_operation
+from agent.banking.cards import normalize_card_operation
+from agent.banking.gates import check_transfer, check_card_operation, check_subscription_cancel
+from contracts.banking import TransferRequest
 from agent.risk.circuit_breaker import get_breaker
 from agent.risk.audit import log_action
 from web.banking_demo import (
@@ -82,13 +88,82 @@ def _provenance() -> dict:
     return {**DEMO_PROVENANCE, "as_of": DEMO_AS_OF}
 
 
+def _audit_event(state, action: str, action_id: str, detail: dict, result="success"):
+    state.audit_outbox.append({"event_id": uuid4().hex, "action": action,
+                               "action_id": action_id, "detail": deepcopy(detail), "result": result})
+
+
+def _flush_audit(state):
+    # Business result and audit intent commit together. Delivery retries are safe to
+    # identify by event_id; a failed audit sink must not turn a receipt into a failure.
+    with state._lock:
+        while state.audit_outbox:
+            event = state.audit_outbox[0]
+            try:
+                log_action(event["action"], USER_ID, event["action_id"],
+                           {**event["detail"], "event_id": event["event_id"]}, event["result"])
+                with state.transaction():
+                    state.audit_outbox.pop(0)
+            except Exception:
+                logger.exception("审计待投递事件保留，将在下次请求重试")
+                break
+
+
+def _transactional(fn):
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        state = get_banking_state()
+        with state.transaction():
+            result = deepcopy(fn(*args, **kwargs))
+        _flush_audit(state)
+        return result
+    return wrapped
+
+
+def _promote_due(state, now=None):
+    now = now or datetime.now()
+    for task in state.scheduled:
+        if task.get("status") != "waiting_due":
+            continue
+        if datetime.fromisoformat(task["scheduled_at"]) > now:
+            continue
+        item = deepcopy(task["item"])
+        item["created_at"] = now.isoformat(timespec="seconds")
+        item["expires_at"] = (now + timedelta(seconds=PENDING_TTL_SECONDS)).isoformat(timespec="seconds")
+        item["scheduled_id"] = task["id"]
+        item["message"] = "预约已到期，请重新确认：" + item["message"]
+        if not any(p["id"] == item["id"] for p in state.pending) and item["id"] not in state.receipts:
+            state.pending.append(item)
+        task["status"] = "pending_confirmation"
+        _audit_event(state, "banking_schedule_due", task["id"], {"scheduled_at": task["scheduled_at"]})
+
+
+@_transactional
+def promote_due_scheduled(now=None):
+    state = get_banking_state()
+    _prune_pending(state)
+    _promote_due(state, now)
+    return {"pending": state.pending, "scheduled": state.scheduled}
+
+
+def _terminal(state, item, result, status):
+    receipt = {**deepcopy(result), "id": item["id"], "status": status,
+               "completed_at": datetime.now().isoformat(timespec="seconds")}
+    state.receipts[item["id"]] = receipt
+    state.pending = [p for p in state.pending if p["id"] != item["id"]]
+    for task in state.scheduled:
+        if task["id"] == item["id"]:
+            task["status"] = status
+    return receipt
+
+
 def _pending_key(scenario: str, question: str, payload: dict) -> str:
     """同一会话中相同待确认请求只保留一条。计划 ID 等动态字段不参与去重。"""
     def stable(value):
         if isinstance(value, dict):
             return {
                 key: stable(val) for key, val in value.items()
-                if key not in {"plan_id", "request_id"}
+                if key not in {"plan_id", "request_id", "id"}
             }
         if isinstance(value, list):
             return [stable(item) for item in value]
@@ -123,7 +198,8 @@ def _prune_pending(state) -> bool:
         except ValueError:
             expired = True
         if expired:
-            log_action("banking_pending_expired", USER_ID, str(item.get("id", "")), {
+            _terminal(state, item, {"success": False, "message": "待确认事项已过期"}, "expired")
+            _audit_event(state, "banking_pending_expired", str(item.get("id", "")), {
                 "scenario": item.get("scenario"), "request_key": item.get("request_key"),
             }, "failure")
             changed = True
@@ -137,9 +213,11 @@ def _prune_pending(state) -> bool:
     return changed
 
 
+@_transactional
 def scenario_overview() -> dict:
     state = get_banking_state()
     _prune_pending(state)
+    _promote_due(state)
     bills = demo_bills()
     subs = state.subscriptions(bills)
     return {
@@ -156,8 +234,11 @@ def scenario_overview() -> dict:
         } for s in subs],
         "contacts": [{"name": c.name, "phone": c.phone, "relation": c.relation}
                      for c in demo_contacts()],
-        "balance": demo_balance(),
+        "balance": state.balance,
         "daily_cumulative": state.daily_cumulative,
+        "pending": state.pending,
+        "scheduled": state.scheduled,
+        "collections": state.collections,
         "tier_matrix": [
             {"tier": "green", "label": "绿色权限",
              "items": "余额/交易记录查询、账单分析、订阅与续费查询、卡片状态查询、理财收益查询",
@@ -184,71 +265,73 @@ def _run_and_queue(state, question: str, *, seeded: bool = False):
     因 10 分钟 TTL 过期被清走。
     """
     res = banking_route(
-        question,
-        bills_data=demo_bills(),
-        cards_data=state.cards,
-        contacts=demo_contacts(),
-        balance=demo_balance(),
-        daily_cumulative=state.daily_cumulative,
-        user_id=USER_ID,
+        question, bills_data=demo_bills(), cards_data=state.cards,
+        contacts=demo_contacts(), balance=state.balance,
+        daily_cumulative=state.daily_cumulative, user_id=USER_ID,
+        cancelled_subs=state.cancelled_subs,
     )
     deduplicated = False
-    if res.status == "pending_confirmation" and res.scenario in ("transfer", "subscription", "card", "cross_scene"):
-        pending_message = res.message
-        if res.scenario == "cross_scene":
-            pending_message = "跨场景计划包含资金操作：确认后只执行演示模拟，不会发生真实扣款或下单。"
-        request_key = _pending_key(res.scenario, question, res.data)
-        existing = next((p for p in state.pending if p.get("request_key") == request_key), None)
-        if existing:
+    if res.status not in ("pending_confirmation", "scheduled"):
+        return res, deduplicated
+    candidates = []
+    if res.data.get("aa_items"):
+        for share in res.data["aa_items"]:
+            data = {"request": {"operation": "aa_collect", "amount": share["amount"],
+                                "payee": share["name"], "memo": res.data["request"]["memo"]}}
+            candidates.append((data, f"AA 模拟收款：向{share['name']}发起 {share['amount']:.2f} 元收款请求（不会转出资金）。"))
+    else:
+        candidates.append((res.data, res.message))
+    active = state.pending + [t["item"] for t in state.scheduled if t["status"] == "waiting_due"]
+    new_items = []
+    for data, message in candidates:
+        key = _pending_key(res.scenario, question, data)
+        if any(p.get("request_key") == key for p in active):
             deduplicated = True
+            continue
+        created = datetime.now()
+        ttl = SEED_PENDING_TTL_SECONDS if seeded else PENDING_TTL_SECONDS
+        item = {"id": "p_" + uuid4().hex, "scenario": res.scenario, "tier": res.tier,
+                "created_at": created.isoformat(timespec="seconds"),
+                "expires_at": (created + timedelta(seconds=ttl)).isoformat(timespec="seconds"),
+                "request_key": key, "message": message, "payload": deepcopy(data),
+                "plan": deepcopy(res.plan)}
+        if seeded:
+            item["seeded"] = True
+        new_items.append(item)
+    if len(active) + len(new_items) > 200:
+        res.status, res.message = "blocked", "待办已达上限，请先处理或取消已有待办。"
+        return res, False
+    for item in new_items:
+        if res.status == "scheduled":
+            state.scheduled.append({"id": item["id"], "scheduled_at": res.data["request"]["scheduled_at"],
+                                    "status": "waiting_due", "item": item})
+            _audit_event(state, "banking_schedule_created", item["id"], item["payload"])
         else:
-            created_at = datetime.now()
-            ttl = SEED_PENDING_TTL_SECONDS if seeded else PENDING_TTL_SECONDS
-            item = {
-                "id": f"p_{created_at.strftime('%Y%m%d%H%M%S%f')}",
-                "scenario": res.scenario,
-                "tier": res.tier,
-                "created_at": created_at.isoformat(timespec="seconds"),
-                "expires_at": (created_at + timedelta(seconds=ttl)).isoformat(timespec="seconds"),
-                "request_key": request_key,
-                "message": pending_message,
-                "payload": res.data,
-            }
-            if seeded:
-                item["seeded"] = True
             state.pending.append(item)
-            state.pending = state.pending[-20:]
-            state.save()
     return res, deduplicated
 
 
+@_transactional
 def run_scenario(text: str) -> dict:
-    """统一场景执行入口：理财请求标记 delegated，其余直接执行。"""
     question = (text or "").strip()
     if not question:
         return {"delegated": False, "result": None, "message": "请输入自然语言请求"}
-    scenario = detect_scenario(question)
-    if scenario == "wealth":
-        return {"delegated": True, "result": None,
-                "message": "理财请求转交深度分析闭环"}
-
     state = get_banking_state()
     _prune_pending(state)
+    _promote_due(state)
     res, deduplicated = _run_and_queue(state, question)
-
+    if res.status == "delegated":
+        return {"delegated": True, "result": None, "message": res.message}
     return {"delegated": False, "result": {
-        "scenario": res.scenario,
-        "scenario_label": res.scenario_label,
-        "intent": res.intent,
-        "plan": res.plan,
-        "tier": res.tier,
-        "tier_label": tier_label(res.tier),
-        "status": res.status,
-        "message": res.message,
-        "data": res.data,
-    }, "pending": state.pending, "breaker": get_breaker().state(),
-            "provenance": _provenance(), "deduplicated": deduplicated}
+        "scenario": res.scenario, "scenario_label": res.scenario_label,
+        "intent": res.intent, "plan": res.plan, "tier": res.tier,
+        "tier_label": tier_label(res.tier), "status": res.status,
+        "message": res.message, "data": res.data,
+    }, "pending": state.pending, "scheduled": state.scheduled,
+        "breaker": get_breaker().state(), "provenance": _provenance(), "deduplicated": deduplicated}
 
+
+@_transactional
 
 def seed_demo_queue() -> dict:
     """预置演示数据：跑一组覆盖六场景 + 注入拦截的任务。
@@ -279,136 +362,122 @@ def seed_demo_queue() -> dict:
             "provenance": _provenance()}
 
 
+@_transactional
 def confirm_action(payload: dict) -> dict:
-    """确认黄色/红色待办：黄=明确确认；红=短信+人脸 Mock 强验证。
-
-    强验证失败计入熔断（连续 3 次安全事件锁定，与理财路径同一熔断器）。
-    """
-    pending_id = str(payload.get("id", "")).strip()
     state = get_banking_state()
     _prune_pending(state)
-    if not pending_id:
-        return {"success": False, "message": "缺少待确认事项 ID"}
+    _promote_due(state)
+    pending_id = str(payload.get("id", "")).strip()
+
+    def response(ok, message, **extra):
+        return {"success": ok, "message": message, "pending": state.pending,
+                "scheduled": state.scheduled, "breaker": get_breaker().state(),
+                "provenance": _provenance(), **extra}
 
     item = next((p for p in state.pending if p.get("id") == pending_id), None)
     if item is None:
-        return {"success": False, "message": "待确认事项不存在、已处理或已过期",
-                "pending": state.pending, "provenance": _provenance()}
-
+        return response(False, "待确认事项不存在、已处理或已过期", receipt=state.receipts.get(pending_id))
     if get_breaker().is_locked():
-        return {"success": False,
-                "message": "⛔ 系统熔断锁定中：连续安全事件超过阈值，已暂停执行链路，请先人工确认恢复。"}
+        return response(False, "系统熔断锁定中，请先人工确认恢复。")
 
-    tier = item.get("tier", "yellow")
-    # 红色：多因子强验证（短信 6 位 + 人脸，演示 Mock）
+    scenario, data = item["scenario"], item.get("payload") or {}
+    tier, checks, passed = item["tier"], [], True
+    request = data.get("request") or {}
+    operation = request.get("operation", "transfer")
+    if scenario == "transfer" and operation == "transfer":
+        req = TransferRequest(request_id=pending_id, payee=request.get("payee", ""),
+                              amount=float(request.get("amount", 0)))
+        passed, checks = check_transfer(req, demo_contacts(), state.balance, state.daily_cumulative)
+        tier = tier_of_operation("transfer", "transfer_now", req.amount, state.daily_cumulative)
+    elif scenario == "transfer" and operation == "aa_collect":
+        passed = bool(request.get("payee")) and float(request.get("amount", 0)) > 0
+        tier = "yellow"
+    elif scenario == "card":
+        card = next((c for c in state.cards if c.card_id == data.get("card", {}).get("card_id")
+                     or c.last4 == data.get("card", {}).get("last4")), None)
+        op = normalize_card_operation(card, data.get("operation", "")) if card else data.get("operation", "")
+        data["operation"] = op
+        passed, checks = check_card_operation(card, op, data.get("new_limit"))
+        tier = tier_of_operation("card", op)
+    elif scenario == "subscription":
+        target = data.get("target") or {}
+        sub = next((s for s in state.subscriptions(demo_bills()) if
+                    s.sub_id == target.get("sub_id", f"sub_{target.get('merchant', '')}_{target.get('amount', 0):.0f}")), None)
+        passed, checks = check_subscription_cancel(sub)
+    elif scenario != "cross_scene":
+        passed = False
+    if not passed:
+        message = "执行前复核未通过：" + ("；".join(c["detail"] for c in checks if not c["passed"])
+                                     or "请求无效，请重新发起")
+        _terminal(state, item, {"success": False, "message": message}, "blocked")
+        _audit_event(state, "banking_confirmation_blocked", pending_id, {"checks": checks}, "failure")
+        return response(False, message, gate_checks=checks)
+    if tier == "red" and item["tier"] != "red":
+        item["tier"] = tier
+        item["message"] += " 当前状态已变化，升级为红色权限，须重新强验证确认。"
+        return response(False, "当前累计金额或卡片状态已变化，请核对并重新强验证确认。", tier=tier, tier_changed=True)
+    item["tier"] = tier
     if tier == "red":
-        sms = str(payload.get("verification", {}).get("sms_code", "")).strip()
-        face = bool(payload.get("verification", {}).get("face_verified"))
-        passed = len(sms) == 6 and sms.isdigit() and face
-        log_action("banking_strong_verification", USER_ID, pending_id, {
-            "method": "短信验证码 + 人脸识别",
-            "channel": "Mock（演示环境不发送真实短信）",
-            "sms_code_ok": len(sms) == 6 and sms.isdigit(), "face_ok": face,
-        }, "success" if passed else "failure")
-        if not passed:
-            get_breaker().record_failure("strong_verify_failed", {
-                "pending_id": pending_id, "scenario": item.get("scenario"),
-            }, USER_ID)
-            return {"success": False, "tier": tier,
-                    "breaker": get_breaker().state(),
-                    "message": "强验证未通过：需要 6 位短信验证码并完成人脸识别（演示为 Mock）。",
-                    "provenance": _provenance()}
+        verification = payload.get("verification") or {}
+        sms = str(verification.get("sms_code", "")).strip()
+        face = verification.get("face_verified") is True
+        verified = len(sms) == 6 and sms.isascii() and sms.isdigit() and face
+        _audit_event(state, "banking_strong_verification", pending_id,
+                     {"sms_code_ok": len(sms) == 6 and sms.isascii() and sms.isdigit(), "face_ok": face,
+                      "channel": "Mock 演示验证"}, "success" if verified else "failure")
+        if not verified:
+            get_breaker().record_failure("strong_verify_failed", {"pending_id": pending_id}, USER_ID)
+            return response(False, "强验证未通过：需要6位短信验证码并完成人脸识别（演示为 Mock）。", tier=tier)
 
-    scenario = item.get("scenario", "")
-    data = item.get("payload", {}) or {}
-    result: dict = {"success": True, "tier": tier, "scenario": scenario}
-
-    try:
-        if scenario == "transfer":
-            amount = float((data.get("request") or {}).get("amount", 0))
-            payee = (data.get("request") or {}).get("payee", "")
-            memo = (data.get("request") or {}).get("memo", "")
-            state.record_transfer(amount)
-            result.update({
-                "message": f"转账成功（演示模拟）：向 {payee} 转出 {amount:,.2f} 元"
-                           f"{('，备注：' + memo) if memo else ''}。",
-                "daily_cumulative": state.daily_cumulative,
-            })
-            log_action("banking_transfer_executed", USER_ID, pending_id, {
-                "payee": payee, "amount": amount, "memo": memo, "tier": tier,
-                "note": "演示模拟，未发生真实资金转移",
-            }, "success")
-        elif scenario == "subscription":
-            target = data.get("target") or {}
-            merchant = target.get("merchant", "")
-            state.mark_subscription_cancelled(f"sub_{merchant}_{target.get('amount', 0):.0f}")
-            result["message"] = f"已取消订阅：{merchant}。历史账单保留，仅停止后续自动扣费（演示模拟）。"
-            log_action("banking_subscription_cancelled", USER_ID, pending_id, {
-                "merchant": merchant, "tier": tier,
-            }, "success")
-        elif scenario == "card":
-            card = data.get("card") or {}
-            op = data.get("operation", "")
-            # 额度调整需要从原话里带出新额度——payload 里已保存 gate_checks，
-            # 这里按操作名映射状态变更
-            state.apply_card_action(card.get("card_id", "") or
-                                    _card_id_by_last4(state, card.get("last4", "")), op,
-                                    (data.get("new_limit") if data.get("new_limit") is not None else None))
-            op_label = {"lock": "锁卡", "unlock": "解锁", "loss_report": "挂失",
-                        "limit_adjust": "额度调整"}.get(op, op)
-            result["message"] = f"卡片操作已生效（演示模拟）：{op_label}。"
-            log_action("banking_card_action_executed", USER_ID, pending_id, {
-                "operation": op, "tier": tier,
-            }, "success")
-        elif scenario == "cross_scene":
-            # 跨场景的资金锁定与外部下单在当前作品中均为演示模拟；
-            # 确认动作仍然要经过黄色权限队列并留下审计回执。
-            plan = data.get("plan") or {}
-            result["message"] = "跨场景计划已确认（演示模拟）：资金锁定与外部订购均未调用真实服务。"
-            result["plan_id"] = plan.get("plan_id", "")
-            log_action("banking_cross_scene_confirmed", USER_ID, pending_id, {
-                "plan_id": plan.get("plan_id", ""),
-                "note": "演示模拟，未发生真实资金变动或外部下单",
-            }, "success")
+    result = {"success": True, "tier": tier, "scenario": scenario}
+    if scenario == "transfer":
+        amount, payee = float(request["amount"]), request["payee"]
+        if operation == "aa_collect":
+            collection = {"id": pending_id, "participant": payee, "amount": amount,
+                          "status": "issued", "simulation": True}
+            state.collections.append(collection)
+            result.update(message=f"已创建向{payee}收取 {amount:.2f} 元的模拟收款请求；尚未收款。", collection=collection)
         else:
-            result["message"] = "已确认。"
-    except Exception as exc:      # noqa: BLE001
-        logger.exception("确认动作执行失败：%s", exc)
-        return {"success": False, "message": f"执行失败：{exc}"}
+            state.record_transfer(amount)
+            result.update(message=f"转账成功（演示模拟）：向 {payee} 转出 {amount:,.2f} 元。",
+                          daily_cumulative=state.daily_cumulative, balance=state.balance)
+    elif scenario == "subscription":
+        state.mark_subscription_cancelled(sub.sub_id)
+        result["message"] = f"已取消订阅：{sub.merchant}（演示模拟）。"
+    elif scenario == "card":
+        state.apply_card_action(card.card_id, op, data.get("new_limit"))
+        label = {"lock": "锁卡", "unlock": "解锁", "loss_report": "挂失", "loss_release": "解挂", "limit_adjust": "额度调整"}.get(op, op)
+        result["message"] = f"卡片操作已生效（演示模拟）：{label}。"
+    else:
+        result.update(message="跨场景计划已确认（演示模拟）：资金锁定与外部订购均未调用真实服务。",
+                      plan_id=(data.get("plan") or {}).get("plan_id", ""))
+    receipt = _terminal(state, item, result, "executed")
+    _audit_event(state, "banking_action_executed", pending_id,
+                 {"scenario": scenario, "operation": operation if scenario == "transfer" else data.get("operation"),
+                  "receipt": receipt, "simulation": True})
+    return response(True, result.pop("message"), **{k: v for k, v in result.items() if k != "success"}, receipt=receipt)
 
-    state.pending = [p for p in state.pending if p.get("id") != pending_id]
-    state.save()
-    result["pending"] = state.pending
-    result["breaker"] = get_breaker().state()
-    result["provenance"] = _provenance()
-    return result
 
-
-def _card_id_by_last4(state, last4: str) -> str:
-    for c in state.cards:
-        if c.last4 == last4:
-            return c.card_id
-    return ""
-
-
+@_transactional
 def pending_list() -> list[dict]:
     state = get_banking_state()
     _prune_pending(state)
-    return list(state.pending)
+    _promote_due(state)
+    return state.pending
 
 
+@_transactional
 def cancel_pending(pending_id: str) -> dict:
-    """用户拒绝黄色/红色待办。"""
     state = get_banking_state()
     _prune_pending(state)
-    item = next((p for p in state.pending if p.get("id") == pending_id), None)
+    item = next((p for p in state.pending if p["id"] == pending_id), None)
+    if item is None:
+        task = next((t for t in state.scheduled if t["id"] == pending_id and t["status"] == "waiting_due"), None)
+        item = task["item"] if task else None
     if item is None:
         return {"success": False, "message": "待确认事项不存在、已处理或已过期",
-                "pending": state.pending, "provenance": _provenance()}
-    state.pending = [p for p in state.pending if p.get("id") != pending_id]
-    state.save()
-    log_action("banking_pending_rejected", USER_ID, pending_id, {
-        "scenario": item.get("scenario"), "tier": item.get("tier"),
-    }, "success")
-    return {"success": True, "pending": state.pending,
+                "pending": state.pending, "scheduled": state.scheduled, "provenance": _provenance()}
+    _terminal(state, item, {"success": True, "message": "用户已拒绝该操作"}, "rejected")
+    _audit_event(state, "banking_pending_rejected", pending_id, {"scenario": item["scenario"]})
+    return {"success": True, "pending": state.pending, "scheduled": state.scheduled,
             "message": "已拒绝该操作（演示）。", "provenance": _provenance()}

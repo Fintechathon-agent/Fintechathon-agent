@@ -132,6 +132,7 @@ class TransferRequest:
     memo: str = ""
     scheduled_at: str = ""     # 定时转账的预约时间（空=立即）
     aa_participants: list[str] = field(default_factory=list)  # AA 拆分人数或名单
+    validation_error: str = ""
     created_at: str = ""
 
     def __post_init__(self):

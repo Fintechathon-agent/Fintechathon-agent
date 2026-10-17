@@ -198,9 +198,11 @@ class ApprovalRequest:
     portfolio_snapshot: Portfolio
     risk_report: RiskReport
     created_at: str
-    status: Literal["pending", "approved", "rejected", "cancelled"] = "pending"
+    status: Literal["pending", "approved", "executing", "executed", "failed", "rejected", "cancelled", "expired"] = "pending"
     approver_comment: str = ""
     user_id: str = ""               # 归属用户（空 = 未标注），供按用户过滤待办
+    expires_at: str = ""
+    execution_result: dict = field(default_factory=dict)
 
 
 # ============================================================

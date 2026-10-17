@@ -52,7 +52,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cors_origin:
         serve_argv.extend(["--cors-origin", args.cors_origin])
     if not args.no_open:
-        serve_argv.append("--open")
+        serve_argv.extend(["--open", "--open-path", "/team/"])
 
     from web.app import main as serve
     return serve(serve_argv)

@@ -1,0 +1,11 @@
+[
+  {
+    "url": "https://lixjanus526-art.github.io/finance-lab-ui-preview/build-info.json",
+    "status": 200,
+    "body": "{\n  \"mode\": \"STATIC_UI_ONLY\",\n  \"apiMocks\": false,\n  \"backend\": \"Not included. Service calls must fail visibly when unavailable.\"\n}"
+  },
+  {
+    "url": "https://lixjanus526-art.github.io/finance-lab-ui-preview/api/demo/portfolio",
+    "status": 404
+  }
+]

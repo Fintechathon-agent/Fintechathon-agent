@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import re
+from decimal import Decimal, InvalidOperation
 from datetime import datetime, timedelta
 
 from contracts.banking import Contact, TransferRequest, TransferResult
@@ -18,22 +19,72 @@ from agent.banking.gates import check_transfer
 from agent.banking.tiers import tier_of_operation
 
 
-_AMOUNT_RE = re.compile(r"(\d+(?:\.\d{1,2})?)\s*(万|千|百)?\s*(?:元|块|块钱)?")
 _PHONE_RE = re.compile(r"1[3-9]\d{9}")
 _AA_RE = re.compile(r"[Aa][Aa]|分摊|平分|几个人分|大家平摊")
 
 
-def parse_transfer_request(text: str, contacts: list[Contact]) -> TransferRequest:
+def parse_schedule(text: str, now: datetime) -> str:
+    """Resolve supported dates; unspecified time is explicitly 09:00 local time."""
+    wants_schedule = re.search(r"定时|预约|明天|后天|下周|下个?月|今天|今晚|小时后|分钟后|上午|下午|晚上|早上|中午|凌晨|\d{1,2}点|\d{1,2}[:：]\d{2}|\d{1,2}月\d{1,2}[日号]|\d{4}-\d{2}-\d{2}", text)
+    if not wants_schedule:
+        return ""
+    target = now
+    if "后天" in text:
+        target += timedelta(days=2)
+    elif "明天" in text:
+        target += timedelta(days=1)
+    elif re.search(r"下周[一二三四五六日天]", text):
+        day = re.search(r"下周([一二三四五六日天])", text).group(1)
+        target += timedelta(days=7 - now.weekday() + min("一二三四五六日天".index(day), 6))
+    else:
+        date = re.search(r"(?:(\d{4})年)?(\d{1,2})月(\d{1,2})[日号]", text)
+        iso_date = re.search(r"\d{4}-\d{2}-\d{2}", text)
+        if date:
+            target = target.replace(year=int(date.group(1) or now.year), month=int(date.group(2)), day=int(date.group(3)))
+        elif iso_date:
+            target = datetime.fromisoformat(iso_date.group())
+        elif "今天" not in text:
+            raise ValueError("请给出明确预约日期，例如明天上午10点")
+    clock = re.search(r"(?:(上午|下午|晚上|早上|中午)\s*)?(\d{1,2})(?:点|:|：)(?:(\d{1,2})分?)?", text)
+    hour, minute = (9, 0)
+    if clock:
+        hour, minute = int(clock.group(2)), int(clock.group(3) or 0)
+        if "点半" in text:
+            minute = 30
+        if clock.group(1) in ("下午", "晚上", "中午") and hour < 12:
+            hour += 12
+    target = target.replace(hour=hour, minute=minute, second=0, microsecond=0)
+    if target <= now:
+        raise ValueError("预约时间已经过去，请指定未来的日期和时间")
+    return target.isoformat(timespec="seconds")
+
+
+def parse_transfer_request(text: str, contacts: list[Contact], now: datetime | None = None) -> TransferRequest:
     """从自然语言抽取转账请求。
 
     收款人优先级：手机号 > 通讯录姓名 > 「给X转」句式中的 X。
     """
+    now = now or datetime.now()
     amount = 0.0
-    m = _AMOUNT_RE.search(text)
-    if m:
-        amount = float(m.group(1))
-        unit = m.group(2)
-        amount *= {"万": 10000, "千": 1000, "百": 100}.get(unit or "", 1)
+    error = ""
+    amount_text = _PHONE_RE.sub(" ", text.split("备注")[0])
+    candidates = re.findall(r"([+-]?\d+(?:\.\d+)?)\s*(万|千|百)?\s*(?:元|块钱|块)", amount_text)
+    if not candidates:
+        candidates = re.findall(r"(?:转账|转|汇款|打款)\s*([+-]?\d+(?:\.\d+)?)\s*(万|千|百)?", amount_text)
+    if len(candidates) == 1:
+        number, unit = candidates[0]
+        try:
+            value = Decimal(number) * {"万": 10000, "千": 1000, "百": 100}.get(unit, 1)
+            if value != value.quantize(Decimal("0.01")):
+                error = "金额精度须到分，请重新说明金额"
+            elif value > Decimal("1000000000000"):
+                error = "金额超出可办理范围，请重新说明金额"
+            else:
+                amount = float(value)
+        except InvalidOperation:
+            error = "金额无效，请重新说明金额"
+    elif len(candidates) > 1:
+        error = "检测到多笔金额，请分别发起转账以逐笔确认"
 
     memo = ""
     mm = re.search(r"备注[：:\s]*([^\s，。！？]+)", text)
@@ -41,18 +92,20 @@ def parse_transfer_request(text: str, contacts: list[Contact]) -> TransferReques
         memo = mm.group(1)
 
     scheduled_at = ""
-    sm = re.search(r"(明天|后天|下(?:周|月)[一二三四五六日天]?|(\d{1,2})[月\-](\d{1,2})[日号]?)\s*(?:上午|下午|晚上|早上|中午)?\s*(\d{1,2})?[：:]?(\d{2})?", text)
-    if sm and ("定时" in text or "预约" in text or "到时" in text or re.search(r"(明天|后天)", text)):
-        scheduled_at = sm.group(0)
+    try:
+        scheduled_at = parse_schedule(text.split("备注")[0], now)
+    except ValueError as exc:
+        error = str(exc)
 
-    payee = ""
-    for c in contacts:
-        if c.phone and c.phone in text:
-            payee = c.phone
-            break
+    payee_text = text.split("备注")[0]
+    phones = _PHONE_RE.findall(payee_text)
+    payee = phones[0] if phones else ""
+    matched_contacts = [c for c in contacts if (c.name and c.name in payee_text) or (c.phone and c.phone in payee_text)]
+    if len(set(phones)) > 1 or len(matched_contacts) > 1:
+        error = "检测到多个收款人，请分别发起转账以逐笔确认"
     if not payee:
         for c in contacts:
-            if c.name and c.name in text:
+            if c.name and c.name in payee_text:
                 payee = c.name
                 break
     if not payee:
@@ -67,10 +120,12 @@ def parse_transfer_request(text: str, contacts: list[Contact]) -> TransferReques
     aa: list[str] = []
     if _AA_RE.search(text):
         n_match = re.search(r"(\d+)\s*(?:个?人|人分)", text)
-        n = int(n_match.group(1)) if n_match else 3
-        aa = [f"AA-{i+1}" for i in range(n)]
+        n = int(n_match.group(1)) if n_match else 0
+        if not 2 <= n <= 100:
+            error = "请说明AA参与人数（2至100人）"
+        else:
+            aa = [f"AA-{i+1}" for i in range(n)]
 
-    now = datetime.now()
     return TransferRequest(
         request_id=f"tr_{now.strftime('%Y%m%d%H%M%S%f')}",
         payee=payee.strip(),
@@ -78,6 +133,7 @@ def parse_transfer_request(text: str, contacts: list[Contact]) -> TransferReques
         memo=memo,
         scheduled_at=scheduled_at,
         aa_participants=aa,
+        validation_error=error,
     )
 
 
@@ -90,7 +146,9 @@ def handle_transfer(
 ) -> TransferResult:
     """处理转账意图：抽取 → 闸门 → 权限分级 → 结果。"""
     now = now or datetime.now()
-    req = parse_transfer_request(text, contacts)
+    req = parse_transfer_request(text, contacts, now)
+    if req.validation_error:
+        return TransferResult(request=req, tier="green", status="needs_clarification", message=req.validation_error)
 
     if not req.payee and not req.aa_participants:
         return TransferResult(
@@ -107,16 +165,14 @@ def handle_transfer(
 
     # AA 拆分不要求单一收款人——拆出多条待确认收款请求
     if req.aa_participants:
-        share = round(req.amount / len(req.aa_participants), 2)
-        items = [{
-            "id": f"{req.request_id}_{i}",
-            "label": f"收款请求 #{i+1}",
-            "amount": share,
-            "status": "pending_confirmation",
-        } for i in range(len(req.aa_participants))]
+        if req.scheduled_at or req.amount * 100 < len(req.aa_participants):
+            return TransferResult(request=req, tier="green", status="needs_clarification",
+                                  message="AA 收款暂不支持预约，且每人份额至少为一分钱，请调整请求")
+        items = [{**item, "label": f"收款请求 #{i+1}", "status": "pending_confirmation"}
+                 for i, item in enumerate(split_aa(req))]
         return TransferResult(
             request=req, tier="yellow", status="pending_confirmation",
-            message=f"已生成 {len(items)} 条 AA 收款请求（每人 {share:,.2f} 元），等待逐个确认。",
+            message=f"已生成 {len(items)} 条 AA 收款请求，共 {req.amount:,.2f} 元，逐个确认后创建模拟收款请求，不转出资金。",
             gate_checks=[], aa_items=items,
         )
 
@@ -139,7 +195,7 @@ def handle_transfer(
     if req.scheduled_at:
         return TransferResult(
             request=req, tier=tier, status="scheduled",
-            message=f"已创建定时转账任务：{req.scheduled_at} 向 {req.payee} 转账 {req.amount:,.2f} 元"
+            message=f"定时转账安排：{req.scheduled_at} 向 {req.payee} 转账 {req.amount:,.2f} 元"
                     f"{('，备注：' + req.memo) if req.memo else ''}。到点执行前仍需按当前权限确认。",
             gate_checks=checks, matched_contact=matched,
             daily_cumulative=daily_cumulative,
@@ -159,6 +215,6 @@ def split_aa(req: TransferRequest) -> list[dict]:
     """AA 拆分明细（把总金额摊到每个参与者）。"""
     if not req.aa_participants:
         return []
-    share = round(req.amount / len(req.aa_participants), 2)
-    return [{"id": f"{req.request_id}_{i}", "name": f"参与者 {i+1}", "amount": share}
+    cents, remainder = divmod(int(Decimal(str(req.amount)) * 100), len(req.aa_participants))
+    return [{"id": f"{req.request_id}_{i}", "name": f"参与者 {i+1}", "amount": (cents + (i < remainder)) / 100}
             for i in range(len(req.aa_participants))]

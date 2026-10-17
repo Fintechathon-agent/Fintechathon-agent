@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+from copy import deepcopy
 from pathlib import Path
 from typing import Optional
 
 from contracts.types import ApprovalRequest
+from agent.core.storage import atomic_write_json, storage_lock
 
 
 class ApprovalManager:
@@ -17,17 +19,22 @@ class ApprovalManager:
         self.dir = Path(storage_dir)
         self.dir.mkdir(parents=True, exist_ok=True)
         self._pending: dict[str, ApprovalRequest] = {}
+        self.lock = storage_lock(self.dir)
 
     def submit(self, request: ApprovalRequest) -> str:
         """提交审批请求，返回审批 ID"""
-        self._pending[request.id] = request
-        self._save(request)
+        with self.lock:
+            if self._file_path(request.id).exists():
+                return request.id
+            request = deepcopy(request)
+            if not request.expires_at:
+                request.expires_at = (datetime.fromisoformat(request.created_at) + timedelta(minutes=10)).isoformat()
+            self._save(request)
         return request.id
 
     def get(self, approval_id: str) -> Optional[ApprovalRequest]:
         """查询审批请求"""
-        if approval_id in self._pending:
-            return self._pending[approval_id]
+        # Disk is authoritative, including terminal states after a restart.
         # 尝试从文件加载
         p = self._file_path(approval_id)
         if p.exists():
@@ -42,25 +49,35 @@ class ApprovalManager:
 
     def approve(self, approval_id: str, comment: str = "") -> bool:
         """审批通过"""
-        req = self.get(approval_id)
-        if not req:
-            return False
-        req.status = "approved"
-        req.approver_comment = comment
-        self._pending[approval_id] = req
-        self._save(req)
-        return True
+        return self._transition(approval_id, "executing", comment)
 
     def reject(self, approval_id: str, comment: str = "") -> bool:
         """审批拒绝"""
-        req = self.get(approval_id)
-        if not req:
-            return False
-        req.status = "rejected"
-        req.approver_comment = comment
-        self._pending[approval_id] = req
-        self._save(req)
-        return True
+        return self._transition(approval_id, "rejected", comment)
+
+    def _transition(self, approval_id: str, status: str, comment: str) -> bool:
+        with self.lock:
+            req = self.get(approval_id)
+            if not req or req.status != "pending":
+                return False
+            expiry = req.expires_at or (datetime.fromisoformat(req.created_at) + timedelta(minutes=10)).isoformat()
+            if datetime.fromisoformat(expiry) <= datetime.now():
+                req.status = "expired"
+                self._save(req)
+                return False
+            req.status = status
+            req.approver_comment = comment
+            self._save(req)
+            return True
+
+    def finish(self, approval_id: str, result: dict) -> None:
+        with self.lock:
+            req = self.get(approval_id)
+            if not req or req.status not in ("executing", "approved"):
+                raise ValueError("审批不在执行中")
+            req.status = "executed" if result.get("executed") else "failed"
+            req.execution_result = deepcopy(result)
+            self._save(req)
 
     def list_pending(self, user_id: str = "") -> list[ApprovalRequest]:
         """列出待审批请求。
@@ -82,7 +99,7 @@ class ApprovalManager:
                 if owner and owner != user_id:
                     continue
             aid = raw.get("id", "")
-            req = self._pending.get(aid) or self._load_file(f)
+            req = self._load_file(f)
             if req is not None:
                 out.append(req)
         return out
@@ -99,12 +116,18 @@ class ApprovalManager:
 
     def _save(self, request: ApprovalRequest) -> None:
         p = self._file_path(request.id)
-        p.write_text(
-            json.dumps(self._request_to_dict(request), ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
+        data = self._request_to_dict(request)
+        if p.exists():
+            previous = json.loads(p.read_text(encoding="utf-8"))
+            for key in ("portfolio_summary", "risk_summary"):
+                if key not in data and key in previous:
+                    data[key] = previous[key]
+        atomic_write_json(p, data)
+        self._pending[request.id] = deepcopy(request)
 
     def _file_path(self, approval_id: str) -> Path:
+        if not approval_id or Path(approval_id).name != approval_id or any(c in approval_id for c in "/\\:"):
+            raise ValueError("审批 ID 无效")
         return self.dir / f"{approval_id}.json"
 
     @staticmethod
@@ -123,6 +146,8 @@ class ApprovalManager:
             "created_at": r.created_at,
             "status": r.status,
             "approver_comment": r.approver_comment,
+            "expires_at": r.expires_at,
+            "execution_result": r.execution_result,
             "recommendation": {
                 "action": r.recommendation.action.value,
                 "symbol": r.recommendation.symbol,
@@ -173,4 +198,6 @@ class ApprovalManager:
             status=d["status"],
             approver_comment=d.get("approver_comment", ""),
             user_id=d.get("user_id", ""),
+            expires_at=d.get("expires_at", ""),
+            execution_result=d.get("execution_result", {}),
         )

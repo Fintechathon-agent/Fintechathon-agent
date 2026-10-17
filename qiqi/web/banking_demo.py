@@ -1,7 +1,7 @@
 """六场景演示数据（fixtures）与运行态管理。
 
 数据全部 source="demo"，界面显著标注；运行态（卡片状态、订阅取消、
-转账日累计、待确认队列）内存维护，重启回退到 fixture 并可从审计/日志重放。
+转账日累计、待确认队列与回执）以原子文件保存，重启恢复；文件损坏时停止加载。
 
 口径：
   · 金额单位为元；时间 ISO；
@@ -11,7 +11,11 @@
 from __future__ import annotations
 
 import json
+import math
 import threading
+from contextlib import contextmanager
+from copy import deepcopy
+from agent.core.storage import atomic_write_json
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
@@ -140,102 +144,119 @@ def demo_balance() -> float:
 
 
 class BankingState:
-    """六场景运行态：卡片状态、已取消订阅、转账日累计、待确认队列。
-
-    写操作落盘到 data/banking/state.json（该目录已在 .gitignore 的
-    运行时产物清单内），重启后按文件重放，保持演示连续性。
-    """
+    """One atomic document holds balance, actions, receipts and scheduled requests."""
 
     def __init__(self):
         self._lock = threading.RLock()
-        self.cards = demo_cards()
-        self.cancelled_subs: set[str] = set()
-        self.transfer_day: str = datetime.now().strftime("%Y-%m-%d")
-        self.daily_cumulative: float = 0.0
-        self.pending: list[dict] = []
-        # 演示数据预置开关：全新环境首次打开第三版任务台时自动预置一次，
-        # 之后（含用户重置）保持用户操作后的真实状态，不再自动重灌。
-        self.demo_seeded: bool = False
+        self._transaction_depth = 0
+        self._restore({})
         self._load()
 
     def _path(self) -> Path:
         return STATE_DIR / "state.json"
 
+    def _restore(self, raw: dict) -> None:
+        self.cards = demo_cards()
+        for saved in raw.get("cards", []):
+            for card in self.cards:
+                if card.card_id == saved.get("card_id"):
+                    card.status = saved.get("status", card.status)
+                    card.credit_limit = saved.get("credit_limit", card.credit_limit)
+                    card.daily_txn_limit = saved.get("daily_txn_limit", card.daily_txn_limit)
+        self.cancelled_subs = set(raw.get("cancelled_subs", []))
+        self.transfer_day = raw.get("transfer_day", datetime.now().strftime("%Y-%m-%d"))
+        self.daily_cumulative = float(raw.get("daily_cumulative", 0))
+        self.balance = float(raw.get("balance", max(0, demo_balance() - self.daily_cumulative)))
+        if not all(math.isfinite(v) and v >= 0 for v in (self.balance, self.daily_cumulative)):
+            raise ValueError("银行账本数值无效，须人工核实")
+        self.pending = deepcopy(raw.get("pending", []))
+        self.scheduled = deepcopy(raw.get("scheduled", []))
+        self.receipts = deepcopy(raw.get("receipts", {}))
+        self.collections = deepcopy(raw.get("collections", []))
+        self.audit_outbox = deepcopy(raw.get("audit_outbox", []))
+        self.demo_seeded = bool(raw.get("demo_seeded", False))
+
+    def _dump(self) -> dict:
+        return {
+            "schema_version": 2,
+            "cards": [{"card_id": c.card_id, "status": c.status, "credit_limit": c.credit_limit,
+                       "daily_txn_limit": c.daily_txn_limit} for c in self.cards],
+            "cancelled_subs": sorted(self.cancelled_subs), "transfer_day": self.transfer_day,
+            "daily_cumulative": self.daily_cumulative, "balance": self.balance,
+            "pending": self.pending, "scheduled": self.scheduled, "receipts": self.receipts,
+            "collections": self.collections, "demo_seeded": self.demo_seeded,
+            "audit_outbox": self.audit_outbox,
+        }
+
     def _load(self) -> None:
         try:
             raw = json.loads(self._path().read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
+        except FileNotFoundError:
             return
-        self.cancelled_subs = set(raw.get("cancelled_subs", []))
-        for card_d in raw.get("cards", []):
-            for c in self.cards:
-                if c.card_id == card_d.get("card_id"):
-                    c.status = card_d.get("status", c.status)
-                    c.credit_limit = card_d.get("credit_limit", c.credit_limit)
-                    c.daily_txn_limit = card_d.get("daily_txn_limit", c.daily_txn_limit)
-        self.transfer_day = raw.get("transfer_day", self.transfer_day)
-        if self.transfer_day == datetime.now().strftime("%Y-%m-%d"):
-            self.daily_cumulative = float(raw.get("daily_cumulative", 0.0))
-        self.pending = raw.get("pending", [])
-        self.demo_seeded = bool(raw.get("demo_seeded", False))
+        # Damaged state must fail closed instead of restoring spendable fixture money.
+        self._restore(raw)
+        self.refresh_day()
+
+    def refresh_day(self) -> None:
+        today = datetime.now().strftime("%Y-%m-%d")
+        if today != self.transfer_day:
+            self.transfer_day = today
+            self.daily_cumulative = 0.0
+
+    @contextmanager
+    def transaction(self):
+        with self._lock:
+            outer = self._transaction_depth == 0
+            snapshot = deepcopy(self._dump()) if outer else None
+            self._transaction_depth += 1
+            try:
+                self.refresh_day()
+                yield self
+                if outer:
+                    current = self._dump()
+                    if current != snapshot:
+                        atomic_write_json(self._path(), current)
+            except BaseException:
+                if outer:
+                    self._restore(snapshot)
+                raise
+            finally:
+                self._transaction_depth -= 1
 
     def save(self) -> None:
-        STATE_DIR.mkdir(parents=True, exist_ok=True)
-        self._path().write_text(json.dumps({
-            "cancelled_subs": sorted(self.cancelled_subs),
-            "cards": [{
-                "card_id": c.card_id, "status": c.status,
-                "credit_limit": c.credit_limit, "daily_txn_limit": c.daily_txn_limit,
-            } for c in self.cards],
-            "transfer_day": self.transfer_day,
-            "daily_cumulative": self.daily_cumulative,
-            "pending": self.pending,
-            "demo_seeded": self.demo_seeded,
-        }, ensure_ascii=False, indent=2), encoding="utf-8")
+        with self._lock:
+            if not self._transaction_depth:
+                atomic_write_json(self._path(), self._dump())
 
     def reset(self) -> None:
-        """重置演示状态：卡片/订阅回到 fixture，清空待办与当日累计。
-
-        同时把 demo_seeded 置 True——用户主动重置后保持空队列，
-        不再在下次启动时自动重灌演示数据（可手动点「预置演示数据」）。
-        """
-        with self._lock:
-            self.cards = demo_cards()
-            self.cancelled_subs = set()
-            self.transfer_day = datetime.now().strftime("%Y-%m-%d")
-            self.daily_cumulative = 0.0
-            self.pending = []
-            self.demo_seeded = True
-            self.save()
-
-    # ---- 操作 ----
+        with self.transaction():
+            self._restore({"demo_seeded": True})
 
     def record_transfer(self, amount: float) -> None:
-        with self._lock:
-            today = datetime.now().strftime("%Y-%m-%d")
-            if today != self.transfer_day:
-                self.transfer_day = today
-                self.daily_cumulative = 0.0
-            self.daily_cumulative += amount
-            self.save()
+        with self.transaction():
+            if not (0 < amount <= self.balance):
+                raise ValueError("可用余额不足或金额无效")
+            self.balance = round(self.balance - amount, 2)
+            self.daily_cumulative = round(self.daily_cumulative + amount, 2)
 
     def mark_subscription_cancelled(self, sub_id: str) -> None:
-        with self._lock:
+        with self.transaction():
+            if sub_id in self.cancelled_subs:
+                raise ValueError("该订阅已取消")
             self.cancelled_subs.add(sub_id)
-            self.save()
 
     def apply_card_action(self, card_id: str, op: str, new_limit: Optional[float] = None) -> None:
         from agent.banking.cards import apply_card_action
-        with self._lock:
-            apply_card_action(self.cards, card_id, op, new_limit)
-            self.save()
+        with self.transaction():
+            if apply_card_action(self.cards, card_id, op, new_limit) is None:
+                raise ValueError("卡片不存在")
 
     def subscriptions(self, bills: list[BillRecord]) -> list[Subscription]:
         from agent.banking.subscriptions import detect_subscriptions
         subs = detect_subscriptions(bills)
-        for s in subs:
-            if s.sub_id in self.cancelled_subs:
-                s.status = "cancelled"
+        for sub in subs:
+            if sub.sub_id in self.cancelled_subs:
+                sub.status = "cancelled"
         return subs
 
 

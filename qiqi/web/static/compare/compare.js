@@ -10,7 +10,7 @@
   });
   const shortTime = (value) => String(value || '').replace('T', ' ').slice(0, 16);
   const icon = { transfer: '↗', bill: '▦', card: '▣', subscription: '↻', cross_scene: '◇', wealth: '◈', unsafe: '!', out_of_scope: '·' };
-  const state = { boot: null, pending: [], breaker: null };
+  const state = { boot: null, pending: [], scheduled: [], breaker: null };
 
   const tierClass = (tier) => {
     if (tier === 'yellow') return 'yellow';
@@ -47,6 +47,7 @@
       const [overview, audit] = await Promise.all([api('/api/scenarios/boot'), api('/api/audit')]);
       state.boot = overview;
       state.pending = overview.pending || [];
+      state.scheduled = overview.scheduled || [];
       state.breaker = overview.breaker || null;
       $('#balance-value').textContent = `¥${money(overview.balance)}`;
       renderQuickActions(overview.scenarios || []);
@@ -96,6 +97,7 @@
         renderResult(response.result, response.provenance);
       }
       state.pending = response.pending || [];
+      state.scheduled = response.scheduled || state.scheduled;
       if (response.breaker) {
         state.breaker = response.breaker;
         renderBreaker(response.breaker);
@@ -112,7 +114,7 @@
 
   function renderDelegated(message) {
     $('#result-card').className = 'result-card';
-    $('#result-card').innerHTML = `<div class="result-head"><span class="result-icon">${icon.wealth}</span><span class="result-title">理财深度分析</span><span class="tier-badge green">深度路径</span></div><div class="result-message">${esc(message || '理财请求已转交深度分析路径')}。这里保留银行任务安全链，组合诊断和模拟方案请进入主工作台完成。</div><a class="text-link" href="/#intent-area">打开理财分析 <span>↗</span></a>`;
+    $('#result-card').innerHTML = `<div class="result-head"><span class="result-icon">${icon.wealth}</span><span class="result-title">理财深度分析</span><span class="tier-badge green">深度路径</span></div><div class="result-message">${esc(message || '理财请求已转交深度分析路径')}。这里保留银行任务安全链，组合诊断和模拟方案请进入主工作台完成。</div><a class="text-link" href="../index.html#intent-area">打开理财分析 <span>↗</span></a>`;
     $('#plan-list').innerHTML = '<div class="plan-empty">理财请求已分流；主工作台负责诊断、方案比较和纸交易确认。</div>';
     $('#evidence-note').textContent = '理财深度场景使用主工作台的分析闭环；当前页面不把投资建议伪装成银行执行结果。';
   }
@@ -183,7 +185,7 @@
 
   function renderEvidence(result, provenance) {
     const source = (provenance && provenance.source_label) || '演示固定数据';
-    const status = result.status === 'done' ? '已返回' : result.status === 'blocked' ? '已拦截' : result.status === 'pending_confirmation' ? '等待确认' : '已澄清';
+    const status = result.status === 'done' ? '已返回' : result.status === 'blocked' ? '已拦截' : result.status === 'pending_confirmation' ? '等待确认' : result.status === 'scheduled' ? '等待预约到期' : '已澄清';
     $('#evidence-grid').innerHTML = `
       <div class="evidence-cell"><small>来源</small><b>${esc(source)}</b></div>
       <div class="evidence-cell"><small>状态</small><b>${esc(status)}</b></div>
@@ -197,6 +199,7 @@
   }
 
   function renderPending(items) {
+    items = [...items, ...state.scheduled.filter((task) => task.status === 'waiting_due').map((task) => ({ ...task.item, scheduled_at: task.scheduled_at }))];
     $('#pending-count').textContent = items.length;
     if (!items.length) {
       $('#pending-list').innerHTML = '<div class="pending-empty">暂无待确认事项</div>';
@@ -204,10 +207,10 @@
     }
     $('#pending-list').innerHTML = items.map((item) => {
       const tier = item.tier === 'red' ? 'red' : 'yellow';
-      const action = tier === 'red'
+      const action = item.scheduled_at ? '<span>预约等待中，到期后重新确认</span>' : tier === 'red'
         ? `<input class="verify-input" maxlength="6" inputmode="numeric" placeholder="6位验证码" data-sms="${esc(item.id)}" /><label class="verify-label"><input type="checkbox" data-face="${esc(item.id)}" /> 人脸 Mock</label><button class="small-btn confirm" data-confirm="${esc(item.id)}">验证并执行</button>`
         : `<button class="small-btn confirm" data-confirm="${esc(item.id)}">确认执行</button>`;
-      return `<div class="pending-item"><div class="pending-top"><span class="tier-badge ${tier}">${tier === 'red' ? '红色强验证' : '黄色确认'}</span><span class="pending-text">${esc(item.message || '')}</span></div><div class="pending-time">创建 ${esc(shortTime(item.created_at))} · 有效至 ${esc(shortTime(item.expires_at))}</div><div class="pending-actions">${action}<button class="small-btn" data-cancel="${esc(item.id)}">拒绝</button></div></div>`;
+      return `<div class="pending-item"><div class="pending-top"><span class="tier-badge ${tier}">${tier === 'red' ? '红色强验证' : '黄色确认'}</span><span class="pending-text">${esc(item.message || '')}</span></div><div class="pending-time">创建 ${esc(shortTime(item.created_at))} · ${item.scheduled_at ? '预约时间' : '有效至'} ${esc(shortTime(item.scheduled_at || item.expires_at))}</div><div class="pending-actions">${action}<button class="small-btn" data-cancel="${esc(item.id)}">拒绝</button></div></div>`;
     }).join('');
     $('#pending-list').querySelectorAll('[data-confirm]').forEach((button) => button.addEventListener('click', () => confirmPending(button.dataset.confirm)));
     $('#pending-list').querySelectorAll('[data-cancel]').forEach((button) => button.addEventListener('click', () => cancelPending(button.dataset.cancel)));
@@ -218,7 +221,9 @@
     const face = $(`[data-face="${CSS.escape(id)}"]`);
     try {
       const result = await api('/api/scenarios/confirm', { method: 'POST', body: { id, verification: { sms_code: sms ? sms.value : '', face_verified: Boolean(face && face.checked) } } });
-      if (result.success) state.pending = result.pending || [];
+      if (Array.isArray(result.pending)) state.pending = result.pending;
+      if (Array.isArray(result.scheduled)) state.scheduled = result.scheduled;
+      if (typeof result.balance === 'number') $('#balance-value').textContent = `¥${money(result.balance)}`;
       renderPending(state.pending);
       if (result.breaker) {
         state.breaker = result.breaker;
@@ -237,6 +242,7 @@
     try {
       const result = await api('/api/scenarios/cancel', { method: 'POST', body: { id } });
       state.pending = result.pending || [];
+      state.scheduled = result.scheduled || state.scheduled;
       renderPending(state.pending);
       await refreshAudit();
       setJourney(null, false, state.pending.length ? 'pending' : 'done');

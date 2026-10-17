@@ -1,0 +1,17 @@
+审计待投递事件保留，将在下次请求重试
+Traceback (most recent call last):
+  File "C:\Users\qiqi\AppData\Local\Temp\finance-lab-safety-fixes-cvnvjsbz\web\banking_service.py", line 103, in _flush_audit
+    log_action(event["action"], USER_ID, event["action_id"],
+  File "C:\Users\qiqi\AppData\Local\Programs\Python\Python310\lib\unittest\mock.py", line 1104, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "C:\Users\qiqi\AppData\Local\Programs\Python\Python310\lib\unittest\mock.py", line 1108, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "C:\Users\qiqi\AppData\Local\Programs\Python\Python310\lib\unittest\mock.py", line 1163, in _execute_mock_call
+    raise effect
+OSError: audit unavailable
+LLM 决策失败: fake timeout，尝试降级
+真实模型调用失败（不回退）: fake timeout
+----------------------------------------------------------------------
+Ran 154 tests in 29.136s
+
+OK

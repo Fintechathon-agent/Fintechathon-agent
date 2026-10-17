@@ -89,7 +89,8 @@ async function checkDesktop(page) {
   await resetState(page);
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
   await page.locator('#v2-balance').waitFor();
-  if (await page.locator('a[href="https://fund-risk-workbench.panxintian44.chatgpt.site/risk"]').count() !== 2) throw new Error('team risk workbench links missing');
+  if (await page.locator('a[href^="https://"]').filter({ hasText: '风险' }).count() !== 0) throw new Error('external risk workbench link still present');
+  if (await page.locator('a[href="/#risk-workbench"]').count() !== 2) throw new Error('embedded investment risk links missing');
   const seededCount = await checkSeedButton(page);
   const demos = await checkDemoSections(page);
   await resetState(page);

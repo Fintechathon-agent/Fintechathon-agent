@@ -1,0 +1,92 @@
+{
+  "cumulative_transfer": {
+    "initial_tiers": [
+      "yellow",
+      "yellow"
+    ],
+    "first_success": true,
+    "second_success_without_verification": true,
+    "second_final_tier": "yellow",
+    "final_daily_total": 1200.0
+  },
+  "lost_card_unlock": {
+    "before_state": "lost",
+    "unlock_tier": "yellow",
+    "unlock_success_without_verification": true,
+    "after_state": "normal"
+  },
+  "aa_confirmation": {
+    "aa_item_count": 3,
+    "pending_count": 1,
+    "confirmation_message": "转账成功（演示模拟）：向  转出 300.00 元。",
+    "daily_total": 300.0
+  },
+  "scheduled_transfer": {
+    "status": "scheduled",
+    "pending_count": 0,
+    "message": "已创建定时转账任务：明天 向 王芳 转账 500.00 元。到点执行前仍需按当前权限确认。"
+  },
+  "phone_first_amount": {
+    "status": "blocked",
+    "parsed_amount": 13800001111.0
+  },
+  "duplicate_subscription_cancel": {
+    "first_success": true,
+    "second_status": "pending_confirmation",
+    "second_pending_count": 1
+  },
+  "cross_scene_confirm": {
+    "queued": 1,
+    "confirmed": true,
+    "pending_after": 0
+  },
+  "breaker_strong_verification": {
+    "failed": 3,
+    "locked": true
+  },
+  "breaker_injection": {
+    "statuses": [
+      "blocked",
+      "blocked",
+      "blocked"
+    ],
+    "locked": false,
+    "count": 0
+  },
+  "transfer_balance": {
+    "successes": [
+      true,
+      true
+    ],
+    "daily_total": 40000.0,
+    "displayed_balance_after": 25680.5
+  },
+  "wealth_replay": {
+    "first_success": true,
+    "second_success": true,
+    "trade_counts": [
+      1,
+      2
+    ],
+    "first_executed": true,
+    "second_executed": true,
+    "before_qty": 5000,
+    "after_qty": 2000.0
+  },
+  "wealth_reject_then_approve": {
+    "reject_success": true,
+    "approve_same_id_success": true,
+    "executed": true,
+    "trade_count": 1
+  },
+  "wealth_executor_failure": {
+    "fault_injection": "paper executor returned success=false",
+    "response_success": true,
+    "response_executed": true,
+    "message": "审批已通过并执行",
+    "trade_result": "AUDIT: executor unavailable",
+    "trade_count": 0,
+    "before_qty": 5000,
+    "after_qty": 3500.0
+  }
+}

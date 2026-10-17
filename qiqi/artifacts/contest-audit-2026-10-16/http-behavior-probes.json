@@ -1,0 +1,51 @@
+{
+  "cumulative_transfer": {
+    "initial_tiers": [
+      "yellow",
+      "yellow"
+    ],
+    "first_success": true,
+    "second_success_without_verification": true,
+    "second_final_tier": "yellow",
+    "final_daily_total": 1200.0
+  },
+  "lost_card_unlock": {
+    "loss_confirmation_success": true,
+    "before_state": "lost",
+    "unlock_tier": "yellow",
+    "unlock_operation": "unlock",
+    "unlock_success_without_verification": true,
+    "after_state": "normal"
+  },
+  "aa_confirmation": {
+    "aa_item_count": 3,
+    "pending_count": 1,
+    "confirmation_message": "转账成功（演示模拟）：向  转出 300.00 元。",
+    "daily_total": 300.0
+  },
+  "scheduled_transfer": {
+    "status": "scheduled",
+    "pending_count": 0,
+    "message": "已创建定时转账任务：明天 向 王芳 转账 500.00 元。到点执行前仍需按当前权限确认。"
+  },
+  "phone_first_amount": {
+    "status": "blocked",
+    "parsed_amount": 13800001111.0,
+    "message": "转账被确定性闸门拦截：账户余额 25,680.50 元不足转出 13,800,001,111.00 元"
+  },
+  "duplicate_subscription_cancel": {
+    "first_success": true,
+    "second_status": "pending_confirmation",
+    "second_pending_count": 1
+  },
+  "cross_scene_fixed": {
+    "queued": 1,
+    "confirmed": true,
+    "pending_after": 0,
+    "message": "跨场景计划已确认（演示模拟）：资金锁定与外部订购均未调用真实服务。"
+  },
+  "breaker_failure_lock": {
+    "failed_verifications": 3,
+    "locked": true
+  }
+}

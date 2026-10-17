@@ -108,6 +108,44 @@
       <div class="health-line" id="health-line"></div>
     </div>
 
+    <section class="card risk-workbench" id="risk-workbench" aria-labelledby="risk-workbench-title">
+      <div class="card-head">
+        <div>
+          <h2 id="risk-workbench-title">风控工作台</h2>
+          <p class="risk-workbench-subtitle">已内嵌在投资组合中 · 与 RiskEngine 同口径计算</p>
+        </div>
+        <span class="tag tag-live" id="risk-workbench-status">实时评估</span>
+      </div>
+      <div class="risk-overview">
+        <div class="risk-score-card">
+          <div class="risk-score-label">综合风险评分</div>
+          <div class="risk-score-value" id="risk-score-value">—</div>
+          <div class="risk-score-caption" id="risk-score-caption">正在读取当前组合</div>
+          <div class="risk-score-track" aria-hidden="true"><i id="risk-score-bar"></i></div>
+        </div>
+        <div class="risk-metric-grid" aria-label="风险核心指标">
+          <div class="risk-metric"><span>VaR（95%）</span><b id="risk-var">—</b><small>单日潜在损失</small></div>
+          <div class="risk-metric"><span>最大回撤</span><b id="risk-drawdown">—</b><small>历史或简化估算</small></div>
+          <div class="risk-metric"><span>行业集中度</span><b id="risk-concentration">—</b><small>最高持仓行业</small></div>
+          <div class="risk-metric"><span>持仓相关性</span><b id="risk-correlation">—</b><small>有历史数据时计算</small></div>
+        </div>
+      </div>
+      <div class="risk-workbench-grid">
+        <div>
+          <div class="risk-section-title">当前风险提示</div>
+          <div id="risk-warning-list" class="risk-warning-list" aria-live="polite"><span class="muted">正在读取风险提示……</span></div>
+        </div>
+        <div>
+          <div class="risk-section-title">下一步</div>
+          <div id="risk-next-actions" class="risk-next-actions"><span class="muted">发起体检后会给出具体动作。</span></div>
+        </div>
+      </div>
+      <div class="risk-workbench-foot">
+        <span id="risk-generated-at">—</span>
+        <a class="btn btn-outline btn-sm" href="#nl-question">进入投资分析</a>
+      </div>
+    </section>
+
     <div class="card">
       <div class="card-head">
         <h2>理财深度模块 · 持仓明细</h2>
