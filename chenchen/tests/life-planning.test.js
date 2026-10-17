@@ -15,10 +15,10 @@ const bills = () => { const f = example(); return { ...f.subscriptions, data_mod
 const errorCode = code => error => error.code === code;
 
 test("long life request separates plans, completed bills, hypotheses, negations and cancellation", () => {
-  const text = "我计划投资8000元，但下月要交房租4500元；学费6000元已经交了。如果工资到账，再买基金500元。没有买基金；取消了会员。申请取消另一项订阅。";
+  const text = "我计划投资8000元，但下月要交房租4500元；学费6000元已经交了。如果工资到账，再买基金500元。没有买基金；取消了会员。申请取消另一项订阅。我没有取消会员；不打算取消自动续费。";
   const draft = extract(input(text), clock);
   assert.deepEqual(draft.candidates.map(c => c.classification.status),
-    ["PLANNED", "PLANNED", "COMPLETED", "CONDITIONAL", "CONDITIONAL", "NEGATED", "CANCELLED", "CANCELLATION_REQUESTED"]);
+    ["PLANNED", "PLANNED", "COMPLETED", "CONDITIONAL", "CONDITIONAL", "NEGATED", "CANCELLED", "CANCELLATION_REQUESTED", "NEGATED", "NEGATED"]);
   assert.equal(draft.risk_decision, null);
   assert.equal(draft.execution_allowed, false);
   assert.equal(draft.memory_write_performed, false);
@@ -32,6 +32,7 @@ test("emoji offsets, clause continuation and corrections retain exact source evi
   assert.equal(amount.inherited_categories[0].code, "LIVING_COST");
   assert.equal(correction.classification.status, "CORRECTION");
   assert.equal(correction.related_candidate_id, amount.candidate_id);
+  assert.equal(correction.inherited_categories[0].code, "LIVING_COST");
   assert.equal(friendAmount.classification.subject, "THIRD_PARTY");
   assert.equal(self.classification.subject, "SELF_REPORTED");
   for (const c of draft.candidates) for (const span of [c, ...c.amount_mentions])

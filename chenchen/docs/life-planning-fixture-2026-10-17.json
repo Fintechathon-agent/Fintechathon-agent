@@ -374,7 +374,7 @@
     "speech_recognition_performed": false,
     "interpretation_sha256": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28",
     "confirmation": {
-      "receipt_id": "confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
+      "receipt_id": "confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
       "confirmed_at": "2026-10-17T04:00:00.000Z",
       "scope": "TEXT_AND_PLAN_REVIEW_ONLY",
       "reviewed_plan_sha256": "b897a4119f6a41bd345c229b7fa0bd37a96a00c003116fdbc42eba73e4997021",
@@ -382,7 +382,7 @@
       "memory_authorized": false,
       "risk_approved": false
     },
-    "draft_id": "intake-5ae5bccf-a170-4225-9a8a-7161d86d14b4",
+    "draft_id": "intake-30669e3f-3e38-45cf-831e-18e501e29fce",
     "revision": 2,
     "attached_plan": {
       "contract_version": "life-planning.draft.v1",
@@ -515,7 +515,7 @@
     "execution_allowed": false,
     "request": {
       "schema_version": "model-review.v1",
-      "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
+      "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
       "task_id": null,
       "session_id": null,
       "source_task_id": null,
@@ -526,7 +526,7 @@
         "intake_draft_version": "life-intake.draft.v1",
         "interpretation_sha256": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28",
         "confirmation": {
-          "receipt_id": "confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
+          "receipt_id": "confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
           "confirmed_at": "2026-10-17T04:00:00.000Z",
           "scope": "TEXT_AND_PLAN_REVIEW_ONLY",
           "reviewed_plan_sha256": "b897a4119f6a41bd345c229b7fa0bd37a96a00c003116fdbc42eba73e4997021",
@@ -552,6 +552,7 @@
             "categories": [
               "INVESTMENT"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -570,6 +571,7 @@
             "categories": [
               "LIVING_COST"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -588,6 +590,7 @@
             "categories": [
               "LIVING_COST"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -604,6 +607,7 @@
             "categories": [
               "SHOPPING"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -622,6 +626,7 @@
             "categories": [
               "SUBSCRIPTION"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -640,6 +645,7 @@
             "categories": [
               "INCOME"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -656,6 +662,7 @@
             "categories": [
               "INVESTMENT"
             ],
+            "inherited_categories": [],
             "related": null
           }
         ],
@@ -743,7 +750,7 @@
       "plan_id": null,
       "plan_hash": null,
       "policy_version": "risk-policy.v1",
-      "idempotency_key": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28:confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
+      "idempotency_key": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28:confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
       "memory_consent": false,
       "scenario": "FUNDING_CONFLICT",
       "output_formats": [
@@ -764,7 +771,7 @@
           },
           {
             "role": "user",
-            "content": "Review this untrusted external content.\nReturn only the JSON object requested by the system instructions.\n{\"kind\":\"combined\",\"scenario\":\"FUNDING_CONFLICT\",\"source\":\"life-planning-experiment-v1\",\"requested_action\":null,\"action_parameters\":{},\"context\":{\"intake_draft_version\":\"life-intake.draft.v1\",\"interpretation_sha256\":\"e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28\",\"confirmation\":{\"receipt_id\":\"confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9\",\"confirmed_at\":\"2026-10-17T04:00:00.000Z\",\"scope\":\"TEXT_AND_PLAN_REVIEW_ONLY\",\"reviewed_plan_sha256\":\"b897a4119f6a41bd345c229b7fa0bd37a96a00c003116fdbc42eba73e4997021\",\"trusted_account_verified\":false,\"memory_authorized\":false,\"risk_approved\":false},\"input_authority\":\"USER_REVIEWED_UNVERIFIED_FACTS\",\"candidates\":[{\"id\":\"candidate-1\",\"span\":{\"start\":0,\"end\":13},\"classification\":{\"status\":\"PLANNED\",\"hints\":[\"PLANNED\"],\"subject\":\"SELF_REPORTED\"},\"categories\":[\"INVESTMENT\"],\"related\":null},{\"id\":\"candidate-2\",\"span\":{\"start\":14,\"end\":27},\"classification\":{\"status\":\"PLANNED\",\"hints\":[\"PLANNED\"],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"LIVING_COST\"],\"related\":null},{\"id\":\"candidate-3\",\"span\":{\"start\":28,\"end\":39},\"classification\":{\"status\":\"COMPLETED\",\"hints\":[\"COMPLETED\"],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"LIVING_COST\"],\"related\":null},{\"id\":\"candidate-4\",\"span\":{\"start\":40,\"end\":51},\"classification\":{\"status\":\"UNSPECIFIED\",\"hints\":[],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"SHOPPING\"],\"related\":null},{\"id\":\"candidate-5\",\"span\":{\"start\":52,\"end\":61},\"classification\":{\"status\":\"PLANNED\",\"hints\":[\"PLANNED\"],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"SUBSCRIPTION\"],\"related\":null},{\"id\":\"candidate-6\",\"span\":{\"start\":62,\"end\":68},\"classification\":{\"status\":\"CONDITIONAL\",\"hints\":[\"CONDITIONAL\"],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"INCOME\"],\"related\":null},{\"id\":\"candidate-7\",\"span\":{\"start\":69,\"end\":74},\"classification\":{\"status\":\"CONDITIONAL\",\"hints\":[],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"INVESTMENT\"],\"related\":null}],\"plan\":{\"plan_sha256\":\"b897a4119f6a41bd345c229b7fa0bd37a96a00c003116fdbc42eba73e4997021\",\"as_of\":\"2026-10-17T12:00:00+08:00\",\"input_authority\":\"USER_REVIEWED_UNVERIFIED_FACTS\",\"known_purchase_and_bills_minor\":279500,\"money_unit\":\"CNY_MINOR\",\"incomplete\":false,\"affordability\":\"NOT_ASSESSED\",\"quotes\":[{\"quote_id\":\"shop-a\",\"platform\":\"虚构平台A\",\"source_ref\":\"fixture://quote-a\",\"quoted_at\":\"2026-10-17T10:00:00+08:00\",\"valid_until\":\"2026-10-18T10:00:00+08:00\",\"status\":\"COMPARABLE\",\"reasons\":[],\"coupon_checks\":[{\"coupon_id\":\"coupon-a\",\"status\":\"APPLICABLE\"}],\"selected_coupon_id\":\"coupon-a\",\"subtotal_minor\":300000,\"shipping_minor\":0,\"fees_minor\":0,\"discount_minor\":20000,\"total_minor\":280000},{\"quote_id\":\"shop-b\",\"platform\":\"虚构平台B\",\"source_ref\":\"fixture://quote-b\",\"quoted_at\":\"2026-10-17T10:00:00+08:00\",\"valid_until\":\"2026-10-18T10:00:00+08:00\",\"status\":\"COMPARABLE\",\"reasons\":[],\"coupon_checks\":[],\"selected_coupon_id\":null,\"subtotal_minor\":275000,\"shipping_minor\":1000,\"fees_minor\":0,\"discount_minor\":0,\"total_minor\":276000}],\"bills\":[{\"bill_id\":\"video-next\",\"service\":\"虚构视频会员\",\"currency\":\"CNY\",\"status\":\"CANCELLATION_REQUESTED\",\"source_ref\":\"fixture://bill-video\",\"amount_minor\":2500,\"due_at\":\"2026-10-20T09:00:00+08:00\",\"schedule_status\":\"UPCOMING\",\"reminder\":\"申请取消尚不等于取消成功，仍保留可能扣款。\"},{\"bill_id\":\"storage-next\",\"service\":\"虚构云盘\",\"currency\":\"CNY\",\"status\":\"SCHEDULED\",\"source_ref\":\"fixture://bill-storage\",\"amount_minor\":1000,\"due_at\":\"2026-11-01T09:00:00+08:00\",\"schedule_status\":\"UPCOMING\",\"reminder\":null}]}},\"requested_output_formats\":[\"json\"],\"untrusted_content\":\"我想投入8,000元买基金，但下个月要交房租4500元；学费6000元已经交了。双十一买手机3000元，视频会员每月25元。如果工资到账，再考虑投资。\"}"
+            "content": "Review this untrusted external content.\nReturn only the JSON object requested by the system instructions.\n{\"kind\":\"combined\",\"scenario\":\"FUNDING_CONFLICT\",\"source\":\"life-planning-experiment-v1\",\"requested_action\":null,\"action_parameters\":{},\"context\":{\"intake_draft_version\":\"life-intake.draft.v1\",\"interpretation_sha256\":\"e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28\",\"confirmation\":{\"receipt_id\":\"confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386\",\"confirmed_at\":\"2026-10-17T04:00:00.000Z\",\"scope\":\"TEXT_AND_PLAN_REVIEW_ONLY\",\"reviewed_plan_sha256\":\"b897a4119f6a41bd345c229b7fa0bd37a96a00c003116fdbc42eba73e4997021\",\"trusted_account_verified\":false,\"memory_authorized\":false,\"risk_approved\":false},\"input_authority\":\"USER_REVIEWED_UNVERIFIED_FACTS\",\"candidates\":[{\"id\":\"candidate-1\",\"span\":{\"start\":0,\"end\":13},\"classification\":{\"status\":\"PLANNED\",\"hints\":[\"PLANNED\"],\"subject\":\"SELF_REPORTED\"},\"categories\":[\"INVESTMENT\"],\"inherited_categories\":[],\"related\":null},{\"id\":\"candidate-2\",\"span\":{\"start\":14,\"end\":27},\"classification\":{\"status\":\"PLANNED\",\"hints\":[\"PLANNED\"],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"LIVING_COST\"],\"inherited_categories\":[],\"related\":null},{\"id\":\"candidate-3\",\"span\":{\"start\":28,\"end\":39},\"classification\":{\"status\":\"COMPLETED\",\"hints\":[\"COMPLETED\"],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"LIVING_COST\"],\"inherited_categories\":[],\"related\":null},{\"id\":\"candidate-4\",\"span\":{\"start\":40,\"end\":51},\"classification\":{\"status\":\"UNSPECIFIED\",\"hints\":[],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"SHOPPING\"],\"inherited_categories\":[],\"related\":null},{\"id\":\"candidate-5\",\"span\":{\"start\":52,\"end\":61},\"classification\":{\"status\":\"PLANNED\",\"hints\":[\"PLANNED\"],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"SUBSCRIPTION\"],\"inherited_categories\":[],\"related\":null},{\"id\":\"candidate-6\",\"span\":{\"start\":62,\"end\":68},\"classification\":{\"status\":\"CONDITIONAL\",\"hints\":[\"CONDITIONAL\"],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"INCOME\"],\"inherited_categories\":[],\"related\":null},{\"id\":\"candidate-7\",\"span\":{\"start\":69,\"end\":74},\"classification\":{\"status\":\"CONDITIONAL\",\"hints\":[],\"subject\":\"UNSPECIFIED\"},\"categories\":[\"INVESTMENT\"],\"inherited_categories\":[],\"related\":null}],\"plan\":{\"plan_sha256\":\"b897a4119f6a41bd345c229b7fa0bd37a96a00c003116fdbc42eba73e4997021\",\"as_of\":\"2026-10-17T12:00:00+08:00\",\"input_authority\":\"USER_REVIEWED_UNVERIFIED_FACTS\",\"known_purchase_and_bills_minor\":279500,\"money_unit\":\"CNY_MINOR\",\"incomplete\":false,\"affordability\":\"NOT_ASSESSED\",\"quotes\":[{\"quote_id\":\"shop-a\",\"platform\":\"虚构平台A\",\"source_ref\":\"fixture://quote-a\",\"quoted_at\":\"2026-10-17T10:00:00+08:00\",\"valid_until\":\"2026-10-18T10:00:00+08:00\",\"status\":\"COMPARABLE\",\"reasons\":[],\"coupon_checks\":[{\"coupon_id\":\"coupon-a\",\"status\":\"APPLICABLE\"}],\"selected_coupon_id\":\"coupon-a\",\"subtotal_minor\":300000,\"shipping_minor\":0,\"fees_minor\":0,\"discount_minor\":20000,\"total_minor\":280000},{\"quote_id\":\"shop-b\",\"platform\":\"虚构平台B\",\"source_ref\":\"fixture://quote-b\",\"quoted_at\":\"2026-10-17T10:00:00+08:00\",\"valid_until\":\"2026-10-18T10:00:00+08:00\",\"status\":\"COMPARABLE\",\"reasons\":[],\"coupon_checks\":[],\"selected_coupon_id\":null,\"subtotal_minor\":275000,\"shipping_minor\":1000,\"fees_minor\":0,\"discount_minor\":0,\"total_minor\":276000}],\"bills\":[{\"bill_id\":\"video-next\",\"service\":\"虚构视频会员\",\"currency\":\"CNY\",\"status\":\"CANCELLATION_REQUESTED\",\"source_ref\":\"fixture://bill-video\",\"amount_minor\":2500,\"due_at\":\"2026-10-20T09:00:00+08:00\",\"schedule_status\":\"UPCOMING\",\"reminder\":\"申请取消尚不等于取消成功，仍保留可能扣款。\"},{\"bill_id\":\"storage-next\",\"service\":\"虚构云盘\",\"currency\":\"CNY\",\"status\":\"SCHEDULED\",\"source_ref\":\"fixture://bill-storage\",\"amount_minor\":1000,\"due_at\":\"2026-11-01T09:00:00+08:00\",\"schedule_status\":\"UPCOMING\",\"reminder\":null}]}},\"requested_output_formats\":[\"json\"],\"untrusted_content\":\"我想投入8,000元买基金，但下个月要交房租4500元；学费6000元已经交了。双十一买手机3000元，视频会员每月25元。如果工资到账，再考虑投资。\"}"
           }
         ],
         "response_format": {
@@ -779,13 +786,13 @@
     "contract_version": "model-review.v1",
     "workflow_version": "review-workflow.v1",
     "schema_version": "model-review.v1",
-    "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
-    "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-    "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-    "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
+    "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
+    "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+    "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+    "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
     "source_task_id": null,
-    "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-    "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
+    "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+    "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
     "data_mode": "FIXTURE",
     "execution_mode": "PAPER",
     "capability": "REVIEW_ONLY",
@@ -804,7 +811,7 @@
     },
     "portfolio_snapshot_id": null,
     "risk_profile_version": "risk-profile.v1",
-    "plan_id": "plan-45f97693-b195-424c-a5e0-3eff141ce6dc",
+    "plan_id": "plan-df66aec4-f918-413b-b9a8-1cc842a838e3",
     "plan_hash": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
     "policy_version": "risk-policy.v1",
     "workflow_status": "PENDING_RISK",
@@ -823,9 +830,9 @@
     },
     "reviewed_input": {
       "schema_version": "model-review.v1",
-      "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-      "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-      "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
+      "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+      "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+      "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
       "source_task_id": null,
       "source": "life-planning-experiment-v1",
       "kind": "combined",
@@ -834,7 +841,7 @@
         "intake_draft_version": "life-intake.draft.v1",
         "interpretation_sha256": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28",
         "confirmation": {
-          "receipt_id": "confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
+          "receipt_id": "confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
           "confirmed_at": "2026-10-17T04:00:00.000Z",
           "scope": "TEXT_AND_PLAN_REVIEW_ONLY",
           "reviewed_plan_sha256": "b897a4119f6a41bd345c229b7fa0bd37a96a00c003116fdbc42eba73e4997021",
@@ -860,6 +867,7 @@
             "categories": [
               "INVESTMENT"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -878,6 +886,7 @@
             "categories": [
               "LIVING_COST"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -896,6 +905,7 @@
             "categories": [
               "LIVING_COST"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -912,6 +922,7 @@
             "categories": [
               "SHOPPING"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -930,6 +941,7 @@
             "categories": [
               "SUBSCRIPTION"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -948,6 +960,7 @@
             "categories": [
               "INCOME"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -964,6 +977,7 @@
             "categories": [
               "INVESTMENT"
             ],
+            "inherited_categories": [],
             "related": null
           }
         ],
@@ -1051,7 +1065,7 @@
       "plan_id": null,
       "plan_hash": null,
       "policy_version": "risk-policy.v1",
-      "idempotency_key": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28:confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
+      "idempotency_key": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28:confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
       "memory_consent": false,
       "scenario": "FUNDING_CONFLICT",
       "output_formats": [
@@ -1069,17 +1083,17 @@
       "retry_count": 0
     },
     "evidence": {
-      "input_sha256": "326edcf3e02062cebf8105b3b5d18e6786e8476b9fa55ccbdba11e1dc79a0bf9",
+      "input_sha256": "7d4ceeb92c8f8b3d481bde2d5a0e54e4f95a92e3c7d432bc4facf96fdf1908ed",
       "model_response_id": "synthetic-model-response",
       "proposal_sha256": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
-      "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-      "plan_id": "plan-45f97693-b195-424c-a5e0-3eff141ce6dc",
+      "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+      "plan_id": "plan-df66aec4-f918-413b-b9a8-1cc842a838e3",
       "plan_hash": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
       "policy_version": "risk-policy.v1"
     },
     "approval": {
-      "approval_id": "approval-18eab111-9d1d-4c61-97c7-10cff7930b9e",
-      "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+      "approval_id": "approval-1e593955-bdab-4c53-a67f-857681718e64",
+      "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
       "required": true,
       "status": "BLOCKED",
       "decision": null,
@@ -1091,43 +1105,43 @@
     "memory_write_status": "NOT_REQUESTED",
     "trace": {
       "schema_version": "model-review.v1",
-      "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-      "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-      "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-      "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-      "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-      "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+      "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+      "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+      "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+      "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+      "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+      "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
     },
     "audit": {
-      "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
+      "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
       "event_count": 7,
       "latest_event": {
-        "event_id": "event-5c3c1bda-3c58-4c6a-9092-56a7894701ae",
-        "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+        "event_id": "event-a66bdf96-b309-4ed4-9a48-a80bdba897e8",
+        "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
         "actor": "execution-gateway",
         "event_type": "execution.blocked",
         "payload": {
           "reason": "risk_pending",
           "execution_allowed": false,
-          "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-          "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-          "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-          "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-          "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+          "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+          "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+          "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+          "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+          "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
           "trace": {
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
           }
         },
-        "timestamp": "2026-10-17T15:19:55.385Z"
+        "timestamp": "2026-10-17T15:26:05.842Z"
       }
     },
-    "record_endpoint": "/api/review/task/review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+    "record_endpoint": "/api/review/task/review-task-ebc44b57-dd39-4732-a499-da02314d5692",
     "callback": {
       "callback_version": "risk-callback.v1",
       "endpoint": "/api/review/risk-callback",
@@ -1155,9 +1169,9 @@
   "workflow": {
     "workflow_version": "review-workflow.v1",
     "schema_version": "model-review.v1",
-    "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-    "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-    "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
+    "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+    "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+    "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
     "source_task_id": null,
     "data_mode": "FIXTURE",
     "execution_mode": "PAPER",
@@ -1177,20 +1191,20 @@
     },
     "portfolio_snapshot_id": null,
     "risk_profile_version": "risk-profile.v1",
-    "plan_id": "plan-45f97693-b195-424c-a5e0-3eff141ce6dc",
+    "plan_id": "plan-df66aec4-f918-413b-b9a8-1cc842a838e3",
     "plan_hash": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
     "policy_version": "risk-policy.v1",
-    "idempotency_key": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28:confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-    "request_fingerprint": "05ea47d61326de082a27373d2ff8648641c48cbd82e7fe86df8f5ee5d4501782",
+    "idempotency_key": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28:confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+    "request_fingerprint": "4edcc286b78751433ca79702c533221f4a5e8d31c562b538d1ac24e50399a976",
     "memory_consent": false,
     "memory_write_status": "NOT_REQUESTED",
-    "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
+    "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
     "status": "SIMULATED",
     "reviewed_input": {
       "schema_version": "model-review.v1",
-      "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-      "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-      "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
+      "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+      "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+      "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
       "source_task_id": null,
       "source": "life-planning-experiment-v1",
       "kind": "combined",
@@ -1199,7 +1213,7 @@
         "intake_draft_version": "life-intake.draft.v1",
         "interpretation_sha256": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28",
         "confirmation": {
-          "receipt_id": "confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
+          "receipt_id": "confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
           "confirmed_at": "2026-10-17T04:00:00.000Z",
           "scope": "TEXT_AND_PLAN_REVIEW_ONLY",
           "reviewed_plan_sha256": "b897a4119f6a41bd345c229b7fa0bd37a96a00c003116fdbc42eba73e4997021",
@@ -1225,6 +1239,7 @@
             "categories": [
               "INVESTMENT"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -1243,6 +1258,7 @@
             "categories": [
               "LIVING_COST"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -1261,6 +1277,7 @@
             "categories": [
               "LIVING_COST"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -1277,6 +1294,7 @@
             "categories": [
               "SHOPPING"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -1295,6 +1313,7 @@
             "categories": [
               "SUBSCRIPTION"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -1313,6 +1332,7 @@
             "categories": [
               "INCOME"
             ],
+            "inherited_categories": [],
             "related": null
           },
           {
@@ -1329,6 +1349,7 @@
             "categories": [
               "INVESTMENT"
             ],
+            "inherited_categories": [],
             "related": null
           }
         ],
@@ -1416,7 +1437,7 @@
       "plan_id": null,
       "plan_hash": null,
       "policy_version": "risk-policy.v1",
-      "idempotency_key": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28:confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
+      "idempotency_key": "e55e0194307272de361537e0b1a8cef9ae261419a44a60973eddb6174a2dcc28:confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
       "memory_consent": false,
       "scenario": "FUNDING_CONFLICT",
       "output_formats": [
@@ -1464,8 +1485,8 @@
         "schema_version": "model-review.v1",
         "kind": "combined",
         "source": "life-planning-experiment-v1",
-        "input_sha256": "326edcf3e02062cebf8105b3b5d18e6786e8476b9fa55ccbdba11e1dc79a0bf9",
-        "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
+        "input_sha256": "7d4ceeb92c8f8b3d481bde2d5a0e54e4f95a92e3c7d432bc4facf96fdf1908ed",
+        "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
         "source_task_id": null,
         "data_mode": "FIXTURE",
         "execution_mode": "PAPER",
@@ -1492,435 +1513,435 @@
     },
     "risk_handoff": {
       "contract_version": "model-review.v1",
-      "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
-      "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-      "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
+      "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
+      "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+      "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
       "status": "APPROVED",
       "decision": "APPROVE",
       "owner": "Unified Risk",
       "reason": "模型输出只是拟议动作，必须由统一 Risk 决定是否进入审批。",
       "evidence": {
-        "input_sha256": "326edcf3e02062cebf8105b3b5d18e6786e8476b9fa55ccbdba11e1dc79a0bf9",
+        "input_sha256": "7d4ceeb92c8f8b3d481bde2d5a0e54e4f95a92e3c7d432bc4facf96fdf1908ed",
         "model_response_id": "synthetic-model-response",
         "proposal_sha256": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
-        "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-        "plan_id": "plan-45f97693-b195-424c-a5e0-3eff141ce6dc",
+        "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+        "plan_id": "plan-df66aec4-f918-413b-b9a8-1cc842a838e3",
         "plan_hash": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
         "policy_version": "risk-policy.v1"
       },
       "execution_allowed": false
     },
     "risk_decision": {
-      "risk_decision_id": "risk-decision-331d406c-d2b1-4f4b-a77a-bdf62e37b644",
-      "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+      "risk_decision_id": "risk-decision-1b8567a7-4f09-4604-a3d4-0f6a2e19b4ed",
+      "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
       "decision": "APPROVE",
       "status": "APPROVED",
       "reviewer": "synthetic-risk-owner",
       "reason": "Fixture callback; not a real Risk verdict",
       "proposal_sha256": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
-      "decided_at": "2026-10-17T15:19:55.388Z"
+      "decided_at": "2026-10-17T15:26:05.846Z"
     },
     "approval": {
-      "approval_id": "approval-18eab111-9d1d-4c61-97c7-10cff7930b9e",
-      "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+      "approval_id": "approval-1e593955-bdab-4c53-a67f-857681718e64",
+      "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
       "required": true,
       "status": "APPROVED",
       "decision": "APPROVE",
       "proposal_sha256": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
       "approver": "synthetic-user",
-      "decided_at": "2026-10-17T15:19:55.392Z",
-      "expires_at": "2026-10-17T15:34:55.388Z",
+      "decided_at": "2026-10-17T15:26:05.850Z",
+      "expires_at": "2026-10-17T15:41:05.846Z",
       "reason": "Synthetic approval for PAPER only"
     },
     "execution": {
-      "execution_id": "sim-exec-b32af9b5-aee9-41f9-89ab-0fb0e54110f1",
-      "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+      "execution_id": "sim-exec-33cfc199-c47f-4142-90f9-5fb8a8601080",
+      "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
       "status": "SIMULATED",
       "simulation_allowed": false,
       "execution_allowed": false,
       "receipt": {
         "mode": "SIMULATED",
-        "execution_id": "sim-exec-b32af9b5-aee9-41f9-89ab-0fb0e54110f1",
-        "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+        "execution_id": "sim-exec-33cfc199-c47f-4142-90f9-5fb8a8601080",
+        "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
         "proposal_sha256": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
         "side_effects": false,
         "message": "模拟执行完成；未调用真实交易、付款或账户网关。",
-        "completed_at": "2026-10-17T15:19:55.394Z"
+        "completed_at": "2026-10-17T15:26:05.851Z"
       }
     },
     "audit": {
-      "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
+      "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
       "workflow_version": "review-workflow.v1",
-      "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-      "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-      "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
+      "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+      "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+      "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
       "events": [
         {
-          "event_id": "event-a4261505-bed3-4907-92d3-5a6dc6b15b16",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-563c88ba-da96-4505-a907-7b9eb84f4901",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "model-service",
           "event_type": "review.received",
           "payload": {
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.351Z"
+          "timestamp": "2026-10-17T15:26:05.811Z"
         },
         {
-          "event_id": "event-f45b56c8-6d6d-401f-a490-8347657b8a77",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-8554fd64-318b-4995-b8af-c7c822895c7d",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "model-service",
           "event_type": "model.completed",
           "payload": {
             "source": "model",
             "attempt_count": 1,
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.383Z"
+          "timestamp": "2026-10-17T15:26:05.841Z"
         },
         {
-          "event_id": "event-3b347eaf-8e0f-4511-bbd9-6ca8e718f65a",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-5776b63d-5175-4a25-a23d-70189aafddf3",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "model-service",
           "event_type": "gateway.checked",
           "payload": {
             "execution_allowed": false,
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.383Z"
+          "timestamp": "2026-10-17T15:26:05.841Z"
         },
         {
-          "event_id": "event-77c392bc-1758-4dfb-b6cf-73802c5b9416",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-6f429493-354d-4256-910b-269f7bc267a0",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "core-agent",
           "event_type": "workflow.created",
           "payload": {
             "stage": "MODEL",
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.385Z"
+          "timestamp": "2026-10-17T15:26:05.842Z"
         },
         {
-          "event_id": "event-90eb61ec-fdd7-4734-b5c2-051e23ea410c",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-2c3ee078-e1ca-437b-8f9a-6db22a315c69",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "core-agent",
           "event_type": "proposal.bound",
           "payload": {
             "source": "model",
             "proposal_sha256": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.385Z"
+          "timestamp": "2026-10-17T15:26:05.842Z"
         },
         {
-          "event_id": "event-1e9cefc7-74bb-4220-8429-ed18664d52b9",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-7cd125ef-e8ee-4fff-9b2b-3b238c0a7254",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "risk-gateway",
           "event_type": "risk.handoff.created",
           "payload": {
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.385Z"
+          "timestamp": "2026-10-17T15:26:05.842Z"
         },
         {
-          "event_id": "event-5c3c1bda-3c58-4c6a-9092-56a7894701ae",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-a66bdf96-b309-4ed4-9a48-a80bdba897e8",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "execution-gateway",
           "event_type": "execution.blocked",
           "payload": {
             "reason": "risk_pending",
             "execution_allowed": false,
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.385Z"
+          "timestamp": "2026-10-17T15:26:05.842Z"
         },
         {
-          "event_id": "event-902260f8-e64d-47a6-b381-b9b47e019c9a",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-5b7a3428-6905-4540-810d-57c861499942",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "execution-gateway",
           "event_type": "workflow.operation_blocked",
           "payload": {
             "code": "EXECUTION_BLOCKED",
             "stage": "EXECUTION",
             "execution_allowed": false,
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.387Z"
+          "timestamp": "2026-10-17T15:26:05.845Z"
         },
         {
-          "event_id": "event-c753fd1c-768d-4bb9-86f0-4ae4ea9a4628",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-0158c7df-0288-4051-b181-6889d2415950",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "risk",
           "event_type": "risk.approved",
           "payload": {
             "approval_required": true,
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.388Z"
+          "timestamp": "2026-10-17T15:26:05.846Z"
         },
         {
-          "event_id": "event-e6e87e7a-a0cd-4288-932d-025a99516f13",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-a8a449f4-0f9d-45a7-a6de-3f020db9852d",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "approval-gateway",
           "event_type": "approval.pending",
           "payload": {
-            "approval_id": "approval-18eab111-9d1d-4c61-97c7-10cff7930b9e",
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "approval_id": "approval-1e593955-bdab-4c53-a67f-857681718e64",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.388Z"
+          "timestamp": "2026-10-17T15:26:05.846Z"
         },
         {
-          "event_id": "event-14f6500d-e063-45ab-91f5-e183c5a7a882",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-7419af73-d1c7-4f14-9619-95b3ab760a03",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "risk-gateway",
           "event_type": "risk.callback.recorded",
           "payload": {
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
             "proposal_sha256": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
             "decision": "APPROVE",
-            "risk_decision_id": "risk-decision-331d406c-d2b1-4f4b-a77a-bdf62e37b644",
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
+            "risk_decision_id": "risk-decision-1b8567a7-4f09-4604-a3d4-0f6a2e19b4ed",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.389Z"
+          "timestamp": "2026-10-17T15:26:05.846Z"
         },
         {
-          "event_id": "event-7d1f406e-d0d8-45ad-b4a0-4b8477e93233",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-18d9bb8a-fde8-48ec-89bd-e078a76a645e",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "execution-gateway",
           "event_type": "workflow.operation_blocked",
           "payload": {
             "code": "EXECUTION_BLOCKED",
             "stage": "EXECUTION",
             "execution_allowed": false,
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.391Z"
+          "timestamp": "2026-10-17T15:26:05.849Z"
         },
         {
-          "event_id": "event-888af6ca-17cf-47de-a939-9b183af8a153",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-ba9bc5ba-1d9a-471f-820c-c54d8d3ad501",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "approval",
           "event_type": "approval.approved",
           "payload": {
-            "approval_id": "approval-18eab111-9d1d-4c61-97c7-10cff7930b9e",
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "approval_id": "approval-1e593955-bdab-4c53-a67f-857681718e64",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.392Z"
+          "timestamp": "2026-10-17T15:26:05.850Z"
         },
         {
-          "event_id": "event-1a55c2e9-acda-4b26-943e-bb3af0ab5fac",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-ab338232-fa31-43b8-8e21-420928d47392",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "execution-gateway",
           "event_type": "execution.ready_for_simulation",
           "payload": {
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.392Z"
+          "timestamp": "2026-10-17T15:26:05.850Z"
         },
         {
-          "event_id": "event-d340c364-db5d-4fe4-ae11-24269c09069a",
-          "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
+          "event_id": "event-4a93a00f-a107-4295-bc3c-4f97085ed7dc",
+          "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
           "actor": "execution-gateway",
           "event_type": "execution.simulated",
           "payload": {
-            "execution_id": "sim-exec-b32af9b5-aee9-41f9-89ab-0fb0e54110f1",
+            "execution_id": "sim-exec-33cfc199-c47f-4142-90f9-5fb8a8601080",
             "side_effects": false,
-            "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-            "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-            "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-            "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-            "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-            "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
+            "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+            "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+            "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+            "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+            "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+            "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
             "trace": {
-              "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-              "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-              "session_id": "session-1641d1c5-6c9e-4a5c-9c4e-b2dbfc687530",
-              "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-              "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
-              "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51"
+              "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+              "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+              "session_id": "session-7048f032-17f0-414b-9c27-27035be216ef",
+              "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+              "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
+              "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f"
             }
           },
-          "timestamp": "2026-10-17T15:19:55.394Z"
+          "timestamp": "2026-10-17T15:26:05.851Z"
         }
       ]
     },
@@ -1928,17 +1949,17 @@
       "callback_version": "risk-callback.v1",
       "request": {
         "callback_version": "risk-callback.v1",
-        "handoff_id": "handoff-712ed01e-3ba5-49ae-9115-1ccffd3afe51",
-        "task_id": "review-task-09598360-2e28-446b-bafb-deae50f86f9e",
-        "request_id": "req-confirmation-5c28d07b-2a7b-4b8b-b13e-4258a076e6b9",
-        "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
-        "audit_id": "audit-421fcf6f-5db6-4325-a353-2e50104df61a",
+        "handoff_id": "handoff-1cac6a05-5f34-4793-9ea1-a9bb6d0cfa6f",
+        "task_id": "review-task-ebc44b57-dd39-4732-a499-da02314d5692",
+        "request_id": "req-confirmation-4adbb885-e207-4bba-a137-6b9a9e56d386",
+        "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
+        "audit_id": "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d",
         "proposal_sha256": "876c6252e8154133b4729c455478973c36a7f39691bf5507970373cb0752871f",
         "decision": "APPROVE",
         "reviewer": "synthetic-risk-owner",
         "reason": "Fixture callback; not a real Risk verdict"
       },
-      "received_at": "2026-10-17T15:19:55.389Z"
+      "received_at": "2026-10-17T15:26:05.846Z"
     }
   },
   "plan": {
@@ -2076,9 +2097,9 @@
       "generated_by": "agent",
       "contract_version": "1.0",
       "sensitivity": "private",
-      "run_id": "review-5a468d2e-842e-41b3-946e-3cc16364335a",
+      "run_id": "review-2ee531b5-8997-47ed-9ef2-fa9eb51080de",
       "audit_refs": [
-        "audit-421fcf6f-5db6-4325-a353-2e50104df61a"
+        "audit-7dc84616-5f2b-4c65-9906-b054a72abf1d"
       ],
       "disclaimer": "虚构案例，仅验证整理与比价流程；未调用真实模型、账户或交易。"
     },

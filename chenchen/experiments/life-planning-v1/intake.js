@@ -36,7 +36,9 @@ function classify(text, inherited) {
   const correction = /改成|改为|更正|说错|不是.+(?:而是|是)/u.test(text);
   // Hints are deliberately not interpreted as confirmed facts or financial instructions.
   const cancellationRequested = /(?:申请|想|准备|打算|计划)取消|取消申请|取消.{0,6}(?:失败|未成功|没成功)/u.test(text);
+  const cancellationNegated = /(?:不|没(?:有)?|未)(?:打算|准备|申请)?取消/u.test(text);
   const status = correction ? "CORRECTION" : hints.includes("CONDITIONAL") ? "CONDITIONAL"
+    : cancellationNegated ? "NEGATED"
     : cancellationRequested ? "CANCELLATION_REQUESTED"
     : hints.includes("CANCELLED") ? "CANCELLED" : hints.includes("NEGATED") ? "NEGATED"
       : hints.includes("COMPLETED") && hints.includes("PLANNED") ? "AMBIGUOUS"
@@ -71,7 +73,7 @@ function extract(input, options) {
       ...item,
       classification,
       related_candidate_id: link ? previous.candidate_id : null,
-      inherited_categories: isContinuation ? previous.categories.filter(c => c.code !== "UNCLASSIFIED") : [],
+      inherited_categories: isContinuation ? [...previous.categories, ...previous.inherited_categories].filter(c => c.code !== "UNCLASSIFIED") : [],
       relationship_status: link ? "NEEDS_CONFIRMATION" : null,
       planning_eligibility: "NEEDS_USER_AND_SOURCE_VERIFICATION",
       warnings: ["识别结果需要核对；不是账户事实、风险结论或执行授权。"]
@@ -163,7 +165,8 @@ class IntakeSessions {
     const context = { intake_draft_version: VERSION, interpretation_sha256: draft.interpretation_sha256,
       confirmation: draft.confirmation, input_authority: "USER_REVIEWED_UNVERIFIED_FACTS",
       candidates: draft.candidates.map(c => ({ id: c.candidate_id, span: c.source_span,
-        classification: c.classification, categories: c.categories.map(x => x.code), related: c.related_candidate_id })) };
+        classification: c.classification, categories: c.categories.map(x => x.code),
+        inherited_categories: c.inherited_categories.map(x => x.code), related: c.related_candidate_id })) };
     if (draft.attached_plan) {
       const plan = draft.attached_plan;
       context.plan = { plan_sha256: plan.plan_sha256, as_of: plan.as_of,
