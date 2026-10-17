@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>生活资金 · 长文本风险工作台</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
 <body><main>
-  <header><a class="brand" href="/">生活资金<span>LONG TEXT LAB</span></a><span class="tag">临时共创版 · 本地测算</span></header>
+  <header><a class="brand" href="/">生活资金<span>LONG TEXT LAB</span></a><a id="workbench-home" href="/risk" hidden>返回风控工作台</a><span class="tag" id="mode-label">临时共创版 · 本地测算</span></header>
   <div class="hero"><p class="eyebrow">让每一笔生活安排，都有依据</p><h1>说清生活计划，<br>看见资金影响。</h1><p>房租、学费、工资和投资写在一起也可以。先拆分，逐项核对，再查看生活资金是否受到影响。</p></div>
   <p class="notice">此入口用于虚构场景联调，不连接真实账户、不执行付款或交易。风险结论仅针对已核对输入与所选时间区间。</p>
   <nav class="steps" aria-label="分析步骤"><span id="step-input" class="active">01 写下安排</span><span id="step-review">02 核对事项</span><span id="step-result">03 查看影响</span></nav>
@@ -24,7 +24,7 @@
     <div id="reasons"></div><h3>收支时间线</h3><p class="muted">投资合计按分析日一次性占用。未来工资仅进入收支情景，不增加今天能投入的现金。</p><div class="table-scroll"><table><thead><tr><th>日期</th><th>事项</th><th>变动（元）</th><th>剩余可结算现金（元）</th></tr></thead><tbody id="timeline"></tbody></table></div>
     <details><summary>计算范围与假设</summary><ul id="assumptions"></ul></details>
     <details><summary>查看结构化结果与本次审计</summary><pre id="json"></pre></details>
-    <div class="actions"><button id="download" class="secondary" type="button">下载核对与风险 JSON</button><button id="review-draft" class="secondary" type="button">导出模型复核请求</button><button id="model-review" class="secondary" type="button" hidden>在线只读复核</button></div><p id="model-status" role="status"></p><pre id="model-output" hidden></pre>
+    <div class="actions"><button id="download" class="secondary" type="button">下载核对与风险 JSON</button><button id="review-draft" class="secondary" type="button">导出模型复核请求</button><button id="model-review" class="secondary" type="button" hidden>在线只读复核</button><button id="handoff" class="primary" type="button" hidden>提交工作台并调用在线模型 →</button></div><p id="model-status" role="status"></p><div id="handoff-result" hidden><h3>已接入同一风控任务</h3><p id="handoff-summary"></p><a id="handoff-link" class="primary" href="/risk">进入工作台查看计划与审计 →</a></div><pre id="model-output" hidden></pre>
   </section>
-  <footer>原文仅保留在本地进程的临时草稿中，30分钟过期，重启清空。刷新页面会丢失当前草稿入口，请按需下载结果。在线复核仅在服务端显式启用后可用。</footer>
+  <footer id="storage-note">原文仅保留在本地进程的临时草稿中，30分钟过期，重启清空。刷新页面会丢失当前草稿入口，请按需下载结果。在线复核仅在服务端显式启用后可用。</footer>
 </main></body></html>

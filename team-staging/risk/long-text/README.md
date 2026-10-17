@@ -4,6 +4,10 @@
 
 ## 启动
 
+**工作台集成版**：已接入现有 `/risk` 任务、确认、沙箱记账和审计，并接通团队在线模型。Windows 双击 [start-workbench.cmd](start-workbench.cmd)，或按 [INTEGRATION.md](INTEGRATION.md) 启动。入口为 <http://127.0.0.1:8780/risk/long-text>。线上原站更新仍需站点编辑权限。
+
+以下命令保留独立测算模式：
+
 需要 Node.js 22 或以上版本，以及完整仓库（会引用 `chenchen` 中的模块）。无需安装第三方依赖。
 
 在仓库根目录执行：

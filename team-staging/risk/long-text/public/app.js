@@ -6,6 +6,8 @@ const rawYuan = value => value === null || value === undefined ? "" : String(val
 const labels = { CASH: "现金线索", RESERVE: "保底线索", EXPENSE: "生活支出", INCOME: "收入", INVESTMENT: "投资计划", ASSET: "现有资产", OTHER: "待识别事项" };
 const stateLabels = { PLANNED: "计划", COMPLETED: "已发生", CONDITIONAL: "条件假设", NEGATED: "否定语句待核对", CANCELLED: "取消", CANCELLATION_REQUESTED: "申请取消（未必成功）", CORRECTION: "金额更正", AMBIGUOUS: "时态混合", UNSPECIFIED: "未注明时态" };
 let draft = null, busy = false, inputRevision = 0, modelEnabled = false;
+const integrated = location.pathname.startsWith("/risk/long-text");
+let riskSession = null, sourceDirty = false;
 const examples = {
   conflict: "我目前现金5万元，保底1万元。每月5号交房租3500元，下个月20号交学费2万元。我每月10号工资8000元，想拿2万元买基金。",
   safe: "我目前现金8万元，保底1万元。下个月5号交房租3500元，下个月20号交学费2万元。我想投资2万元。",
@@ -19,9 +21,10 @@ function cents(value) {
   if (!Number.isSafeInteger(n)) throw Error("金额过大"); return n;
 }
 async function request(route, body) {
-  const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 45000);
+  const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), route.includes("model-review") ? 75000 : 45000);
   try {
-    const response = await fetch("/api/long-text/v1/" + route, { method: body ? "POST" : "GET", headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
+    const path = integrated ? route === "daily-model-review" ? "/api/safety/daily/model-review" : "/api/safety/long-text/" + route : "/api/long-text/v1/" + route;
+    const response = await fetch(path, { method: body ? "POST" : "GET", credentials: "same-origin", headers: { "Content-Type": "application/json", ...(integrated ? { "X-Risk-Csrf": riskSession?.csrf || "" } : {}) }, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
     const value = await response.json(); if (!response.ok) throw Error(value.error?.message || value.error?.code || "请求失败"); return value;
   } finally { clearTimeout(timeout); }
 }
@@ -34,8 +37,9 @@ async function action(fn) {
 }
 function invalidate(sourceChanged = false) {
   inputRevision++; $("result").hidden = true; $("model-output").hidden = true; $("model-status").textContent = "";
+  $("handoff-result").hidden = true;
   $("nonoverlap").checked = false; $("step-result").classList.remove("active");
-  if (sourceChanged) { $("review").hidden = true; draft = null; $("step-review").classList.remove("active"); }
+  if (sourceChanged) { $("review").hidden = true; sourceDirty = true; if (!integrated) draft = null; $("step-review").classList.remove("active"); }
   $("status").textContent = "输入已变化，旧结果已隐藏；请重新核对并测算。";
 }
 function selectOptions(values, current) { return Object.entries(values).map(([key, label]) => `<option value="${key}" ${key === current ? "selected" : ""}>${esc(label)}</option>`).join(""); }
@@ -79,7 +83,7 @@ function renderResult() {
     return `<tr><td>${esc(row.at?.slice(0, 10))}</td><td>${esc(name)}</td><td>${row.kind === "OPENING" ? "—" : esc(yuan(row.amount_minor))}</td><td class="${row.balance_minor < 0 ? "negative" : ""}">${esc(yuan(row.balance_minor))}</td></tr>`;
   }).join("");
   $("assumptions").innerHTML = (result.assumptions || []).map(s => `<li>${esc(s)}</li>`).join("");
-  $("json").textContent = JSON.stringify({ result, audit: draft.audit }, null, 2); $("model-review").hidden = !modelEnabled;
+  $("json").textContent = JSON.stringify({ result, audit: draft.audit }, null, 2); $("model-review").hidden = integrated || !modelEnabled; $("handoff").hidden = !integrated;
 }
 function download(value, name) { const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: "application/json" })); const a = document.createElement("a"); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
 for (const id of ["source", "as-of", "horizon"]) $(id).addEventListener("input", () => { invalidate(true); $("counter").textContent = $("source").value.length.toLocaleString() + " / 20,000"; });
@@ -89,21 +93,26 @@ $("review").addEventListener("input", event => {
 });
 document.querySelectorAll("[data-example]").forEach(button => button.addEventListener("click", () => { $("source").value = examples[button.dataset.example]; invalidate(true); $("counter").textContent = $("source").value.length + " / 20,000"; }));
 $("parse").addEventListener("click", () => action(async () => {
-  const revision = inputRevision; const result = await request("intake", { text: $("source").value, data_mode: "SYNTHETIC_REPLAY", as_of: $("as-of").value, horizon_days: Number($("horizon").value) });
-  if (revision !== inputRevision) return; draft = result; renderDraft(); $("status").textContent = `已拆分${draft.items.length}项。请逐项核对，补齐必要信息。`; $("review").scrollIntoView({ block: "start" });
+  if (integrated && !riskSession) throw Error("工作台会话尚未就绪，请稍后再试");
+  const revision = inputRevision, revising = integrated && draft;
+  const result = await request(revising ? "revise" : "intake", { ...(revising ? binding() : { data_mode: "SYNTHETIC_REPLAY" }), text: $("source").value, as_of: $("as-of").value, horizon_days: Number($("horizon").value) });
+  draft = result;
+  if (integrated) { const url = new URL(location.href); url.searchParams.set("draft_id", draft.draft_id); history.replaceState(null, "", url); }
+  if (revision !== inputRevision) return; sourceDirty = false; renderDraft();
+  $("status").textContent = `已拆分${draft.items.length}项。请逐项核对，补齐必要信息。`; $("review").scrollIntoView({ block: "start" });
 }));
 $("save").addEventListener("click", () => action(async () => {
   if (!draft) return; const revision = inputRevision; const result = await request("correct", corrections());
-  if (revision !== inputRevision) return; draft = result; renderDraft(); $("result").hidden = true; $("nonoverlap").checked = false; $("status").textContent = "纠错已保存；请核对当前版本后再测算。";
+  draft = result; if (revision !== inputRevision) return; renderDraft(); $("result").hidden = true; $("nonoverlap").checked = false; $("status").textContent = "纠错已保存；请核对当前版本后再测算。";
 }));
 $("confirm").addEventListener("click", () => action(async () => {
   if (!draft) return;
   const checked = [...document.querySelectorAll(".item-reviewed:checked")].map(x => x.dataset.id), nonoverlap = $("nonoverlap").checked;
   if (checked.length !== draft.items.length || !nonoverlap) throw Error("请逐条勾选核对，并确认资金事实没有重复计算。");
   const revision = inputRevision; const corrected = await request("correct", corrections());
-  if (revision !== inputRevision) return; draft = corrected; renderQuestions();
+  draft = corrected; if (revision !== inputRevision) return; renderQuestions();
   const result = await request("confirm", { ...binding(), reviewed_item_ids: checked, confirmed: true, nonoverlap_confirmed: true });
-  if (revision !== inputRevision) return; draft = result; renderResult(); $("revision").textContent = "已核对 · 版本 " + draft.revision; $("status").textContent = "已按当前版本完成测算。修改任一输入后需重新核对。"; $("result").scrollIntoView({ block: "start" });
+  draft = result; if (revision !== inputRevision) return; renderResult(); $("revision").textContent = "已核对 · 版本 " + draft.revision; $("status").textContent = "已按当前版本完成测算。修改任一输入后需重新核对。"; $("result").scrollIntoView({ block: "start" });
 }));
 $("download").addEventListener("click", () => action(async () => { const value = await request("export", binding()); download(value, "生活资金核对与风险.json"); }));
 $("review-draft").addEventListener("click", () => action(async () => { const value = await request("review-draft", binding()); download(value, "model-review-request.json"); $("model-status").textContent = "已导出既有 model-review.v1 请求；尚未提交在线模型。"; }));
@@ -112,5 +121,39 @@ $("model-review").addEventListener("click", () => action(async () => {
   try { const value = await request("model-review", binding()); if (revision !== inputRevision) return; $("model-output").hidden = false; $("model-output").textContent = JSON.stringify(value.model, null, 2); $("model-status").textContent = "在线复核已返回。上方确定性风险结果保持原样。"; }
   catch (error) { $("model-status").textContent = "在线复核失败；未产生在线成功结果。"; throw error; }
 }));
+$("handoff").addEventListener("click", () => action(async () => {
+  const revision = inputRevision;
+  if (!draft?.confirmation || sourceDirty) throw Error("请重新核对本版本再提交");
+  $("model-status").textContent = "正在登记到风控工作台…";
+  const task = await request("handoff", binding());
+  if (revision !== inputRevision) return;
+  $("handoff-result").hidden = false;
+  $("handoff-link").href = "/risk?task_id=" + encodeURIComponent(task.input.binding.task_id);
+  $("handoff-summary").textContent = `任务 ${task.input.binding.task_id} · 风控 ${task.review.decision} · 尚未审批或执行`;
+  $("model-status").textContent = "正在调用团队在线模型，核对当前原文、资金与规则结果…";
+  try {
+    const model = task.model_review || await request("daily-model-review", { task_id: task.input.binding.task_id });
+    if (revision !== inputRevision) return;
+    $("model-output").textContent = JSON.stringify(model, null, 2); $("model-output").hidden = false;
+    $("model-status").textContent = `在线模型已返回：${model.proposal.summary}（运行编号 ${model.run_id}）`;
+  } catch (error) {
+    if (revision === inputRevision) { $("model-status").textContent = "在线模型复核失败。工作台任务已保留；再次点击可重试同一任务，不会重复登记或自动执行。"; $("model-output").hidden = true; }
+    throw error;
+  }
+}));
 $("as-of").value = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-request("health").then(data => { modelEnabled = data.network_model_enabled; }).catch(e => { $("error").textContent = "本地服务未连接：" + e.message; });
+async function initialize() {
+  if (integrated) {
+    const response = await fetch("/api/safety/session", { credentials: "same-origin" });
+    if (!response.ok) throw Error("无法连接风控工作台会话");
+    riskSession = await response.json(); $("workbench-home").hidden = false; $("mode-label").textContent = "风控工作台 · 长文本入口";
+    $("storage-note").textContent = "草稿核对有效期30分钟；已提交任务的原文与审计沿用工作台存储。在线复核会发送已核对的虚构原文与资金信息到团队 Core 模型；不执行真实交易。";
+  }
+  const health = await request("health"); modelEnabled = health.network_model_enabled;
+  const id = new URLSearchParams(location.search).get("draft_id");
+  if (integrated && id) {
+    draft = await request("restore", { draft_id: id }); $("source").value = draft.source_text; $("as-of").value = draft.as_of; $("horizon").value = String(draft.horizon_days);
+    $("counter").textContent = draft.source_text.length + " / 20,000"; renderDraft(); renderResult(); $("status").textContent = "已恢复当前会话草稿。修改后需重新核对。";
+  }
+}
+initialize().catch(e => { $("error").textContent = "服务连接或草稿恢复失败：" + e.message; });
