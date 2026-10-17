@@ -9,6 +9,7 @@ import ownerBridgeModule from "../integrations/owner-bridge.js";
 import reviewWorkflowModule from "../integrations/review-workflow.js";
 import fundingPlanModule from "../integrations/funding-plan.js";
 import coreErrorModule from "../contracts/core-agent-error.js";
+import bailianBudgetModule from "../integrations/bailian-budget.js";
 import { reviewDocs } from "./review-docs.js";
 
 const { Harness } = harnessModule;
@@ -147,6 +148,7 @@ function allowedByRateLimit(request, env) {
 
 function requiresApiKey(request, env) {
   const expected = String(env.CORE_AGENT_API_KEY || "").trim();
+  if (["bailian", "aliyun_bailian"].includes(String(env.MODEL_PROVIDER || "").trim().toLowerCase()) && !expected) return false;
   return !expected || request.headers.get("X-Core-Agent-Key") === expected;
 }
 
@@ -185,10 +187,15 @@ export class ReviewService {
     this.env = env;
     this.queue = Promise.resolve();
     this.modelBuckets = new Map();
+    this.bailianBudget = new bailianBudgetModule.BailianBudget({ storage: this.storage, env });
+    this.pendingRequests = 0;
   }
 
   fetch(request) {
-    const pending = this.queue.then(() => this.handle(request));
+    const bailian = ["bailian", "aliyun_bailian"].includes(String(this.env.MODEL_PROVIDER || "").trim().toLowerCase());
+    if (bailian && this.pendingRequests >= 8) return Promise.resolve(json(request, this.env, 429, errorPayload(rateLimitFailure()), { "Retry-After": "60" }));
+    this.pendingRequests++;
+    const pending = this.queue.then(() => this.handle(request)).finally(() => { this.pendingRequests--; });
     this.queue = pending.catch(() => {});
     return pending;
   }
@@ -285,7 +292,14 @@ export class ReviewService {
         bucket.count++;
         this.modelBuckets.set(ip, bucket);
         await this.loadFundingPlan(fundingPlans, input.action_parameters?.funding_plan_id);
-        result = await workflow.start(input, env);
+        const usageHooks = this.bailianBudget.hooks();
+        result = await workflow.start(input, env, {
+          ...usageHooks,
+          afterModelAttempt: async attempt => {
+            const evidence = await usageHooks.afterModelAttempt(attempt);
+            console.log(JSON.stringify({ event: "bailian.attempt", ...evidence }));
+          }
+        });
       } else {
         const record = await this.lookupTask(body.task_id);
         if (record) workflow.save(record);

@@ -1,0 +1,120 @@
+{
+  "evidence_type": "UNEXECUTED_TEMPLATE",
+  "provider": "aliyun_bailian",
+  "model": "qwen3.7-flash",
+  "data_mode": "SYNTHETIC_REPLAY",
+  "status": "NOT_RUN",
+  "paid_test_authorized": false,
+  "workspace_configured": false,
+  "client_network": {
+    "country_region": null,
+    "city": null,
+    "operator": null,
+    "vpn_or_proxy": null,
+    "confirmed_by": null
+  },
+  "deployment_version": null,
+  "cases": [
+    {
+      "name": "normal_review",
+      "status": "NOT_RUN",
+      "request_id": null,
+      "run_id": null,
+      "audit_id": null,
+      "provider_response_id": null,
+      "elapsed_ms": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "actual_outcome": null,
+      "evidence_path": null
+    },
+    {
+      "name": "authorized_account_query",
+      "status": "NOT_RUN",
+      "request_id": null,
+      "run_id": null,
+      "audit_id": null,
+      "provider_response_id": null,
+      "elapsed_ms": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "actual_outcome": null,
+      "evidence_path": null
+    },
+    {
+      "name": "readonly_tool_roundtrip",
+      "status": "NOT_RUN",
+      "request_id": null,
+      "run_id": null,
+      "audit_id": null,
+      "provider_response_id": null,
+      "elapsed_ms": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "actual_outcome": null,
+      "evidence_path": null
+    },
+    {
+      "name": "risk_rejection",
+      "status": "NOT_RUN",
+      "request_id": null,
+      "run_id": null,
+      "audit_id": null,
+      "provider_response_id": null,
+      "elapsed_ms": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "actual_outcome": null,
+      "evidence_path": null
+    },
+    {
+      "name": "timeout",
+      "status": "NOT_RUN",
+      "request_id": null,
+      "run_id": null,
+      "audit_id": null,
+      "provider_response_id": null,
+      "elapsed_ms": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "actual_outcome": null,
+      "evidence_path": null
+    },
+    {
+      "name": "concurrent_requests",
+      "status": "NOT_RUN",
+      "request_id": null,
+      "run_id": null,
+      "audit_id": null,
+      "provider_response_id": null,
+      "elapsed_ms": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "actual_outcome": null,
+      "evidence_path": null
+    }
+  ],
+  "latency_summary": {
+    "sample_count": 0,
+    "p50_ms": null,
+    "p95_ms": null,
+    "error_rate": null
+  },
+  "joint_acceptance": {
+    "model_owner": null,
+    "risk_owner": null,
+    "identity_owner": null,
+    "data_tool_owner": null,
+    "accepted_at": null
+  },
+  "notes": [
+    "No actual measurements or paid model calls performed.",
+    "Do not add secrets, real account data or chat transcripts to a public report."
+  ]
+}

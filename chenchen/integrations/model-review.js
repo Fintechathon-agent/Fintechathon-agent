@@ -18,6 +18,7 @@ const CAPABILITIES = ["REVIEW_ONLY", "SIMULATION_ONLY"];
 const DEFAULT_POLICY_VERSION = "risk-policy.v1";
 const DEFAULT_RISK_PROFILE_VERSION = "risk-profile.v1";
 const coreError = require("../contracts/core-agent-error");
+const { resolveBailianConfig } = require("./bailian-provider");
 
 const REVIEW_SCHEMA = {
   type: "object",
@@ -224,7 +225,7 @@ function resolveModelConfig(env = {}) {
   const responseFormat = envString(env, ["MODEL_RESPONSE_FORMAT"], style === "responses" ? "json_schema" : "json_object").toLowerCase();
   const timeoutMs = Number(envString(env, ["MODEL_TIMEOUT_MS"], "30000"));
   const maxAttempts = Number(envString(env, ["MODEL_MAX_ATTEMPTS"], "2"));
-  return {
+  const config = {
     provider: workersAI ? "cloudflare_workers_ai" : deepseek ? "deepseek" : providerName || "http",
     apiKey: envString(env, deepseek ? ["MODEL_API_KEY"] : ["MODEL_API_KEY", "OPENAI_API_KEY"]),
     endpoint: workersAI ? "cloudflare:AI" : endpoint,
@@ -239,6 +240,10 @@ function resolveModelConfig(env = {}) {
     fallbackToRules: envString(env, ["MODEL_FALLBACK_TO_RULES"], "false").toLowerCase() === "true",
     disableRuleFallback: envString(env, ["MODEL_DISABLE_RULE_FALLBACK"], "false").toLowerCase() === "true"
   };
+  if (["bailian", "aliyun_bailian"].includes(providerName)) {
+    return { ...config, ...resolveBailianConfig(env), maxAttempts: Math.min(config.maxAttempts, 2) };
+  }
+  return config;
 }
 
 function schemaFormat(config) {
@@ -309,7 +314,8 @@ function buildModelRequest(input, config) {
       { role: "user", content: prompt }
     ],
     ...(format ? { response_format: format.type === "json_schema" ? { type: "json_schema", json_schema: format } : format } : {}),
-    ...(config.provider === "deepseek" ? { max_tokens: 1600 } : {})
+    ...(config.provider === "deepseek" ? { max_tokens: 1600 } : {}),
+    ...(config.provider === "aliyun_bailian" ? { max_tokens: config.maxOutputTokens, enable_thinking: false, stream: false } : {})
   };
 }
 
@@ -448,7 +454,7 @@ function gatewayCheck(proposal, input) {
   };
 }
 
-async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {}) {
+async function runReview(input, env = {}, { fetchImpl = globalThis.fetch, beforeModelAttempt, afterModelAttempt } = {}) {
   const normalized = normalizeReviewInput(input);
   const outputContract = buildOutputContract(normalized);
   const runId = randomId("review-");
@@ -493,12 +499,31 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
         }
         if (typeof payload?.response === "object") rawTextFormat = "provider_json_serialized";
       } else {
-        if (!config.apiKey) throw new ReviewError("MODEL_NOT_CONFIGURED", "model API key is not configured", { statusCode: 503, stage: "CONFIGURATION", recovery: config.provider === "deepseek" ? "Set MODEL_API_KEY for DeepSeek on the backend and retry." : "Set MODEL_API_KEY or OPENAI_API_KEY on the backend and retry." });
-        payload = await fetchJson(fetchImpl, config.endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: "Bearer " + config.apiKey },
-          body: JSON.stringify(buildModelRequest(normalized, config))
-        }, remainingMs);
+        if (!config.apiKey) throw new ReviewError("MODEL_NOT_CONFIGURED", "model API key is not configured", { statusCode: 503, stage: "CONFIGURATION", recovery: config.provider === "aliyun_bailian" ? "Store DASHSCOPE_API_KEY as a backend secret." : config.provider === "deepseek" ? "Set MODEL_API_KEY for DeepSeek on the backend and retry." : "Set MODEL_API_KEY or OPENAI_API_KEY on the backend and retry." });
+        const request = buildModelRequest(normalized, config);
+        const bailian = config.provider === "aliyun_bailian";
+        if (bailian && (typeof beforeModelAttempt !== "function" || typeof afterModelAttempt !== "function")) {
+          throw new ReviewError("MODEL_NOT_CONFIGURED", "Bailian requires a durable budget and usage recorder", { statusCode: 503, stage: "CONFIGURATION" });
+        }
+        const reservation = bailian ? await beforeModelAttempt({ run_id: runId, attempt, request, model: config.model }) : null;
+        const started = Date.now();
+        let providerError;
+        try {
+          const availableMs = deadline - Date.now();
+          if (availableMs <= 0) throw new ReviewError("MODEL_TIMEOUT", "Model call budget expired before HTTP", { statusCode: 504 });
+          payload = await fetchJson(fetchImpl, config.endpoint, {
+            method: "POST", redirect: "error",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + config.apiKey },
+            body: JSON.stringify(request)
+          }, availableMs);
+        } catch (error) {
+          providerError = error;
+          throw error;
+        } finally {
+          if (bailian) await afterModelAttempt({ reservation, usage: payload?.usage,
+            provider_response_id: payload?.id, elapsed_ms: Date.now() - started,
+            error_code: providerError?.code || (providerError ? "MODEL_PROVIDER_UNAVAILABLE" : null) });
+        }
       }
       rawText = extractModelText(payload, config.style);
       if (!rawText) throw new ReviewError("MODEL_EMPTY_RESPONSE", "model provider returned no text", { retryable: true, recovery: "Retry the review or use a model that returns text output." });
