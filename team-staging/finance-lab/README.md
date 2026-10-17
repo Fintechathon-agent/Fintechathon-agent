@@ -8,3 +8,5 @@
 - 请求/响应契约：[API-CONTRACT.md](API-CONTRACT.md)
 
 暂存区可以继续修改和联调；通过团队确认后，再按同一来源提交登记到 `team-release/finance-lab/`。
+
+- 蒸馏方案（草案）：[REVERSE-ENGINEERING-DISTILLATION.md](REVERSE-ENGINEERING-DISTILLATION.md)

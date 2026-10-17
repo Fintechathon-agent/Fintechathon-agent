@@ -40,3 +40,7 @@ python web/app.py --port 8765
 ## 转入正式区
 
 团队确认接口字段、运行路径和联合验收记录后，把本入口登记的同一来源提交同步到 [`team-release/finance-lab/`](../../team-release/finance-lab/)，并在正式版本记录中写明测试和回滚依据。
+
+## 教师模型行为蒸馏
+
+当前仅登记方案，不代表已经训练或接入生产：[REVERSE-ENGINEERING-DISTILLATION.md](REVERSE-ENGINEERING-DISTILLATION.md)。
