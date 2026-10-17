@@ -1,0 +1,21 @@
+{
+  "scope": "READ_ONLY_HEALTH_CHECK",
+  "checked_at": "2026-10-17T23:20:54.1048605+08:00",
+  "status_code": 200,
+  "body": {
+    "status": "ok",
+    "service": "core-agent",
+    "contract_version": "investment-agent.v1",
+    "review_endpoint": "/api/review",
+    "docs": "/docs",
+    "model": {
+      "provider": "cloudflare_workers_ai",
+      "name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "configured": true
+    },
+    "audit_storage": "durable_object"
+  },
+  "model_inference_calls": 0,
+  "paid_model_calls": 0,
+  "new_experiment_deployed": false
+}
