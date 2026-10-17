@@ -77,6 +77,19 @@ async function fingerprint(input) {
   return hash(canonical);
 }
 
+async function matchesRequestFingerprint(record, input) {
+  if (record?.request_fingerprint === await fingerprint(input)) return true;
+  // Only the two newly defaulted fields may be absent from a legacy request.
+  // The original stored digest still has to match all remaining input fields.
+  if (!record?.reviewed_input || Object.hasOwn(record.reviewed_input, "scenario") ||
+      Object.hasOwn(record.reviewed_input, "output_formats") || input.scenario !== "GENERAL_REVIEW" ||
+      JSON.stringify(input.output_formats) !== '["json"]') return false;
+  const legacy = clone(input);
+  delete legacy.scenario;
+  delete legacy.output_formats;
+  return record.request_fingerprint === await fingerprint(legacy);
+}
+
 function event(record, eventType, payload = {}, actor = "core-agent") {
   const trace = {
     request_id: record.request_id,
@@ -210,7 +223,7 @@ class ReviewWorkflowStore {
     const taskId = input.task_id || id("review-task-");
     if (input.idempotency_key && this.byIdempotency.has(input.idempotency_key)) {
       const existing = this.getByRunId(this.byIdempotency.get(input.idempotency_key));
-      if (existing?.request_fingerprint === await fingerprint(input)) return existing;
+      if (await matchesRequestFingerprint(existing, input)) return existing;
       throw new WorkflowError("IDEMPOTENCY_CONFLICT", "idempotency key is already bound to different review input", {
         statusCode: 409, stage: "VALIDATION", recovery: "Reuse the original request body or create a new idempotency key.", record: existing
       });
@@ -697,4 +710,4 @@ class ReviewWorkflowStore {
   }
 }
 
-module.exports = { WORKFLOW_VERSION, RISK_DECISIONS, APPROVAL_DECISIONS, WorkflowError, ReviewWorkflowStore, fingerprint };
+module.exports = { WORKFLOW_VERSION, RISK_DECISIONS, APPROVAL_DECISIONS, WorkflowError, ReviewWorkflowStore, fingerprint, matchesRequestFingerprint };

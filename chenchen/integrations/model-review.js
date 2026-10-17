@@ -41,6 +41,7 @@ const SYSTEM_PROMPT = [
   "Write concise summaries, reasons, and evidence in Simplified Chinese. Keep enum values unchanged.",
   "Use REQUEST_MORE_INFO when evidence is insufficient, HOLD_FOR_REVIEW when a human decision is required, and FLAG_FOR_RISK when the content contains a material anomaly or possible fraud signal.",
   "Use NO_ACTION only when the content is clear and no follow-up is needed.",
+  "Keep budgets, prices, expenses and savings distinct. Never invent offers, balances, dates or completed transactions. When comparison evidence is missing, request it.",
   "Any proposed action is advisory. The gateway will keep execution disabled."
 ].join(" ");
 
@@ -216,7 +217,8 @@ function resolveModelConfig(env = {}) {
   const workersAI = providerName === "workers_ai";
   const deepseek = providerName === "deepseek";
   const styleFromEnv = envString(env, ["MODEL_API_STYLE"], "").toLowerCase();
-  const rawUrl = envString(env, ["MODEL_API_URL", "OPENAI_BASE_URL"], "");
+  // Provider-specific selection must not inherit another provider's credentials.
+  const rawUrl = envString(env, deepseek ? ["MODEL_API_URL"] : ["MODEL_API_URL", "OPENAI_BASE_URL"], "");
   const style = styleFromEnv || (rawUrl.includes("/responses") ? "responses" : "chat_completions");
   const endpoint = rawUrl || (deepseek ? DEFAULT_DEEPSEEK_CHAT_URL : style === "responses" ? DEFAULT_RESPONSES_URL : DEFAULT_CHAT_URL);
   const responseFormat = envString(env, ["MODEL_RESPONSE_FORMAT"], style === "responses" ? "json_schema" : "json_object").toLowerCase();
@@ -224,9 +226,12 @@ function resolveModelConfig(env = {}) {
   const maxAttempts = Number(envString(env, ["MODEL_MAX_ATTEMPTS"], "2"));
   return {
     provider: workersAI ? "cloudflare_workers_ai" : deepseek ? "deepseek" : providerName || "http",
-    apiKey: envString(env, ["MODEL_API_KEY", "OPENAI_API_KEY"]),
+    apiKey: envString(env, deepseek ? ["MODEL_API_KEY"] : ["MODEL_API_KEY", "OPENAI_API_KEY"]),
     endpoint: workersAI ? "cloudflare:AI" : endpoint,
-    model: envString(env, ["MODEL_NAME", "OPENAI_MODEL"], workersAI ? "@cf/meta/llama-3.3-70b-instruct-fp8-fast" : DEFAULT_MODEL),
+    model: envString(env, deepseek ? ["MODEL_NAME"] : ["MODEL_NAME", "OPENAI_MODEL"], workersAI ? "@cf/meta/llama-3.3-70b-instruct-fp8-fast" : deepseek ? "" : DEFAULT_MODEL),
+    configurationIssue: deepseek && style !== "chat_completions" && !rawUrl
+      ? "DeepSeek non-chat configuration requires an explicit MODEL_API_URL."
+      : null,
     style: workersAI ? "workers_ai" : style === "responses" ? "responses" : "chat_completions",
     responseFormat: workersAI ? "json_schema" : ["json_schema", "json_object", "none"].includes(responseFormat) ? responseFormat : "json_object",
     timeoutMs: Number.isFinite(timeoutMs) && timeoutMs > 0 ? Math.min(timeoutMs, 120000) : 30000,
@@ -270,10 +275,17 @@ function buildUserPrompt(input) {
 function buildModelRequest(input, config) {
   const prompt = buildUserPrompt(input);
   const format = schemaFormat(config);
+  const instructions = [SYSTEM_PROMPT,
+    "Required JSON schema: " + JSON.stringify(REVIEW_SCHEMA),
+    "Format-only example; do not copy it as evidence: " + JSON.stringify({
+      summary: "信息不足，等待补充。", risk_level: "unknown", proposed_action: "REQUEST_MORE_INFO",
+      action_reason: "尚不能核实用途和金额。", missing_information: ["可核查的原始凭据"], evidence: []
+    })
+  ].join("\n");
   if (config.style === "workers_ai") {
     return {
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: instructions },
         { role: "user", content: prompt }
       ],
       response_format: { type: "json_schema", json_schema: REVIEW_SCHEMA },
@@ -285,7 +297,7 @@ function buildModelRequest(input, config) {
   if (config.style === "responses") {
     return {
       model: config.model,
-      instructions: SYSTEM_PROMPT,
+      instructions,
       input: prompt,
       ...(format ? { text: { format } } : {})
     };
@@ -293,10 +305,11 @@ function buildModelRequest(input, config) {
   return {
     model: config.model,
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: instructions },
       { role: "user", content: prompt }
     ],
-    ...(format ? { response_format: format.type === "json_schema" ? { type: "json_schema", json_schema: format } : format } : {})
+    ...(format ? { response_format: format.type === "json_schema" ? { type: "json_schema", json_schema: format } : format } : {}),
+    ...(config.provider === "deepseek" ? { max_tokens: 1600 } : {})
   };
 }
 
@@ -385,15 +398,19 @@ function boundedArray(value, field) {
 
 function normalizeProposal(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new ReviewError("MODEL_INVALID_RESPONSE", "model response must be a JSON object", { recovery: "Retry with a model that follows the review schema." });
-  const riskLevel = ["low", "medium", "high", "unknown"].includes(value.risk_level) ? value.risk_level : "unknown";
   if (!ACTIONS.includes(value.proposed_action)) throw new ReviewError("MODEL_UNSAFE_ACTION", "model proposed an unsupported action", { details: { proposed_action: value.proposed_action || null }, recovery: "Review the content manually; the gateway blocked this proposal." });
+  if (!REVIEW_SCHEMA.properties.risk_level.enum.includes(value.risk_level) ||
+      REVIEW_SCHEMA.required.some(key => !Object.hasOwn(value, key)) ||
+      Object.keys(value).some(key => !Object.hasOwn(REVIEW_SCHEMA.properties, key))) {
+    throw new ReviewError("MODEL_INVALID_RESPONSE", "model response does not match the review schema", { recovery: "Retry with a model that follows the review schema." });
+  }
   return {
     summary: boundedString(value.summary, "summary"),
-    risk_level: riskLevel,
+    risk_level: value.risk_level,
     proposed_action: value.proposed_action,
     action_reason: boundedString(value.action_reason, "action_reason"),
-    missing_information: boundedArray(value.missing_information || [], "missing_information"),
-    evidence: boundedArray(value.evidence || [], "evidence")
+    missing_information: boundedArray(value.missing_information, "missing_information"),
+    evidence: boundedArray(value.evidence, "evidence")
   };
 }
 
@@ -460,6 +477,7 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
     if (pendingRetry) retryEvents.push({ ...pendingRetry, at: new Date().toISOString() });
     let payload;
     try {
+      if (config.configurationIssue || !config.model) throw new ReviewError("MODEL_NOT_CONFIGURED", config.configurationIssue || "MODEL_NAME must be explicitly configured for the selected provider", { statusCode: 503, stage: "CONFIGURATION" });
       if (config.style === "workers_ai") {
         if (typeof env.AI?.run !== "function") throw new ReviewError("MODEL_NOT_CONFIGURED", "Workers AI binding is not configured", { statusCode: 503, stage: "CONFIGURATION" });
         let timer;
@@ -475,7 +493,7 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch } = {})
         }
         if (typeof payload?.response === "object") rawTextFormat = "provider_json_serialized";
       } else {
-        if (!config.apiKey) throw new ReviewError("MODEL_NOT_CONFIGURED", "model API key is not configured", { statusCode: 503, stage: "CONFIGURATION", recovery: "Set MODEL_API_KEY or OPENAI_API_KEY on the backend and retry." });
+        if (!config.apiKey) throw new ReviewError("MODEL_NOT_CONFIGURED", "model API key is not configured", { statusCode: 503, stage: "CONFIGURATION", recovery: config.provider === "deepseek" ? "Set MODEL_API_KEY for DeepSeek on the backend and retry." : "Set MODEL_API_KEY or OPENAI_API_KEY on the backend and retry." });
         payload = await fetchJson(fetchImpl, config.endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: "Bearer " + config.apiKey },

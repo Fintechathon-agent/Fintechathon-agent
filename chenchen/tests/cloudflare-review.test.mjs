@@ -4,6 +4,7 @@ import vm from "node:vm";
 import { createHash } from "node:crypto";
 import worker, { ReviewService } from "../deployment/worker.js";
 import { reviewDocs } from "../deployment/review-docs.js";
+import workflowModule from "../integrations/review-workflow.js";
 
 const proposal = {
   summary: "虚构账单要求改付个人账户。", risk_level: "high",
@@ -31,6 +32,14 @@ function req(path, body) {
   });
 }
 
+test("health does not advertise an incomplete DeepSeek configuration as configured", async () => {
+  for (const config of [{ MODEL_API_KEY: "test" }, { MODEL_NAME: "configured-model" },
+    { MODEL_API_KEY: "test", MODEL_NAME: "configured-model", MODEL_API_STYLE: "responses" }]) {
+    const health = await worker.fetch(req("/health"), { MODEL_PROVIDER: "deepseek", ...config }).then(r => r.json());
+    assert.equal(health.model.configured, false);
+  }
+});
+
 test("public review survives cold starts and keeps workflow mutations in the audit", async () => {
   const app = setup();
   const created = await worker.fetch(req("/api/review", { kind: "bill", text: "虚构账单改付个人" }), app.env);
@@ -48,6 +57,26 @@ test("public review survives cold starts and keeps workflow mutations in the aud
   const audited = await worker.fetch(req("/api/review/task/" + record.task_id), app.env).then(r => r.json());
   assert.equal(audited.execution.execution_allowed, false);
   assert.ok(audited.audit.events.length > record.audit.events.length);
+});
+
+test("persisted pre-scenario requests remain idempotent across a worker upgrade", async () => {
+  const app = setup();
+  const input = { text: "虚构升级前账单", idempotency_key: "legacy-durable-retry", action_parameters: { amount: 25 } };
+  const created = await worker.fetch(req("/api/review", input), app.env).then(r => r.json());
+  delete created.reviewed_input.scenario;
+  delete created.reviewed_input.output_formats;
+  created.request_fingerprint = await workflowModule.fingerprint(created.reviewed_input);
+  await app.storage.put({ ["run:" + created.run_id]: created });
+  app.restart();
+  app.env.AI.run = async () => { throw new Error("replay must not invoke the model again"); };
+  const replay = await worker.fetch(req("/api/review", input), app.env);
+  assert.equal(replay.status, 200);
+  assert.deepEqual(await replay.json(), created);
+  for (const changed of [{ text: "不同用途" }, { scenario: "DOUBLE11_COMPARE" }, { output_formats: ["xlsx"] }, { action_parameters: { amount: 50 } }]) {
+    const conflict = await worker.fetch(req("/api/review", { ...input, ...changed }), app.env);
+    assert.equal(conflict.status, 409);
+    assert.equal((await conflict.json()).error.code, "IDEMPOTENCY_CONFLICT");
+  }
 });
 
 test("durable workflow refuses Risk mutation after simulation", async () => {

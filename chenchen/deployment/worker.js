@@ -19,7 +19,7 @@ const modelReview = modelReviewModule;
 const legacyReviewAdapter = legacyReviewAdapterModule;
 const riskHandoff = riskHandoffModule;
 const ownerBridge = ownerBridgeModule;
-const { ReviewWorkflowStore, WorkflowError, fingerprint } = reviewWorkflowModule;
+const { ReviewWorkflowStore, WorkflowError, matchesRequestFingerprint } = reviewWorkflowModule;
 const { FundingPlanStore } = fundingPlanModule;
 const coreError = coreErrorModule;
 const harness = new Harness({ toolset: tools });
@@ -261,7 +261,7 @@ export class ReviewService {
         if (input.idempotency_key) {
           const existing = await this.lookupIdempotency(input.idempotency_key);
           if (existing) {
-            const same = existing.request_fingerprint === await fingerprint(input);
+            const same = await matchesRequestFingerprint(existing, input);
             if (same) return json(request, env, 200, url.pathname === "/api/review/legacy" ? legacyReviewAdapter.mapWorkflowToLegacyResponse(existing) : existing);
             throw new WorkflowError("IDEMPOTENCY_CONFLICT", "idempotency key is already bound to different review input", {
               statusCode: 409, stage: "VALIDATION", recovery: "Reuse the original request body or create a new idempotency key.", record: existing
@@ -343,7 +343,7 @@ export default {
       return json(request, env, 200, {
         status: "ok", service: "core-agent", contract_version: contract.CONTRACT_VERSION,
         review_endpoint: "/api/review", docs: "/docs",
-        model: { provider: config.provider, name: config.model, configured: config.style === "workers_ai" ? Boolean(env.AI) : Boolean(config.apiKey) },
+        model: { provider: config.provider, name: config.model, configured: config.style === "workers_ai" ? typeof env.AI?.run === "function" : Boolean(config.apiKey && config.model && !config.configurationIssue) },
         audit_storage: env.REVIEW_SERVICE ? "durable_object" : "unconfigured"
       });
     }

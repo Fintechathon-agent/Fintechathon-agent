@@ -181,6 +181,65 @@ test("DeepSeek uses the domestic chat endpoint and keeps the shared JSON contrac
   assert.equal(config.model, "deepseek-chat");
 });
 
+test("DeepSeek ignores OpenAI credentials, model and endpoint aliases", () => {
+  const config = resolveModelConfig({ MODEL_PROVIDER: "deepseek", OPENAI_API_KEY: "other-provider-secret",
+    OPENAI_BASE_URL: "https://other-provider.invalid/responses", OPENAI_MODEL: "other-provider-model" });
+  assert.equal(config.apiKey, "");
+  assert.equal(config.model, "");
+  assert.equal(config.endpoint, "https://api.deepseek.com/chat/completions");
+  assert.equal(config.style, "chat_completions");
+});
+
+test("missing DeepSeek configuration fails before HTTP with auditable blocked output", async () => {
+  for (const config of [
+    { MODEL_API_KEY: "test" },
+    { MODEL_NAME: "configured-model", OPENAI_API_KEY: "unrelated-key" },
+    { MODEL_API_KEY: "test", MODEL_NAME: "configured-model", MODEL_API_STYLE: "responses" }
+  ]) {
+    let calls = 0;
+    await assert.rejects(runReview({ text: "虚构测试" }, { MODEL_PROVIDER: "deepseek", ...config }, {
+      fetchImpl: async () => { calls++; throw new Error("must not call"); }
+    }), error => {
+      assert.equal(error.code, "MODEL_NOT_CONFIGURED");
+      assert.equal(error.reviewRecord.status, "FAILED");
+      assert.equal(error.reviewRecord.gateway.execution_allowed, false);
+      assert.equal(error.reviewRecord.attempt_count, 1);
+      assert.equal(calls, 0);
+      return true;
+    });
+  }
+});
+
+test("DeepSeek chat adapter carries the full schema and records a verifiable model response", async () => {
+  let sent;
+  const result = await runReview({ text: "虚构测试：只有399元预算，没有平台报价。" }, {
+    MODEL_PROVIDER: "deepseek", MODEL_API_KEY: "synthetic-key", MODEL_NAME: "configured-deepseek-model"
+  }, { fetchImpl: async (url, options) => {
+    sent = JSON.parse(options.body);
+    assert.equal(url, "https://api.deepseek.com/chat/completions");
+    assert.equal(options.headers.Authorization, "Bearer synthetic-key");
+    return new Response(JSON.stringify({ id: "synthetic-deepseek-response", choices: [{ message: { content: JSON.stringify(proposal) } }], usage: { total_tokens: 90 } }));
+  } });
+  assert.deepEqual(sent.response_format, { type: "json_object" });
+  assert.equal(sent.max_tokens, 1600);
+  for (const key of Object.keys(proposal)) assert.ok(sent.messages[0].content.includes(key));
+  assert.match(sent.messages[0].content, /Format-only example/);
+  assert.equal(result.model_response.provider_response_id, "synthetic-deepseek-response");
+  assert.equal(result.model_response.raw_text, JSON.stringify(proposal));
+  assert.equal(result.model_response.usage.total_tokens, 90);
+  assert.equal(result.gateway.execution_allowed, false);
+});
+
+test("schema-invalid responses cannot silently become safe-looking proposals", async () => {
+  const { evidence: _evidence, ...withoutEvidence } = proposal;
+  for (const invalid of [withoutEvidence, { ...proposal, risk_level: "safe" },
+    { ...proposal, missing_information: null }, { ...proposal, execute: true }, { ...proposal, evidence: [8] }]) {
+    await assert.rejects(runReview({ text: "虚构测试" }, env, { fetchImpl: async () =>
+      new Response(JSON.stringify({ output_text: JSON.stringify(invalid) }))
+    }), error => error.code === "MODEL_INVALID_RESPONSE" && error.reviewRecord.gateway.execution_allowed === false);
+  }
+});
+
 test("scenario routing and output conversion stay explicit", () => {
   const input = normalizeReviewInput({
     kind: "combined",

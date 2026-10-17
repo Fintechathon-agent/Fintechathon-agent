@@ -2,7 +2,7 @@
 
 const assert = require("node:assert/strict");
 const test = require("node:test");
-const { ReviewWorkflowStore, WorkflowError } = require("../integrations/review-workflow");
+const { ReviewWorkflowStore, WorkflowError, fingerprint } = require("../integrations/review-workflow");
 
 function fakeReview(input) {
   return Promise.resolve({
@@ -97,6 +97,26 @@ test("model failure creates an auditable blocked workflow", async () => {
     assert.ok(error.workflowRecord.audit.events.some(item => item.event_type === "model.failed"));
     return true;
   });
+});
+
+test("legacy default-only retries reuse their original record and changed inputs still conflict", async () => {
+  let calls = 0;
+  const store = new ReviewWorkflowStore({ modelRunner: input => { calls++; return fakeReview(input); } });
+  const input = { text: "虚构旧版账单", idempotency_key: "legacy-retry", action_parameters: { amount: 25 } };
+  const created = await store.start(input);
+  const legacy = structuredClone(created);
+  delete legacy.reviewed_input.scenario;
+  delete legacy.reviewed_input.output_formats;
+  legacy.request_fingerprint = await fingerprint(legacy.reviewed_input);
+  store.records.set(legacy.run_id, legacy);
+  const replay = await store.start(input);
+  assert.deepEqual(replay, legacy);
+  assert.equal(calls, 1);
+  for (const changed of [{ text: "不同用途" }, { action_parameters: { amount: 26 } },
+    { scenario: "SUBSCRIPTION_REVIEW" }, { output_formats: ["json", "xlsx"] }]) {
+    await assert.rejects(store.start({ ...input, ...changed }), error => error.code === "IDEMPOTENCY_CONFLICT");
+  }
+  assert.equal(calls, 1);
 });
 
 test("terminal workflow states cannot be mutated by repeated Risk or approval calls", async () => {
