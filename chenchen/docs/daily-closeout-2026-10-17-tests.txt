@@ -1,0 +1,1012 @@
+
+> portfolio-sentinel@0.13.0 test
+> node --test --test-reporter=tap
+
+TAP version 13
+# Subtest: deployed handler wires durable Bailian accounting, blocked execution and task replay
+ok 1 - deployed handler wires durable Bailian accounting, blocked execution and task replay
+  ---
+  duration_ms: 91.8605
+  type: 'test'
+  ...
+# Subtest: Bailian configuration isolates its key, model, workspace and Beijing endpoint
+ok 2 - Bailian configuration isolates its key, model, workspace and Beijing endpoint
+  ---
+  duration_ms: 2.916
+  type: 'test'
+  ...
+# Subtest: unapproved payment, wrong domains, unsupported models and protocols fail before HTTP
+ok 3 - unapproved payment, wrong domains, unsupported models and protocols fail before HTTP
+  ---
+  duration_ms: 36.1476
+  type: 'test'
+  ...
+# Subtest: B01 normal structured response retains usage, model evidence and non-executing status
+ok 4 - B01 normal structured response retains usage, model evidence and non-executing status
+  ---
+  duration_ms: 45.2595
+  type: 'test'
+  ...
+# Subtest: B02 account query without a data service remains a request for information
+ok 5 - B02 account query without a data service remains a request for information
+  ---
+  duration_ms: 6.4694
+  type: 'test'
+  ...
+# Subtest: B03 provider tool_calls cannot make review execute a tool or infer a trade
+ok 6 - B03 provider tool_calls cannot make review execute a tool or infer a trade
+  ---
+  duration_ms: 6.3748
+  type: 'test'
+  ...
+# Subtest: B04 Risk rejection blocks simulation and keeps the same task and audit
+ok 7 - B04 Risk rejection blocks simulation and keeps the same task and audit
+  ---
+  duration_ms: 11.3121
+  type: 'test'
+  ...
+# Subtest: B05 timeout aborts HTTP, preserves its reservation and never falls back
+ok 8 - B05 timeout aborts HTTP, preserves its reservation and never falls back
+  ---
+  duration_ms: 31.8181
+  type: 'test'
+  ...
+# Subtest: B06 concurrent calls share a persistent budget and cannot overspend its reservation limit
+ok 9 - B06 concurrent calls share a persistent budget and cannot overspend its reservation limit
+  ---
+  duration_ms: 7.1013
+  type: 'test'
+  ...
+# Subtest: retries reserve separately, duplicates do not call again and missing usage is not zero
+ok 10 - retries reserve separately, duplicates do not call again and missing usage is not zero
+  ---
+  duration_ms: 262.409
+  type: 'test'
+  ...
+# Subtest: missing guard, storage failures and oversized requests cannot start billable HTTP
+ok 11 - missing guard, storage failures and oversized requests cannot start billable HTTP
+  ---
+  duration_ms: 2.6375
+  type: 'test'
+  ...
+# Subtest: global rate guard counts attempts, including different callers, across restarts
+ok 12 - global rate guard counts attempts, including different callers, across restarts
+  ---
+  duration_ms: 1.0554
+  type: 'test'
+  ...
+# Subtest: Bailian public service refuses anonymous access and caps queued work
+ok 13 - Bailian public service refuses anonymous access and caps queued work
+  ---
+  duration_ms: 8.8719
+  type: 'test'
+  ...
+# Subtest: health does not advertise an incomplete DeepSeek configuration as configured
+ok 14 - health does not advertise an incomplete DeepSeek configuration as configured
+  ---
+  duration_ms: 46.1692
+  type: 'test'
+  ...
+# Subtest: public review survives cold starts and keeps workflow mutations in the audit
+ok 15 - public review survives cold starts and keeps workflow mutations in the audit
+  ---
+  duration_ms: 47.7291
+  type: 'test'
+  ...
+# Subtest: persisted pre-scenario requests remain idempotent across a worker upgrade
+ok 16 - persisted pre-scenario requests remain idempotent across a worker upgrade
+  ---
+  duration_ms: 29.4125
+  type: 'test'
+  ...
+# Subtest: durable workflow refuses Risk mutation after simulation
+ok 17 - durable workflow refuses Risk mutation after simulation
+  ---
+  duration_ms: 23.1247
+  type: 'test'
+  ...
+# Subtest: failed real inference returns an error and a persistent blocked record
+ok 18 - failed real inference returns an error and a persistent blocked record
+  ---
+  duration_ms: 275.2478
+  type: 'test'
+  ...
+# Subtest: retried Workers AI inference retains one task and durable Risk evidence without authorizing execution
+ok 19 - retried Workers AI inference retains one task and durable Risk evidence without authorizing execution
+  ---
+  duration_ms: 296.7618
+  type: 'test'
+  ...
+# Subtest: public endpoint validates input, caps requests, and accepts frontend preflight
+ok 20 - public endpoint validates input, caps requests, and accepts frontend preflight
+  ---
+  duration_ms: 11.2559
+  type: 'test'
+  ...
+# Subtest: explicit task ids cannot create a second workflow record
+ok 21 - explicit task ids cannot create a second workflow record
+  ---
+  duration_ms: 6.2844
+  type: 'test'
+  ...
+# Subtest: decision retry conflicts and validation failures persist without changing approved evidence
+ok 22 - decision retry conflicts and validation failures persist without changing approved evidence
+  ---
+  duration_ms: 45.5944
+  type: 'test'
+  ...
+# Subtest: legacy question endpoint returns an adapter response without bypassing Risk
+ok 23 - legacy question endpoint returns an adapter response without bypassing Risk
+  ---
+  duration_ms: 16.8684
+  type: 'test'
+  ...
+# Subtest: test page is reachable even when opening the POST URL in a browser
+ok 24 - test page is reachable even when opening the POST URL in a browser
+  ---
+  duration_ms: 4.6418
+  type: 'test'
+  ...
+# Subtest: handoff callback is persistent, idempotent, audit-bound and guarded against concurrent conflicts
+ok 25 - handoff callback is persistent, idempotent, audit-bound and guarded against concurrent conflicts
+  ---
+  duration_ms: 57.5205
+  type: 'test'
+  ...
+# Subtest: handoff reads and callbacks use the same configured API authentication
+ok 26 - handoff reads and callbacks use the same configured API authentication
+  ---
+  duration_ms: 2.2846
+  type: 'test'
+  ...
+# Subtest: Risk dispatch fails closed and persists the Owner configuration failure
+ok 27 - Risk dispatch fails closed and persists the Owner configuration failure
+  ---
+  duration_ms: 11.6671
+  type: 'test'
+  ...
+# Subtest: public funding ledger serializes concurrent tasks and survives restart with matching receipts
+ok 28 - public funding ledger serializes concurrent tasks and survives restart with matching receipts
+  ---
+  duration_ms: 61.1585
+  type: 'test'
+  ...
+# Subtest: plan revision after approval is persisted and blocks stale execution
+ok 29 - plan revision after approval is persisted and blocks stale execution
+  ---
+  duration_ms: 20.4761
+  type: 'test'
+  ...
+# Subtest: public cancellation preserves the audit and blocks all later Risk changes
+ok 30 - public cancellation preserves the audit and blocks all later Risk changes
+  ---
+  duration_ms: 24.5726
+  type: 'test'
+  ...
+# Subtest: failed atomic persistence cannot leave orphan allocations or a successful receipt
+ok 31 - failed atomic persistence cannot leave orphan allocations or a successful receipt
+  ---
+  duration_ms: 26.408
+  type: 'test'
+  ...
+# Subtest: public contract examples validate and preserve the request id
+ok 32 - public contract examples validate and preserve the request id
+  ---
+  duration_ms: 12.0099
+  type: 'test'
+  ...
+# Subtest: Agent output creates a Risk handoff from the same contract
+ok 33 - Agent output creates a Risk handoff from the same contract
+  ---
+  duration_ms: 79.4012
+  type: 'test'
+  ...
+# Subtest: response semantics reject broken references and authorization changes
+ok 34 - response semantics reject broken references and authorization changes
+  ---
+  duration_ms: 74.6845
+  type: 'test'
+  ...
+# Subtest: contract rejects the old unversioned bare request
+ok 35 - contract rejects the old unversioned bare request
+  ---
+  duration_ms: 1.3993
+  type: 'test'
+  ...
+# Subtest: contract keeps investment errors traceable
+ok 36 - contract keeps investment errors traceable
+  ---
+  duration_ms: 0.483
+  type: 'test'
+  ...
+# Subtest: failed task errors carry task, session and audit trace
+ok 37 - failed task errors carry task, session and audit trace
+  ---
+  duration_ms: 2.0658
+  type: 'test'
+  ...
+# Subtest: Risk Workbench adapter preserves evidence and stays read-only
+ok 38 - Risk Workbench adapter preserves evidence and stays read-only
+  ---
+  duration_ms: 30.1018
+  type: 'test'
+  ...
+# Subtest: mixed financial statements retain source spans, categories and unconfirmed dates
+ok 39 - mixed financial statements retain source spans, categories and unconfirmed dates
+  ---
+  duration_ms: 14.9764
+  type: 'test'
+  ...
+# Subtest: negation, third party text and multiple purposes never create financial facts
+ok 40 - negation, third party text and multiple purposes never create financial facts
+  ---
+  duration_ms: 0.6452
+  type: 'test'
+  ...
+# Subtest: injected instructions and caller fields cannot authorize memory or execution
+ok 41 - injected instructions and caller fields cannot authorize memory or execution
+  ---
+  duration_ms: 1.4122
+  type: 'test'
+  ...
+# Subtest: shopping and subscription missing evidence produces questions, not savings or cancellation
+ok 42 - shopping and subscription missing evidence produces questions, not savings or cancellation
+  ---
+  duration_ms: 0.6166
+  type: 'test'
+  ...
+# Subtest: money tokens stay literal including refunds, decimals and Chinese numerals
+ok 43 - money tokens stay literal including refunds, decimals and Chinese numerals
+  ---
+  duration_ms: 0.4134
+  type: 'test'
+  ...
+# Subtest: invalid, oversized and excessive inputs fail explicitly without truncation
+ok 44 - invalid, oversized and excessive inputs fail explicitly without truncation
+  ---
+  duration_ms: 3.6181
+  type: 'test'
+  ...
+# Subtest: preview never mutates the caller or fetches external data
+ok 45 - preview never mutates the caller or fetches external data
+  ---
+  duration_ms: 0.3908
+  type: 'test'
+  ...
+# Subtest: the shared error contract uses one trace vocabulary
+ok 46 - the shared error contract uses one trace vocabulary
+  ---
+  duration_ms: 11.6703
+  type: 'test'
+  ...
+# Subtest: health errors carry the shared envelope and retain the health source contract
+ok 47 - health errors carry the shared envelope and retain the health source contract
+  ---
+  duration_ms: 2.1441
+  type: 'test'
+  ...
+# Subtest: demo portfolio validates and preserves the weight invariant
+ok 48 - demo portfolio validates and preserves the weight invariant
+  ---
+  duration_ms: 5.2727
+  type: 'test'
+  ...
+# Subtest: invalid market values stop the tool instead of being guessed
+ok 49 - invalid market values stop the tool instead of being guessed
+  ---
+  duration_ms: 0.8628
+  type: 'test'
+  ...
+# Subtest: diagnosis is deterministic and exposes hidden concentration
+ok 50 - diagnosis is deterministic and exposes hidden concentration
+  ---
+  duration_ms: 122.792
+  type: 'test'
+  ...
+# Subtest: candidate generation creates three structured plans
+ok 51 - candidate generation creates three structured plans
+  ---
+  duration_ms: 25.72
+  type: 'test'
+  ...
+# Subtest: simulation rejects a tampered ActionProposal
+ok 52 - simulation rejects a tampered ActionProposal
+  ---
+  duration_ms: 25.4202
+  type: 'test'
+  ...
+# Subtest: simulation returns reproducible quantiles with fixed seed
+ok 53 - simulation returns reproducible quantiles with fixed seed
+  ---
+  duration_ms: 50.6618
+  type: 'test'
+  ...
+# Subtest: harness stops at the ownership boundary and supports clarification
+ok 54 - harness stops at the ownership boundary and supports clarification
+  ---
+  duration_ms: 33.8321
+  type: 'test'
+  ...
+# Subtest: harness resumes from the last completed checkpoint after a tool failure
+ok 55 - harness resumes from the last completed checkpoint after a tool failure
+  ---
+  duration_ms: 26.0392
+  type: 'test'
+  ...
+# Subtest: memory requires explicit consent and is session-only
+ok 56 - memory requires explicit consent and is session-only
+  ---
+  duration_ms: 1.3309
+  type: 'test'
+  ...
+# Subtest: paper trading fails closed and is idempotent
+ok 57 - paper trading fails closed and is idempotent
+  ---
+  duration_ms: 26.4598
+  type: 'test'
+  ...
+# Subtest: T01: missing review evidence stays at input validation
+ok 58 - T01: missing review evidence stays at input validation
+  ---
+  duration_ms: 2.9967
+  type: 'test'
+  ...
+# Subtest: T02: the request binds schema, data mode, execution mode and policy versions
+ok 59 - T02: the request binds schema, data mode, execution mode and policy versions
+  ---
+  duration_ms: 1.8454
+  type: 'test'
+  ...
+# Subtest: T03: Risk approval creates one expiring approval bound to the plan hash
+ok 60 - T03: Risk approval creates one expiring approval bound to the plan hash
+  ---
+  duration_ms: 19.7905
+  type: 'test'
+  ...
+# Subtest: T04: execution remains blocked before Risk and approval
+ok 61 - T04: execution remains blocked before Risk and approval
+  ---
+  duration_ms: 5.0712
+  type: 'test'
+  ...
+# Subtest: T05: explicit Memory consent is visible and can be written through the existing Memory rule
+ok 62 - T05: explicit Memory consent is visible and can be written through the existing Memory rule
+  ---
+  duration_ms: 5.8031
+  type: 'test'
+  ...
+# Subtest: T06: handoff and audit share the same trace identifiers
+ok 63 - T06: handoff and audit share the same trace identifiers
+  ---
+  duration_ms: 3.9189
+  type: 'test'
+  ...
+# Subtest: T07: Risk rejection is terminal and cannot reach simulation
+ok 64 - T07: Risk rejection is terminal and cannot reach simulation
+  ---
+  duration_ms: 13.3493
+  type: 'test'
+  ...
+# Subtest: T08: unsupported live execution mode is rejected before model invocation
+ok 65 - T08: unsupported live execution mode is rejected before model invocation
+  ---
+  duration_ms: 0.5845
+  type: 'test'
+  ...
+# Subtest: T09: proposal hash changes cannot be approved
+ok 66 - T09: proposal hash changes cannot be approved
+  ---
+  duration_ms: 4.8047
+  type: 'test'
+  ...
+# Subtest: T10: Risk callback with a different task or audit is blocked
+ok 67 - T10: Risk callback with a different task or audit is blocked
+  ---
+  duration_ms: 3.4526
+  type: 'test'
+  ...
+# Subtest: T11: rule fallback requires an explicitly enabled backend mode
+ok 68 - T11: rule fallback requires an explicitly enabled backend mode
+  ---
+  duration_ms: 3.6101
+  type: 'test'
+  ...
+# Subtest: T12: an expired approval blocks both approval and simulation
+ok 69 - T12: an expired approval blocks both approval and simulation
+  ---
+  duration_ms: 10.8634
+  type: 'test'
+  ...
+# Subtest: T13: the same idempotency key replays the same task and rejects changed input
+ok 70 - T13: the same idempotency key replays the same task and rejects changed input
+  ---
+  duration_ms: 3.2754
+  type: 'test'
+  ...
+# Subtest: T14: a model failure creates a blocked auditable record with no execution authority
+ok 71 - T14: a model failure creates a blocked auditable record with no execution authority
+  ---
+  duration_ms: 3.1228
+  type: 'test'
+  ...
+# Subtest: funding plans require explicit synthetic confirmation and precise minor units
+ok 72 - funding plans require explicit synthetic confirmation and precise minor units
+  ---
+  duration_ms: 7.3565
+  type: 'test'
+  ...
+# Subtest: overlapping tasks and duplicate requests cannot spend the same simulated capacity twice
+ok 73 - overlapping tasks and duplicate requests cannot spend the same simulated capacity twice
+  ---
+  duration_ms: 37.8371
+  type: 'test'
+  ...
+# Subtest: simultaneous retries on one approved task return the same receipt
+ok 74 - simultaneous retries on one approved task return the same receipt
+  ---
+  duration_ms: 9.6475
+  type: 'test'
+  ...
+# Subtest: changed funding purposes invalidate prior approval even if remaining funds suffice
+ok 75 - changed funding purposes invalidate prior approval even if remaining funds suffice
+  ---
+  duration_ms: 17.8344
+  type: 'test'
+  ...
+# Subtest: model NO_ACTION and injected external text cannot bypass human approval or rent protection
+ok 76 - model NO_ACTION and injected external text cannot bypass human approval or rent protection
+  ---
+  duration_ms: 15.745
+  type: 'test'
+  ...
+# Subtest: revising a plan preserves previous allocations and exposes any resulting deficit
+ok 77 - revising a plan preserves previous allocations and exposes any resulting deficit
+  ---
+  duration_ms: 2.0435
+  type: 'test'
+  ...
+# Subtest: reconfirming the same purposes keeps the revision and cancellation is terminal
+ok 78 - reconfirming the same purposes keeps the revision and cancellation is terminal
+  ---
+  duration_ms: 7.484
+  type: 'test'
+  ...
+# Subtest: HTTP flows: pages, independent cookies, review gating, import failure and disabled execution
+    # Subtest: all page assets load with the right type including the separate product stylesheet
+    ok 1 - all page assets load with the right type including the separate product stylesheet
+      ---
+      duration_ms: 44.9857
+      type: 'test'
+      ...
+    1..1
+ok 79 - HTTP flows: pages, independent cookies, review gating, import failure and disabled execution
+  ---
+  duration_ms: 635.9123
+  type: 'test'
+  ...
+# Subtest: legacy question input maps into the unified review contract
+ok 80 - legacy question input maps into the unified review contract
+  ---
+  duration_ms: 25.7933
+  type: 'test'
+  ...
+# Subtest: market brief fixture validates and flags abnormal moves without inventing attribution
+ok 81 - market brief fixture validates and flags abnormal moves without inventing attribution
+  ---
+  duration_ms: 6.7045
+  type: 'test'
+  ...
+# Subtest: Core Agent carries market context to Risk while preserving Quant outputs
+ok 82 - Core Agent carries market context to Risk while preserving Quant outputs
+  ---
+  duration_ms: 152.0155
+  type: 'test'
+  ...
+# Subtest: duplicate market observations stop at the Core Agent input boundary
+ok 83 - duplicate market observations stop at the Core Agent input boundary
+  ---
+  duration_ms: 1.9789
+  type: 'test'
+  ...
+# Subtest: 2026-10-09 market brief replays with source conflict evidence and no Quant drift
+ok 84 - 2026-10-09 market brief replays with source conflict evidence and no Quant drift
+  ---
+  duration_ms: 64.0706
+  type: 'test'
+  ...
+# Subtest: ledger totals use net receipts and never add settled bills to opening cash
+ok 85 - ledger totals use net receipts and never add settled bills to opening cash
+  ---
+  duration_ms: 33.071
+  type: 'test'
+  ...
+# Subtest: the payout equation keeps fees and refunds visible
+ok 86 - the payout equation keeps fees and refunds visible
+  ---
+  duration_ms: 3.1853
+  type: 'test'
+  ...
+# Subtest: duplicate imports are idempotent and conflicting duplicates are rejected atomically
+ok 87 - duplicate imports are idempotent and conflicting duplicates are rejected atomically
+  ---
+  duration_ms: 5.0784
+  type: 'test'
+  ...
+# Subtest: cents, dates, status, currency and quantity validation reject invalid imports
+ok 88 - cents, dates, status, currency and quantity validation reject invalid imports
+  ---
+  duration_ms: 2.0006
+  type: 'test'
+  ...
+# Subtest: review requires bill viewing and explicit confirmation of the current revision
+ok 89 - review requires bill viewing and explicit confirmation of the current revision
+  ---
+  duration_ms: 3.4934
+  type: 'test'
+  ...
+# Subtest: a replacement resets review and followups even after a previously confirmed import
+ok 90 - a replacement resets review and followups even after a previously confirmed import
+  ---
+  duration_ms: 2.9976
+  type: 'test'
+  ...
+# Subtest: same-item price and quantity effects sum to the actual purchase increase
+ok 91 - same-item price and quantity effects sum to the actual purchase increase
+  ---
+  duration_ms: 1.259
+  type: 'test'
+  ...
+# Subtest: mixed items or absent baseline do not get invented unit-price explanations
+ok 92 - mixed items or absent baseline do not get invented unit-price explanations
+  ---
+  duration_ms: 1.5564
+  type: 'test'
+  ...
+# Subtest: arrival delay exposes an earlier cash gap without moving supplier due dates
+ok 93 - arrival delay exposes an earlier cash gap without moving supplier due dates
+  ---
+  duration_ms: 2.6119
+  type: 'test'
+  ...
+# Subtest: overdue payments are reserved tomorrow and not subtracted repeatedly
+ok 94 - overdue payments are reserved tomorrow and not subtracted repeatedly
+  ---
+  duration_ms: 1.4499
+  type: 'test'
+  ...
+# Subtest: separate merchant sessions cannot see each other’s ledger or confirmation
+ok 95 - separate merchant sessions cannot see each other’s ledger or confirmation
+  ---
+  duration_ms: 2.6089
+  type: 'test'
+  ...
+# Subtest: empty ledger has a flat known-cash forecast without fabricated warnings
+ok 96 - empty ledger has a flat known-cash forecast without fabricated warnings
+  ---
+  duration_ms: 0.6475
+  type: 'test'
+  ...
+# Subtest: negative opening cash is the first gap even when next-day receipts cover it
+ok 97 - negative opening cash is the first gap even when next-day receipts cover it
+  ---
+  duration_ms: 1.3096
+  type: 'test'
+  ...
+# Subtest: notice status moves through plain-language states and resets after replacement
+ok 98 - notice status moves through plain-language states and resets after replacement
+  ---
+  duration_ms: 8.4052
+  type: 'test'
+  ...
+# Subtest: single receipt delay scenario moves only the selected income bill
+ok 99 - single receipt delay scenario moves only the selected income bill
+  ---
+  duration_ms: 1.912
+  type: 'test'
+  ...
+# Subtest: model review calls the configured Responses endpoint and stays read-only
+ok 100 - model review calls the configured Responses endpoint and stays read-only
+  ---
+  duration_ms: 72.2504
+  type: 'test'
+  ...
+# Subtest: chat completions request uses the configured JSON object response format
+ok 101 - chat completions request uses the configured JSON object response format
+  ---
+  duration_ms: 1.6738
+  type: 'test'
+  ...
+# Subtest: model failure is explicit unless rule fallback is requested
+ok 102 - model failure is explicit unless rule fallback is requested
+  ---
+  duration_ms: 263.5907
+  type: 'test'
+  ...
+# Subtest: transient model failures retry once and expose the retry in the audit
+ok 103 - transient model failures retry once and expose the retry in the audit
+  ---
+  duration_ms: 272.6195
+  type: 'test'
+  ...
+# Subtest: unsupported model actions are rejected before gateway output
+ok 104 - unsupported model actions are rejected before gateway output
+  ---
+  duration_ms: 3.7609
+  type: 'test'
+  ...
+# Subtest: Workers AI invokes the bound model without an API key and retains provider output
+ok 105 - Workers AI invokes the bound model without an API key and retains provider output
+  ---
+  duration_ms: 5.2363
+  type: 'test'
+  ...
+# Subtest: public configuration disallows requested fallback when real inference fails
+ok 106 - public configuration disallows requested fallback when real inference fails
+  ---
+  duration_ms: 255.813
+  type: 'test'
+  ...
+# Subtest: combined input preserves both bill and news
+ok 107 - combined input preserves both bill and news
+  ---
+  duration_ms: 1.2088
+  type: 'test'
+  ...
+# Subtest: attempt configuration is bounded and fractional configuration cannot skip inference
+ok 108 - attempt configuration is bounded and fractional configuration cannot skip inference
+  ---
+  duration_ms: 1.12
+  type: 'test'
+  ...
+# Subtest: DeepSeek uses the domestic chat endpoint and keeps the shared JSON contract
+ok 109 - DeepSeek uses the domestic chat endpoint and keeps the shared JSON contract
+  ---
+  duration_ms: 0.8346
+  type: 'test'
+  ...
+# Subtest: DeepSeek ignores OpenAI credentials, model and endpoint aliases
+ok 110 - DeepSeek ignores OpenAI credentials, model and endpoint aliases
+  ---
+  duration_ms: 0.4015
+  type: 'test'
+  ...
+# Subtest: missing DeepSeek configuration fails before HTTP with auditable blocked output
+ok 111 - missing DeepSeek configuration fails before HTTP with auditable blocked output
+  ---
+  duration_ms: 4.9358
+  type: 'test'
+  ...
+# Subtest: DeepSeek chat adapter carries the full schema and records a verifiable model response
+ok 112 - DeepSeek chat adapter carries the full schema and records a verifiable model response
+  ---
+  duration_ms: 2.8244
+  type: 'test'
+  ...
+# Subtest: schema-invalid responses cannot silently become safe-looking proposals
+ok 113 - schema-invalid responses cannot silently become safe-looking proposals
+  ---
+  duration_ms: 10.3384
+  type: 'test'
+  ...
+# Subtest: scenario routing and output conversion stay explicit
+ok 114 - scenario routing and output conversion stay explicit
+  ---
+  duration_ms: 0.6602
+  type: 'test'
+  ...
+# Subtest: persistent transient failures stop at the cap and retain retry evidence
+ok 115 - persistent transient failures stop at the cap and retain retry evidence
+  ---
+  duration_ms: 778.0136
+  type: 'test'
+  ...
+# Subtest: authentication errors, invalid proposals and unsafe actions are never retried
+ok 116 - authentication errors, invalid proposals and unsafe actions are never retried
+  ---
+  duration_ms: 1.817
+  type: 'test'
+  ...
+# Subtest: Retry-After longer than the shared time budget returns a failure without another call
+ok 117 - Retry-After longer than the shared time budget returns a failure without another call
+  ---
+  duration_ms: 1.0233
+  type: 'test'
+  ...
+# Subtest: Workers AI timeout uses one total budget and a late result cannot change the failed record
+ok 118 - Workers AI timeout uses one total budget and a late result cannot change the failed record
+  ---
+  duration_ms: 43.5478
+  type: 'test'
+  ...
+# Subtest: HTTP timeout aborts the request and does not create another attempt after the budget
+ok 119 - HTTP timeout aborts the request and does not create another attempt after the budget
+  ---
+  duration_ms: 31.3214
+  type: 'test'
+  ...
+# Subtest: owner signatures are deterministic and reject tampering
+ok 120 - owner signatures are deterministic and reject tampering
+  ---
+  duration_ms: 17.2568
+  type: 'test'
+  ...
+# Subtest: missing actor secrets remain visibly demo-only and can be made fail closed
+ok 121 - missing actor secrets remain visibly demo-only and can be made fail closed
+  ---
+  duration_ms: 1.81
+  type: 'test'
+  ...
+# Subtest: Risk dispatch signs one handoff and records the upstream response
+ok 122 - Risk dispatch signs one handoff and records the upstream response
+  ---
+  duration_ms: 56.4346
+  type: 'test'
+  ...
+# Subtest: Risk dispatch refuses to pretend delivery when the Owner is not configured
+ok 123 - Risk dispatch refuses to pretend delivery when the Owner is not configured
+  ---
+  duration_ms: 0.813
+  type: 'test'
+  ...
+# Subtest: workflow dispatch stays auditable and retries only after a failed handoff
+ok 124 - workflow dispatch stays auditable and retries only after a failed handoff
+  ---
+  duration_ms: 12.3862
+  type: 'test'
+  ...
+# Subtest: Risk and approval records keep verified actor evidence
+ok 125 - Risk and approval records keep verified actor evidence
+  ---
+  duration_ms: 6.0244
+  type: 'test'
+  ...
+# Subtest: data date labels describe age, not automatic real-time freshness
+ok 126 - data date labels describe age, not automatic real-time freshness
+  ---
+  duration_ms: 6.7502
+  type: 'test'
+  ...
+# Subtest: negative drawdown compares closer to zero; CURRENT is never a candidate
+ok 127 - negative drawdown compares closer to zero; CURRENT is never a candidate
+  ---
+  duration_ms: 2.3705
+  type: 'test'
+  ...
+# Subtest: ties prefer lower turnover; invalid and empty plans have no invented winner
+ok 128 - ties prefer lower turnover; invalid and empty plans have no invented winner
+  ---
+  duration_ms: 0.6286
+  type: 'test'
+  ...
+# Subtest: gap changes with delay and opening negative cash is reported as already negative
+ok 129 - gap changes with delay and opening negative cash is reported as already negative
+  ---
+  duration_ms: 30.149
+  type: 'test'
+  ...
+# Subtest: due-today unsettled receipts agree with forecast exclusions
+ok 130 - due-today unsettled receipts agree with forecast exclusions
+  ---
+  duration_ms: 2.0058
+  type: 'test'
+  ...
+# Subtest: bill priority surfaces pending dates without changing the ledger
+ok 131 - bill priority surfaces pending dates without changing the ledger
+  ---
+  duration_ms: 2.2928
+  type: 'test'
+  ...
+# Subtest: empty merchant overview does not fabricate bills or gaps
+ok 132 - empty merchant overview does not fabricate bills or gaps
+  ---
+  duration_ms: 0.732
+  type: 'test'
+  ...
+# Subtest: numeric strings, mismatched replay dates and missing snapshot amounts are rejected
+ok 133 - numeric strings, mismatched replay dates and missing snapshot amounts are rejected
+  ---
+  duration_ms: 8.0353
+  type: 'test'
+  ...
+# Subtest: negative correlation is not labelled as same-direction concentration; cash is separate
+ok 134 - negative correlation is not labelled as same-direction concentration; cash is separate
+  ---
+  duration_ms: 2.1055
+  type: 'test'
+  ...
+# Subtest: net return equals curve endpoint and holding A matches baseline scenarios exactly
+ok 135 - net return equals curve endpoint and holding A matches baseline scenarios exactly
+  ---
+  duration_ms: 64.5358
+  type: 'test'
+  ...
+# Subtest: C includes the price path of a new bond holding even when the original portfolio lacks it
+ok 136 - C includes the price path of a new bond holding even when the original portfolio lacks it
+  ---
+  duration_ms: 70.49
+  type: 'test'
+  ...
+# Subtest: extreme concentration and zero cash still produce auditable plans
+ok 137 - extreme concentration and zero cash still produce auditable plans
+  ---
+  duration_ms: 58.149
+  type: 'test'
+  ...
+# Subtest: stale or fabricated health reports do not influence strategy generation
+ok 138 - stale or fabricated health reports do not influence strategy generation
+  ---
+  duration_ms: 1.1243
+  type: 'test'
+  ...
+# Subtest: changing inputs invalidates cached artifacts; identical completed requests reuse the result
+ok 139 - changing inputs invalidates cached artifacts; identical completed requests reuse the result
+  ---
+  duration_ms: 37.1345
+  type: 'test'
+  ...
+# Subtest: clearing risk preferences requests clarification and unknown tasks are not recreated
+ok 140 - clearing risk preferences requests clarification and unknown tasks are not recreated
+  ---
+  duration_ms: 15.2154
+  type: 'test'
+  ...
+# Subtest: the circuit breaker stops repeated tool failure instead of running forever
+ok 141 - the circuit breaker stops repeated tool failure instead of running forever
+  ---
+  duration_ms: 1.2047
+  type: 'test'
+  ...
+# Subtest: HTTP model-to-Risk-to-approval-to-simulation chain is queryable
+    # Subtest: Risk dispatch fails closed and leaves an auditable failure when no Owner is configured
+    ok 1 - Risk dispatch fails closed and leaves an auditable failure when no Owner is configured
+      ---
+      duration_ms: 11.0492
+      type: 'test'
+      ...
+    # Subtest: HTTP retries require exact approval evidence and return traceable conflicts
+    ok 2 - HTTP retries require exact approval evidence and return traceable conflicts
+      ---
+      duration_ms: 21.8949
+      type: 'test'
+      ...
+    # Subtest: local funding endpoints preserve plan revisions and share the workflow guard
+    ok 3 - local funding endpoints preserve plan revisions and share the workflow guard
+      ---
+      duration_ms: 32.4952
+      type: 'test'
+      ...
+    1..3
+ok 142 - HTTP model-to-Risk-to-approval-to-simulation chain is queryable
+  ---
+  duration_ms: 238.9752
+  type: 'test'
+  ...
+# Subtest: golden path keeps one task across model, Risk, approval, simulation and audit
+ok 143 - golden path keeps one task across model, Risk, approval, simulation and audit
+  ---
+  duration_ms: 28.5291
+  type: 'test'
+  ...
+# Subtest: Risk rejection remains terminal for execution
+ok 144 - Risk rejection remains terminal for execution
+  ---
+  duration_ms: 6.8795
+  type: 'test'
+  ...
+# Subtest: proposal hash prevents approval after parameters change
+ok 145 - proposal hash prevents approval after parameters change
+  ---
+  duration_ms: 3.2316
+  type: 'test'
+  ...
+# Subtest: model failure creates an auditable blocked workflow
+ok 146 - model failure creates an auditable blocked workflow
+  ---
+  duration_ms: 2.7071
+  type: 'test'
+  ...
+# Subtest: legacy default-only retries reuse their original record and changed inputs still conflict
+ok 147 - legacy default-only retries reuse their original record and changed inputs still conflict
+  ---
+  duration_ms: 10.4777
+  type: 'test'
+  ...
+# Subtest: terminal workflow states cannot be mutated by repeated Risk or approval calls
+ok 148 - terminal workflow states cannot be mutated by repeated Risk or approval calls
+  ---
+  duration_ms: 8.6799
+  type: 'test'
+  ...
+# Subtest: handoff is a detached export with trace identifiers and model evidence
+ok 149 - handoff is a detached export with trace identifiers and model evidence
+  ---
+  duration_ms: 22.8425
+  type: 'test'
+  ...
+# Subtest: every identity mismatch is rejected and recorded without allowing execution
+ok 150 - every identity mismatch is rejected and recorded without allowing execution
+  ---
+  duration_ms: 11.9912
+  type: 'test'
+  ...
+# Subtest: callback rejects unsupported fields, versions, decisions, and incomplete evidence
+ok 151 - callback rejects unsupported fields, versions, decisions, and incomplete evidence
+  ---
+  duration_ms: 7.8137
+  type: 'test'
+  ...
+# Subtest: callback approval still requires human approval; duplicate after simulation has no side effects
+ok 152 - callback approval still requires human approval; duplicate after simulation has no side effects
+  ---
+  duration_ms: 9.1901
+  type: 'test'
+  ...
+# Subtest: rejected and more-info callbacks remain blocked and accept only identical retries
+ok 153 - rejected and more-info callbacks remain blocked and accept only identical retries
+  ---
+  duration_ms: 8.6576
+  type: 'test'
+  ...
+# Subtest: callback cannot adopt or replace a decision recorded through the old endpoint
+ok 154 - callback cannot adopt or replace a decision recorded through the old endpoint
+  ---
+  duration_ms: 3.2674
+  type: 'test'
+  ...
+# Subtest: a callback racing cancellation must not restore the cancelled task
+ok 155 - a callback racing cancellation must not restore the cancelled task
+  ---
+  duration_ms: 30.1452
+  type: 'test'
+  ...
+# Subtest: simultaneous identical callbacks record exactly once in the shared workflow
+ok 156 - simultaneous identical callbacks record exactly once in the shared workflow
+  ---
+  duration_ms: 5.6444
+  type: 'test'
+  ...
+# Subtest: Risk retries require the same normalized reviewer, decision and reason
+ok 157 - Risk retries require the same normalized reviewer, decision and reason
+  ---
+  duration_ms: 7.8229
+  type: 'test'
+  ...
+# Subtest: approval retries cannot silently substitute a different person or reason
+ok 158 - approval retries cannot silently substitute a different person or reason
+  ---
+  duration_ms: 5.6487
+  type: 'test'
+  ...
+# Subtest: missing or overlong reasons cannot be hidden by duplicate decisions
+ok 159 - missing or overlong reasons cannot be hidden by duplicate decisions
+  ---
+  duration_ms: 10.1276
+  type: 'test'
+  ...
+# Subtest: a cancellation accepted first rejects late Risk callbacks and keeps its audit
+ok 160 - a cancellation accepted first rejects late Risk callbacks and keeps its audit
+  ---
+  duration_ms: 4.462
+  type: 'test'
+  ...
+# Subtest: competing callbacks cannot replace the accepted evidence or lose the blocked event
+ok 161 - competing callbacks cannot replace the accepted evidence or lose the blocked event
+  ---
+  duration_ms: 3.8663
+  type: 'test'
+  ...
+# Subtest: decision labels accept 500 characters but never truncate overlong identities
+ok 162 - decision labels accept 500 characters but never truncate overlong identities
+  ---
+  duration_ms: 5.135
+  type: 'test'
+  ...
+1..162
+# tests 166
+# suites 0
+# pass 166
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2206.0512

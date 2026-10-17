@@ -1,0 +1,109 @@
+{
+  "checked_at": "2026-10-17T14:07:19.819745+00:00",
+  "scope": "Offline retained synthetic evidence required-key and cross-object trace checks; NOT full JSON Schema validation, NOT a new public request or Risk joint acceptance",
+  "source_sha256": "97bd2689b4f810d1432d74416c45521d19cc98e1290fbcffaf7eb3e8407f0fab",
+  "checks": [
+    {
+      "name": "ReviewRequest required keys",
+      "passed": true
+    },
+    {
+      "name": "WorkflowRecord required keys",
+      "passed": true
+    },
+    {
+      "name": "workflow and schema versions",
+      "passed": true
+    },
+    {
+      "name": "nonempty session identifier",
+      "passed": true
+    },
+    {
+      "name": "audit matches request_id",
+      "passed": true
+    },
+    {
+      "name": "audit matches task_id",
+      "passed": true
+    },
+    {
+      "name": "audit matches run_id",
+      "passed": true
+    },
+    {
+      "name": "event 1 six identifiers match",
+      "passed": true
+    },
+    {
+      "name": "event 2 six identifiers match",
+      "passed": true
+    },
+    {
+      "name": "event 3 six identifiers match",
+      "passed": true
+    },
+    {
+      "name": "event 4 six identifiers match",
+      "passed": true
+    },
+    {
+      "name": "event 5 six identifiers match",
+      "passed": true
+    },
+    {
+      "name": "event 6 six identifiers match",
+      "passed": true
+    },
+    {
+      "name": "event 7 six identifiers match",
+      "passed": true
+    },
+    {
+      "name": "event 8 six identifiers match",
+      "passed": true
+    },
+    {
+      "name": "event 9 six identifiers match",
+      "passed": true
+    },
+    {
+      "name": "handoff task and run binding",
+      "passed": true
+    },
+    {
+      "name": "handoff audit binding",
+      "passed": true
+    },
+    {
+      "name": "proposal hash binding",
+      "passed": true
+    },
+    {
+      "name": "Risk remains pending",
+      "passed": true
+    },
+    {
+      "name": "execution denied at both boundaries",
+      "passed": true
+    },
+    {
+      "name": "dispatch failure retained",
+      "passed": true
+    },
+    {
+      "name": "public retained checks",
+      "passed": true
+    }
+  ],
+  "passed": 23,
+  "failed": 0,
+  "audit_event_count": 9,
+  "schema_optional_session": true,
+  "unmapped_health_fields": [
+    "task_state",
+    "artifacts",
+    "tool_results",
+    "audit_evidence"
+  ]
+}

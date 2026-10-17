@@ -63,3 +63,7 @@ flowchart LR
 10. UI 只消费状态与证据；Quant 计算归原工具；Memory consent 和生命周期归 Memory
 
 图像版与字段归属见 core-agent-integration-guide-2026-10-15.docx；未完成独立 Risk 正式审核闭环。
+
+## 2026-10-17 当前接口修订
+
+当前模型 WorkflowRecord 已定义 session_id（Schema 可选），9 条审计事件的六编号关联已核验。健康 Harness 与模型 ReviewWorkflowStore 为两条存储路径；跨链路四响应字段映射待 Backend。正式 Risk 审核闭环尚未验收。完整职责、时序、必填字段与图像见 core-agent-integration-guide-2026-10-17.md 及同名 DOCX。本节修正上方历史限制，不改变运行时接口。

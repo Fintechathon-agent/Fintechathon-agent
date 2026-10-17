@@ -100,3 +100,7 @@ sequenceDiagram
 12. 12 UI 查询 task / run / audit；Memory 无自动长期读写；冲突市场上下文仅待复核
 
 图像版与字段归属见 core-agent-integration-guide-2026-10-15.docx；未完成独立 Risk 正式审核闭环。
+
+## 2026-10-17 当前接口修订
+
+当前入口错误使用 core-agent-error.v1；模型创建 session 关联后调用模型，绑定提议与审计，显式签名派发 Risk；503 写失败审计并等待，回调校验后仍只有 PAPER。正式 Risk 审核闭环尚未验收。完整职责、时序、必填字段与图像见 core-agent-integration-guide-2026-10-17.md 及同名 DOCX。本节修正上方历史限制，不改变运行时接口。
