@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-17",
+  "status": "ADAPTER_DEPLOYED_BAILIAN_NOT_ACTIVATED",
+  "backend": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+  "code_commit": "e8800aaff6cbd0ee5040949efeb115ab0cdff1ca",
+  "deployment_version": "56db35f0-63d6-4015-aa4b-944a9112633d",
+  "previous_deployment_version": "5ddf34f5-21cc-4505-8cbb-1946cf73070c",
+  "active_provider": "cloudflare_workers_ai",
+  "bailian": {
+    "workspace_configured": false,
+    "key_configured": false,
+    "paid_calls_enabled": false,
+    "authorized_budget_cny": 0,
+    "actual_inference_calls": 0
+  },
+  "verification": {
+    "local_tests": {
+      "passed": 166,
+      "failed": 0,
+      "skipped": 0,
+      "provider": "mock"
+    },
+    "syntax": "PASS",
+    "bailian_dry_run": "PASS",
+    "preflight": {
+      "status": "NOT_READY",
+      "exit_code": 2
+    },
+    "public": {
+      "checked_at": "2026-10-17T13:41:22.1930531Z",
+      "health_http": 200,
+      "health": {
+        "status": "ok",
+        "service": "core-agent",
+        "contract_version": "investment-agent.v1",
+        "review_endpoint": "/api/review",
+        "docs": "/docs",
+        "model": {
+          "provider": "cloudflare_workers_ai",
+          "name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "configured": true
+        },
+        "audit_storage": "durable_object"
+      },
+      "docs_http": 200,
+      "paid_model_test_requests": 0,
+      "scope": "GET health/docs only; no model inference"
+    }
+  },
+  "china_mainland_end_to_end_latency": {
+    "status": "NOT_MEASURED",
+    "reason": "No paid inference test authorized; no confirmed mainland client network measurement."
+  },
+  "joint_acceptance": "NOT_COMPLETED"
+}

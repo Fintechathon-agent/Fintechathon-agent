@@ -23,7 +23,7 @@
 | 真实百炼 | 未接通、未测试 | 业务空间、Key 未配置；付费开关为 false、预算 0 |
 | 国内网络速度 | 未测试 | 没有真实端到端模型测量，不能拿本地测试毫秒数或健康检查替代 |
 | 联合验收 | 未完成 | 真实账户、工具服务、身份审批、Risk Owner 接入仍需对应模块一起确认 |
-| 线上现有服务 | 保持 Workers AI 配置 | 本轮后续仅做健康检查，不进行收费模型调用；部署证据见独立记录 |
+| 线上现有服务 | 新适配代码已部署，保持 Workers AI 配置 | GET /health 与 /docs 均为 HTTP 200；没有收费模型测试，[部署证据](bailian-deployment-evidence-2026-10-17.json) |
 
 本地测试中的 `call_succeeded=true` 仅表示测试替身返回成功；不代表向阿里云发过请求。
 
@@ -75,6 +75,8 @@
 按 [官方首次调用说明](https://help.aliyun.com/zh/model-studio/first-api-call-to-qwen)、[结构化输出](https://help.aliyun.com/zh/model-studio/qwen-structured-output)、[Chat 接口参数](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions/) 核对北京专属域名、json_object、enable_thinking=false 与 max_tokens。这是兼容接口适配，未使用 OpenAI 服务。
 
 团队代码基线 `eddae8b093813cf8c32ed8aba979a7e9ca51ef08`，个人代码基线 `8ac2e5f7f4cfed8583540a709e3a25e2298fc7d9`；上一线上版本 `5ddf34f5-21cc-4505-8cbb-1946cf73070c`。不删除旧版本或数据；需要回退时从这些提交建恢复分支，或恢复对应 Cloudflare 版本，不强制改共享历史。
+
+本轮已部署代码提交 `e8800aaff6cbd0ee5040949efeb115ab0cdff1ca`，部署版本 `56db35f0-63d6-4015-aa4b-944a9112633d`。使用原 wrangler.toml，未应用禁用状态的百炼示例配置；只是预先安装适配能力。后续提交只补本次部署证据，不改变运行代码。
 
 ## 今日 Update 补充
 
