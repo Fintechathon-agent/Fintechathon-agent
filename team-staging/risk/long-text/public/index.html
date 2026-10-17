@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>生活资金 · 长文本风险工作台</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body><main>
+  <header><a class="brand" href="/">生活资金<span>LONG TEXT LAB</span></a><span class="tag">临时共创版 · 本地测算</span></header>
+  <div class="hero"><p class="eyebrow">让每一笔生活安排，都有依据</p><h1>说清生活计划，<br>看见资金影响。</h1><p>房租、学费、工资和投资写在一起也可以。先拆分，逐项核对，再查看生活资金是否受到影响。</p></div>
+  <p class="notice">此入口用于虚构场景联调，不连接真实账户、不执行付款或交易。风险结论仅针对已核对输入与所选时间区间。</p>
+  <nav class="steps" aria-label="分析步骤"><span id="step-input" class="active">01 写下安排</span><span id="step-review">02 核对事项</span><span id="step-result">03 查看影响</span></nav>
+  <p id="error" role="alert"></p><p id="status" role="status" aria-live="polite"></p>
+  <section aria-labelledby="input-title"><div class="section-head"><h2 id="input-title">一段话，说说你的安排</h2><span id="counter">0 / 20,000</span></div>
+    <label for="source">生活计划原文</label><textarea id="source" maxlength="20000" rows="6" placeholder="例如：我有现金5万元，保底1万元，每月5号交房租3500元，下个月20号交学费2万元，还想投资2万元。"></textarea>
+    <div class="samples"><span>试试虚构案例</span><button type="button" data-example="conflict" class="link">学费与投资冲突</button><button type="button" data-example="safe" class="link">留足生活资金</button><button type="button" data-example="uncertain" class="link">条件收入与已付款</button></div>
+    <div class="input-row"><div><label for="as-of">分析基准日（北京时间）</label><input id="as-of" type="date" min="2000-01-01" max="2099-01-01" required></div><div><label for="horizon">未来测算区间</label><select id="horizon"><option value="30">30天</option><option value="90" selected>90天</option><option value="180">180天</option><option value="365">365天</option></select></div><button id="parse" class="primary" type="button">拆分并核对 →</button></div>
+  </section>
+  <section id="review" hidden aria-labelledby="review-title"><div class="section-head"><h2 id="review-title">每件事，都和原文对得上</h2><span id="revision" class="tag"></span></div><p class="muted">规则识别可能不完整。请核对金额、日期、周期和是否计入；没有把握的地方会保留为待补信息。</p>
+    <div id="items"></div>
+    <h3>本次采用的资金事实</h3><p class="muted">这里是统一测算口径。现金包含已经到账的钱；保底须独立于下方生活支出，已有占用须与这些预留互不重复。没有的项目请明确填0。</p>
+    <div class="profile-grid"><div><label for="cash">账面现金（元）</label><input id="cash" type="number" step="0.01" min="0" placeholder="未知"></div><div><label for="floor">独立现金保底（元）</label><input id="floor" type="number" step="0.01" min="0" placeholder="未知"></div><div><label for="holds">已有冻结或任务占用（元）</label><input id="holds" type="number" step="0.01" min="0" placeholder="没有则填0"></div><div><label for="fees">投资计划合计费用（元）</label><input id="fees" type="number" step="0.01" min="0" placeholder="确认无费用则填0"></div></div>
+    <div id="questions" class="questions"></div>
+    <label class="check"><input id="nonoverlap" type="checkbox">我已核对上面的虚构资金事实，现金保底、生活支出和已有占用没有重复计算。</label>
+    <div class="actions"><button id="save" type="button" class="secondary">保存纠错，更新待补信息</button><button id="confirm" type="button" class="primary">确认本版本并测算 →</button></div>
+  </section>
+  <section id="result" hidden aria-labelledby="result-title"><div class="section-head"><h2 id="result-title">生活资金影响</h2><span id="decision" class="tag"></span></div><p id="summary" class="result-summary"></p><div id="metrics" class="metric-grid"></div>
+    <div id="reasons"></div><h3>收支时间线</h3><p class="muted">投资合计按分析日一次性占用。未来工资仅进入收支情景，不增加今天能投入的现金。</p><div class="table-scroll"><table><thead><tr><th>日期</th><th>事项</th><th>变动（元）</th><th>剩余可结算现金（元）</th></tr></thead><tbody id="timeline"></tbody></table></div>
+    <details><summary>计算范围与假设</summary><ul id="assumptions"></ul></details>
+    <details><summary>查看结构化结果与本次审计</summary><pre id="json"></pre></details>
+    <div class="actions"><button id="download" class="secondary" type="button">下载核对与风险 JSON</button><button id="review-draft" class="secondary" type="button">导出模型复核请求</button><button id="model-review" class="secondary" type="button" hidden>在线只读复核</button></div><p id="model-status" role="status"></p><pre id="model-output" hidden></pre>
+  </section>
+  <footer>原文仅保留在本地进程的临时草稿中，30分钟过期，重启清空。刷新页面会丢失当前草稿入口，请按需下载结果。在线复核仅在服务端显式启用后可用。</footer>
+</main></body></html>
