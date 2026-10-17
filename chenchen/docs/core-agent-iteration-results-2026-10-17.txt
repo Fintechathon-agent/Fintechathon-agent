@@ -1,0 +1,40 @@
+Core Agent 迭代与测试结果（2026-10-17）
+
+今天主要解决：
+1. 把混在一句话里的投资、房租、购物、订阅整理成待确认条目，保留原话。这个试验先供团队测试，还没放进网页。
+2. 修复切换 DeepSeek 时误用其他模型配置的问题。没有配好就报错，不假装接通。
+3. 对模型返回内容严格检查；缺字段和异常内容会被阻止。
+4. 兼容旧任务重试；相同请求返回原记录，金额改了会拒绝。
+5. 后端修复已上线，原地址继续有效，旧版本保留。
+
+本地结果：153 项通过、0 失败、0 跳过。语法检查通过。
+公网结果：8 项通过，真实调用 Workers AI 一次，模型要求补充资料。
+模型原话：信息不足，无法确认资金安排。
+需要补充：账户当前余额、具体投资日期、基金投资详情。
+
+公网检查：
+/health → HTTP 200
+/api/review → HTTP 200
+/api/review → HTTP 200
+/api/review → HTTP 409，IDEMPOTENCY_CONFLICT
+/api/review/simulate → HTTP 409，EXECUTION_BLOCKED
+/api/review/risk-dispatch → HTTP 503，RISK_OWNER_NOT_CONFIGURED
+/api/review/task/task-iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4 → HTTP 200
+
+任务：task-iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4
+运行记录：review-825a7fd3-bdcc-45e6-a93c-50cda5704dbd
+审计：audit-65f85cc2-fc06-44ec-a32f-05e6923c5bbb
+供应商响应：chatcmpl-88526a62-6314-4941-8074-560068d24a42
+模型用量：646 tokens
+最终：PENDING_RISK；Risk 派发失败 RISK_OWNER_NOT_CONFIGURED；执行保持禁止。
+测试中的房租、余额描述和投资计划均为虚构。真实的是模型调用和保存的运行记录。
+
+尚未完成：
+正式 Risk 服务、真实审批身份、Memory 写入和可信数据接入尚未联合验收。
+DeepSeek 只有适配测试，没有真实调用。
+新清单没有确认页面；自动跨平台比价与订阅取消没有实现。
+PDF/PPT/Word/Excel 转换服务仍待接入。
+
+代码和说明放在 chenchen/；共创入口放在 team-staging/core-agent/conversation-intake/。
+正式区不放未确认试验；其他人的文件和以前版本保留。
+详细原始记录：core-agent-local-tests-2026-10-17.txt、core-agent-public-evidence-2026-10-17.json。

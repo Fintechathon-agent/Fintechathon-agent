@@ -13,7 +13,9 @@ async function request(path, body) {
     ...(body === undefined ? {} : { body: JSON.stringify(body) }), signal: AbortSignal.timeout(60000)
   });
   const result = { path, status: response.status, body: await response.json() };
-  report.exchanges.push(result);
+  report.exchanges.push({ path, status: response.status, workflow_status: result.body.status || null,
+    run_id: result.body.run_id || result.body.trace?.run_id || null,
+    error: result.body.error || null });
   return result;
 }
 function check(label, condition) {
@@ -45,6 +47,7 @@ try {
   const dispatch = await request("/api/review/risk-dispatch", taskInput);
   check("unconfigured Risk gateway fails explicitly", dispatch.status === 503 && dispatch.body.error.code === "RISK_OWNER_NOT_CONFIGURED");
   const loaded = await request("/api/review/task/" + encodeURIComponent(record.task_id));
+  report.final_record = loaded.body;
   check("task and audit remain queryable and execution stays blocked", loaded.status === 200 && loaded.body.audit.audit_id === record.audit.audit_id &&
     loaded.body.execution.execution_allowed === false && loaded.body.audit.events.length > record.audit.events.length);
   report.result = "PASS";
