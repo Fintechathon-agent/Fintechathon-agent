@@ -1,0 +1,105 @@
+{
+  "report_version": "core-agent-deployment.v1",
+  "recorded_for_date": "2026-10-19",
+  "timezone": "Asia/Shanghai",
+  "worker": "personal-ai-fund-manager-core-agent",
+  "base_url": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+  "version_id": "dcfe338e-4129-4644-b296-c6fe4cadac4a",
+  "previous_version_id": "aa17f7d8-4362-4426-bd0c-2bd8319ae7cc",
+  "deployment_confirmed": true,
+  "deployment_tool": "wrangler 4.151.1",
+  "source": {
+    "team": {
+      "repository": "https://github.com/Fintechathon-agent/Fintechathon-agent",
+      "branch": "main",
+      "commit": "7f08509a71128e2150be90ddd7d7a3b1919b748a",
+      "remote_head_verified": true
+    },
+    "personal": {
+      "repository": "https://github.com/realchenchenluo/agent",
+      "branch": "main",
+      "commit": "b5acbe369b971a1b367a6146d26e4b6698eaf851",
+      "remote_head_verified": true
+    },
+    "delivery_files_identical": 18,
+    "runtime_source_equal": true
+  },
+  "scope": [
+    "Durable request reservation before model inference",
+    "Atomic final workflow and reservation completion",
+    "Fail closed with trace when record persistence is unresolved",
+    "Replay persisted records after restart without another model run"
+  ],
+  "verification": {
+    "core_tests": {
+      "passed": 213,
+      "failed": 0,
+      "skipped": 0
+    },
+    "new_storage_tests": 8,
+    "sqlite_processes": 4,
+    "sqlite_forced_exits": 2,
+    "local_owner_assertion_groups": 9,
+    "strict_handoff_schema": "FAILED_SOURCE_TASK_ID_UNDECLARED",
+    "syntax": "PASS",
+    "cloudflare_dry_run": "PASS",
+    "public_read_only": {
+      "checked_at": "2026-10-18T16:26:50.632Z",
+      "method": "GET_ONLY",
+      "model_calls": 0,
+      "results": [
+        {
+          "path": "/health",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "body": {
+            "status": "ok",
+            "service": "core-agent",
+            "contract_version": "investment-agent.v1",
+            "review_endpoint": "/api/review",
+            "docs": "/docs",
+            "model": {
+              "provider": "cloudflare_workers_ai",
+              "name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+              "configured": true
+            },
+            "audit_storage": "durable_object"
+          }
+        },
+        {
+          "path": "/docs",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "review_route_present": true,
+          "length": 8661
+        }
+      ]
+    },
+    "production_inference_tested": false,
+    "production_storage_faults_tested": false
+  },
+  "boundaries": {
+    "external_model_calls": 0,
+    "paid_model_calls": 0,
+    "local_model_responses_are_synthetic": true,
+    "public_schemas_changed": false,
+    "memory_rules_changed": false,
+    "model_configuration_changed": false,
+    "risk_owner_code_changed": false,
+    "ui_candidate_deployed": false,
+    "formal_risk_callback_connected": false,
+    "joint_acceptance": false,
+    "team_release_promoted": false
+  },
+  "rollback": {
+    "old_versions_preserved": true,
+    "new_storage_records_preserved": true,
+    "warning": "Prior Worker versions do not understand reservations. Pause new model requests and reconcile unresolved reservations before reverting to older code. Do not delete storage or automatically release uncertain reservations."
+  },
+  "limitations": [
+    "Requires stable idempotency key or fixed task identifier; unidentified repeated requests cannot be deduplicated.",
+    "Reservation is a durable admission record, not proof of model invocation or a complete response audit.",
+    "Local SQLite adapter and process exits are not Cloudflare disaster recovery acceptance.",
+    "Formal Risk schema, callback, provider response identity and trusted user identity remain unresolved."
+  ]
+}
