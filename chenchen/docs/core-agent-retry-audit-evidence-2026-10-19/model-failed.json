@@ -1,0 +1,272 @@
+{
+  "workflow_version": "review-workflow.v1",
+  "schema_version": "model-review.v1",
+  "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+  "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+  "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+  "source_task_id": null,
+  "data_mode": "FIXTURE",
+  "execution_mode": "PAPER",
+  "capability": "REVIEW_ONLY",
+  "portfolio_snapshot_id": null,
+  "risk_profile_version": "risk-profile.v1",
+  "plan_id": null,
+  "plan_hash": null,
+  "policy_version": "risk-policy.v1",
+  "idempotency_key": "retry-audit-provider-failure",
+  "request_fingerprint": "7b11e9f0d0dc9da81ac22d54bb6998afcb21c3ed23fdc551d1b3da9cf09788d4",
+  "memory_consent": false,
+  "memory_write_status": "NOT_REQUESTED",
+  "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+  "reviewed_input": {
+    "schema_version": "model-review.v1",
+    "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+    "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+    "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+    "source_task_id": null,
+    "source": "qiqi-legacy-review",
+    "kind": "combined",
+    "text": "虚构供应商失败案例",
+    "context": {
+      "legacy_contract": "legacy-review.v0",
+      "legacy_run_id": null,
+      "legacy_session_id": null
+    },
+    "action_parameters": {},
+    "requested_action": "只生成建议并交给统一 Risk，不执行任何动作",
+    "allow_rule_fallback": false,
+    "data_mode": "FIXTURE",
+    "execution_mode": "PAPER",
+    "capability": "REVIEW_ONLY",
+    "portfolio_snapshot_id": null,
+    "risk_profile_version": "risk-profile.v1",
+    "plan_id": null,
+    "plan_hash": null,
+    "policy_version": "risk-policy.v1",
+    "idempotency_key": "retry-audit-provider-failure",
+    "memory_consent": false,
+    "scenario": "GENERAL_REVIEW",
+    "output_formats": [
+      "json"
+    ]
+  },
+  "status": "MODEL_FAILED",
+  "model": {
+    "status": "FAILED",
+    "response": {
+      "review_version": "model-review.v1",
+      "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+      "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+      "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+      "status": "FAILED",
+      "source": "model",
+      "created_at": "2026-10-18T17:02:46.332Z",
+      "schema_version": "model-review.v1",
+      "input": {
+        "schema_version": "model-review.v1",
+        "kind": "combined",
+        "source": "qiqi-legacy-review",
+        "input_sha256": "420dad2267d8f177fd971fb5fcbe4828ebb1b4cd6f01c7d07b62a31fc9eb781d",
+        "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+        "source_task_id": null,
+        "data_mode": "FIXTURE",
+        "execution_mode": "PAPER",
+        "capability": "REVIEW_ONLY",
+        "scenario": "GENERAL_REVIEW",
+        "output_formats": [
+          "json"
+        ],
+        "portfolio_snapshot_id": null,
+        "risk_profile_version": "risk-profile.v1",
+        "plan_id": null,
+        "plan_hash": null,
+        "policy_version": "risk-policy.v1"
+      },
+      "attempt_count": 1,
+      "retry_count": 0,
+      "error": {
+        "code": "MODEL_PROVIDER_UNAVAILABLE",
+        "message": "model provider failed",
+        "retryable": true
+      },
+      "gateway": {
+        "gateway_version": "review-gateway.v1",
+        "status": "BLOCKED",
+        "decision": "MODEL_FAILED",
+        "execution_allowed": false
+      },
+      "audit": {
+        "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+        "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+        "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+        "input_sha256": "420dad2267d8f177fd971fb5fcbe4828ebb1b4cd6f01c7d07b62a31fc9eb781d",
+        "events": [
+          {
+            "event_type": "review.received",
+            "at": "2026-10-18T17:02:46.332Z"
+          },
+          {
+            "event_type": "model.failed",
+            "at": "2026-10-18T17:02:46.332Z",
+            "code": "MODEL_PROVIDER_UNAVAILABLE",
+            "attempt_count": 1
+          },
+          {
+            "event_type": "gateway.blocked",
+            "at": "2026-10-18T17:02:46.332Z",
+            "execution_allowed": false
+          }
+        ]
+      }
+    }
+  },
+  "proposed_action": null,
+  "risk_handoff": {
+    "contract_version": "model-review.v1",
+    "handoff_id": "handoff-149d020c-8b4e-428a-84f9-4275fabb0f9c",
+    "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+    "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+    "owner": "Unified Risk",
+    "evidence": {
+      "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+      "model_response_id": null,
+      "proposal_sha256": null
+    },
+    "status": "BLOCKED",
+    "decision": "MODEL_FAILED",
+    "execution_allowed": false,
+    "reason": "模型调用失败，不能交给 Risk 或执行端。"
+  },
+  "risk_decision": null,
+  "approval": {
+    "approval_id": "approval-aa2c1379-392a-4269-908b-9f4b49ed246e",
+    "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+    "proposal_sha256": null,
+    "required": true,
+    "status": "BLOCKED",
+    "decision": null,
+    "expires_at": null
+  },
+  "execution": {
+    "execution_id": null,
+    "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+    "status": "BLOCKED",
+    "simulation_allowed": false,
+    "execution_allowed": false,
+    "receipt": null
+  },
+  "audit": {
+    "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+    "workflow_version": "review-workflow.v1",
+    "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+    "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+    "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+    "events": [
+      {
+        "event_id": "event-a6799d04-0793-4962-9e00-4cf0fc864165",
+        "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+        "actor": "core-agent",
+        "event_type": "task.created",
+        "payload": {
+          "stage": "MODEL",
+          "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+          "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+          "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+          "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+          "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+          "handoff_id": "handoff-149d020c-8b4e-428a-84f9-4275fabb0f9c",
+          "trace": {
+            "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+            "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+            "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+            "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+            "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+            "handoff_id": "handoff-149d020c-8b4e-428a-84f9-4275fabb0f9c"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.332Z"
+      },
+      {
+        "event_id": "event-ffcad320-81cd-4aa7-a7f2-86baefdb133f",
+        "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+        "actor": "core-agent",
+        "event_type": "model.failed",
+        "payload": {
+          "code": "MODEL_PROVIDER_UNAVAILABLE",
+          "message": "model provider failed",
+          "retryable": true,
+          "attempt_count": 1,
+          "retry_count": 0,
+          "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+          "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+          "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+          "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+          "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+          "handoff_id": "handoff-149d020c-8b4e-428a-84f9-4275fabb0f9c",
+          "trace": {
+            "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+            "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+            "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+            "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+            "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+            "handoff_id": "handoff-149d020c-8b4e-428a-84f9-4275fabb0f9c"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.333Z"
+      },
+      {
+        "event_id": "event-21708704-10f6-4981-944a-a2dedd97f4fd",
+        "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+        "actor": "risk-gateway",
+        "event_type": "risk.blocked",
+        "payload": {
+          "reason": "model_failed",
+          "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+          "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+          "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+          "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+          "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+          "handoff_id": "handoff-149d020c-8b4e-428a-84f9-4275fabb0f9c",
+          "trace": {
+            "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+            "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+            "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+            "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+            "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+            "handoff_id": "handoff-149d020c-8b4e-428a-84f9-4275fabb0f9c"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.333Z"
+      },
+      {
+        "event_id": "event-1ea0593f-bc50-41d5-86d1-28c9e8206bed",
+        "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+        "actor": "execution-gateway",
+        "event_type": "execution.blocked",
+        "payload": {
+          "reason": "model_failed",
+          "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+          "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+          "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+          "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+          "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+          "handoff_id": "handoff-149d020c-8b4e-428a-84f9-4275fabb0f9c",
+          "trace": {
+            "request_id": "req-14019184-576f-4d85-8fea-f7f1ac1f76cd",
+            "task_id": "review-task-1c83703e-2e08-40f3-96d6-3b79cbead3ec",
+            "session_id": "session-a896555a-a1d0-4436-bac0-23a6db1efdbb",
+            "run_id": "review-8cde9c6d-57be-4961-a739-d6e516020840",
+            "audit_id": "audit-3b1667f5-2e64-4cd5-89ae-b684595a9c2b",
+            "handoff_id": "handoff-149d020c-8b4e-428a-84f9-4275fabb0f9c"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.333Z"
+      }
+    ]
+  },
+  "error": {
+    "code": "MODEL_PROVIDER_UNAVAILABLE",
+    "message": "model provider failed",
+    "retryable": true
+  }
+}

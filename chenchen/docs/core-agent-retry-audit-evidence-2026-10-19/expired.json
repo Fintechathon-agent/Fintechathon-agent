@@ -1,0 +1,565 @@
+{
+  "workflow_version": "review-workflow.v1",
+  "schema_version": "model-review.v1",
+  "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+  "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+  "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+  "source_task_id": null,
+  "data_mode": "FIXTURE",
+  "execution_mode": "PAPER",
+  "capability": "REVIEW_ONLY",
+  "scenario": "GENERAL_REVIEW",
+  "output_contract": {
+    "contract_version": "agent-output.v1",
+    "requested_formats": [
+      "json"
+    ],
+    "available_formats": [
+      "json"
+    ],
+    "status": "READY",
+    "pending_formats": [],
+    "side_effects": false
+  },
+  "portfolio_snapshot_id": null,
+  "risk_profile_version": "risk-profile.v1",
+  "plan_id": "plan-46db8232-091d-4cdd-a8ea-a0a51907387d",
+  "plan_hash": "326f4f6936f17b2e3996f7390e2bd608af7d6b6956da04d49c36d5bd5422757d",
+  "policy_version": "risk-policy.v1",
+  "idempotency_key": "retry-audit-expired",
+  "request_fingerprint": "9f725b236f33b3a92d49d459edafa7c67cd57602f5073fe750cacae2e6e0cdc7",
+  "memory_consent": false,
+  "memory_write_status": "NOT_REQUESTED",
+  "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+  "status": "EXPIRED",
+  "reviewed_input": {
+    "schema_version": "model-review.v1",
+    "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+    "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+    "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+    "source_task_id": null,
+    "source": "qiqi-legacy-review",
+    "kind": "combined",
+    "text": "虚构案例：手上有一万元，预留房租后考虑投资。案例 expired",
+    "context": {
+      "legacy_contract": "legacy-review.v0",
+      "legacy_run_id": null,
+      "legacy_session_id": null
+    },
+    "action_parameters": {},
+    "requested_action": "只生成建议并交给统一 Risk，不执行任何动作",
+    "allow_rule_fallback": false,
+    "data_mode": "FIXTURE",
+    "execution_mode": "PAPER",
+    "capability": "REVIEW_ONLY",
+    "portfolio_snapshot_id": null,
+    "risk_profile_version": "risk-profile.v1",
+    "plan_id": null,
+    "plan_hash": null,
+    "policy_version": "risk-policy.v1",
+    "idempotency_key": "retry-audit-expired",
+    "memory_consent": false,
+    "scenario": "GENERAL_REVIEW",
+    "output_formats": [
+      "json"
+    ]
+  },
+  "model": {
+    "status": "PROPOSED",
+    "source": "model",
+    "model_response": {
+      "provider": "cloudflare_workers_ai",
+      "call_succeeded": true,
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "data_mode": "FIXTURE",
+      "execution_mode": "PAPER",
+      "capability": "REVIEW_ONLY",
+      "scenario": "GENERAL_REVIEW",
+      "endpoint": "cloudflare:AI",
+      "api_style": "workers_ai",
+      "response_format": "json_schema",
+      "provider_response_id": "synthetic-vendor-response-4",
+      "raw_text": "{\"summary\":\"虚构案例：投资前保留房租用途。\",\"risk_level\":\"unknown\",\"proposed_action\":\"HOLD_FOR_REVIEW\",\"action_reason\":\"仅为模型替身提议，等待风控与人工审批。\",\"missing_information\":[\"正式账户数据\"],\"evidence\":[\"虚构房租安排\"]}",
+      "raw_text_format": "provider_json_serialized",
+      "proposal": {
+        "summary": "虚构案例：投资前保留房租用途。",
+        "risk_level": "unknown",
+        "proposed_action": "HOLD_FOR_REVIEW",
+        "action_reason": "仅为模型替身提议，等待风控与人工审批。",
+        "missing_information": [
+          "正式账户数据"
+        ],
+        "evidence": [
+          "虚构房租安排"
+        ]
+      },
+      "usage": null,
+      "attempt_count": 1,
+      "retry_count": 0
+    },
+    "input": {
+      "schema_version": "model-review.v1",
+      "kind": "combined",
+      "source": "qiqi-legacy-review",
+      "input_sha256": "6f852effd83f8c0c2d3357f258406fedd5e9bcb6d3481395cb9a71b4af0633b3",
+      "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+      "source_task_id": null,
+      "data_mode": "FIXTURE",
+      "execution_mode": "PAPER",
+      "capability": "REVIEW_ONLY",
+      "scenario": "GENERAL_REVIEW",
+      "output_formats": [
+        "json"
+      ],
+      "portfolio_snapshot_id": null,
+      "risk_profile_version": "risk-profile.v1",
+      "plan_id": null,
+      "plan_hash": null,
+      "policy_version": "risk-policy.v1"
+    }
+  },
+  "proposed_action": {
+    "proposed_action": "HOLD_FOR_REVIEW",
+    "action_reason": "仅为模型替身提议，等待风控与人工审批。",
+    "risk_level": "unknown",
+    "requested_action": "只生成建议并交给统一 Risk，不执行任何动作",
+    "action_parameters": {},
+    "model_response_id": "synthetic-vendor-response-4",
+    "proposal_sha256": "326f4f6936f17b2e3996f7390e2bd608af7d6b6956da04d49c36d5bd5422757d"
+  },
+  "risk_handoff": {
+    "contract_version": "model-review.v1",
+    "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+    "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+    "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+    "status": "APPROVED",
+    "decision": "APPROVE",
+    "owner": "Unified Risk",
+    "reason": "模型输出只是拟议动作，必须由统一 Risk 决定是否进入审批。",
+    "evidence": {
+      "input_sha256": "6f852effd83f8c0c2d3357f258406fedd5e9bcb6d3481395cb9a71b4af0633b3",
+      "model_response_id": "synthetic-vendor-response-4",
+      "proposal_sha256": "326f4f6936f17b2e3996f7390e2bd608af7d6b6956da04d49c36d5bd5422757d",
+      "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+      "plan_id": "plan-46db8232-091d-4cdd-a8ea-a0a51907387d",
+      "plan_hash": "326f4f6936f17b2e3996f7390e2bd608af7d6b6956da04d49c36d5bd5422757d",
+      "policy_version": "risk-policy.v1"
+    },
+    "execution_allowed": false
+  },
+  "risk_decision": {
+    "risk_decision_id": "risk-decision-6d066656-8990-4de8-b087-28dcacf7732d",
+    "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+    "decision": "APPROVE",
+    "status": "APPROVED",
+    "reviewer": "synthetic-risk-reviewer",
+    "reason": "本地签名通道试验，非正式 Risk 服务判定",
+    "proposal_sha256": "326f4f6936f17b2e3996f7390e2bd608af7d6b6956da04d49c36d5bd5422757d",
+    "decided_at": "2026-10-18T17:02:46.321Z",
+    "auth": {
+      "owner": "risk",
+      "actor": "synthetic-risk-reviewer",
+      "mode": "HMAC_SHA256",
+      "verified": true,
+      "signature_header": "X-Risk-Signature"
+    }
+  },
+  "approval": {
+    "approval_id": "approval-f8b56233-501d-4ebb-ab67-c62edf9cfb29",
+    "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+    "required": true,
+    "status": "EXPIRED",
+    "decision": "APPROVE",
+    "proposal_sha256": "326f4f6936f17b2e3996f7390e2bd608af7d6b6956da04d49c36d5bd5422757d",
+    "approver": "synthetic-human",
+    "decided_at": "2026-10-18T17:02:46.324Z",
+    "expires_at": "2000-01-01T00:00:00.000Z",
+    "reason": "虚构人工确认，仅限 PAPER",
+    "auth": {
+      "owner": "approval",
+      "actor": "synthetic-human",
+      "mode": "HMAC_SHA256",
+      "verified": true,
+      "signature_header": "X-Approval-Signature"
+    }
+  },
+  "execution": {
+    "execution_id": null,
+    "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+    "status": "BLOCKED",
+    "simulation_allowed": false,
+    "execution_allowed": false,
+    "receipt": null
+  },
+  "audit": {
+    "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+    "workflow_version": "review-workflow.v1",
+    "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+    "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+    "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+    "events": [
+      {
+        "event_id": "event-9ca02854-4f8d-4b70-9f10-c05784b99398",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "model-service",
+        "event_type": "review.received",
+        "payload": {
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.319Z"
+      },
+      {
+        "event_id": "event-d5be2bb6-0f87-4166-b790-47ad65005e86",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "model-service",
+        "event_type": "model.completed",
+        "payload": {
+          "source": "model",
+          "attempt_count": 1,
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.319Z"
+      },
+      {
+        "event_id": "event-1d982c22-cc70-4e3b-993c-98769402bcbe",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "model-service",
+        "event_type": "gateway.checked",
+        "payload": {
+          "execution_allowed": false,
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.319Z"
+      },
+      {
+        "event_id": "event-4f406302-4ee6-4ccd-a7c2-51ecd576dec1",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "core-agent",
+        "event_type": "workflow.created",
+        "payload": {
+          "stage": "MODEL",
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.319Z"
+      },
+      {
+        "event_id": "event-055af269-fe46-4c43-bcf4-8efdf963330c",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "core-agent",
+        "event_type": "proposal.bound",
+        "payload": {
+          "source": "model",
+          "proposal_sha256": "326f4f6936f17b2e3996f7390e2bd608af7d6b6956da04d49c36d5bd5422757d",
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.319Z"
+      },
+      {
+        "event_id": "event-f5a991a3-2dc5-4efb-b74b-88d12ae681c2",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "risk-gateway",
+        "event_type": "risk.handoff.created",
+        "payload": {
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.319Z"
+      },
+      {
+        "event_id": "event-cbdaa41d-b638-47ec-8e13-a2fa27543de6",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "execution-gateway",
+        "event_type": "execution.blocked",
+        "payload": {
+          "reason": "risk_pending",
+          "execution_allowed": false,
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.319Z"
+      },
+      {
+        "event_id": "event-0f3322c8-5698-4747-940f-1c595c25c6e5",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "risk",
+        "event_type": "risk.approved",
+        "payload": {
+          "approval_required": true,
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.321Z"
+      },
+      {
+        "event_id": "event-dd5837e1-c607-4f12-94d2-dc4276ddd6f3",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "approval-gateway",
+        "event_type": "approval.pending",
+        "payload": {
+          "approval_id": "approval-f8b56233-501d-4ebb-ab67-c62edf9cfb29",
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.321Z"
+      },
+      {
+        "event_id": "event-8d817b94-9d70-4a7b-a653-6ac0ff9a0927",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "risk-gateway",
+        "event_type": "risk.callback.recorded",
+        "payload": {
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "proposal_sha256": "326f4f6936f17b2e3996f7390e2bd608af7d6b6956da04d49c36d5bd5422757d",
+          "decision": "APPROVE",
+          "risk_decision_id": "risk-decision-6d066656-8990-4de8-b087-28dcacf7732d",
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.321Z"
+      },
+      {
+        "event_id": "event-83bb5e42-1d92-42e1-809f-6fe6a5cade0b",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "approval",
+        "event_type": "approval.approved",
+        "payload": {
+          "approval_id": "approval-f8b56233-501d-4ebb-ab67-c62edf9cfb29",
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.324Z"
+      },
+      {
+        "event_id": "event-0c567ff0-6e09-4e7c-a61e-805322453dfd",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "execution-gateway",
+        "event_type": "execution.ready_for_simulation",
+        "payload": {
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.324Z"
+      },
+      {
+        "event_id": "event-53cce682-510c-4329-8367-e6289e83d8bd",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "approval-gateway",
+        "event_type": "approval.expired",
+        "payload": {
+          "approval_id": "approval-f8b56233-501d-4ebb-ab67-c62edf9cfb29",
+          "expires_at": "2000-01-01T00:00:00.000Z",
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.326Z"
+      },
+      {
+        "event_id": "event-6cab30b7-3808-48e3-b432-2d2c8fa5650e",
+        "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+        "actor": "execution-gateway",
+        "event_type": "execution.blocked",
+        "payload": {
+          "reason": "approval_expired",
+          "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+          "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+          "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+          "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+          "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+          "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+          "trace": {
+            "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+            "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+            "session_id": "session-b47714aa-6230-407f-b7ae-17f7331c3064",
+            "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+            "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+            "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2"
+          }
+        },
+        "timestamp": "2026-10-18T17:02:46.326Z"
+      }
+    ]
+  },
+  "risk_callback": {
+    "callback_version": "risk-callback.v1",
+    "request": {
+      "callback_version": "risk-callback.v1",
+      "handoff_id": "handoff-0a6971bf-33f1-4140-8beb-9e0deb9b6ad2",
+      "task_id": "review-task-8efc0c46-7452-4e7b-b668-bb0b8e795520",
+      "request_id": "req-dc65560c-0235-4345-ba91-0512eb1bfd1d",
+      "run_id": "review-c912bda8-93d0-4220-929e-bea145e64191",
+      "audit_id": "audit-9787e0b7-13dd-4c56-b0bc-d36b2f8a17af",
+      "proposal_sha256": "326f4f6936f17b2e3996f7390e2bd608af7d6b6956da04d49c36d5bd5422757d",
+      "decision": "APPROVE",
+      "reviewer": "synthetic-risk-reviewer",
+      "reason": "本地签名通道试验，非正式 Risk 服务判定"
+    },
+    "received_at": "2026-10-18T17:02:46.321Z",
+    "auth": {
+      "owner": "risk",
+      "actor": "synthetic-risk-reviewer",
+      "mode": "HMAC_SHA256",
+      "verified": true,
+      "signature_header": "X-Risk-Signature"
+    }
+  }
+}

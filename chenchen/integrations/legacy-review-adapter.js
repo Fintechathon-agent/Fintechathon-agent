@@ -13,7 +13,8 @@ function requiredQuestion(value) {
     });
     throw error;
   }
-  return value.trim().slice(0, 20000);
+  // Let the shared validator reject oversized input; never drop a financial constraint.
+  return value.trim();
 }
 
 function normalizeLegacyReviewInput(input = {}) {
@@ -34,6 +35,7 @@ function normalizeLegacyReviewInput(input = {}) {
   return modelReview.normalizeReviewInput({
     request_id: input.request_id || input.run_id || null,
     task_id: input.task_id || null,
+    idempotency_key: input.idempotency_key,
     source: input.source || "qiqi-legacy-review",
     kind: input.kind || "combined",
     text: question,

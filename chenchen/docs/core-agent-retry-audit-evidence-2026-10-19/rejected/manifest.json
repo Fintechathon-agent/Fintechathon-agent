@@ -1,0 +1,29 @@
+{
+  "report_version": "review-evidence-export.v1",
+  "exported_at": "2026-10-18T17:02:46.306Z",
+  "source_sha256": "3a8f0c990424b53f494f4875b4eff40798f1787e8aa4b773cb6ca4f34c7dc97b",
+  "trace": {
+    "task_id": "review-task-0e0e2875-1879-467b-8cbd-2054a876820d",
+    "request_id": "req-99e0cde7-8f4c-4ac9-9ebe-e0f330f2dab5",
+    "run_id": "review-a8c91f5a-64c4-4855-a5f9-9256253fa2cb",
+    "audit_id": "audit-512bf9d5-b6d7-4cbe-8e68-832d22f02a24",
+    "handoff_id": "handoff-7c80a31e-a9ef-483e-9887-b9ad6185dd36"
+  },
+  "workflow_status": "REJECTED",
+  "data_mode": "FIXTURE",
+  "consistency_status": "CONSISTENT_WITH_LIMITS",
+  "content_included": true,
+  "findings": [],
+  "event_count": 12,
+  "record_is_not_authenticated": true,
+  "signatures_reverified": false,
+  "joint_acceptance": false,
+  "note": "仅核对所提供文件的内部一致性；不证明模型真实调用、审批准许或服务真实性，不替代正式 Schema 与联合验收。",
+  "files": [
+    {
+      "name": "任务记录.txt",
+      "sha256": "24b0af022ed59de12595761a4de2a8d2e8c07c5d743e2285c72e7f7cbe130ba6",
+      "bytes": 22859
+    }
+  ]
+}
