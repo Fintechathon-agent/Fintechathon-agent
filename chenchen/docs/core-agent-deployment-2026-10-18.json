@@ -1,0 +1,97 @@
+{
+  "report_version": "core-agent-deployment.v1",
+  "recorded_for_date": "2026-10-18",
+  "worker": "personal-ai-fund-manager-core-agent",
+  "base_url": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+  "version_id": "aa17f7d8-4362-4426-bd0c-2bd8319ae7cc",
+  "previous_version_id": "56db35f0-63d6-4015-aa4b-944a9112633d",
+  "deployment_confirmed": true,
+  "deployment_tool": "wrangler 4.151.1",
+  "source": {
+    "team": {
+      "repository": "https://github.com/Fintechathon-agent/Fintechathon-agent",
+      "branch": "main",
+      "commit": "0274b1b2702ba8bc6d271e680d38362aef48a228",
+      "remote_head_verified": true
+    },
+    "personal": {
+      "repository": "https://github.com/realchenchenluo/agent",
+      "branch": "main",
+      "commit": "a8ccc6eb23613d79d8683d0519c97708aac648a9",
+      "remote_head_verified": true
+    },
+    "delivery_files_identical": 17,
+    "runtime_source_equal": true,
+    "prior_independent_daily_evidence_preserved": true
+  },
+  "scope": [
+    "Review request deduplication within a workflow store",
+    "Preserve current workflow state after asynchronous Risk delivery",
+    "Bound signed Owner HTTP delivery and reject invalid acknowledgements"
+  ],
+  "verification": {
+    "local_core_tests": {
+      "passed": 205,
+      "failed": 0,
+      "skipped": 0
+    },
+    "local_owner_assertion_groups": 9,
+    "strict_handoff_schema": "FAILED_SOURCE_TASK_ID_UNDECLARED",
+    "syntax": "PASS",
+    "cloudflare_build": "PASS",
+    "public_read_only": {
+      "checked_at": "2026-10-18T14:24:22.687Z",
+      "method": "GET_ONLY",
+      "model_calls": 0,
+      "results": [
+        {
+          "path": "/health",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "body": {
+            "status": "ok",
+            "service": "core-agent",
+            "contract_version": "investment-agent.v1",
+            "review_endpoint": "/api/review",
+            "docs": "/docs",
+            "model": {
+              "provider": "cloudflare_workers_ai",
+              "name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+              "configured": true
+            },
+            "audit_storage": "durable_object"
+          }
+        },
+        {
+          "path": "/docs",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "contains_review_route": true,
+          "size": 8661
+        }
+      ]
+    },
+    "production_inference_tested": false,
+    "production_mutation_tested": false
+  },
+  "boundaries": {
+    "paid_model_calls": 0,
+    "local_vendor_calls_are_synthetic": true,
+    "model_provider_unchanged": true,
+    "risk_owner_code_deployed": false,
+    "contract_schemas_changed": false,
+    "memory_rules_changed": false,
+    "formal_risk_callback_connected": false,
+    "joint_acceptance": false,
+    "team_release_promoted": false
+  },
+  "rollback": {
+    "preserved_worker_version": "56db35f0-63d6-4015-aa4b-944a9112633d",
+    "git_strategy": "Use new revert commits; do not rewrite shared history. The previous Worker has the concurrency limitations described in the iteration report."
+  },
+  "remaining": [
+    "Core/Backend and Risk must agree source_task_id placement/version.",
+    "Provider and Risk must align provider response ID evidence requirements.",
+    "Configure formal Risk receiver, signed callbacks and trusted approval identity before joint acceptance."
+  ]
+}
