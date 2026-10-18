@@ -1,0 +1,111 @@
+{
+  "report_version": "core-agent-deployment.v1",
+  "recorded_for_date": "2026-10-19",
+  "timezone": "Asia/Shanghai",
+  "worker": "personal-ai-fund-manager-core-agent",
+  "base_url": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+  "version_id": "92ecddff-6a19-463f-b87c-ea61680bc5f6",
+  "previous_version_id": "dcfe338e-4129-4644-b296-c6fe4cadac4a",
+  "deployment_confirmed": true,
+  "deployment_tool": "wrangler 4.151.1",
+  "source": {
+    "team": {
+      "repository": "https://github.com/Fintechathon-agent/Fintechathon-agent",
+      "branch": "main",
+      "commit": "7faf08c5ea1920184f31872a4f42b7f5c69bf0cb",
+      "remote_head_verified": true
+    },
+    "personal": {
+      "repository": "https://github.com/realchenchenluo/agent",
+      "branch": "main",
+      "commit": "3fe14eb720028106c089296f9c648a1105ddcbe6",
+      "remote_head_verified": true
+    },
+    "delivery_files_identical": 16
+  },
+  "scope": [
+    "Enforce existing approval deadline before PAPER simulation",
+    "Publish a single in-memory receipt before waiting for optional Memory writer",
+    "Merge Memory outcome with latest audit without changing Memory rules"
+  ],
+  "verification": {
+    "core_tests": {
+      "passed": 220,
+      "failed": 0,
+      "skipped": 0
+    },
+    "new_regression_tests": 7,
+    "baseline_new_workflow_tests": {
+      "passed": 1,
+      "failed": 5
+    },
+    "local_owner_assertion_groups": 9,
+    "local_owner_synthetic_responses": 6,
+    "strict_runtime_handoff_schema": "FAILED_SOURCE_TASK_ID_UNDECLARED",
+    "isolated_handoff_candidate": {
+      "status": "CANDIDATE_VALIDATED_NOT_APPLIED",
+      "records_checked": 5,
+      "owner_confirmed": false
+    },
+    "syntax": "PASS",
+    "cloudflare_dry_run": "PASS",
+    "public_read_only": {
+      "checked_at": "2026-10-18T16:43:29.585Z",
+      "method": "GET_ONLY",
+      "model_calls": 0,
+      "results": [
+        {
+          "path": "/health",
+          "status": 200,
+          "content_type": "application/json; charset=utf-8",
+          "body": {
+            "status": "ok",
+            "service": "core-agent",
+            "contract_version": "investment-agent.v1",
+            "review_endpoint": "/api/review",
+            "docs": "/docs",
+            "model": {
+              "provider": "cloudflare_workers_ai",
+              "name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+              "configured": true
+            },
+            "audit_storage": "durable_object"
+          }
+        },
+        {
+          "path": "/docs",
+          "status": 200,
+          "content_type": "text/html; charset=utf-8",
+          "review_route_present": true,
+          "length": 8661
+        }
+      ]
+    },
+    "production_inference_tested": false,
+    "production_memory_writer_tested": false,
+    "production_approval_flow_tested": false
+  },
+  "boundaries": {
+    "external_model_calls": 0,
+    "paid_model_calls": 0,
+    "public_schemas_changed": false,
+    "public_handoff_export_changed": false,
+    "memory_rules_changed": false,
+    "model_configuration_changed": false,
+    "risk_owner_code_changed": false,
+    "formal_risk_callback_connected": false,
+    "joint_acceptance": false,
+    "team_release_promoted": false
+  },
+  "rollback": {
+    "old_versions_preserved": true,
+    "database_records_preserved": true,
+    "warning": "Reverting to the previous version reintroduces expired approval and slow Memory receipt/audit defects. Pause new execution and reconcile pending tasks first. Older pre-reservation versions also require reconciliation of unresolved reservations; do not clear storage."
+  },
+  "limitations": [
+    "The early receipt save is in-process state, not an early durable storage commit.",
+    "Slow Memory tests used an injected synthetic writer. The deployed Durable Object serializes requests and does not inject a real Memory writer.",
+    "Read-only public checks do not verify model inference, trusted Risk callbacks, approval identity or joint acceptance.",
+    "Handoff candidate is an isolated review artifact. Runtime strict schema failure and missing provider response identity remain unresolved."
+  ]
+}

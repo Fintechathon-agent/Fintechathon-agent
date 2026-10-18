@@ -9,5 +9,6 @@
 - [运行版冻结接口仍失败](../../../chenchen/docs/core-risk-execution-guards-blocker-2026-10-19.json)
 - [待确认的一行补丁、兼容性说明和复跑方法](../../../chenchen/experiments/handoff-contract-candidate-v1/README.md)
 - [候选验证结果](../../../chenchen/docs/core-risk-handoff-candidate-2026-10-19.json)
+- [运行修复线上部署回执](../../../chenchen/docs/core-agent-execution-guards-deployment-2026-10-19.json)
 
 最需要团队确认的是来源任务字段放在哪里，以及正式签名回调和供应商回执编号。候选通过不代表已经接通。所有数据为虚构测试数据，未调用付费模型。
