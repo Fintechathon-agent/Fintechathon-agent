@@ -41,7 +41,7 @@ const { chromium } = require('playwright');
         assert.equal(await page.locator('a[href*="merchant"]').count(), 0);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, name + ' overflow');
       }
-      assert(externalApis.every(url => url === '/api/demo/portfolio'), 'existing workspace may only probe demo portfolio');
+      assert(externalApis.every(url => url.endsWith('/api/demo/portfolio')), 'existing workspace may only probe demo portfolio');
       const existingWorkspaceProbes = externalApis.length;
       externalApis.length = 0;
       await page.goto(base + 'investment-only/investment.html');

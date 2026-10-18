@@ -25,6 +25,21 @@
   "personalRelease": {
     "branch": "preview",
     "commit": "cd1ac68fd9ca09afa64965ac29d692ce5d530e8f",
-    "remoteVerified": true
+    "remoteVerified": true,
+    "pagesRun": "https://github.com/lixjanus526-art/finance-lab-ui-preview/actions/runs/39124045423",
+    "pagesBuild": "success",
+    "liveBrowser": {
+      "widths": [
+        1440,
+        1024,
+        375
+      ],
+      "pageStatus": 200,
+      "plans": 3,
+      "legacyRedirects": 4,
+      "newPreviewApiNetworkRequests": 0,
+      "aiStatus": 503,
+      "aiCode": "STATIC_AI_UNAVAILABLE"
+    }
   }
 }
