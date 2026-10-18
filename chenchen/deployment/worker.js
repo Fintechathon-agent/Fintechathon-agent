@@ -10,6 +10,7 @@ import reviewWorkflowModule from "../integrations/review-workflow.js";
 import fundingPlanModule from "../integrations/funding-plan.js";
 import coreErrorModule from "../contracts/core-agent-error.js";
 import bailianBudgetModule from "../integrations/bailian-budget.js";
+import reviewReservationModule from "../integrations/review-reservation.js";
 import { reviewDocs } from "./review-docs.js";
 
 const { Harness } = harnessModule;
@@ -171,6 +172,7 @@ function workflowErrorPayload(error) {
     sourceContractVersion: modelReview.REVIEW_VERSION,
     requestId,
     taskId: record?.task_id || error.taskId || null,
+    sessionId: error.sessionId || null,
     runId: record?.run_id || error.runId || null,
     auditId: record?.audit?.audit_id || error.auditId || null,
     handoffId: record?.risk_handoff?.handoff_id || null,
@@ -188,6 +190,7 @@ export class ReviewService {
     this.queue = Promise.resolve();
     this.modelBuckets = new Map();
     this.bailianBudget = new bailianBudgetModule.BailianBudget({ storage: this.storage, env });
+    this.reservations = new reviewReservationModule.ReviewReservations(this.storage);
     this.pendingRequests = 0;
   }
 
@@ -200,11 +203,12 @@ export class ReviewService {
     return pending;
   }
 
-  async persist(record, fundingPlans = null) {
+  async persist(record, fundingPlans = null, reservation = null) {
     if (!record?.run_id) return;
     const entries = {
       ["run:" + record.run_id]: record,
-      ["task:" + record.task_id]: record.run_id
+      ["task:" + record.task_id]: record.run_id,
+      ...this.reservations.completedEntries(reservation, record)
     };
     if (record.idempotency_key) entries["idempotency:" + record.idempotency_key] = record.run_id;
     // One atomic storage operation commits both the simulation receipt and its allocation.
@@ -233,6 +237,7 @@ export class ReviewService {
     const env = this.env;
     const url = new URL(request.url);
     const fundingPlans = new FundingPlanStore();
+    let reservation = null;
     try {
       if (request.method === "GET" && url.pathname.startsWith("/api/funding-demo/plan/")) {
         const planId = decodeURIComponent(url.pathname.slice("/api/funding-demo/plan/".length));
@@ -243,6 +248,10 @@ export class ReviewService {
         const handoffRequested = url.pathname.endsWith("/risk-handoff");
         const key = decodeURIComponent(url.pathname.slice("/api/review/".length, handoffRequested ? -"/risk-handoff".length : undefined));
         const result = key.startsWith("task/") ? await this.lookupTask(key.slice(5)) : await this.storage.get("run:" + key);
+        if (!result && key.startsWith("task/")) {
+          const reserved = await this.reservations.byTask(key.slice(5));
+          if (reserved) throw reviewReservationModule.unavailable(reserved);
+        }
         return json(request, env, result ? 200 : 404, result ? (handoffRequested ? riskHandoff.buildRiskHandoffPackage(result) : result) : { error: { code: "REVIEW_NOT_FOUND", message: "没有找到这个运行编号。" } });
       }
       const body = await readJson(request);
@@ -268,7 +277,7 @@ export class ReviewService {
         if (input.idempotency_key) {
           const existing = await this.lookupIdempotency(input.idempotency_key);
           if (existing) {
-            const same = await matchesRequestFingerprint(existing, input);
+            const same = await matchesRequestFingerprint(existing, input) || await this.reservations.matchesCompleted(existing, input);
             if (same) return json(request, env, 200, url.pathname === "/api/review/legacy" ? legacyReviewAdapter.mapWorkflowToLegacyResponse(existing) : existing);
             throw new WorkflowError("IDEMPOTENCY_CONFLICT", "idempotency key is already bound to different review input", {
               statusCode: 409, stage: "VALIDATION", recovery: "Reuse the original request body or create a new idempotency key.", record: existing
@@ -282,6 +291,7 @@ export class ReviewService {
             recovery: "Use the existing task record or create a new task_id."
           });
         }
+        await this.reservations.assertAvailable(input);
         const minute = Math.floor(Date.now() / 60000);
         for (const [ip, bucket] of this.modelBuckets) if (bucket.minute !== minute) this.modelBuckets.delete(ip);
         const ip = requestIdentity(request);
@@ -292,6 +302,12 @@ export class ReviewService {
         bucket.count++;
         this.modelBuckets.set(ip, bucket);
         await this.loadFundingPlan(fundingPlans, input.action_parameters?.funding_plan_id);
+        // Validate the existing funding binding before reserving an inference.
+        fundingPlans.bind(input.action_parameters);
+        reservation = await this.reservations.reserve(input);
+        input.task_id = reservation.task_id;
+        input.request_id = reservation.request_id;
+        input.session_id = reservation.session_id;
         const usageHooks = this.bailianBudget.hooks();
         result = await workflow.start(input, env, {
           ...usageHooks,
@@ -330,16 +346,18 @@ export class ReviewService {
         }
         if (!method) return json(request, env, 404, errorPayload(routeNotFoundFailure()));
       }
-      await this.persist(result, fundingPlans);
+      await this.persist(result, fundingPlans, reservation);
       return json(request, env, 200, url.pathname === "/api/review/legacy"
         ? legacyReviewAdapter.mapWorkflowToLegacyResponse(result)
         : result);
     } catch (error) {
       if (error.name === "ReviewError" || error.name === "WorkflowError") {
-        await this.persist(error.workflowRecord || error.record, fundingPlans);
+        try { await this.persist(error.workflowRecord || error.record, fundingPlans, reservation); }
+        catch { return json(request, env, 503, workflowErrorPayload(reviewReservationModule.unavailable(reservation))); }
         return json(request, env, error.statusCode || 502, workflowErrorPayload(error));
       }
       if (error.code === "INVALID_JSON") return json(request, env, 400, errorPayload(error));
+      if (reservation) return json(request, env, 503, workflowErrorPayload(reviewReservationModule.unavailable(reservation)));
       return json(request, env, 503, errorPayload(serviceUnavailableFailure()));
     }
   }

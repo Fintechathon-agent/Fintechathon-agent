@@ -1,0 +1,120 @@
+TAP version 13
+# Subtest: storage failure before reservation cannot invoke a model
+not ok 1 - storage failure before reservation cannot invoke a model
+  ---
+  duration_ms: 37.1494
+  type: 'test'
+  location: '<WORKSPACE>\\chenchen\\tests\\review-storage-recovery.test.mjs:31:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    1 !== 0
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///<WORKSPACE>/chenchen/tests/review-storage-recovery.test.mjs:34:46)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: lost final write leaves an unresolved reservation; restart and retries cannot invoke again
+not ok 2 - lost final write leaves an unresolved reservation; restart and retries cannot invoke again
+  ---
+  duration_ms: 11.6132
+  type: 'test'
+  location: '<WORKSPACE>\\chenchen\\tests\\review-storage-recovery.test.mjs:37:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(failure.trace.task_id)
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: ~
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///<WORKSPACE>/chenchen/tests/review-storage-recovery.test.mjs:41:40)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: model failure whose audit write fails also blocks repeated inference
+not ok 3 - model failure whose audit write fails also blocks repeated inference
+  ---
+  duration_ms: 4.1018
+  type: 'test'
+  location: '<WORKSPACE>\\chenchen\\tests\\review-storage-recovery.test.mjs:58:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(failed.trace.task_id)
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: ~
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///<WORKSPACE>/chenchen/tests/review-storage-recovery.test.mjs:63:48)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: atomic commit stores reservation and record together and survives a lost response
+not ok 4 - atomic commit stores reservation and record together and survives a lost response
+  ---
+  duration_ms: 7.9359
+  type: 'test'
+  location: '<WORKSPACE>\\chenchen\\tests\\review-storage-recovery.test.mjs:68:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    503 !== 200
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 503
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///<WORKSPACE>/chenchen/tests/review-storage-recovery.test.mjs:78:52)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: completed reservations do not block normal workflow mutations or legacy records
+not ok 5 - completed reservations do not block normal workflow mutations or legacy records
+  ---
+  duration_ms: 3.9859
+  type: 'test'
+  location: '<WORKSPACE>\\chenchen\\tests\\review-storage-recovery.test.mjs:84:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(reservations.length)
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: 0
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///<WORKSPACE>/chenchen/tests/review-storage-recovery.test.mjs:88:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 0
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 470.7541

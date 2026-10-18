@@ -56,7 +56,7 @@ export async function verify(directory) {
   let service = new ReviewService({ storage }, env);
   env.REVIEW_SERVICE = { idFromName: name => name, get: () => service };
   const transport = [], cases = [], stores = [];
-  const evidence = { evidence_version: "core-risk-source-integration.v1", recorded_for_date: "2026-10-18",
+  const evidence = { evidence_version: "core-risk-source-integration.v1", recorded_for_date: "2026-10-18", recorded_at: new Date().toISOString(),
     owner_commit: PIN, verified_owner_files: snapshot.file_count, mode: "LOCAL_SYNTHETIC_INTEGRATION",
     real_owner_rules_used: true, real_core_http_handler_used: true, real_model_called: false,
     core_storage: "IN_MEMORY_DURABLE_OBJECT_TEST_ADAPTER", risk_storage: "OWNER_JOURNAL_TEMP_FILES",

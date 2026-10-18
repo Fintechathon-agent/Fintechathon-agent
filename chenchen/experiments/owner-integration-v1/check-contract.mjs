@@ -29,7 +29,7 @@ const record = evidence.transport.find(entry => entry.response.workflow_version 
 if (!record) throw new Error("No successful Core workflow record in evidence");
 const handoff = handoffModule.buildRiskHandoffPackage(record);
 const valid = validator(handoff);
-const result = { recorded_for_date: evidence.recorded_for_date, schema_modified: false,
+const result = { recorded_for_date: evidence.recorded_for_date, checked_at: new Date().toISOString(), schema_modified: false,
   validator: "ajv " + require("ajv/package.json").version, schema: "risk-handoff.v1#/$defs/HandoffPackage",
   status: valid ? "PASS" : "BLOCKED_CONTRACT_MISMATCH", errors: validator.errors || [],
   owner_commit: evidence.owner_commit, input_task_id: record.task_id, handoff,

@@ -1,0 +1,812 @@
+{
+  "evidence_version": "core-durable-recovery.v1",
+  "recorded_at": "2026-10-18T16:18:42.825Z",
+  "mode": "LOCAL_SQLITE_PROCESS_RESTART",
+  "status": "PASS",
+  "process_count": 4,
+  "forced_exits": [
+    {
+      "phase": "before final commit",
+      "exit_code": 86
+    },
+    {
+      "phase": "after final commit before response",
+      "exit_code": 87
+    }
+  ],
+  "synthetic_model_calls": 2,
+  "real_model_calls": 0,
+  "paid_calls": 0,
+  "public_cloud_fault_injection": false,
+  "database": "Temporary SQLite file with explicit transactions and synchronous FULL; not a Cloudflare runtime emulator",
+  "cases": [
+    {
+      "phase": "retry-unresolved",
+      "http_status": 503,
+      "response": {
+        "review_version": "model-review.v1",
+        "contract_version": "model-review.v1",
+        "error": {
+          "code": "REVIEW_SERVICE_UNAVAILABLE",
+          "message": "任务记录尚未确认保存，已阻止重复模型调用。",
+          "retryable": false,
+          "stage": "BACKEND",
+          "recovery": "保留原 task_id 和幂等键，联系后端核查持久记录；不要换键或自动重试模型。未完成核查前不能审批或执行。",
+          "details": null
+        },
+        "workflow": null,
+        "error_contract_version": "core-agent-error.v1",
+        "source_contract_version": "model-review.v1",
+        "operation": "MODEL_REVIEW",
+        "request_id": "req-fcb75500-b0fa-4e2b-9901-3ac69fafd3ff",
+        "trace": {
+          "contract_version": "model-review.v1",
+          "error_contract_version": "core-agent-error.v1",
+          "source_contract_version": "model-review.v1",
+          "request_id": "req-fcb75500-b0fa-4e2b-9901-3ac69fafd3ff",
+          "task_id": "review-task-f2ab2369-8071-40a6-9a84-f19dfe4f17f7",
+          "session_id": "session-c2f0c2dd-9efa-43f9-8301-c5d8c08ebaed",
+          "run_id": null,
+          "audit_id": null,
+          "handoff_id": null
+        }
+      },
+      "query_status": 503,
+      "query_response": {
+        "review_version": "model-review.v1",
+        "contract_version": "model-review.v1",
+        "error": {
+          "code": "REVIEW_SERVICE_UNAVAILABLE",
+          "message": "任务记录尚未确认保存，已阻止重复模型调用。",
+          "retryable": false,
+          "stage": "BACKEND",
+          "recovery": "保留原 task_id 和幂等键，联系后端核查持久记录；不要换键或自动重试模型。未完成核查前不能审批或执行。",
+          "details": null
+        },
+        "workflow": null,
+        "error_contract_version": "core-agent-error.v1",
+        "source_contract_version": "model-review.v1",
+        "operation": "MODEL_REVIEW",
+        "request_id": "req-fcb75500-b0fa-4e2b-9901-3ac69fafd3ff",
+        "trace": {
+          "contract_version": "model-review.v1",
+          "error_contract_version": "core-agent-error.v1",
+          "source_contract_version": "model-review.v1",
+          "request_id": "req-fcb75500-b0fa-4e2b-9901-3ac69fafd3ff",
+          "task_id": "review-task-f2ab2369-8071-40a6-9a84-f19dfe4f17f7",
+          "session_id": "session-c2f0c2dd-9efa-43f9-8301-c5d8c08ebaed",
+          "run_id": null,
+          "audit_id": null,
+          "handoff_id": null
+        }
+      },
+      "model_calls_before": 1,
+      "model_calls_after": 1,
+      "reservations": [
+        {
+          "reservation_version": "review-reservation.v1",
+          "state": "RESERVED",
+          "task_id": "review-task-f2ab2369-8071-40a6-9a84-f19dfe4f17f7",
+          "request_id": "req-fcb75500-b0fa-4e2b-9901-3ac69fafd3ff",
+          "session_id": "session-c2f0c2dd-9efa-43f9-8301-c5d8c08ebaed",
+          "request_fingerprint": "4b7a0fc4073f76d0dc04b423f1ff6c96a9001f21cc1d8b946370718b7ec98600",
+          "idempotency_storage_key": "review-reservation:key:c666974791a45fc2b4562ca275000b274d448c77d30cd27dbcaffdd7de8fae99",
+          "reserved_at": "2026-10-18T16:18:42.157Z"
+        }
+      ]
+    },
+    {
+      "phase": "retry-completed",
+      "http_status": 200,
+      "response": {
+        "workflow_version": "review-workflow.v1",
+        "schema_version": "model-review.v1",
+        "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+        "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+        "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+        "source_task_id": null,
+        "data_mode": "SYNTHETIC_REPLAY",
+        "execution_mode": "PAPER",
+        "capability": "REVIEW_ONLY",
+        "scenario": "GENERAL_REVIEW",
+        "output_contract": {
+          "contract_version": "agent-output.v1",
+          "requested_formats": [
+            "json"
+          ],
+          "available_formats": [
+            "json"
+          ],
+          "status": "READY",
+          "pending_formats": [],
+          "side_effects": false
+        },
+        "portfolio_snapshot_id": null,
+        "risk_profile_version": "risk-profile.v1",
+        "plan_id": "plan-53eaf95f-d69d-4064-ac0e-343f9fd83062",
+        "plan_hash": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74",
+        "policy_version": "risk-policy.v1",
+        "idempotency_key": "synthetic-completed-key",
+        "request_fingerprint": "4b7a0fc4073f76d0dc04b423f1ff6c96a9001f21cc1d8b946370718b7ec98600",
+        "memory_consent": false,
+        "memory_write_status": "NOT_REQUESTED",
+        "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+        "status": "PENDING_RISK",
+        "reviewed_input": {
+          "schema_version": "model-review.v1",
+          "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+          "source_task_id": null,
+          "source": null,
+          "kind": "combined",
+          "text": "虚构房租与投资安排，不涉及真实资料",
+          "context": {},
+          "action_parameters": {},
+          "requested_action": null,
+          "allow_rule_fallback": false,
+          "data_mode": "SYNTHETIC_REPLAY",
+          "execution_mode": "PAPER",
+          "capability": "REVIEW_ONLY",
+          "portfolio_snapshot_id": null,
+          "risk_profile_version": "risk-profile.v1",
+          "plan_id": null,
+          "plan_hash": null,
+          "policy_version": "risk-policy.v1",
+          "idempotency_key": "synthetic-completed-key",
+          "memory_consent": false,
+          "scenario": "GENERAL_REVIEW",
+          "output_formats": [
+            "json"
+          ]
+        },
+        "model": {
+          "status": "PROPOSED",
+          "source": "model",
+          "model_response": {
+            "provider": "cloudflare_workers_ai",
+            "call_succeeded": true,
+            "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            "data_mode": "SYNTHETIC_REPLAY",
+            "execution_mode": "PAPER",
+            "capability": "REVIEW_ONLY",
+            "scenario": "GENERAL_REVIEW",
+            "endpoint": "cloudflare:AI",
+            "api_style": "workers_ai",
+            "response_format": "json_schema",
+            "provider_response_id": "synthetic-disk-test-2",
+            "raw_text": "{\"summary\":\"虚构磁盘恢复案例\",\"risk_level\":\"unknown\",\"proposed_action\":\"HOLD_FOR_REVIEW\",\"action_reason\":\"等待 Risk\",\"missing_information\":[],\"evidence\":[]}",
+            "raw_text_format": "provider_json_serialized",
+            "proposal": {
+              "summary": "虚构磁盘恢复案例",
+              "risk_level": "unknown",
+              "proposed_action": "HOLD_FOR_REVIEW",
+              "action_reason": "等待 Risk",
+              "missing_information": [],
+              "evidence": []
+            },
+            "usage": null,
+            "attempt_count": 1,
+            "retry_count": 0
+          },
+          "input": {
+            "schema_version": "model-review.v1",
+            "kind": "combined",
+            "source": null,
+            "input_sha256": "6d7b81e6996a7be55a461fdb761acac5a44d4b04e894f58e54c54472027abecb",
+            "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+            "source_task_id": null,
+            "data_mode": "SYNTHETIC_REPLAY",
+            "execution_mode": "PAPER",
+            "capability": "REVIEW_ONLY",
+            "scenario": "GENERAL_REVIEW",
+            "output_formats": [
+              "json"
+            ],
+            "portfolio_snapshot_id": null,
+            "risk_profile_version": "risk-profile.v1",
+            "plan_id": null,
+            "plan_hash": null,
+            "policy_version": "risk-policy.v1"
+          }
+        },
+        "proposed_action": {
+          "proposed_action": "HOLD_FOR_REVIEW",
+          "action_reason": "等待 Risk",
+          "risk_level": "unknown",
+          "requested_action": null,
+          "action_parameters": {},
+          "model_response_id": "synthetic-disk-test-2",
+          "proposal_sha256": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74"
+        },
+        "risk_handoff": {
+          "contract_version": "model-review.v1",
+          "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+          "status": "PENDING_REVIEW",
+          "decision": "REQUIRED",
+          "owner": "Unified Risk",
+          "reason": "模型输出只是拟议动作，必须由统一 Risk 决定是否进入审批。",
+          "evidence": {
+            "input_sha256": "6d7b81e6996a7be55a461fdb761acac5a44d4b04e894f58e54c54472027abecb",
+            "model_response_id": "synthetic-disk-test-2",
+            "proposal_sha256": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74",
+            "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+            "plan_id": "plan-53eaf95f-d69d-4064-ac0e-343f9fd83062",
+            "plan_hash": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74",
+            "policy_version": "risk-policy.v1"
+          },
+          "execution_allowed": false
+        },
+        "risk_decision": null,
+        "approval": {
+          "approval_id": "approval-7dbaf515-4888-4431-95ce-295dc54e078f",
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "required": true,
+          "status": "BLOCKED",
+          "decision": null,
+          "proposal_sha256": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74",
+          "approver": null,
+          "decided_at": null,
+          "expires_at": null
+        },
+        "execution": {
+          "execution_id": null,
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "status": "BLOCKED",
+          "simulation_allowed": false,
+          "execution_allowed": false,
+          "receipt": null
+        },
+        "audit": {
+          "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+          "workflow_version": "review-workflow.v1",
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+          "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+          "events": [
+            {
+              "event_id": "event-092b75ad-d7d7-4379-a225-d52d1a832e37",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "model-service",
+              "event_type": "review.received",
+              "payload": {
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.610Z"
+            },
+            {
+              "event_id": "event-89038099-c6ee-4bff-97fe-b37ce28daa43",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "model-service",
+              "event_type": "model.completed",
+              "payload": {
+                "source": "model",
+                "attempt_count": 1,
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.613Z"
+            },
+            {
+              "event_id": "event-c671d263-cf04-4045-8d77-c13a64eb954a",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "model-service",
+              "event_type": "gateway.checked",
+              "payload": {
+                "execution_allowed": false,
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.613Z"
+            },
+            {
+              "event_id": "event-b8eceb82-8af1-4498-b574-ab04de2f09fb",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "core-agent",
+              "event_type": "workflow.created",
+              "payload": {
+                "stage": "MODEL",
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.614Z"
+            },
+            {
+              "event_id": "event-40e6d6de-745e-4762-b7a9-bfbf12347004",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "core-agent",
+              "event_type": "proposal.bound",
+              "payload": {
+                "source": "model",
+                "proposal_sha256": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74",
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.614Z"
+            },
+            {
+              "event_id": "event-ccb22608-937c-42b5-ba5e-ce09285806a2",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "risk-gateway",
+              "event_type": "risk.handoff.created",
+              "payload": {
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.614Z"
+            },
+            {
+              "event_id": "event-6ac196c9-a0cb-4f1b-8631-6c4d3f2437d9",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "execution-gateway",
+              "event_type": "execution.blocked",
+              "payload": {
+                "reason": "risk_pending",
+                "execution_allowed": false,
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.614Z"
+            }
+          ]
+        }
+      },
+      "query_status": 200,
+      "query_response": {
+        "workflow_version": "review-workflow.v1",
+        "schema_version": "model-review.v1",
+        "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+        "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+        "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+        "source_task_id": null,
+        "data_mode": "SYNTHETIC_REPLAY",
+        "execution_mode": "PAPER",
+        "capability": "REVIEW_ONLY",
+        "scenario": "GENERAL_REVIEW",
+        "output_contract": {
+          "contract_version": "agent-output.v1",
+          "requested_formats": [
+            "json"
+          ],
+          "available_formats": [
+            "json"
+          ],
+          "status": "READY",
+          "pending_formats": [],
+          "side_effects": false
+        },
+        "portfolio_snapshot_id": null,
+        "risk_profile_version": "risk-profile.v1",
+        "plan_id": "plan-53eaf95f-d69d-4064-ac0e-343f9fd83062",
+        "plan_hash": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74",
+        "policy_version": "risk-policy.v1",
+        "idempotency_key": "synthetic-completed-key",
+        "request_fingerprint": "4b7a0fc4073f76d0dc04b423f1ff6c96a9001f21cc1d8b946370718b7ec98600",
+        "memory_consent": false,
+        "memory_write_status": "NOT_REQUESTED",
+        "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+        "status": "PENDING_RISK",
+        "reviewed_input": {
+          "schema_version": "model-review.v1",
+          "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+          "source_task_id": null,
+          "source": null,
+          "kind": "combined",
+          "text": "虚构房租与投资安排，不涉及真实资料",
+          "context": {},
+          "action_parameters": {},
+          "requested_action": null,
+          "allow_rule_fallback": false,
+          "data_mode": "SYNTHETIC_REPLAY",
+          "execution_mode": "PAPER",
+          "capability": "REVIEW_ONLY",
+          "portfolio_snapshot_id": null,
+          "risk_profile_version": "risk-profile.v1",
+          "plan_id": null,
+          "plan_hash": null,
+          "policy_version": "risk-policy.v1",
+          "idempotency_key": "synthetic-completed-key",
+          "memory_consent": false,
+          "scenario": "GENERAL_REVIEW",
+          "output_formats": [
+            "json"
+          ]
+        },
+        "model": {
+          "status": "PROPOSED",
+          "source": "model",
+          "model_response": {
+            "provider": "cloudflare_workers_ai",
+            "call_succeeded": true,
+            "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            "data_mode": "SYNTHETIC_REPLAY",
+            "execution_mode": "PAPER",
+            "capability": "REVIEW_ONLY",
+            "scenario": "GENERAL_REVIEW",
+            "endpoint": "cloudflare:AI",
+            "api_style": "workers_ai",
+            "response_format": "json_schema",
+            "provider_response_id": "synthetic-disk-test-2",
+            "raw_text": "{\"summary\":\"虚构磁盘恢复案例\",\"risk_level\":\"unknown\",\"proposed_action\":\"HOLD_FOR_REVIEW\",\"action_reason\":\"等待 Risk\",\"missing_information\":[],\"evidence\":[]}",
+            "raw_text_format": "provider_json_serialized",
+            "proposal": {
+              "summary": "虚构磁盘恢复案例",
+              "risk_level": "unknown",
+              "proposed_action": "HOLD_FOR_REVIEW",
+              "action_reason": "等待 Risk",
+              "missing_information": [],
+              "evidence": []
+            },
+            "usage": null,
+            "attempt_count": 1,
+            "retry_count": 0
+          },
+          "input": {
+            "schema_version": "model-review.v1",
+            "kind": "combined",
+            "source": null,
+            "input_sha256": "6d7b81e6996a7be55a461fdb761acac5a44d4b04e894f58e54c54472027abecb",
+            "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+            "source_task_id": null,
+            "data_mode": "SYNTHETIC_REPLAY",
+            "execution_mode": "PAPER",
+            "capability": "REVIEW_ONLY",
+            "scenario": "GENERAL_REVIEW",
+            "output_formats": [
+              "json"
+            ],
+            "portfolio_snapshot_id": null,
+            "risk_profile_version": "risk-profile.v1",
+            "plan_id": null,
+            "plan_hash": null,
+            "policy_version": "risk-policy.v1"
+          }
+        },
+        "proposed_action": {
+          "proposed_action": "HOLD_FOR_REVIEW",
+          "action_reason": "等待 Risk",
+          "risk_level": "unknown",
+          "requested_action": null,
+          "action_parameters": {},
+          "model_response_id": "synthetic-disk-test-2",
+          "proposal_sha256": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74"
+        },
+        "risk_handoff": {
+          "contract_version": "model-review.v1",
+          "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+          "status": "PENDING_REVIEW",
+          "decision": "REQUIRED",
+          "owner": "Unified Risk",
+          "reason": "模型输出只是拟议动作，必须由统一 Risk 决定是否进入审批。",
+          "evidence": {
+            "input_sha256": "6d7b81e6996a7be55a461fdb761acac5a44d4b04e894f58e54c54472027abecb",
+            "model_response_id": "synthetic-disk-test-2",
+            "proposal_sha256": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74",
+            "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+            "plan_id": "plan-53eaf95f-d69d-4064-ac0e-343f9fd83062",
+            "plan_hash": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74",
+            "policy_version": "risk-policy.v1"
+          },
+          "execution_allowed": false
+        },
+        "risk_decision": null,
+        "approval": {
+          "approval_id": "approval-7dbaf515-4888-4431-95ce-295dc54e078f",
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "required": true,
+          "status": "BLOCKED",
+          "decision": null,
+          "proposal_sha256": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74",
+          "approver": null,
+          "decided_at": null,
+          "expires_at": null
+        },
+        "execution": {
+          "execution_id": null,
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "status": "BLOCKED",
+          "simulation_allowed": false,
+          "execution_allowed": false,
+          "receipt": null
+        },
+        "audit": {
+          "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+          "workflow_version": "review-workflow.v1",
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+          "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+          "events": [
+            {
+              "event_id": "event-092b75ad-d7d7-4379-a225-d52d1a832e37",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "model-service",
+              "event_type": "review.received",
+              "payload": {
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.610Z"
+            },
+            {
+              "event_id": "event-89038099-c6ee-4bff-97fe-b37ce28daa43",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "model-service",
+              "event_type": "model.completed",
+              "payload": {
+                "source": "model",
+                "attempt_count": 1,
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.613Z"
+            },
+            {
+              "event_id": "event-c671d263-cf04-4045-8d77-c13a64eb954a",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "model-service",
+              "event_type": "gateway.checked",
+              "payload": {
+                "execution_allowed": false,
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.613Z"
+            },
+            {
+              "event_id": "event-b8eceb82-8af1-4498-b574-ab04de2f09fb",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "core-agent",
+              "event_type": "workflow.created",
+              "payload": {
+                "stage": "MODEL",
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.614Z"
+            },
+            {
+              "event_id": "event-40e6d6de-745e-4762-b7a9-bfbf12347004",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "core-agent",
+              "event_type": "proposal.bound",
+              "payload": {
+                "source": "model",
+                "proposal_sha256": "6f5301e66708d78512d3bdec071253076338badfd456aa98fe9657f8f84ded74",
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.614Z"
+            },
+            {
+              "event_id": "event-ccb22608-937c-42b5-ba5e-ce09285806a2",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "risk-gateway",
+              "event_type": "risk.handoff.created",
+              "payload": {
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.614Z"
+            },
+            {
+              "event_id": "event-6ac196c9-a0cb-4f1b-8631-6c4d3f2437d9",
+              "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+              "actor": "execution-gateway",
+              "event_type": "execution.blocked",
+              "payload": {
+                "reason": "risk_pending",
+                "execution_allowed": false,
+                "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3",
+                "trace": {
+                  "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+                  "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+                  "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+                  "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+                  "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7",
+                  "handoff_id": "handoff-6f8be111-1e31-4c41-b9c7-c336c8fb04d3"
+                }
+              },
+              "timestamp": "2026-10-18T16:18:42.614Z"
+            }
+          ]
+        }
+      },
+      "model_calls_before": 2,
+      "model_calls_after": 2,
+      "reservations": [
+        {
+          "reservation_version": "review-reservation.v1",
+          "state": "RESERVED",
+          "task_id": "review-task-f2ab2369-8071-40a6-9a84-f19dfe4f17f7",
+          "request_id": "req-fcb75500-b0fa-4e2b-9901-3ac69fafd3ff",
+          "session_id": "session-c2f0c2dd-9efa-43f9-8301-c5d8c08ebaed",
+          "request_fingerprint": "4b7a0fc4073f76d0dc04b423f1ff6c96a9001f21cc1d8b946370718b7ec98600",
+          "idempotency_storage_key": "review-reservation:key:c666974791a45fc2b4562ca275000b274d448c77d30cd27dbcaffdd7de8fae99",
+          "reserved_at": "2026-10-18T16:18:42.157Z"
+        },
+        {
+          "reservation_version": "review-reservation.v1",
+          "state": "COMPLETED",
+          "task_id": "review-task-8105f128-0fa6-4839-8331-0b4ed4932b9d",
+          "request_id": "req-35f94faa-b074-4da9-b903-b093be75a5aa",
+          "session_id": "session-d1602ef0-8a2b-4e0c-93a6-2428fd2109ea",
+          "request_fingerprint": "4b7a0fc4073f76d0dc04b423f1ff6c96a9001f21cc1d8b946370718b7ec98600",
+          "idempotency_storage_key": "review-reservation:key:3c4c515d97635dbbea857973199df7419cd7a18498b67c79e1b4051866c42c58",
+          "reserved_at": "2026-10-18T16:18:42.602Z",
+          "completed_at": "2026-10-18T16:18:42.614Z",
+          "run_id": "review-8886e369-22f3-44bd-b8e1-755284a5a958",
+          "audit_id": "audit-991854a5-e85b-4ad1-88ed-b89fc522e4c7"
+        }
+      ]
+    }
+  ],
+  "joint_acceptance": false
+}
