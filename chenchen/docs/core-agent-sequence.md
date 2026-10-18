@@ -104,3 +104,7 @@ sequenceDiagram
 ## 2026-10-17 当前接口修订
 
 当前入口错误使用 core-agent-error.v1；模型创建 session 关联后调用模型，绑定提议与审计，显式签名派发 Risk；503 写失败审计并等待，回调校验后仍只有 PAPER。正式 Risk 审核闭环尚未验收。完整职责、时序、必填字段与图像见 core-agent-integration-guide-2026-10-17.md 及同名 DOCX。本节修正上方历史限制，不改变运行时接口。
+
+## 2026-10-18 严格校验补充
+
+本轮自动化无业务代码变更；启动时 main 无今日业务提交，团队后续协作者工作区变动单独保留。完整 Schema 检查发现 Risk 导出 source_task_id 未在严格 HandoffPackage 声明，两仓库一致复现。正式接收联调应先解决该字段归属与版本兼容；未修改 Schema 或绕过 Risk。现有回调必填 request/task/run/audit/handoff，session 由存储记录关联，不能称为六编号均由回调必填。当前完整架构、时序、字段归属与限制见 core-agent-integration-guide-2026-10-18.md 和同名双图 DOCX；历史记录不删除。
