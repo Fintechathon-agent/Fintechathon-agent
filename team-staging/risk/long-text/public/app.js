@@ -4,6 +4,11 @@ const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp
 const yuan = value => value === null || value === undefined ? "待补信息" : (value / 100).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const rawYuan = value => value === null || value === undefined ? "" : String(value / 100);
 const labels = { CASH: "现金线索", RESERVE: "保底线索", EXPENSE: "生活支出", INCOME: "收入", INVESTMENT: "投资计划", ASSET: "现有资产", OTHER: "待识别事项" };
+const expenseLabels = { STUDY: "留学／教育费用", TRANSPORT: "机票／交通费用", LIVING: "生活费", HOUSING: "房租／住宿费用", TRAVEL: "旅游计划" };
+const contextLabels = { HEADING: "标题", QUESTION: "提问", CONCERN: "资金顾虑", LOCATION: "留学地点", TRAVEL_DETAIL: "旅游目的地" };
+const itemLabel = item => item.context_kind && item.type === "OTHER" ? contextLabels[item.context_kind] : item.type === "EXPENSE" ? expenseLabels[item.expense_category] || labels.EXPENSE : labels[item.type];
+const isContext = item => item.context_kind && item.type === "OTHER" && item.disposition === "EXCLUDE";
+const rangeYuan = range => !range ? "待补信息" : range.min === range.max ? yuan(range.min) : `${yuan(range.min)} – ${yuan(range.max)}`;
 const stateLabels = { PLANNED: "计划", COMPLETED: "已发生", CONDITIONAL: "条件假设", NEGATED: "否定语句待核对", CANCELLED: "取消", CANCELLATION_REQUESTED: "申请取消（未必成功）", CORRECTION: "金额更正", AMBIGUOUS: "时态混合", UNSPECIFIED: "未注明时态" };
 let draft = null, busy = false, inputRevision = 0, modelEnabled = false;
 const integrated = location.pathname.startsWith("/risk/long-text");
@@ -41,25 +46,42 @@ function invalidate(sourceChanged = false) {
   $("nonoverlap").checked = false; $("step-result").classList.remove("active");
   if (sourceChanged) { $("review").hidden = true; sourceDirty = true; if (!integrated) draft = null; $("step-review").classList.remove("active"); }
   $("status").textContent = "输入已变化，旧结果已隐藏；请重新核对并测算。";
+  $("planning-preview").hidden = true;
 }
 function selectOptions(values, current) { return Object.entries(values).map(([key, label]) => `<option value="${key}" ${key === current ? "selected" : ""}>${esc(label)}</option>`).join(""); }
+function renderPlanning() {
+  const p = draft.planning_preview;
+  $("planning-preview").hidden = !p;
+  if (!p) return;
+  $("planning-preview").innerHTML = `<div class="planning-head"><h3>预算概览</h3><span class="tag">待核对 · 人民币元</span></div>
+    <div class="metric-grid"><div class="metric"><small>当前现金</small><strong>${esc(yuan(p.cash_minor))}</strong></div><div class="metric"><small>已知支出合计</small><strong>${esc(rangeYuan(p.known_expense_range_minor))}</strong></div><div class="metric"><small>扣除已知支出后的余额区间</small><strong>${esc(rangeYuan(p.remaining_after_known_expenses_minor))}</strong></div></div>
+    <p class="muted">余额区间尚未扣除未知预算、投资和独立保底；不是可直接投入的额度。</p>
+    <div class="budget-rows">${p.expense_rows.map(row => `<div><span>${esc(row.label)}${row.occurrence_count > 1 ? ` · ${row.occurrence_count}次` : ""}</span><strong>${row.range_minor ? esc(rangeYuan(row.range_minor)) : "预算待定 · 未计入"}</strong></div>`).join("") || "尚无可计入的支出事项。"}</div>
+    ${p.investment_items.length ? `<p><strong>投资意向已记录</strong><br>${p.investment_items.map(x => `${esc(x.text)} — ${x.amount_minor === null ? "金额待分配" : `${esc(yuan(x.amount_minor))} 元`}`).join("<br>")}<br><span class="muted">以核对栏填写的金额测算；未确定的方向保留为意向，不会自动分配全部余款。</span></p>` : ""}
+    ${p.next_steps.length ? `<h3>接下来只需明确</h3><ul>${p.next_steps.map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
+    <details><summary>预算概览怎么算</summary><ul>${p.assumptions.map(s => `<li>${esc(s)}</li>`).join("")}</ul></details>`;
+}
 function renderDraft() {
   $("review").hidden = false; $("step-review").classList.add("active"); $("revision").textContent = "版本 " + draft.revision;
-  $("items").innerHTML = draft.items.map((item, i) => `<article class="item" data-id="${esc(item.id)}"><div class="section-head"><strong>${i + 1}. ${esc(labels[item.type])}</strong><span class="meta">${esc(stateLabels[item.classification.status])} · 原文 ${item.source_span.start}–${item.source_span.end}</span></div><p class="source">${esc(item.text)}</p><div class="item-grid">
+  renderPlanning();
+  const cards = draft.items.map((item, i) => `<article class="item${isContext(item) ? " context-item" : ""}" data-id="${esc(item.id)}"><div class="section-head"><strong>${i + 1}. ${esc(itemLabel(item))}</strong><span class="meta">${esc(isContext(item) ? "补充背景 · 不单独计费" : stateLabels[item.classification.status])} · 原文 ${item.source_span.start}–${item.source_span.end}</span></div><p class="source">${esc(item.text)}</p>
+    ${isContext(item) ? "<details><summary>修改归类或处理方式</summary>" : ""}<div class="item-grid">
     <div><label for="${item.id}-type">事项类型</label><select id="${item.id}-type" data-field="type">${selectOptions(labels, item.type)}</select></div>
-    <div><label for="${item.id}-amount">金额（元）</label><input id="${item.id}-amount" data-field="amount_minor" type="number" min="0" step="0.01" value="${rawYuan(item.amount_minor)}" placeholder="未知"></div>
-    <div><label for="${item.id}-date">下一次日期</label><input id="${item.id}-date" data-field="due_date" type="date" value="${esc(item.due_date || "")}"></div>
-    <div><label for="${item.id}-repeat">周期</label><select id="${item.id}-repeat" data-field="recurrence">${selectOptions({ ONCE: "一次", MONTHLY: "每月", WEEKLY: "每周", DAILY: "每天" }, item.recurrence)}</select></div>
+    <div><label for="${item.id}-amount">金额（元）</label><input id="${item.id}-amount" data-field="amount_minor" type="number" min="0" step="0.01" value="${rawYuan(item.amount_minor)}" placeholder="${item.amount_range_minor ? esc(rangeYuan(item.amount_range_minor)) : item.amount_basis === "REMAINING" ? "剩余资金 · 待分配" : "未知"}">${item.amount_range_minor ? `<button class="link range-choice" type="button" data-id="${item.id}" data-amount="${item.amount_range_minor.max}">按上限 ${esc(yuan(item.amount_range_minor.max))} 元预留</button>` : ""}</div>
+    <div data-temporal ${["CASH", "RESERVE"].includes(item.type) ? "hidden" : ""}><label for="${item.id}-date">下一次日期</label><input id="${item.id}-date" data-field="due_date" type="date" value="${esc(item.due_date || "")}"></div>
+    <div data-temporal ${["CASH", "RESERVE"].includes(item.type) ? "hidden" : ""}><label for="${item.id}-repeat">周期</label><select id="${item.id}-repeat" data-field="recurrence">${selectOptions({ ONCE: "一次", MONTHLY: "每月", WEEKLY: "每周", DAILY: "每天" }, item.recurrence)}</select></div>
     <div><label for="${item.id}-disposition">本次如何处理</label><select id="${item.id}-disposition" data-field="disposition">${selectOptions({ INCLUDE: "计入测算", EXCLUDE: "不计入", UNRESOLVED: "待核对" }, item.disposition)}</select></div>
     <div><label for="${item.id}-certainty">是否确定纳入</label><select id="${item.id}-certainty" data-field="certainty">${selectOptions({ EXPECTED: "按此计划安排", UNCERTAIN: "可能发生／未确定" }, item.certainty)}</select></div>
-    <div class="wide"><label for="${item.id}-reason">不计入的原因</label><input id="${item.id}-reason" data-field="exclusion_reason" maxlength="240" value="${esc(item.exclusion_reason)}" placeholder="例如：已支付、他人情况、只是提问"></div></div>
+    <div class="wide"><label for="${item.id}-reason">不计入的原因</label><input id="${item.id}-reason" data-field="exclusion_reason" maxlength="240" value="${esc(item.exclusion_reason)}" placeholder="例如：已支付、他人情况、只是提问"></div></div>${isContext(item) ? "</details>" : ""}
     <p class="item-notes">${esc([...item.issues, ...item.date_notes, ...(item.duplicate_of ? ["与前面的原文重复，请确认是另一笔支出还是重复描述"] : []), ...(item.related_item_id ? ["可能延续上一事项，请核对是否合并或更正，避免重复计算"] : [])].join("；"))}</p>
-    <label class="check"><input class="item-reviewed" type="checkbox" data-id="${esc(item.id)}">已核对这条原文及以上解释</label></article>`).join("");
+    <label class="check"><input class="item-reviewed" type="checkbox" data-id="${esc(item.id)}">已核对这条原文及以上解释</label></article>`);
+  const contexts = cards.filter((_, i) => isContext(draft.items[i]));
+  $("items").innerHTML = cards.filter((_, i) => !isContext(draft.items[i])).join("") + (contexts.length ? `<details id="context-items"><summary>补充背景与提问 · ${contexts.length}条（不作为独立收支）</summary>${contexts.join("")}</details><label class="check"><input id="contexts-reviewed" type="checkbox">我已核对补充背景与提问，无需作为独立收支</label>` : "");
   for (const [id, key] of Object.entries({ cash: "cash_minor", floor: "hard_floor_minor", holds: "existing_holds_minor", fees: "fees_minor" })) $(id).value = rawYuan(draft.profile[key]);
   renderQuestions();
 }
 function renderQuestions() {
-  $("questions").innerHTML = draft.questions.length ? `<p><strong>待补信息 · ${draft.questions.length}项</strong></p><ul>${draft.questions.map(q => `<li>${q.item_id ? `事项${Number(q.item_id.split("-")[1]) + 1}：` : ""}${esc(q.message)}</li>`).join("")}</ul>` : "";
+  $("questions").innerHTML = draft.questions.length ? `<details><summary><strong>逐日测算与在线复核前，还需确认 ${draft.questions.length} 项</strong></summary><ul>${draft.questions.map(q => `<li>${q.item_id ? `${esc(itemLabel(draft.items.find(x => x.id === q.item_id)))}（事项${Number(q.item_id.split("-")[1]) + 1}）：` : ""}${esc(q.message)}</li>`).join("")}</ul></details>` : "";
 }
 function corrections() {
   const items = [...document.querySelectorAll(".item")].map(card => {
@@ -88,8 +110,19 @@ function renderResult() {
 function download(value, name) { const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: "application/json" })); const a = document.createElement("a"); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
 for (const id of ["source", "as-of", "horizon"]) $(id).addEventListener("input", () => { invalidate(true); $("counter").textContent = $("source").value.length.toLocaleString() + " / 20,000"; });
 $("review").addEventListener("input", event => {
+  if (event.target.id === "contexts-reviewed") { document.querySelectorAll(".context-item .item-reviewed").forEach(el => { el.checked = event.target.checked; }); return; }
   if (event.target.matches(".item-reviewed, #nonoverlap")) return;
-  invalidate(); const card = event.target.closest(".item"); if (card) card.querySelector(".item-reviewed").checked = false;
+  invalidate(); const card = event.target.closest(".item"); if (card) {
+    card.querySelector(".item-reviewed").checked = false;
+    if (event.target.dataset.field === "type") card.querySelectorAll("[data-temporal]").forEach(el => { el.hidden = ["CASH", "RESERVE"].includes(event.target.value); });
+  }
+  if ($("contexts-reviewed")) $("contexts-reviewed").checked = false;
+});
+$("items").addEventListener("click", event => {
+  const button = event.target.closest(".range-choice");
+  if (!button || busy) return;
+  const field = $(button.dataset.id + "-amount"); field.value = rawYuan(Number(button.dataset.amount)); field.dispatchEvent(new Event("input", { bubbles: true }));
+  $("status").textContent = "已选择区间上限作为预留金额；保存后更新预算概览，核对后再测算。";
 });
 document.querySelectorAll("[data-example]").forEach(button => button.addEventListener("click", () => { $("source").value = examples[button.dataset.example]; invalidate(true); $("counter").textContent = $("source").value.length + " / 20,000"; }));
 $("parse").addEventListener("click", () => action(async () => {
@@ -99,7 +132,7 @@ $("parse").addEventListener("click", () => action(async () => {
   draft = result;
   if (integrated) { const url = new URL(location.href); url.searchParams.set("draft_id", draft.draft_id); history.replaceState(null, "", url); }
   if (revision !== inputRevision) return; sourceDirty = false; renderDraft();
-  $("status").textContent = `已拆分${draft.items.length}项。请逐项核对，补齐必要信息。`; $("review").scrollIntoView({ block: "start" });
+  $("status").textContent = `已识别${draft.items.filter(x => !isContext(x)).length}条资金事项，另有${draft.items.filter(isContext).length}条背景与提问。可先查看预算概览。`; $("review").scrollIntoView({ block: "start" });
 }));
 $("save").addEventListener("click", () => action(async () => {
   if (!draft) return; const revision = inputRevision; const result = await request("correct", corrections());

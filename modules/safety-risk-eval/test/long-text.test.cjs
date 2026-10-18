@@ -95,3 +95,26 @@ test("Beijing date-only action can execute after local midnight before UTC midni
   assert.equal(task.input.action.at, "2026-10-18"); gateway.confirm(id, actor, f.confirm(task));
   assert.equal((await gateway.execute(id, actor, "beijing-midnight-safe")).status, "SUCCEEDED");
 });
+
+test("partial narrative budget survives restore and only confirmed amounts reach the workbench model", async t => {
+  const { call, gateway, actor } = setup(t);
+  const text = "现金18万元。1. 留学费用7万元。2. 生活费3到4万元。3. 旅游计划：想去旅游。我留学的地方在法国。剩余现金想all in指数基金。";
+  let draft = call("intake", { ...intake(), text });
+  assert.equal(draft.profile.cash_minor, 18000000);
+  assert.deepEqual(draft.planning_preview.known_expense_range_minor, { min: 10000000, max: 11000000 });
+  assert.deepEqual(call("restore", { draft_id: draft.draft_id }).planning_preview, draft.planning_preview);
+  assert.throws(() => call("handoff", binding(draft)), { code: "CONFIRMATION_REQUIRED" });
+  draft = call("correct", { ...binding(draft), items: draft.items.filter(x => ["EXPENSE", "INVESTMENT"].includes(x.type)).map(x => ({ id: x.id, due_date: "2026-11-01", amount_minor: x.amount_minor ?? x.amount_range_minor?.max ?? 1000000 })), profile: { hard_floor_minor: 1000000, existing_holds_minor: 0, fees_minor: 0 } });
+  draft = confirm(call, draft);
+  const task = call("handoff", binding(draft));
+  assert.equal(task.input.snapshot.purposes.length, 3);
+  assert.equal(task.input.action.amount_minor, 1000000);
+  assert.equal(task.review.metrics.projected_free_after_minor, draft.result.metrics.projected_free_after_minor);
+  await model.review({ gateway, actor, payload: { task_id: task.input.binding.task_id }, fetchImpl: async (_url, init) => {
+    const request = JSON.parse(init.body);
+    assert.ok(JSON.stringify(request).includes("4000000"));
+    assert.ok(JSON.stringify(request).includes(text));
+    return Response.json(f.modelResponse(request));
+  } });
+  assert.equal(gateway.inspect(task.input.binding.task_id, actor).approval.status, "UNCONFIRMED");
+});

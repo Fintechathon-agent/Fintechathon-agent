@@ -28,6 +28,10 @@
 
 响应的 `draft_id`、`revision` 和 `interpretation_sha256` 构成版本绑定，后续每次请求必须使用最新返回的三项。草稿中 `source_span.start/end` 是 UTF-16 下标，`end` 不包含尾字符，可用 JS `source_text.slice(start,end)` 校验。不要用 UTF-8 字节偏移解释。
 
+草稿输出新增只读 `planning_preview`，在解析、纠错、恢复和导出时根据当前事项重新计算。`scope=UNCONFIRMED_PARTIAL_BUDGET`；`expense_rows` 列出已知金额区间或缺失预算，`known_expense_range_minor` 为已知支出上下限，`remaining_after_known_expenses_minor` 仅为现金扣除这些支出后的区间，未扣除其他资金事实与投资。`next_steps` 指出需要补充的预算及口径，`suggested_horizon_days` 可提示年度计划。它不授予风险审批，不绕过 `confirm` / `handoff`。
+
+事项的 `amount_range_minor={min,max}` 保留人民币整数分的上下限，同时 `amount_minor=null`，需通过 `correct` 选择实际测算金额。`context_kind` 标记标题、提问、顾虑、地点与旅行补充信息；默认 `EXCLUDE` 并保留原因、原文及核对要求。`expense_category` 是支出标签；`amount_basis=REMAINING` / `allocation_intent=ALL_IN` 只是投资意图，不会自行产生投资金额。这些解释字段不可通过纠错接口直接篡改。
+
 ## 纠错与确认
 
 `correct.items` 每项包含 `id`，可修改 `type`、`amount_minor`、`due_date`、`recurrence`、`certainty`、`disposition`、`exclusion_reason`。不可修改原文范围、风险结果、确认记录或权限。`profile` 可修改 `cash_minor`、`hard_floor_minor`、`existing_holds_minor`、`fees_minor`，四项都须明确。

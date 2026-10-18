@@ -12,7 +12,9 @@
     <div class="samples"><span>试试虚构案例</span><button type="button" data-example="conflict" class="link">学费与投资冲突</button><button type="button" data-example="safe" class="link">留足生活资金</button><button type="button" data-example="uncertain" class="link">条件收入与已付款</button></div>
     <div class="input-row"><div><label for="as-of">分析基准日（北京时间）</label><input id="as-of" type="date" min="2000-01-01" max="2099-01-01" required></div><div><label for="horizon">未来测算区间</label><select id="horizon"><option value="30">30天</option><option value="90" selected>90天</option><option value="180">180天</option><option value="365">365天</option></select></div><button id="parse" class="primary" type="button">拆分并核对 →</button></div>
   </section>
-  <section id="review" hidden aria-labelledby="review-title"><div class="section-head"><h2 id="review-title">每件事，都和原文对得上</h2><span id="revision" class="tag"></span></div><p class="muted">规则识别可能不完整。请核对金额、日期、周期和是否计入；没有把握的地方会保留为待补信息。</p>
+  <section id="review" hidden aria-labelledby="review-title"><div class="section-head"><h2 id="review-title">先看预算，再核对细节</h2><span id="revision" class="tag"></span></div>
+    <div id="planning-preview" aria-label="预算概览"></div>
+    <h3>已识别的资金事项</h3><p class="muted">先核对分类与金额；需要逐日测算或在线复核时，再补齐付款日期和投资额度。</p>
     <div id="items"></div>
     <h3>本次采用的资金事实</h3><p class="muted">这里是统一测算口径。现金包含已经到账的钱；保底须独立于下方生活支出，已有占用须与这些预留互不重复。没有的项目请明确填0。</p>
     <div class="profile-grid"><div><label for="cash">账面现金（元）</label><input id="cash" type="number" step="0.01" min="0" placeholder="未知"></div><div><label for="floor">独立现金保底（元）</label><input id="floor" type="number" step="0.01" min="0" placeholder="未知"></div><div><label for="holds">已有冻结或任务占用（元）</label><input id="holds" type="number" step="0.01" min="0" placeholder="没有则填0"></div><div><label for="fees">投资计划合计费用（元）</label><input id="fees" type="number" step="0.01" min="0" placeholder="确认无费用则填0"></div></div>

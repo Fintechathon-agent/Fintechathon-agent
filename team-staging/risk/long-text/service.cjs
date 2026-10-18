@@ -27,13 +27,12 @@ function missing(draft) {
     if (item.requires_split) { add("source_text", "本句包含多个资金用途，请在原文拆成独立事项后重新解析；不能只填写一个金额", item.id); continue; }
     if (item.type === "OTHER" || item.type === "ASSET") { add("type", "请明确事项类型，或说明排除原因", item.id); continue; }
     if (["CASH", "RESERVE"].includes(item.type)) continue;
-    if (item.amount_minor === null) add("amount_minor", "请补齐本事项的明确人民币金额", item.id);
+    if (item.amount_minor === null || item.issues.length) add("amount_minor", item.issues.length ? item.issues.join("；") : item.amount_basis === "REMAINING" ? "已识别为使用余款投资，请在预留生活与旅游预算后明确投资金额" : "请补齐本事项的明确人民币金额", item.id);
     if (item.due_date === null) add("due_date", "请补齐具体日期，不能把下月或近期默认为某一天", item.id);
     else if (item.due_date < draft.as_of) add("due_date", "日期早于分析日，请核对是否已支付或仍逾期待付", item.id);
     else if (item.due_date > draft.through) add("horizon_days", "事项超出测算区间，请扩大区间或明确另行预留后排除", item.id);
     if (item.certainty === "UNCERTAIN" && item.type !== "INCOME") add("certainty", "请核对该条件支出是否要纳入本次计划", item.id);
     if (item.type === "INVESTMENT" && item.recurrence !== "ONCE") add("recurrence", "定投请按本测算区间内计划总额填写为一次占用，或逐笔写入原文", item.id);
-    if (item.issues.length) add("amount_minor", item.issues.join("；"), item.id);
   }
   return result;
 }
@@ -54,6 +53,47 @@ function addMoney(values) {
   const total = values.reduce((a, b) => a + b, 0);
   if (!Number.isSafeInteger(total)) fail("AMOUNT_OVERFLOW", "金额合计超出精确计算范围");
   return total;
+}
+const EXPENSE_LABELS = { STUDY: "留学／教育", TRANSPORT: "机票／交通", LIVING: "生活费", HOUSING: "房租／住宿", TRAVEL: "旅游", OTHER: "其他支出" };
+function planningPreview(draft) {
+  // A partial budget is useful before payment dates are known. It never replaces
+  // confirmation or supplies missing amounts to the authoritative risk engine.
+  const included = draft.items.filter(x => x.disposition === "INCLUDE");
+  const expenses = included.filter(x => x.type === "EXPENSE");
+  const rows = expenses.map(item => {
+    let range = item.amount_minor !== null && !item.issues.length ? { min: item.amount_minor, max: item.amount_minor }
+      : item.issues.length === 1 && item.issues[0] === "金额有范围或估计，请确认用于测算的金额" ? item.amount_range_minor || null : null;
+    if (item.requires_split) range = null;
+    let count = 1;
+    if (item.recurrence !== "ONCE") {
+      if (!item.due_date || item.due_date < draft.as_of || item.due_date > draft.through) { range = null; count = null; }
+      else {
+        try { count = occurrences(item, draft.through).length; } catch { range = null; count = null; }
+      }
+    }
+    if (range && count !== null) range = { min: range.min * count, max: range.max * count };
+    return { item_id: item.id, label: EXPENSE_LABELS[item.expense_category] || "生活支出", text: item.text, range_minor: range, occurrence_count: count };
+  });
+  const known = rows.filter(x => x.range_minor);
+  const total = known.length ? { min: addMoney(known.map(x => x.range_minor.min)), max: addMoney(known.map(x => x.range_minor.max)) } : null;
+  const cash = draft.profile.cash_minor;
+  const remaining = cash !== null && total ? { min: cash - total.max, max: cash - total.min } : null;
+  const investments = included.filter(x => x.type === "INVESTMENT");
+  const needs = [];
+  for (const row of rows.filter(x => !x.range_minor)) needs.push(`${row.label}尚缺${row.occurrence_count === null ? "周期起始日期" : "预算金额"}，暂未计入合计。`);
+  if (expenses.some(x => x.expense_category === "STUDY") && expenses.some(x => ["LIVING", "TRANSPORT"].includes(x.expense_category))) needs.push("请确认留学费用是否已包含生活费或机票；概览暂按各项独立相加，避免确认时重复预留。");
+  if (investments.some(x => x.amount_minor === null && (x.amount_basis === "REMAINING" || x.allocation_intent === "ALL_IN"))) needs.push("“剩余资金／all in”已识别为投资意向；先确定旅游、独立保底和费用，再填写投资总额及各方向分配，同一笔余款不会重复计算。");
+  else if (investments.some(x => x.amount_minor === null)) needs.push("投资方向已记录，请补充各笔投资金额；未填写的金额不会按零处理。");
+  const annual = /(?:留学|出国)[^。！？；\n]{0,30}(?:一年|1\s*年)|(?:一年|1\s*年)[^。！？；\n]{0,20}(?:留学|生活费)/u.test(draft.source_text);
+  if (annual && draft.horizon_days < 365) needs.push(`原文涉及一年安排，当前逐日测算区间是${draft.horizon_days}天；可切换365天后重新解析。年度总额不会自动当作每月金额。`);
+  const unresolved = draft.items.filter(x => x.disposition === "UNRESOLVED" && !x.context_kind);
+  if (unresolved.length) needs.push(`另有${unresolved.length}条资金事项待核对，尚未纳入预算合计。`);
+  return { scope: "UNCONFIRMED_PARTIAL_BUDGET", cash_minor: cash, expense_rows: rows, known_expense_range_minor: total,
+    remaining_after_known_expenses_minor: remaining, unknown_expense_ids: rows.filter(x => !x.range_minor).map(x => x.item_id),
+    investment_items: investments.map(x => ({ item_id: x.id, text: x.text, amount_minor: x.amount_minor, amount_basis: x.amount_basis })),
+    suggested_horizon_days: annual ? 365 : null, next_steps: needs,
+    assumptions: ["金额区间保留上下限；未选择前不会变成确认金额。", "剩余区间只扣除上列已知支出，尚未扣除未知旅游预算、独立保底、已有占用、投资和费用。", "概览不要求先填付款日期；逐日测算与在线复核仍需确认金额、日期及是否重复。"],
+    execution_allowed: false, risk_approval_granted: false };
 }
 function evaluate(draft) {
   const questions = missing(draft);
@@ -107,7 +147,7 @@ class Sessions {
     this.now = now; this.ttlMs = ttlMs; this.capacity = capacity; this.sessions = new Map();
   }
   prune() { for (const [id, row] of this.sessions) if (row.expires <= this.now().getTime()) this.sessions.delete(id); }
-  output(draft) { return clone({ ...draft, questions: missing(draft) }); }
+  output(draft) { return clone({ ...draft, planning_preview: planningPreview(draft), questions: missing(draft) }); }
   create(owner, input) {
     only(input, ["text", "data_mode", "as_of", "horizon_days", "channel", "is_final"], "输入");
     this.prune(); if (this.sessions.size >= this.capacity) fail("CAPACITY", "草稿已满，请稍后重试", 429);
@@ -200,4 +240,4 @@ class Sessions {
   }
 }
 
-module.exports = { Sessions, evaluate, missing, occurrences, binding, describePolicy };
+module.exports = { Sessions, evaluate, missing, occurrences, binding, describePolicy, planningPreview };
