@@ -1,0 +1,178 @@
+{
+  "sourceBaseCommit": "176ffbadf6bf060efb49b624238562c100f9bf2f",
+  "reviewedTeamMain": "c243950a8b3bba1b38fd18647e336627d982d14f",
+  "sourceBranch": "codex/kosx-landing-glass",
+  "candidateOnly": true,
+  "files": [
+    {
+      "file": "chenchen/server.js",
+      "stored_as": "source-overlay/chenchen/server.js",
+      "sha256": "e7e049c9b72eab9d73e7c429065d7ae0b157ffb3028b0f5b7641fd4da0d2480d"
+    },
+    {
+      "file": "chenchen/package.json",
+      "stored_as": "source-overlay/chenchen/package.json",
+      "sha256": "500238a73ea29df602252f8b61295a1dc5753329f1cff1ad4bacf0102805ff3c"
+    },
+    {
+      "file": "chenchen/integrations/model-review.js",
+      "stored_as": "source-overlay/chenchen/integrations/model-review.js",
+      "sha256": "334c8681da11f0cbbe2ef8c59bccae998bf019fd664204f885e3fe98e5db9248"
+    },
+    {
+      "file": "chenchen/integrations/local-review.js",
+      "stored_as": "source-overlay/chenchen/integrations/local-review.js",
+      "sha256": "da28c7177f4399f38f6f4927f69fa0093a5c51e70cbd0aaa66214de0d6aed512"
+    },
+    {
+      "file": "chenchen/scripts/build-static.cjs",
+      "stored_as": "source-overlay/chenchen/scripts/build-static.cjs",
+      "sha256": "e3c547b8bf37a4c48c8ca35ff95d807b09e58b6adcf8c7197df0e4edc0fec14b"
+    },
+    {
+      "file": "chenchen/scripts/static-check.cjs",
+      "stored_as": "source-overlay/chenchen/scripts/static-check.cjs",
+      "sha256": "251279b51198907e160f83825c3274175693f5549e90aea952d562aa5fec8cbf"
+    },
+    {
+      "file": "chenchen/scripts/start-local.cjs",
+      "stored_as": "source-overlay/chenchen/scripts/start-local.cjs",
+      "sha256": "a1b6cca4945a30ed342475d2865a720b57a796580302b9a0d8cd5c9ed2ccdb03"
+    },
+    {
+      "file": "chenchen/scripts/single-product-check.cjs",
+      "stored_as": "source-overlay/chenchen/scripts/single-product-check.cjs",
+      "sha256": "481991fcd42f6620a6fd9b57c710b6b571417389f796687084f27380bea05b6f"
+    },
+    {
+      "file": "chenchen/scripts/local-review-browser-check.cjs",
+      "stored_as": "source-overlay/chenchen/scripts/local-review-browser-check.cjs",
+      "sha256": "4e0daf03ed0c8093eb816c1f50e1e63e0f69476928b35a43e59d31a164ff0eee"
+    },
+    {
+      "file": "chenchen/scripts/check.js",
+      "stored_as": "source-overlay/chenchen/scripts/check.js",
+      "sha256": "7ac64053feadb6b73041ed6d8632ee211ef27cf6478c803c1338ba8bede3037a"
+    },
+    {
+      "file": "chenchen/scripts/glyph-check.cjs",
+      "stored_as": "source-overlay/chenchen/scripts/glyph-check.cjs",
+      "sha256": "7e50832bd688ab7870afa95962911da5f493e282183e78fdbfc64219325817b5"
+    },
+    {
+      "file": "chenchen/scripts/smoke.js",
+      "stored_as": "source-overlay/chenchen/scripts/smoke.js",
+      "sha256": "8f18e54483880b4da8b96ab7c44760e8fd3ec12e1753de576e6b89181e29e8db"
+    },
+    {
+      "file": "chenchen/scripts/archive-check.cjs",
+      "stored_as": "source-overlay/chenchen/scripts/archive-check.cjs",
+      "sha256": "a40930f05f5771672e19598ee42b7e806db6860313e19a34b205b1fcc19aaeb9"
+    },
+    {
+      "file": "chenchen/versions/archive.js",
+      "stored_as": "source-overlay/chenchen/versions/archive.js",
+      "sha256": "b1ef4976e5b5bd4433fc2c41e9302e7c8d54ee6923736304fb03cbbbc871023e"
+    },
+    {
+      "file": "chenchen/versions/common.js",
+      "stored_as": "source-overlay/chenchen/versions/common.js",
+      "sha256": "9aa7c825385e27effde3dba62d43ffd037725188de809eb1049b7121f6b33edb"
+    },
+    {
+      "file": "chenchen/versions/investment.js",
+      "stored_as": "source-overlay/chenchen/versions/investment.js",
+      "sha256": "d6b5a3bb04042d7c19b2ba5858cf302d935b0344b9600645e0c01eb8ebda0183"
+    },
+    {
+      "file": "chenchen/versions/presentation.mjs",
+      "stored_as": "source-overlay/chenchen/versions/presentation.mjs",
+      "sha256": "3c101315ff25b886969f5a88dee77d39ecdf0d3ba6a35c86c64a47ff4f4404d8"
+    },
+    {
+      "file": "chenchen/versions/ui-model.mjs",
+      "stored_as": "source-overlay/chenchen/versions/ui-model.mjs",
+      "sha256": "36a541873a0b49b455aca9fe8c380eb0c145c87e18ed499476e86117196eaff6"
+    },
+    {
+      "file": "chenchen/versions/landing.js",
+      "stored_as": "source-overlay/chenchen/versions/landing.js",
+      "sha256": "a7e191b6b73467f75daad729c37582570c39f6228dd37e7fc66afbf6d1f4c95a"
+    },
+    {
+      "file": "chenchen/versions/favicon.svg",
+      "stored_as": "source-overlay/chenchen/versions/favicon.svg",
+      "sha256": "ca56ebcd31ed874d312ff5a98777f5fb92dbe45b801d70c4cd033b0bba365399"
+    },
+    {
+      "file": "chenchen/versions/tokens.css",
+      "stored_as": "source-overlay/chenchen/versions/tokens.css",
+      "sha256": "d7f804216bca1e98d37ab3764790b9bdb59a15d615e19fbce70e4ca737c76136"
+    },
+    {
+      "file": "chenchen/versions/glass.css",
+      "stored_as": "source-overlay/chenchen/versions/glass.css",
+      "sha256": "a54c2e2f82dfd4aea9d1d46d91b5d296f017b25d7e172114799ff125f185fafd"
+    },
+    {
+      "file": "chenchen/versions/style.css",
+      "stored_as": "source-overlay/chenchen/versions/style.css",
+      "sha256": "3ad7936e65dca78942e26724de6ceece560d2e640d0e5da9b3fd6b71dbcf7998"
+    },
+    {
+      "file": "chenchen/versions/product-overrides.css",
+      "stored_as": "source-overlay/chenchen/versions/product-overrides.css",
+      "sha256": "dda507e6f78a6ea2d04f475acc9a36be6eb13343a7c66bf9c2709cd139b30d99"
+    },
+    {
+      "file": "chenchen/versions/kosx.css",
+      "stored_as": "source-overlay/chenchen/versions/kosx.css",
+      "sha256": "04dd2743cc6c9363d9f7f83a73468c90a412304ebe344ddb6d4eba92122de709"
+    },
+    {
+      "file": "chenchen/versions/landing.css",
+      "stored_as": "source-overlay/chenchen/versions/landing.css",
+      "sha256": "6c993693fdfd969dfc65a4a790cc987f9cf38e76792880564a96d149e8949c71"
+    },
+    {
+      "file": "chenchen/versions/ai-review.js",
+      "stored_as": "source-overlay/chenchen/versions/ai-review.js",
+      "sha256": "2015af3b1a6e9a065d308b1d67091913382e196c43b0f2c9ff98e11c05b8903f"
+    },
+    {
+      "file": "chenchen/versions/ai-review.css",
+      "stored_as": "source-overlay/chenchen/versions/ai-review.css",
+      "sha256": "9f2295830b2316bcd9849eccbdda720297dbd658cfdf61688249a5a4f8200bac"
+    },
+    {
+      "file": "chenchen/versions/landing.html",
+      "stored_as": "source-overlay/chenchen/versions/landing.html",
+      "sha256": "c4210b798b351eea79a1c6c33463972a5658fc4ec466c52f836424f49f01ae01"
+    },
+    {
+      "file": "chenchen/versions/home.html",
+      "stored_as": "source-overlay/chenchen/versions/home.html",
+      "sha256": "4cbf38c31dbc728ce415986ce65caabf580d17a4951980eea2e748128f295d82"
+    },
+    {
+      "file": "chenchen/versions/investment.html",
+      "stored_as": "source-overlay/chenchen/versions/investment.html",
+      "sha256": "3b8da85dda1f1f738a484f318f54fb30efaf6f84a81f08733cad57d2202a8771"
+    },
+    {
+      "file": "chenchen/versions/not-found.html",
+      "stored_as": "source-overlay/chenchen/versions/not-found.html",
+      "sha256": "59005e666c48bf8fb71b9e0953338cf3f50ee6e9c14de00ff3a3c8efa5913864"
+    },
+    {
+      "file": "chenchen/tests/http.test.js",
+      "stored_as": "source-overlay/chenchen/tests/http.test.js.source",
+      "sha256": "5bd19e641aa43076ca2bd0c0cbbf71e9c8a8aa6d06a9b40dff3aea07a5e35a03"
+    },
+    {
+      "file": "chenchen/tests/local-review.test.js",
+      "stored_as": "source-overlay/chenchen/tests/local-review.test.js.source",
+      "sha256": "92c9903449f9d7e06532edb0451da83bf0bc92bbf4532eb1bcb4523a60a585ee"
+    }
+  ]
+}

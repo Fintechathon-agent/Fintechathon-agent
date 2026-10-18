@@ -1,0 +1,39 @@
+{
+  "browser": "Chrome",
+  "mocked_failure_cases": [
+    "MODEL_AUTH_FAILED",
+    "MODEL_TIMEOUT",
+    "MODEL_RATE_LIMITED",
+    "LOCAL_RATE_LIMITED",
+    "MODEL_INVALID_RESPONSE",
+    "RULE_FALLBACK_REJECTED"
+  ],
+  "live": {
+    "http_status": 200,
+    "roundtrip_ms": 12359,
+    "provider_duration_ms": 12301,
+    "model": "qwen3.8-flash",
+    "source": "model",
+    "call_succeeded": true,
+    "frontend_matches_response": true,
+    "browser_credentials_absent": true,
+    "execution_allowed": false,
+    "usage": {
+      "prompt_tokens": 439,
+      "total_tokens": 1035,
+      "completion_tokens": 596,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "text_tokens": 439
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 352,
+        "text_tokens": 596
+      }
+    },
+    "run_id": "review-94ddc8da-e411-4511-a0d9-a60f02f6ab1c",
+    "audit_id": "audit-e7ae691f-3cf8-4147-b8cb-4be2fd03b6ce",
+    "summary": "该文本称虚构企业星澜科技拟调整业务布局，但未披露投资金额、实施日期及审议结果，无法评估业务调整的具体影响或真实性。"
+  },
+  "axe_violations": []
+}

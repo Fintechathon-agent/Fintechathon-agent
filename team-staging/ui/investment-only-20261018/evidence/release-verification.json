@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-18",
+  "candidateNode": {
+    "pass": 57,
+    "fail": 0,
+    "reconstructedFromManifest": true
+  },
+  "teamBaselineNode": {
+    "commit": "c243950a8b3bba1b38fd18647e336627d982d14f",
+    "pass": 193,
+    "fail": 0
+  },
+  "syntax": true,
+  "glyphs": true,
+  "paidModelRequestsThisRelease": 0,
+  "sensitiveScan": {
+    "personalFiles": 62,
+    "teamFiles": 584,
+    "personalHistoryBlobs": 56,
+    "teamHistoryBlobs": 1371,
+    "configuredKeyHits": 0,
+    "tokenPatternCandidates": 0,
+    "forbiddenConfigFiles": 0
+  },
+  "personalRelease": {
+    "branch": "preview",
+    "commit": "cd1ac68fd9ca09afa64965ac29d692ce5d530e8f",
+    "remoteVerified": true
+  }
+}
