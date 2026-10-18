@@ -1,0 +1,45 @@
+# Owner review is required. Copy to an ignored local file before filling values.
+name = "personal-ai-fund-manager-core-agent"
+main = "worker-entry.mjs"
+compatibility_date = "2026-10-11"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+[vars]
+MODEL_PROVIDER = "aliyun_bailian"
+MODEL_NAME = "qwen3.8-flash"
+MODEL_API_STYLE = "chat_completions"
+MODEL_RESPONSE_FORMAT = "json_object"
+MODEL_TIMEOUT_MS = "30000"
+MODEL_MAX_ATTEMPTS = "1"
+MODEL_FALLBACK_TO_RULES = "false"
+MODEL_DISABLE_RULE_FALLBACK = "true"
+BAILIAN_REGION = "cn-beijing"
+BAILIAN_WORKSPACE_ID = ""
+BAILIAN_ALLOW_PAID_CALLS = "false"
+BAILIAN_TEST_BUDGET_CNY = "0"
+BAILIAN_MAX_OUTPUT_TOKENS = "800"
+TINGLAN_DAILY_REQUESTS = "5"
+MODEL_REQUESTS_PER_MINUTE = "6"
+RATE_LIMIT_PER_MINUTE = "30"
+REQUIRE_TRUSTED_ACTORS = "true"
+CORS_ORIGINS = "https://lixjanus526-art.github.io"
+ACCESS_ISSUER = ""
+ACCESS_AUD = ""
+ACCESS_ALLOWED_EMAILS = ""
+# Configure DASHSCOPE_API_KEY and CORE_AGENT_API_KEY as encrypted Secrets only.
+# Retain the existing AI binding to preserve compatibility during rollback.
+[ai]
+binding = "AI"
+[[durable_objects.bindings]]
+name = "REVIEW_SERVICE"
+class_name = "ReviewService"
+[[migrations]]
+tag = "review-service-v1"
+new_sqlite_classes = ["ReviewService"]
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+
+# Owner adds an existing controlled custom domain route; never deploy this blank template as-is.

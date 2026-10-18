@@ -1,0 +1,13 @@
+<section class="panel" id="ai-assistant" aria-labelledby="tinglan-title">
+<p class="section-kicker">AI / 偏好分析</p><h2 id="tinglan-title">听澜 AI 助手</h2>
+<p class="small muted">输入示例投资偏好与待分析问题。AI 内容单独标记，不改写上方确定性计算；没有可信行情或持仓时只说明资料缺口。</p>
+<form id="tinglan-form"><div class="fields">
+<label>投资期限（天）<input name="horizon" type="number" min="1" max="36500" required></label>
+<label>可承受回撤（%）<input name="drawdown" type="number" min="0.1" max="100" step="0.1" required></label>
+<label>资金需求<select name="liquidity" required><option value="">请选择</option><option value="low">近期无需动用</option><option value="medium">需要预留备用金</option><option value="high">近期需要资金</option></select></label></div>
+<label>希望分析的问题<textarea name="text" maxlength="2000" required placeholder="请使用虚构示例，不要填写账号、身份证、密码或密钥。"></textarea></label>
+<label class="small"><input name="synthetic" type="checkbox" required> 我确认本轮使用虚构示例，不含真实账户或身份资料。</label>
+<button type="submit" disabled>请求 AI 分析</button></form>
+<p id="tinglan-status" role="status" aria-live="polite">正在检查安全入口配置…</p>
+<div id="tinglan-result" hidden aria-live="polite"><p data-result="meta" class="small muted"></p><h3>模型分析</h3><p data-result="summary"></p><h3>分析依据</h3><p data-result="reason"></p><p data-result="evidence"></p><h3>待补充信息</h3><p data-result="missing"></p><details><summary>运行与审计记录</summary><pre data-result="trace"></pre></details><p class="small">未执行交易。AI 结果仍需 Core、Risk、PAPER 与 Audit 流程核验。</p></div>
+</section>

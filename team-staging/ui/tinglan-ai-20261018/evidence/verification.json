@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-18",
+  "base": "c243950a8b3bba1b38fd18647e336627d982d14f",
+  "tests": {
+    "candidate": 11,
+    "regression": 193,
+    "failed": 0,
+    "provider": "MOCK"
+  },
+  "paidCalls": 0,
+  "deployment": "OWNER_REQUIRED",
+  "cloudflare": {
+    "healthStatus": 200,
+    "healthDurationMs": 1922,
+    "provider": "cloudflare_workers_ai",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "audit": "durable_object",
+    "earlierNodeDirectRequests": "FAILED",
+    "mainlandNetwork": "NOT_INDEPENDENTLY_VERIFIED"
+  },
+  "localConfig": {
+    "exists": true,
+    "gitIgnored": true,
+    "keyPresent": true,
+    "model": "qwen3.8-flash",
+    "fullBeijingEndpoint": true,
+    "secretPrinted": false
+  }
+}
