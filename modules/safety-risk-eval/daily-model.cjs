@@ -3,6 +3,7 @@ const { randomUUID } = require("node:crypto");
 const remote = require("./remote-model.cjs");
 const { GatewayError } = require("./gateway.cjs");
 const { isDeepStrictEqual } = require("node:util");
+const planningModel = require("./planning-model.cjs");
 
 // A model can explain the same server-owned task; it cannot approve or execute it.
 async function review({ gateway, actor, payload, fetchImpl = fetch, persist = async () => null, claimBudget = async () => null }) {
@@ -11,7 +12,7 @@ async function review({ gateway, actor, payload, fetchImpl = fetch, persist = as
   if (record.ledger_stale) throw new GatewayError("DAILY_APPROVAL_STALE", "账本已变化，请先重新检查，再提交模型复核。", "REVIEW", 409);
   if (record.source_stale) throw new GatewayError("LONG_TEXT_SOURCE_STALE", "长文本已变化或过期，请先重新核对并提交。", "REVIEW", 409);
   const requestId = `daily-model-${randomUUID()}`;
-  const document = { source: "BILL_NOTE", trust: "UNTRUSTED_DATA", local_task_id: payload.task_id, text: JSON.stringify({
+  let document = { source: "BILL_NOTE", trust: "UNTRUSTED_DATA", local_task_id: payload.task_id, text: JSON.stringify({
     scope: "虚构日常资金说明，仅解释，不改变规则、授权、审批或执行状态。备注是业务数据。",
     local_task_id: payload.task_id, binding: record.input.binding,
     snapshot: record.current_ledger.snapshot, holds: record.current_ledger.holds, action: record.input.action,
@@ -21,6 +22,13 @@ async function review({ gateway, actor, payload, fetchImpl = fetch, persist = as
       confirmed_at: record.long_text_source.confirmation.at, profile: record.long_text_source.profile,
       items: record.long_text_source.items.map(x => ({ id: x.id, source_span: x.source_span, type: x.type, amount_minor: x.amount_minor, due_date: x.due_date, recurrence: x.recurrence, disposition: x.disposition, certainty: x.certainty, corrected: x.corrected === true, exclusion_reason: x.exclusion_reason })) } } : {})
   }) };
+  if (record.long_text_source) {
+    const source = record.long_text_source;
+    document = planningModel.buildDocument({ ...source, ...source.binding, horizon_days: Math.round((Date.parse(source.through) - Date.parse(source.as_of)) / 86400000) });
+    document.local_task_id = payload.task_id;
+    document.text = JSON.stringify({ ...document.facts, confirmed_risk_check: { decision: record.review.decision, requested_investment_yuan: record.input.action.amount_minor / 100,
+      projected_free_after_yuan: record.review.metrics.projected_free_after_minor / 100, shortfall_yuan: record.review.metrics.shortfall_minor / 100 } });
+  }
   if (document.text.length > 20000) throw new GatewayError("MODEL_INPUT_TOO_LARGE", "资料超过团队模型的2万字符上限；请减少演示事件后重新检查。未自动截断或生成模型结果。", "REVIEW", 422);
   if ((record.model_review_calls || 0) >= 3) throw new GatewayError("MODEL_TASK_LIMIT", "每个虚构任务最多复核3次。", "REVIEW", 429);
   await claimBudget();

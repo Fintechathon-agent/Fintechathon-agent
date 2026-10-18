@@ -112,7 +112,7 @@ test("partial narrative budget survives restore and only confirmed amounts reach
   assert.equal(task.review.metrics.projected_free_after_minor, draft.result.metrics.projected_free_after_minor);
   await model.review({ gateway, actor, payload: { task_id: task.input.binding.task_id }, fetchImpl: async (_url, init) => {
     const request = JSON.parse(init.body);
-    assert.ok(JSON.stringify(request).includes("4000000"));
+    assert.ok(JSON.parse(request.text).expenses.some(x => x.amount_range_yuan.max === 40000));
     assert.ok(JSON.stringify(request).includes(text));
     return Response.json(f.modelResponse(request));
   } });

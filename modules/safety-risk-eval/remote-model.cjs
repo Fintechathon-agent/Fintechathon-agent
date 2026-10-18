@@ -53,13 +53,14 @@ function validate(value, { requestId, document } = {}) {
 
 function buildRequest(document, requestId) {
   if (!identifier(requestId) || document?.trust !== "UNTRUSTED_DATA" || !["BILL_NOTE", "FINANCIAL_NEWS"].includes(document.source) || typeof document.text !== "string") throw fail("MODEL_REQUEST_INVALID", "缺少服务器登记的虚构业务材料。", 400);
-  return { request_id: requestId, kind: document.source === "FINANCIAL_NEWS" ? "news" : "bill", source: SOURCE, text: document.text, requested_action: "仅分析虚构业务材料及外部指令，不执行交易、付款或记忆写入", action_parameters: {}, context: { synthetic: true, authorized_intent: "ANALYZE_ONLY", business_data_trust: "UNTRUSTED_DATA" }, allow_rule_fallback: false,
+  const planning = document.review_profile === "LONG_TEXT_PLANNING";
+  return { request_id: requestId, kind: document.source === "FINANCIAL_NEWS" ? "news" : "bill", source: SOURCE, text: document.text, requested_action: planning ? document.requested_action : "仅分析虚构业务材料及外部指令，不执行交易、付款或记忆写入", action_parameters: {}, context: { synthetic: true, authorized_intent: "ANALYZE_ONLY", business_data_trust: "UNTRUSTED_DATA", ...(planning ? { review_focus: "GROUNDED_BUDGET_PLANNING", money_unit: "CNY_YUAN" } : {}) }, allow_rule_fallback: false,
     ...(identifier(document.local_task_id) ? { schema_version: "model-review.v1", source_task_id: document.local_task_id, scenario: "FUNDING_CONFLICT", data_mode: "SYNTHETIC_REPLAY", execution_mode: "PAPER", capability: "REVIEW_ONLY" } : {}) };
 }
 async function callReview({ document, requestId, fetchImpl = fetch }) {
   const body = buildRequest(document, requestId);
   try {
-    const value = await readJson(await fetchImpl(ENDPOINT, { method: "POST", redirect: "manual", signal: AbortSignal.timeout(60000), headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }));
+    const value = await readJson(await fetchImpl(ENDPOINT, { method: "POST", redirect: "manual", signal: AbortSignal.timeout(document.review_profile === "LONG_TEXT_PLANNING" ? 45000 : 60000), headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }));
     return validate(value, { requestId, document });
   } catch (error) { if (error instanceof GatewayError) throw error; throw fail("MODEL_SERVICE_UNAVAILABLE", "模型调用超时或连接失败，已暂停；不会切换为离线成功。", 503); }
 }

@@ -44,3 +44,23 @@ test("model outage leaves same workbench task available for explicit retry", asy
   const retry = await call("handoff", binding(draft)); assert.equal(retry.input.binding.task_id, id); assert.equal(retry.model_review, undefined); assert.equal(retry.approval.status, "UNCONFIRMED");
   fail = false; assert.equal((await post("/api/safety/daily/model-review", { task_id: id })).status, 200);
 });
+
+test("planning HTTP uses current draft without confirmation and preserves session, CSRF and revision checks", async t => {
+  const fixture = require("./planning-fixture.cjs"); let calls = 0;
+  const { base, post, call } = await start(t, { coreFetch: async (_u, init) => { calls++; return Response.json(fixture.response(JSON.parse(init.body))); } });
+  let draft = await call("intake", { text: fixture.text, data_mode: "SYNTHETIC_REPLAY", as_of: new Date().toISOString().slice(0, 10), horizon_days: 365 });
+  const route = "/api/safety/long-text/plan-review", source = binding(draft);
+  assert.equal((await post(route, source, { "x-risk-csrf": "wrong" })).status, 403);
+  assert.equal((await post(route, source, { origin: "https://evil.invalid" })).status, 403);
+  assert.equal((await post(route, { ...source, execution_allowed: true })).status, 422);
+  const other = await fetch(base + "/api/safety/session"), auth = await other.json(), cookie = other.headers.get("set-cookie").split(";")[0];
+  assert.equal((await post(route, source, { cookie, "x-risk-csrf": auth.csrf })).status, 404);
+  assert.equal(calls, 0);
+  const result = await call("plan-review", source);
+  assert.equal(result.quality.passed, true); assert.equal(result.execution_allowed, false);
+  draft = await call("restore", { draft_id: draft.draft_id });
+  assert.equal(draft.planning_review.run_id, result.run_id); assert.equal(draft.confirmation, null);
+  assert.equal((await post("/api/safety/long-text/handoff", source)).status, 422);
+  draft = await call("correct", { ...source, items: [], profile: { fees_minor: 100 } });
+  assert.equal(draft.planning_review, null); assert.equal((await post(route, source)).status, 409); assert.equal(calls, 1);
+});

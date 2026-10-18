@@ -164,7 +164,7 @@ class Sessions {
     return row;
   }
   changed(row, draft, event) {
-    draft.revision = row.draft.revision + 1; draft.confirmation = null; draft.result = null;
+    draft.revision = row.draft.revision + 1; draft.confirmation = null; draft.result = null; draft.planning_review = null;
     draft.interpretation_sha256 = hash({ source: draft.source_text, items: draft.items, profile: draft.profile, as_of: draft.as_of, horizon: draft.horizon_days, revision: draft.revision });
     draft.audit = [...row.draft.audit, { event, at: this.now().toISOString(), revision: draft.revision, interpretation_sha256: draft.interpretation_sha256 }];
     row.draft = draft; return this.output(draft);

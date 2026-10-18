@@ -4,6 +4,7 @@ import dailyGatewayModule from "../daily-gateway.cjs";
 import dailyEngine from "../daily-engine.cjs";
 import dailyModel from "../daily-model.cjs";
 import longText from "../long-text.cjs";
+import planningModel from "../planning-model.cjs";
 import adapter from "../core-adapter.cjs";
 import security from "../security.cjs";
 import policy from "../policy.cjs";
@@ -89,7 +90,12 @@ export default {
         return { upstream, risk };
       }
       let result;
-      if (request.method === "POST" && url.pathname.startsWith("/api/safety/long-text/")) result = new longText.LongTextBridge({ store, gateway: dailyGateway }).handle(url.pathname.slice("/api/safety/long-text/".length), actor, payload);
+      if (request.method === "POST" && url.pathname === "/api/safety/long-text/plan-review") result = await planningModel.review({ bridge: new longText.LongTextBridge({ store, gateway: dailyGateway }), actor, payload, persist: () => store.flush(), claimBudget: async () => {
+        const day = new Date().toISOString().slice(0, 10);
+        const claimed = await env.DB.prepare("INSERT INTO risk_model_budget(day,calls) VALUES(?1,1) ON CONFLICT(day) DO UPDATE SET calls=calls+1 WHERE calls<30").bind(day).run();
+        if (!claimed.success || claimed.meta.changes !== 1) throw new GatewayError("MODEL_DAILY_LIMIT", "今日模型次数已用完。", "REVIEW", 429);
+      } });
+      else if (request.method === "POST" && url.pathname.startsWith("/api/safety/long-text/")) result = new longText.LongTextBridge({ store, gateway: dailyGateway }).handle(url.pathname.slice("/api/safety/long-text/".length), actor, payload);
       else if (request.method === "POST" && url.pathname === "/api/safety/daily/tasks") result = dailyGateway.create(actor, payload);
       else if (request.method === "POST" && url.pathname === "/api/safety/daily/revise") result = dailyGateway.revise(payload.task_id, actor, payload);
       else if (request.method === "POST" && url.pathname === "/api/safety/daily/model-review") result = await dailyModel.review({ gateway: dailyGateway, actor, payload, persist: () => store.flush(), claimBudget: async () => {

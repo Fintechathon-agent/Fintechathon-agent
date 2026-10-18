@@ -10,9 +10,9 @@ function payload(amount = 100000) {
 }
 function confirm(record) { return { task_id: record.input.binding.task_id, risk_check_id: record.review.risk_check_id, binding: record.input.binding, accepted_reason_ids: record.review.reasons.filter(r => r.acceptance_allowed).map(r => r.reason_id), confirmed: true }; }
 // Contract substitute only; this is never shown as an actual model run.
-function modelResponse(request) {
+function modelResponse(request, proposalOverride) {
   const task_id = "core-daily-test", run_id = "run-daily-test", audit_id = "audit-daily-test", input_sha256 = sha(request), provider_response_id = "provider-daily-test";
-  const proposal = { summary: "当前资金保护需保留。", risk_level: "medium", proposed_action: "FLAG_FOR_RISK", action_reason: "只读分析不授权执行", evidence: [], missing_information: [] };
+  const proposal = proposalOverride || { summary: "当前资金保护需保留。", risk_level: "medium", proposed_action: "FLAG_FOR_RISK", action_reason: "只读分析不授权执行", evidence: [], missing_information: [] };
   const bound = { proposed_action: proposal.proposed_action, action_reason: proposal.action_reason, risk_level: proposal.risk_level, requested_action: request.requested_action, action_parameters: request.action_parameters, model_response_id: provider_response_id }, proposal_sha256 = sha(bound);
   return { workflow_version: "review-workflow.v1", task_id, request_id: request.request_id, run_id, status: "PENDING_RISK", risk_decision: null,
     model: { source: "model", status: "PROPOSED", input: { source: request.source, kind: request.kind, input_sha256 }, model_response: { call_succeeded: true, model: "test-model", provider_response_id, raw_text: JSON.stringify(proposal), raw_text_format: "provider_json_serialized", proposal } },

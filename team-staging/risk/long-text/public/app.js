@@ -26,7 +26,7 @@ function cents(value) {
   if (!Number.isSafeInteger(n)) throw Error("金额过大"); return n;
 }
 async function request(route, body) {
-  const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), route.includes("model-review") ? 75000 : 45000);
+  const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), route === "plan-review" ? 105000 : route.includes("model-review") ? 75000 : 45000);
   try {
     const path = integrated ? route === "daily-model-review" ? "/api/safety/daily/model-review" : "/api/safety/long-text/" + route : "/api/long-text/v1/" + route;
     const response = await fetch(path, { method: body ? "POST" : "GET", credentials: "same-origin", headers: { "Content-Type": "application/json", ...(integrated ? { "X-Risk-Csrf": riskSession?.csrf || "" } : {}) }, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
@@ -47,6 +47,7 @@ function invalidate(sourceChanged = false) {
   if (sourceChanged) { $("review").hidden = true; sourceDirty = true; if (!integrated) draft = null; $("step-review").classList.remove("active"); }
   $("status").textContent = "输入已变化，旧结果已隐藏；请重新核对并测算。";
   $("planning-preview").hidden = true;
+  $("plan-advice").hidden = true; $("plan-status").textContent = "";
 }
 function selectOptions(values, current) { return Object.entries(values).map(([key, label]) => `<option value="${key}" ${key === current ? "selected" : ""}>${esc(label)}</option>`).join(""); }
 function renderPlanning() {
@@ -64,6 +65,8 @@ function renderPlanning() {
 function renderDraft() {
   $("review").hidden = false; $("step-review").classList.add("active"); $("revision").textContent = "版本 " + draft.revision;
   renderPlanning();
+  $("plan-advice-controls").hidden = !integrated || !modelEnabled;
+  renderAdvice(draft.planning_review);
   const cards = draft.items.map((item, i) => `<article class="item${isContext(item) ? " context-item" : ""}" data-id="${esc(item.id)}"><div class="section-head"><strong>${i + 1}. ${esc(itemLabel(item))}</strong><span class="meta">${esc(isContext(item) ? "补充背景 · 不单独计费" : stateLabels[item.classification.status])} · 原文 ${item.source_span.start}–${item.source_span.end}</span></div><p class="source">${esc(item.text)}</p>
     ${isContext(item) ? "<details><summary>修改归类或处理方式</summary>" : ""}<div class="item-grid">
     <div><label for="${item.id}-type">事项类型</label><select id="${item.id}-type" data-field="type">${selectOptions(labels, item.type)}</select></div>
@@ -82,6 +85,16 @@ function renderDraft() {
 }
 function renderQuestions() {
   $("questions").innerHTML = draft.questions.length ? `<details><summary><strong>逐日测算与在线复核前，还需确认 ${draft.questions.length} 项</strong></summary><ul>${draft.questions.map(q => `<li>${q.item_id ? `${esc(itemLabel(draft.items.find(x => x.id === q.item_id)))}（事项${Number(q.item_id.split("-")[1]) + 1}）：` : ""}${esc(q.message)}</li>`).join("")}</ul></details>` : "";
+}
+function renderAdvice(result) {
+  $("plan-advice").hidden = !result;
+  if (!result) return;
+  const p = result.proposal;
+  $("plan-advice").innerHTML = `<div class="planning-head"><h3>在线资金建议</h3><span class="tag">基于当前草稿 · 待核对</span></div><p class="advice-summary">${esc(p.summary)}</p>
+    <h3>资金怎么安排</h3><p class="advice-text">${esc(result.sections.allocation)}</p><h3>需要注意的风险</h3><p class="advice-text">${esc(result.sections.risks)}</p>
+    ${p.missing_information.length ? `<h3>真正需要你补充的问题</h3><ol>${p.missing_information.map(q => `<li>${esc(q)}</li>`).join("")}</ol>` : "<p>本次模型未提出额外问题，请核对以上假设。</p>"}
+    <details><summary>模型引用的依据与运行记录</summary><ul>${p.evidence.map(e => `<li>${esc(e)}</li>`).join("")}</ul><p>模型 ${esc(result.model)} · 运行 ${esc(result.run_id)}</p><pre>${esc(JSON.stringify(result, null, 2))}</pre></details>
+    <p class="muted">风险说明参考：${result.references.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.title)}</a>`).join(" · ")}</p><p class="muted">${esc(result.notice)}</p>`;
 }
 function corrections() {
   const items = [...document.querySelectorAll(".item")].map(card => {
@@ -138,6 +151,23 @@ $("save").addEventListener("click", () => action(async () => {
   if (!draft) return; const revision = inputRevision; const result = await request("correct", corrections());
   draft = result; if (revision !== inputRevision) return; renderDraft(); $("result").hidden = true; $("nonoverlap").checked = false; $("status").textContent = "纠错已保存；请核对当前版本后再测算。";
 }));
+$("plan-review").addEventListener("click", () => action(async () => {
+  if (!draft || sourceDirty) throw Error("请先重新解析当前原文，再生成在线建议。");
+  const revision = inputRevision;
+  $("plan-advice").hidden = true; $("plan-status").textContent = "正在根据当前金额生成具体资金安排、风险说明和补充问题…";
+  try {
+    const corrected = await request("correct", corrections());
+    draft = corrected; if (revision !== inputRevision) return; $("revision").textContent = "版本 " + draft.revision; renderPlanning(); renderQuestions();
+    const result = await request("plan-review", binding());
+    if (revision !== inputRevision) return;
+    draft.planning_review = result; renderAdvice(result);
+    $("plan-status").textContent = "在线建议已返回，金额依据可在下方查看。修改输入后需重新生成。";
+    $("plan-advice").scrollIntoView({ block: "start" });
+  } catch (error) {
+    if (revision === inputRevision) { $("plan-status").textContent = "本次在线建议未完成，预算概览仍可使用。"; $("plan-advice").hidden = true; }
+    throw error;
+  }
+}));
 $("confirm").addEventListener("click", () => action(async () => {
   if (!draft) return;
   const checked = [...document.querySelectorAll(".item-reviewed:checked")].map(x => x.dataset.id), nonoverlap = $("nonoverlap").checked;
@@ -180,7 +210,7 @@ async function initialize() {
     const response = await fetch("/api/safety/session", { credentials: "same-origin" });
     if (!response.ok) throw Error("无法连接风控工作台会话");
     riskSession = await response.json(); $("workbench-home").hidden = false; $("mode-label").textContent = "风控工作台 · 长文本入口";
-    $("storage-note").textContent = "草稿核对有效期30分钟；已提交任务的原文与审计沿用工作台存储。在线复核会发送已核对的虚构原文与资金信息到团队 Core 模型；不执行真实交易。";
+    $("storage-note").textContent = "草稿核对有效期30分钟；原文与审计沿用工作台存储。在线资金建议会发送当前原文与核对栏内容到团队 Core 模型；正式任务复核需要先确认资金事实。不执行真实交易。";
   }
   const health = await request("health"); modelEnabled = health.network_model_enabled;
   const id = new URLSearchParams(location.search).get("draft_id");

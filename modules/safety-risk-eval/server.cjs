@@ -9,6 +9,7 @@ const { DailyGateway } = require("./daily-gateway.cjs");
 const dailyEngine = require("./daily-engine.cjs");
 const dailyModel = require("./daily-model.cjs");
 const { LongTextBridge } = require("./long-text.cjs");
+const planningModel = require("./planning-model.cjs");
 const adapter = require("./core-adapter.cjs");
 const { runAttackDemo } = require("./security.cjs");
 const policy = require("./policy.cjs");
@@ -112,6 +113,15 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
       payload = await body(req);
       if (url.pathname.startsWith("/api/safety/long-text/")) {
         const bridge = new LongTextBridge({ store, gateway: dailyGateway });
+        if (url.pathname === "/api/safety/long-text/plan-review") {
+          if (modelBusy.has(s.user_id)) throw new GatewayError("MODEL_BUSY", "本会话正在等待在线建议。", "REVIEW", 409);
+          modelBusy.add(s.user_id);
+          try { send(res, 200, await planningModel.review({ bridge, actor: s.user_id, payload, fetchImpl: coreFetch, claimBudget: async () => {
+            const day = new Date().toISOString().slice(0, 10);
+            store.transaction(data => { data.model_budget ||= {}; if ((data.model_budget[day] || 0) >= 30) throw new GatewayError("MODEL_DAILY_LIMIT", "今日模型次数已用完。", "REVIEW", 429); data.model_budget[day] = (data.model_budget[day] || 0) + 1; return null; });
+          } })); } finally { modelBusy.delete(s.user_id); }
+          return;
+        }
         send(res, 200, bridge.handle(url.pathname.slice("/api/safety/long-text/".length), s.user_id, payload)); return;
       }
       if (url.pathname === "/api/safety/daily/tasks") { send(res, 200, dailyGateway.create(s.user_id, payload)); return; }
