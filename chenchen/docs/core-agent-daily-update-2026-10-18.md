@@ -1,5 +1,7 @@
 # Core Agent Daily Update 2026-10-18
 
+> 当日晚间补充：[主链路迭代与实际 Risk 源码联调](core-agent-integration-iteration-2026-10-18.md)。新增 12 项回归，总计 205/205；9 组本地源码联调通过。严格 Handoff 检查仍失败，未改冻结接口；付费调用 0，未联合验收。以下保留本轮自动日报生成时的结果，不将不同时间的检查混为一次。
+
 ## 今日结论与主链路阶段
 
 个人仓库今日无业务代码变更；截至本轮启动核对，两份 main 在北京时间 10 月 18 日均无业务提交。本轮自动化无业务代码变更，只新增文档、检查脚本和合成报告。运行期间团队工作区出现其他协作者未提交的 integrations/review-workflow.js、tests/review-concurrency.test.js、experiments/owner-integration-v1，原样保留、不代提交。已实现健康检查和模型复核到 Risk Handoff，真实执行继续关闭。新发现 Risk 导出与严格 Schema 不一致，联调尚未就绪，不能称为正式 Risk 审核闭环。

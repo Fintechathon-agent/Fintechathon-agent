@@ -198,6 +198,8 @@ class ReviewWorkflowStore {
     this.byTask = new Map();
     this.byIdempotency = new Map();
     this.startingTasks = new Set();
+    this.startingIdempotency = new Map();
+    this.dispatchingTasks = new Map();
   }
 
   save(record) {
@@ -221,6 +223,14 @@ class ReviewWorkflowStore {
   async start(input = {}, env = {}, options = {}) {
     input = modelReview.normalizeReviewInput(input);
     const taskId = input.task_id || id("review-task-");
+    // Join an in-flight request before consulting the completed-record index.
+    // A reused key must never cause a second inference while the first is pending.
+    const pending = input.idempotency_key && this.startingIdempotency.get(input.idempotency_key);
+    if (pending) {
+      try { await pending; } catch (error) {
+        if (!this.byIdempotency.has(input.idempotency_key)) throw error;
+      }
+    }
     if (input.idempotency_key && this.byIdempotency.has(input.idempotency_key)) {
       const existing = this.getByRunId(this.byIdempotency.get(input.idempotency_key));
       if (await matchesRequestFingerprint(existing, input)) return existing;
@@ -232,10 +242,13 @@ class ReviewWorkflowStore {
       throw new WorkflowError("TASK_ALREADY_EXISTS", "task_id already exists; load its record or create a new task", { stage: "VALIDATION", record: this.getByTaskId(taskId) });
     }
     this.startingTasks.add(taskId);
+    const work = this.startNew(input, taskId, env, options);
+    if (input.idempotency_key) this.startingIdempotency.set(input.idempotency_key, work);
     try {
-      return await this.startNew(input, taskId, env, options);
+      return await work;
     } finally {
       this.startingTasks.delete(taskId);
+      if (this.startingIdempotency.get(input.idempotency_key) === work) this.startingIdempotency.delete(input.idempotency_key);
     }
   }
 
@@ -457,9 +470,23 @@ class ReviewWorkflowStore {
     if (typeof sender !== "function") {
       this.deny(record, "RISK_OWNER_NOT_CONFIGURED", "Risk Owner adapter is not configured", "RISK_DISPATCH", "Configure the Risk service address and HMAC secret before dispatching.", 503);
     }
+    if (this.dispatchingTasks.has(taskId)) return clone(await this.dispatchingTasks.get(taskId));
+    const work = this.sendRiskHandoff(record, sender);
+    this.dispatchingTasks.set(taskId, work);
+    try { return await work; }
+    finally {
+      if (this.dispatchingTasks.get(taskId) === work) this.dispatchingTasks.delete(taskId);
+    }
+  }
+
+  async sendRiskHandoff(record, sender) {
+    const taskId = record.task_id;
     try {
       const handoff = riskHandoff.buildRiskHandoffPackage(record);
       const result = await sender(handoff, record);
+      // A callback, cancellation or approval may have completed during I/O.
+      // Only attach delivery evidence to the latest record; never save the stale snapshot.
+      record = this.requireRecord(taskId);
       record.risk_dispatch = {
         dispatch_id: record.risk_dispatch?.dispatch_id || id("risk-dispatch-"),
         status: "SENT",
@@ -470,6 +497,7 @@ class ReviewWorkflowStore {
       event(record, "risk.handoff.dispatched", { dispatch_id: record.risk_dispatch.dispatch_id, upstream_status: record.risk_dispatch.upstream_status }, "risk-gateway");
       return this.save(record);
     } catch (error) {
+      record = this.requireRecord(taskId);
       record.risk_dispatch = {
         dispatch_id: record.risk_dispatch?.dispatch_id || id("risk-dispatch-"),
         status: "FAILED",
@@ -707,6 +735,8 @@ class ReviewWorkflowStore {
     this.byTask.clear();
     this.byIdempotency.clear();
     this.startingTasks.clear();
+    this.startingIdempotency.clear();
+    this.dispatchingTasks.clear();
   }
 }
 

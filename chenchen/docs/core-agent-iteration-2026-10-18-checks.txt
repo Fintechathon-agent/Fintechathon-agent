@@ -1,0 +1,29 @@
+2026-10-18 Core Agent iteration
+Syntax check: exit 0
+JavaScript syntax checks passed.
+
+Cloudflare dry run: exit 0 (build only, not production verification)
+
+ ⛅️ wrangler 4.151.1
+────────────────────
+Total Upload: 271.17 KiB / gzip: 59.01 KiB
+Your Worker has access to the following bindings:
+Binding                                                                           Resource
+env.REVIEW_SERVICE (ReviewService)                                                Durable Object
+env.AI                                                                            AI
+env.CORS_ORIGINS ("*")                                                            Environment Variable
+env.RATE_LIMIT_PER_MINUTE ("60")                                                  Environment Variable
+env.MODEL_PROVIDER ("workers_ai")                                                 Environment Variable
+env.MODEL_NAME ("@cf/meta/llama-3.3-70b-instruct-fp8-f...")                       Environment Variable
+env.MODEL_RESPONSE_FORMAT ("json_schema")                                         Environment Variable
+env.MODEL_FALLBACK_TO_RULES ("false")                                             Environment Variable
+env.MODEL_DISABLE_RULE_FALLBACK ("true")                                          Environment Variable
+env.MODEL_TIMEOUT_MS ("45000")                                                    Environment Variable
+env.MODEL_MAX_ATTEMPTS ("2")                                                      Environment Variable
+env.MODEL_REQUESTS_PER_MINUTE ("6")                                               Environment Variable
+
+--dry-run: exiting now.
+
+Strict Handoff contract check: exit 1
+Additional property source_task_id is not declared by the frozen risk-handoff.v1 schema.
+See core-risk-contract-blocker-2026-10-18.json. This failure has not been waived.

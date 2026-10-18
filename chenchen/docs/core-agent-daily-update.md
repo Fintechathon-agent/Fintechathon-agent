@@ -1,5 +1,7 @@
 # Core Agent Daily Update
 
+> 最新补充（2026-10-18 晚）：[Core × Risk 源码联调及并发修复](core-agent-integration-iteration-2026-10-18.md)。205 项回归、9 组本地源码联调通过；严格公共接口检查仍失败，正式接通待双方确认。旧日报与失败证据保留。
+
 > 用途：每天 22:00 前更新一次，供团队同步主链路进展。本文档只记录 Core Agent 主链路，不替代 Risk、Memory、Quant 或 UI 的专项日报。
 
 ## 2026-10-12
