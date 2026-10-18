@@ -100,6 +100,33 @@ test("durable workflow refuses Risk mutation after simulation", async () => {
   assert.equal(queried.execution.status, "SIMULATED");
 });
 
+test("expired approval blocks the HTTP execution route and remains expired after reload", async () => {
+  const app = setup();
+  const created = await worker.fetch(req("/api/review", { text: "Synthetic expiring approval" }), app.env).then(r => r.json());
+  const input = { task_id: created.task_id, proposal_sha256: created.proposed_action.proposal_sha256 };
+  const risk = await worker.fetch(req("/api/review/risk-decision", { ...input, decision: "APPROVE", reviewer: "synthetic-risk", reason: "Local PAPER test" }), app.env);
+  assert.equal(risk.status, 200);
+  const approval = await worker.fetch(req("/api/review/approval", { ...input, decision: "APPROVE", approver: "synthetic-user", reason: "Local PAPER test" }), app.env);
+  assert.equal(approval.status, 200);
+  const approved = await approval.json();
+  approved.approval.expires_at = new Date(Date.now() - 1000).toISOString();
+  await app.storage.put({ ["run:" + created.run_id]: approved });
+  app.restart();
+  app.env.AI.run = async () => { throw new Error("Execution must not call the model"); };
+  const blocked = await worker.fetch(req("/api/review/simulate", input), app.env);
+  assert.equal(blocked.status, 409);
+  const body = await blocked.json();
+  assert.equal(body.error.code, "APPROVAL_EXPIRED");
+  assert.equal(body.trace.task_id, created.task_id);
+  app.restart();
+  const saved = await worker.fetch(req("/api/review/task/" + created.task_id), app.env).then(r => r.json());
+  assert.equal(saved.status, "EXPIRED");
+  assert.equal(saved.execution.receipt, null);
+  assert.equal(saved.execution.simulation_allowed, false);
+  assert.equal(saved.execution.execution_allowed, false);
+  assert.equal(saved.audit.events.filter(e => e.event_type === "approval.expired").length, 1);
+});
+
 test("failed real inference returns an error and a persistent blocked record", async () => {
   const app = setup();
   let calls = 0;

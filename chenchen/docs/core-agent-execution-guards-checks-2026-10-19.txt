@@ -1,0 +1,31 @@
+日期：2026-10-19（北京时间）
+node scripts/check.js；exit=0
+JavaScript syntax checks passed.
+
+wrangler deploy --dry-run；exit=0（运行代码未在其后修改；仅新增 HTTP 回归测试）
+
+ ⛅️ wrangler 4.151.1
+────────────────────
+Total Upload: 277.09 KiB / gzip: 60.25 KiB
+Your Worker has access to the following bindings:
+Binding                                                                           Resource
+env.REVIEW_SERVICE (ReviewService)                                                Durable Object
+env.AI                                                                            AI
+env.CORS_ORIGINS ("*")                                                            Environment Variable
+env.RATE_LIMIT_PER_MINUTE ("60")                                                  Environment Variable
+env.MODEL_PROVIDER ("workers_ai")                                                 Environment Variable
+env.MODEL_NAME ("@cf/meta/llama-3.3-70b-instruct-fp8-f...")                       Environment Variable
+env.MODEL_RESPONSE_FORMAT ("json_schema")                                         Environment Variable
+env.MODEL_FALLBACK_TO_RULES ("false")                                             Environment Variable
+env.MODEL_DISABLE_RULE_FALLBACK ("true")                                          Environment Variable
+env.MODEL_TIMEOUT_MS ("45000")                                                    Environment Variable
+env.MODEL_MAX_ATTEMPTS ("2")                                                      Environment Variable
+env.MODEL_REQUESTS_PER_MINUTE ("6")                                               Environment Variable
+
+--dry-run: exiting now.
+
+实际 Risk 固定源码本地联调；exit=0
+{"status":"LOCAL_CHECKS_PASSED_INTEGRATION_PENDING","assertion_groups":9,"synthetic_vendor_calls":6,"paid_model_calls":0,"joint_acceptance":false}
+
+冻结 Handoff Schema 检查；exit=1，仍为正式阻塞，见同目录 core-risk-execution-guards-blocker-2026-10-19.json。
+候选补丁单独验证通过，但未改变线上导出或冻结 Schema。

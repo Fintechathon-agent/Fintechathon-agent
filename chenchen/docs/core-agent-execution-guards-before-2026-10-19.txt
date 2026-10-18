@@ -1,0 +1,131 @@
+日期：2026-10-19（北京时间）
+基线：2181aed5c3f3273b863a6254aaa0fc6dbfd590bd，仅新增回归用例后运行。
+命令：node --test tests/review-execution-guards.test.js
+结果：1 通过、5 失败；退出码 1。虚构输入/模型替身，未调用外部模型。
+本机绝对路径统一替换为 <TEAM_CHECKOUT>，仅去除行尾空白，其余输出保留。
+
+TAP version 13
+# Subtest: an approved but expired task cannot allocate funds or write Memory
+not ok 1 - an approved but expired task cannot allocate funds or write Memory
+  ---
+  duration_ms: 15.3398
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-execution-guards.test.js:41:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (<TEAM_CHECKOUT>\chenchen\tests\review-execution-guards.test.js:45:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: expiry never rewrites a completed receipt or terminal audit
+ok 2 - expiry never rewrites a completed receipt or terminal audit
+  ---
+  duration_ms: 7.7141
+  type: 'test'
+  ...
+# Subtest: slow Memory and ten retries keep one receipt and write (funded=false)
+not ok 3 - slow Memory and ten retries keep one receipt and write (funded=false)
+  ---
+  duration_ms: 6.8165
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-execution-guards.test.js:68:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    2 !== 1
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 2
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<TEAM_CHECKOUT>\chenchen\tests\review-execution-guards.test.js:80:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: slow Memory and ten retries keep one receipt and write (funded=true)
+not ok 4 - slow Memory and ten retries keep one receipt and write (funded=true)
+  ---
+  duration_ms: 12.1795
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-execution-guards.test.js:68:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+
+    + 'rejected'
+    - 'fulfilled'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'fulfilled'
+  actual: 'rejected'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<TEAM_CHECKOUT>\chenchen\tests\review-execution-guards.test.js:82:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: late cancellation is blocked and its audit survives Memory completion (fails=false)
+not ok 5 - late cancellation is blocked and its audit survives Memory completion (fails=false)
+  ---
+  duration_ms: 3.5186
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-execution-guards.test.js:96:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+
+    + 'READY_FOR_SIMULATION'
+    - 'SIMULATED'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'SIMULATED'
+  actual: 'READY_FOR_SIMULATION'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<TEAM_CHECKOUT>\chenchen\tests\review-execution-guards.test.js:109:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: late cancellation is blocked and its audit survives Memory completion (fails=true)
+not ok 6 - late cancellation is blocked and its audit survives Memory completion (fails=true)
+  ---
+  duration_ms: 3.8749
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-execution-guards.test.js:96:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+
+    + 'READY_FOR_SIMULATION'
+    - 'SIMULATED'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'SIMULATED'
+  actual: 'READY_FOR_SIMULATION'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<TEAM_CHECKOUT>\chenchen\tests\review-execution-guards.test.js:109:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 1
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 156.4143

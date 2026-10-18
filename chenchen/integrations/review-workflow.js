@@ -389,7 +389,10 @@ class ReviewWorkflowStore {
 
   expireApproval(record) {
     const expiresAt = Date.parse(record.approval?.expires_at || "");
-    if (!record.approval?.required || record.approval.status !== "PENDING" || !Number.isFinite(expiresAt) || expiresAt > Date.now()) return false;
+    // Approval does not extend its deadline. Completed tasks keep their receipt.
+    if (!record.approval?.required || !["PENDING", "APPROVED"].includes(record.approval.status) ||
+        !["PENDING_APPROVAL", "READY_FOR_SIMULATION"].includes(record.status) ||
+        !Number.isFinite(expiresAt) || expiresAt > Date.now()) return false;
     record.approval.status = "EXPIRED";
     record.status = "EXPIRED";
     record.execution.status = "BLOCKED";
@@ -679,16 +682,19 @@ class ReviewWorkflowStore {
     };
     record.status = "SIMULATED";
     event(record, "execution.simulated", { execution_id: executionId, side_effects: false }, "execution-gateway");
+    // Publish the receipt in this store before yielding to an optional writer.
+    // Persistent adapters still own their storage commit; this is not a disk flush.
+    this.save(record);
     await this.writeMemory(record);
-    return this.save(record);
+    return this.requireRecord(taskId);
   }
 
   async writeMemory(record) {
-    if (record.memory_consent !== true) return;
+    if (record.memory_consent !== true) return record;
     if (typeof this.memoryWriter !== "function") {
       record.memory_write_status = "UNAVAILABLE";
       event(record, "memory.write.blocked", { reason: "memory_writer_not_configured" }, "memory");
-      return;
+      return this.save(record);
     }
     try {
       const entry = await this.memoryWriter(record.session_id, {
@@ -697,13 +703,17 @@ class ReviewWorkflowStore {
         value: { task_id: record.task_id, plan_id: record.plan_id, proposal_sha256: record.proposed_action.proposal_sha256, status: record.status },
         consent: true
       });
+      // Retain audit events appended while the writer was pending.
+      record = this.requireRecord(record.task_id);
       record.memory_write_status = "WRITTEN";
       record.memory_id = entry?.memory_id || null;
       event(record, "memory.saved", { memory_id: record.memory_id, status: record.memory_write_status }, "memory");
     } catch (error) {
+      record = this.requireRecord(record.task_id);
       record.memory_write_status = "FAILED";
       event(record, "memory.write.failed", { code: error.code || "MEMORY_WRITE_FAILED", message: error.message }, "memory");
     }
+    return this.save(record);
   }
 
   async cancel(input = {}) {
