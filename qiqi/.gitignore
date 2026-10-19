@@ -41,3 +41,6 @@ brief/out/fund_all_*.json
 docs/KOSX三队微信群状态分析_*.md
 # 成员称呼对照（含群内昵称）：仅保留本地，不同步 GitHub
 docs/成员称呼对照_*.md
+
+# Cloudflare 本地凭据/缓存：不入库
+.wrangler/

@@ -1,0 +1,33 @@
+{
+  "checked_at": "2026-10-20T01:21:31+08:00",
+  "endpoint": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+  "purpose": "团队统一后端真实模型联调证据（合成输入，PAPER 模式）",
+  "request": {
+    "path": "/api/review",
+    "kind": "combined",
+    "scenario": "FUNDING_CONFLICT",
+    "data_mode": "SYNTHETIC_REPLAY",
+    "execution_mode": "PAPER",
+    "input_text_sha256_verified_echo": true
+  },
+  "response": {
+    "http_status": 200,
+    "workflow_status": "PENDING_RISK",
+    "run_id": "review-a8287407-b38c-4fc4-addc-300665c99749",
+    "task_id": "review-task-7c3daf53-8d8d-466a-99f6-53f961ecc458",
+    "audit_id": "audit-d18f6b63-caa3-4fb9-bd7f-2066ba9b8587",
+    "model_source": "model",
+    "call_succeeded": true,
+    "attempt_count": 1,
+    "proposed_action": "HOLD_FOR_REVIEW",
+    "action_reason": "账户变更和紧急转账要求可能是诈骗行为。",
+    "execution_allowed": false,
+    "approval_status": "BLOCKED"
+  },
+  "boundaries": [
+    "输入为虚构账单，不含真实账户或用户数据。",
+    "模型只输出提议，等待独立 Risk；execution_allowed=false。",
+    "本轮未配置正式 Risk Owner，未发生真实资金动作。",
+    "curl 在 Windows 下会把中文命令行参数转码坏，证据改用 Python 客户端采集并核对了回显一致。"
+  ]
+}
