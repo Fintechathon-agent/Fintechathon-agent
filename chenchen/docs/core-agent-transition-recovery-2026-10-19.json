@@ -1,0 +1,1742 @@
+{
+  "evidence_version": "core-transition-recovery.v1",
+  "recorded_at": "2026-10-19T01:43:46.822Z",
+  "status": "PASS",
+  "mode": "LOCAL_SQLITE_FORCED_PROCESS_EXIT",
+  "process_count": 6,
+  "forced_exit_count": 3,
+  "synthetic_model_calls": 6,
+  "real_model_calls": 0,
+  "paid_model_calls": 0,
+  "actual_risk_owner_used": false,
+  "joint_acceptance": false,
+  "public_cloud_fault_injection": false,
+  "database": "Temporary SQLite with transactions, WAL and synchronous FULL; not a Cloudflare emulator",
+  "cases": [
+    {
+      "forced_exit": 86,
+      "scenario": "cancel-before",
+      "status": "PASS",
+      "responses": [
+        {
+          "endpoint": "/api/review/task/review-task-06d92cea-faa4-4019-8e26-4243baf6e1c4",
+          "http_status": 503,
+          "body": {
+            "review_version": "model-review.v1",
+            "contract_version": "model-review.v1",
+            "error": {
+              "code": "REVIEW_SERVICE_UNAVAILABLE",
+              "message": "任务或资金安排的变更尚未确认保存，已阻止沿用旧状态。",
+              "retryable": false,
+              "stage": "BACKEND",
+              "recovery": "保留任务编号，由后端核查变更登记及存储记录。不要自动重试、换任务绕过、清除登记或继续执行。",
+              "details": null
+            },
+            "workflow": null,
+            "error_contract_version": "core-agent-error.v1",
+            "source_contract_version": "model-review.v1",
+            "operation": "MODEL_REVIEW",
+            "request_id": "req-12adb682-da34-48b0-a79d-0091ab69dbb9",
+            "trace": {
+              "contract_version": "model-review.v1",
+              "error_contract_version": "core-agent-error.v1",
+              "source_contract_version": "model-review.v1",
+              "request_id": "req-12adb682-da34-48b0-a79d-0091ab69dbb9",
+              "task_id": "review-task-06d92cea-faa4-4019-8e26-4243baf6e1c4",
+              "session_id": "session-9b8f43ca-49d3-44a5-84ec-e5676c5eb76f",
+              "run_id": "review-57407814-a4f7-48bf-9be9-3614a5c3ed0d",
+              "audit_id": "audit-48d0c74e-d8e6-431d-bbe8-c8bfcca5baf3",
+              "handoff_id": "handoff-0de5c45c-d1b8-4566-bfe9-9dd102326c4e"
+            }
+          }
+        },
+        {
+          "endpoint": "/api/review/simulate",
+          "http_status": 503,
+          "body": {
+            "review_version": "model-review.v1",
+            "contract_version": "model-review.v1",
+            "error": {
+              "code": "REVIEW_SERVICE_UNAVAILABLE",
+              "message": "任务或资金安排的变更尚未确认保存，已阻止沿用旧状态。",
+              "retryable": false,
+              "stage": "BACKEND",
+              "recovery": "保留任务编号，由后端核查变更登记及存储记录。不要自动重试、换任务绕过、清除登记或继续执行。",
+              "details": null
+            },
+            "workflow": null,
+            "error_contract_version": "core-agent-error.v1",
+            "source_contract_version": "model-review.v1",
+            "operation": "MODEL_REVIEW",
+            "request_id": "req-12adb682-da34-48b0-a79d-0091ab69dbb9",
+            "trace": {
+              "contract_version": "model-review.v1",
+              "error_contract_version": "core-agent-error.v1",
+              "source_contract_version": "model-review.v1",
+              "request_id": "req-12adb682-da34-48b0-a79d-0091ab69dbb9",
+              "task_id": "review-task-06d92cea-faa4-4019-8e26-4243baf6e1c4",
+              "session_id": "session-9b8f43ca-49d3-44a5-84ec-e5676c5eb76f",
+              "run_id": "review-57407814-a4f7-48bf-9be9-3614a5c3ed0d",
+              "audit_id": "audit-48d0c74e-d8e6-431d-bbe8-c8bfcca5baf3",
+              "handoff_id": "handoff-0de5c45c-d1b8-4566-bfe9-9dd102326c4e"
+            }
+          }
+        }
+      ],
+      "model_calls_before": 2,
+      "model_calls_after": 2,
+      "persisted_workflow_status": "READY_FOR_SIMULATION",
+      "allocated_minor": 0,
+      "markers": [
+        {
+          "transition_version": "review-transition.v1",
+          "transition_id": "transition-19866783-ca18-41fb-8f1f-298b4d6b34c0",
+          "state": "COMPLETED",
+          "operation": "/api/review/approval",
+          "keys": [
+            "review-transition:task:review-task-06427391-d9fa-4ddb-a364-9296acb74d15"
+          ],
+          "task_id": "review-task-06427391-d9fa-4ddb-a364-9296acb74d15",
+          "request_id": "req-5680887a-99f0-4b37-b30e-7280a1eaec08",
+          "session_id": "session-fa98bfa8-123d-41d0-872a-e8a74fe4bac3",
+          "run_id": "review-a06fcb93-988b-43b0-9038-79afe228b615",
+          "audit_id": "audit-cdd31985-2926-4dc4-9a39-fa2b803a67b2",
+          "handoff_id": "handoff-e105f606-dc08-48bf-b9de-5f1bdb812cd7",
+          "plan_id": null,
+          "request_sha256": "2031e03e9bccf172b0689769e898da773804b62c8f38fbec90097b1715aa3672",
+          "created_at": "2026-10-19T01:43:45.643Z",
+          "completed_at": "2026-10-19T01:43:45.645Z"
+        },
+        {
+          "transition_version": "review-transition.v1",
+          "transition_id": "transition-e361c95d-7546-44f8-bd7f-38abfd303d6a",
+          "state": "PENDING",
+          "operation": "/api/review/cancel",
+          "keys": [
+            "review-transition:task:review-task-06d92cea-faa4-4019-8e26-4243baf6e1c4"
+          ],
+          "task_id": "review-task-06d92cea-faa4-4019-8e26-4243baf6e1c4",
+          "request_id": "req-12adb682-da34-48b0-a79d-0091ab69dbb9",
+          "session_id": "session-9b8f43ca-49d3-44a5-84ec-e5676c5eb76f",
+          "run_id": "review-57407814-a4f7-48bf-9be9-3614a5c3ed0d",
+          "audit_id": "audit-48d0c74e-d8e6-431d-bbe8-c8bfcca5baf3",
+          "handoff_id": "handoff-0de5c45c-d1b8-4566-bfe9-9dd102326c4e",
+          "plan_id": null,
+          "request_sha256": "1095e33fb30c921fe7cd79cdc6796d2a2d8b1a22b74f76d4649fbcc3a3dd41f8",
+          "created_at": "2026-10-19T01:43:45.650Z"
+        }
+      ],
+      "caveat": "Raw database state may be older than a pending transition; it is not a usable API response."
+    },
+    {
+      "forced_exit": 86,
+      "scenario": "simulate-before",
+      "status": "PASS",
+      "responses": [
+        {
+          "endpoint": "/api/review/task/review-task-ac622b88-bca3-4493-b7ca-b433f778be4a",
+          "http_status": 503,
+          "body": {
+            "review_version": "model-review.v1",
+            "contract_version": "model-review.v1",
+            "error": {
+              "code": "REVIEW_SERVICE_UNAVAILABLE",
+              "message": "任务或资金安排的变更尚未确认保存，已阻止沿用旧状态。",
+              "retryable": false,
+              "stage": "BACKEND",
+              "recovery": "保留任务编号，由后端核查变更登记及存储记录。不要自动重试、换任务绕过、清除登记或继续执行。",
+              "details": null
+            },
+            "workflow": null,
+            "error_contract_version": "core-agent-error.v1",
+            "source_contract_version": "model-review.v1",
+            "operation": "MODEL_REVIEW",
+            "request_id": "req-eca0201b-2c56-47c6-b8ca-9e808e38ec7a",
+            "trace": {
+              "contract_version": "model-review.v1",
+              "error_contract_version": "core-agent-error.v1",
+              "source_contract_version": "model-review.v1",
+              "request_id": "req-eca0201b-2c56-47c6-b8ca-9e808e38ec7a",
+              "task_id": "review-task-ac622b88-bca3-4493-b7ca-b433f778be4a",
+              "session_id": "session-b007ae65-7d35-435e-be47-79e9a95d15c7",
+              "run_id": "review-bf28d56f-5880-49c7-85a1-18d6d4f4de2b",
+              "audit_id": "audit-59ba0bf9-8ca0-45f5-9733-aacdcd37d5d8",
+              "handoff_id": "handoff-f1715080-cedb-472d-be97-c700131d2302"
+            }
+          }
+        },
+        {
+          "endpoint": "/api/review/simulate",
+          "http_status": 503,
+          "body": {
+            "review_version": "model-review.v1",
+            "contract_version": "model-review.v1",
+            "error": {
+              "code": "REVIEW_SERVICE_UNAVAILABLE",
+              "message": "任务或资金安排的变更尚未确认保存，已阻止沿用旧状态。",
+              "retryable": false,
+              "stage": "BACKEND",
+              "recovery": "保留任务编号，由后端核查变更登记及存储记录。不要自动重试、换任务绕过、清除登记或继续执行。",
+              "details": null
+            },
+            "workflow": null,
+            "error_contract_version": "core-agent-error.v1",
+            "source_contract_version": "model-review.v1",
+            "operation": "MODEL_REVIEW",
+            "request_id": "req-eca0201b-2c56-47c6-b8ca-9e808e38ec7a",
+            "trace": {
+              "contract_version": "model-review.v1",
+              "error_contract_version": "core-agent-error.v1",
+              "source_contract_version": "model-review.v1",
+              "request_id": "req-eca0201b-2c56-47c6-b8ca-9e808e38ec7a",
+              "task_id": "review-task-ac622b88-bca3-4493-b7ca-b433f778be4a",
+              "session_id": "session-b007ae65-7d35-435e-be47-79e9a95d15c7",
+              "run_id": "review-bf28d56f-5880-49c7-85a1-18d6d4f4de2b",
+              "audit_id": "audit-59ba0bf9-8ca0-45f5-9733-aacdcd37d5d8",
+              "handoff_id": "handoff-f1715080-cedb-472d-be97-c700131d2302"
+            }
+          }
+        },
+        {
+          "endpoint": "/api/review/simulate",
+          "http_status": 503,
+          "body": {
+            "review_version": "model-review.v1",
+            "contract_version": "model-review.v1",
+            "error": {
+              "code": "REVIEW_SERVICE_UNAVAILABLE",
+              "message": "任务或资金安排的变更尚未确认保存，已阻止沿用旧状态。",
+              "retryable": false,
+              "stage": "BACKEND",
+              "recovery": "保留任务编号，由后端核查变更登记及存储记录。不要自动重试、换任务绕过、清除登记或继续执行。",
+              "details": null
+            },
+            "workflow": null,
+            "error_contract_version": "core-agent-error.v1",
+            "source_contract_version": "model-review.v1",
+            "operation": "MODEL_REVIEW",
+            "request_id": "req-eca0201b-2c56-47c6-b8ca-9e808e38ec7a",
+            "trace": {
+              "contract_version": "model-review.v1",
+              "error_contract_version": "core-agent-error.v1",
+              "source_contract_version": "model-review.v1",
+              "request_id": "req-eca0201b-2c56-47c6-b8ca-9e808e38ec7a",
+              "task_id": "review-task-ac622b88-bca3-4493-b7ca-b433f778be4a",
+              "session_id": "session-b007ae65-7d35-435e-be47-79e9a95d15c7",
+              "run_id": "review-bf28d56f-5880-49c7-85a1-18d6d4f4de2b",
+              "audit_id": "audit-59ba0bf9-8ca0-45f5-9733-aacdcd37d5d8",
+              "handoff_id": "handoff-f1715080-cedb-472d-be97-c700131d2302"
+            }
+          }
+        },
+        {
+          "endpoint": "/api/funding-demo/plan/funding-demo-9cd58c91-138b-4095-9ba3-bfe57177941e",
+          "http_status": 503,
+          "body": {
+            "review_version": "model-review.v1",
+            "contract_version": "model-review.v1",
+            "error": {
+              "code": "REVIEW_SERVICE_UNAVAILABLE",
+              "message": "任务或资金安排的变更尚未确认保存，已阻止沿用旧状态。",
+              "retryable": false,
+              "stage": "BACKEND",
+              "recovery": "保留任务编号，由后端核查变更登记及存储记录。不要自动重试、换任务绕过、清除登记或继续执行。",
+              "details": null
+            },
+            "workflow": null,
+            "error_contract_version": "core-agent-error.v1",
+            "source_contract_version": "model-review.v1",
+            "operation": "MODEL_REVIEW",
+            "request_id": "req-eca0201b-2c56-47c6-b8ca-9e808e38ec7a",
+            "trace": {
+              "contract_version": "model-review.v1",
+              "error_contract_version": "core-agent-error.v1",
+              "source_contract_version": "model-review.v1",
+              "request_id": "req-eca0201b-2c56-47c6-b8ca-9e808e38ec7a",
+              "task_id": "review-task-ac622b88-bca3-4493-b7ca-b433f778be4a",
+              "session_id": "session-b007ae65-7d35-435e-be47-79e9a95d15c7",
+              "run_id": "review-bf28d56f-5880-49c7-85a1-18d6d4f4de2b",
+              "audit_id": "audit-59ba0bf9-8ca0-45f5-9733-aacdcd37d5d8",
+              "handoff_id": "handoff-f1715080-cedb-472d-be97-c700131d2302"
+            }
+          }
+        }
+      ],
+      "model_calls_before": 2,
+      "model_calls_after": 2,
+      "persisted_workflow_status": "READY_FOR_SIMULATION",
+      "allocated_minor": 0,
+      "markers": [
+        {
+          "transition_version": "review-transition.v1",
+          "transition_id": "transition-f41246c6-3f4e-4897-b4de-b810929e78a4",
+          "state": "COMPLETED",
+          "operation": "/api/review/approval",
+          "keys": [
+            "review-transition:task:review-task-91b89f4d-6f52-4ea8-bd2f-a974c8ef6384"
+          ],
+          "task_id": "review-task-91b89f4d-6f52-4ea8-bd2f-a974c8ef6384",
+          "request_id": "req-7fb06c2a-e43a-41b6-a3fa-7ca7d63cea9d",
+          "session_id": "session-5c539209-dacc-41e4-b209-e230b9500416",
+          "run_id": "review-9d4ae159-37ac-4fbb-88d0-a87df09da32d",
+          "audit_id": "audit-b3cefa16-f984-4d9e-8860-ac7d4f67e7ad",
+          "handoff_id": "handoff-903fd807-0c43-4389-881c-eb1a9c448668",
+          "plan_id": null,
+          "request_sha256": "7afe881681e9b818dcb77b44d037901af3666c973c96b02c15e7b3597a7dc18f",
+          "created_at": "2026-10-19T01:43:46.102Z",
+          "completed_at": "2026-10-19T01:43:46.104Z"
+        },
+        {
+          "transition_version": "review-transition.v1",
+          "transition_id": "transition-e205c303-8ad4-416c-ade5-499637134843",
+          "state": "PENDING",
+          "operation": "/api/review/simulate",
+          "keys": [
+            "review-transition:task:review-task-ac622b88-bca3-4493-b7ca-b433f778be4a",
+            "review-transition:funding:funding-demo-9cd58c91-138b-4095-9ba3-bfe57177941e"
+          ],
+          "task_id": "review-task-ac622b88-bca3-4493-b7ca-b433f778be4a",
+          "request_id": "req-eca0201b-2c56-47c6-b8ca-9e808e38ec7a",
+          "session_id": "session-b007ae65-7d35-435e-be47-79e9a95d15c7",
+          "run_id": "review-bf28d56f-5880-49c7-85a1-18d6d4f4de2b",
+          "audit_id": "audit-59ba0bf9-8ca0-45f5-9733-aacdcd37d5d8",
+          "handoff_id": "handoff-f1715080-cedb-472d-be97-c700131d2302",
+          "plan_id": "funding-demo-9cd58c91-138b-4095-9ba3-bfe57177941e",
+          "request_sha256": "82c25519e70918801da10205241b19701fd4ddbb9efb9212ec3b4b43db9952cf",
+          "created_at": "2026-10-19T01:43:46.108Z"
+        },
+        {
+          "transition_version": "review-transition.v1",
+          "transition_id": "transition-e205c303-8ad4-416c-ade5-499637134843",
+          "state": "PENDING",
+          "operation": "/api/review/simulate",
+          "keys": [
+            "review-transition:task:review-task-ac622b88-bca3-4493-b7ca-b433f778be4a",
+            "review-transition:funding:funding-demo-9cd58c91-138b-4095-9ba3-bfe57177941e"
+          ],
+          "task_id": "review-task-ac622b88-bca3-4493-b7ca-b433f778be4a",
+          "request_id": "req-eca0201b-2c56-47c6-b8ca-9e808e38ec7a",
+          "session_id": "session-b007ae65-7d35-435e-be47-79e9a95d15c7",
+          "run_id": "review-bf28d56f-5880-49c7-85a1-18d6d4f4de2b",
+          "audit_id": "audit-59ba0bf9-8ca0-45f5-9733-aacdcd37d5d8",
+          "handoff_id": "handoff-f1715080-cedb-472d-be97-c700131d2302",
+          "plan_id": "funding-demo-9cd58c91-138b-4095-9ba3-bfe57177941e",
+          "request_sha256": "82c25519e70918801da10205241b19701fd4ddbb9efb9212ec3b4b43db9952cf",
+          "created_at": "2026-10-19T01:43:46.108Z"
+        }
+      ],
+      "caveat": "Raw database state may be older than a pending transition; it is not a usable API response."
+    },
+    {
+      "forced_exit": 87,
+      "scenario": "simulate-after",
+      "status": "PASS",
+      "responses": [
+        {
+          "endpoint": "/api/review/task/review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+          "http_status": 200,
+          "body": {
+            "workflow_version": "review-workflow.v1",
+            "schema_version": "model-review.v1",
+            "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+            "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+            "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+            "source_task_id": null,
+            "data_mode": "SYNTHETIC_REPLAY",
+            "execution_mode": "PAPER",
+            "capability": "REVIEW_ONLY",
+            "scenario": "GENERAL_REVIEW",
+            "output_contract": {
+              "contract_version": "agent-output.v1",
+              "requested_formats": [
+                "json"
+              ],
+              "available_formats": [
+                "json"
+              ],
+              "status": "READY",
+              "pending_formats": [],
+              "side_effects": false
+            },
+            "portfolio_snapshot_id": null,
+            "risk_profile_version": "risk-profile.v1",
+            "plan_id": "plan-2f75fb31-e7ee-4f43-886c-72a2395eaad4",
+            "plan_hash": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+            "policy_version": "risk-policy.v1",
+            "idempotency_key": "disk-transition-first",
+            "request_fingerprint": "2fa40bbb1b4625b171526166c6076fdd0676793e283274a297e7b6afbeb5850b",
+            "memory_consent": false,
+            "memory_write_status": "NOT_REQUESTED",
+            "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+            "status": "SIMULATED",
+            "reviewed_input": {
+              "schema_version": "model-review.v1",
+              "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+              "source_task_id": null,
+              "source": null,
+              "kind": "combined",
+              "text": "虚构磁盘恢复 first",
+              "context": {
+                "demo_funding_snapshot": {
+                  "guard_version": "funding-plan-demo.v1",
+                  "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                  "revision": 1,
+                  "amount_minor": 400000,
+                  "currency": "CNY",
+                  "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+                  "cash_minor": 1000000,
+                  "protected_purposes": [
+                    {
+                      "purpose_id": "rent",
+                      "label": "虚构房租",
+                      "amount_minor": 400000
+                    }
+                  ],
+                  "check": {
+                    "guard_version": "funding-plan-demo.v1",
+                    "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                    "bound_revision": 1,
+                    "current_revision": 1,
+                    "requested_minor": 400000,
+                    "available_minor": 600000,
+                    "protected_minor": 400000,
+                    "allocated_minor": 0,
+                    "deficit_minor": 0,
+                    "execution_allowed": false,
+                    "status": "AVAILABLE",
+                    "code": null,
+                    "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+                  },
+                  "instruction_authority": false
+                }
+              },
+              "action_parameters": {
+                "synthetic": true,
+                "currency": "CNY",
+                "amount": 4000,
+                "funding_plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                "funding_plan_revision": 1
+              },
+              "requested_action": null,
+              "allow_rule_fallback": false,
+              "data_mode": "SYNTHETIC_REPLAY",
+              "execution_mode": "PAPER",
+              "capability": "REVIEW_ONLY",
+              "portfolio_snapshot_id": null,
+              "risk_profile_version": "risk-profile.v1",
+              "plan_id": null,
+              "plan_hash": null,
+              "policy_version": "risk-policy.v1",
+              "idempotency_key": "disk-transition-first",
+              "memory_consent": false,
+              "scenario": "GENERAL_REVIEW",
+              "output_formats": [
+                "json"
+              ]
+            },
+            "model": {
+              "status": "PROPOSED",
+              "source": "model",
+              "model_response": {
+                "provider": "cloudflare_workers_ai",
+                "call_succeeded": true,
+                "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "data_mode": "SYNTHETIC_REPLAY",
+                "execution_mode": "PAPER",
+                "capability": "REVIEW_ONLY",
+                "scenario": "GENERAL_REVIEW",
+                "endpoint": "cloudflare:AI",
+                "api_style": "workers_ai",
+                "response_format": "json_schema",
+                "provider_response_id": "synthetic-disk-transition-1",
+                "raw_text": "{\"summary\":\"虚构状态变更恢复\",\"risk_level\":\"unknown\",\"proposed_action\":\"HOLD_FOR_REVIEW\",\"action_reason\":\"等风控审批\",\"missing_information\":[],\"evidence\":[]}",
+                "raw_text_format": "provider_json_serialized",
+                "proposal": {
+                  "summary": "虚构状态变更恢复",
+                  "risk_level": "unknown",
+                  "proposed_action": "HOLD_FOR_REVIEW",
+                  "action_reason": "等风控审批",
+                  "missing_information": [],
+                  "evidence": []
+                },
+                "usage": null,
+                "attempt_count": 1,
+                "retry_count": 0
+              },
+              "input": {
+                "schema_version": "model-review.v1",
+                "kind": "combined",
+                "source": null,
+                "input_sha256": "07118df84588fc816cae0cb1d3a6b62cd0c23938752c11bcc4754ec450ddb0af",
+                "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                "source_task_id": null,
+                "data_mode": "SYNTHETIC_REPLAY",
+                "execution_mode": "PAPER",
+                "capability": "REVIEW_ONLY",
+                "scenario": "GENERAL_REVIEW",
+                "output_formats": [
+                  "json"
+                ],
+                "portfolio_snapshot_id": null,
+                "risk_profile_version": "risk-profile.v1",
+                "plan_id": null,
+                "plan_hash": null,
+                "policy_version": "risk-policy.v1"
+              }
+            },
+            "proposed_action": {
+              "proposed_action": "HOLD_FOR_REVIEW",
+              "action_reason": "等风控审批",
+              "risk_level": "unknown",
+              "requested_action": null,
+              "action_parameters": {
+                "synthetic": true,
+                "currency": "CNY",
+                "amount": 4000,
+                "funding_plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                "funding_plan_revision": 1
+              },
+              "model_response_id": "synthetic-disk-transition-1",
+              "funding": {
+                "guard_version": "funding-plan-demo.v1",
+                "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                "revision": 1,
+                "amount_minor": 400000,
+                "currency": "CNY",
+                "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+                "cash_minor": 1000000,
+                "protected_purposes": [
+                  {
+                    "purpose_id": "rent",
+                    "label": "虚构房租",
+                    "amount_minor": 400000
+                  }
+                ]
+              },
+              "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb"
+            },
+            "risk_handoff": {
+              "contract_version": "model-review.v1",
+              "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+              "status": "APPROVED",
+              "decision": "APPROVE",
+              "owner": "Unified Risk",
+              "reason": "模型输出只是拟议动作，必须由统一 Risk 决定是否进入审批。",
+              "evidence": {
+                "input_sha256": "07118df84588fc816cae0cb1d3a6b62cd0c23938752c11bcc4754ec450ddb0af",
+                "model_response_id": "synthetic-disk-transition-1",
+                "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                "plan_id": "plan-2f75fb31-e7ee-4f43-886c-72a2395eaad4",
+                "plan_hash": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                "policy_version": "risk-policy.v1"
+              },
+              "execution_allowed": false
+            },
+            "risk_decision": {
+              "risk_decision_id": "risk-decision-c30a5b0d-8d90-43ac-b5d4-5bdc0c84a6f7",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "decision": "APPROVE",
+              "status": "APPROVED",
+              "reviewer": "synthetic-risk",
+              "reason": "Fixture decision",
+              "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+              "decided_at": "2026-10-19T01:43:46.555Z",
+              "auth": {
+                "owner": "risk",
+                "actor": "synthetic-risk",
+                "mode": "DEMO_UNVERIFIED",
+                "verified": false,
+                "signature_header": "X-Risk-Signature"
+              }
+            },
+            "approval": {
+              "approval_id": "approval-4febee4e-58ac-4a7e-9426-2d1172c20e70",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "required": true,
+              "status": "APPROVED",
+              "decision": "APPROVE",
+              "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+              "approver": "synthetic-user",
+              "decided_at": "2026-10-19T01:43:46.560Z",
+              "expires_at": "2026-10-19T01:58:46.555Z",
+              "reason": "Fixture approval",
+              "auth": {
+                "owner": "approval",
+                "actor": "synthetic-user",
+                "mode": "DEMO_UNVERIFIED",
+                "verified": false,
+                "signature_header": "X-Approval-Signature"
+              }
+            },
+            "execution": {
+              "execution_id": "sim-exec-3f0b0fa8-dd09-4961-bbd5-67ae5adc0fa8",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "status": "SIMULATED",
+              "simulation_allowed": false,
+              "execution_allowed": false,
+              "receipt": {
+                "mode": "SIMULATED",
+                "execution_id": "sim-exec-3f0b0fa8-dd09-4961-bbd5-67ae5adc0fa8",
+                "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                "side_effects": false,
+                "funding_allocation": {
+                  "allocation_id": "allocation-ec83078e-17de-4a8f-b25c-ffdc3681fc5f",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                  "execution_id": "sim-exec-3f0b0fa8-dd09-4961-bbd5-67ae5adc0fa8",
+                  "revision": 1,
+                  "amount_minor": 400000,
+                  "created_at": "2026-10-19T01:43:46.585Z",
+                  "mode": "SIMULATED",
+                  "side_effects": false
+                },
+                "message": "模拟执行完成；未调用真实交易、付款或账户网关。",
+                "completed_at": "2026-10-19T01:43:46.585Z"
+              }
+            },
+            "audit": {
+              "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+              "workflow_version": "review-workflow.v1",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+              "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+              "events": [
+                {
+                  "event_id": "event-904430c5-4aa8-4559-b02f-2f1c919b3934",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "model-service",
+                  "event_type": "review.received",
+                  "payload": {
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.545Z"
+                },
+                {
+                  "event_id": "event-1031adb7-d99a-4702-9f2c-05e7e5151058",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "model-service",
+                  "event_type": "model.completed",
+                  "payload": {
+                    "source": "model",
+                    "attempt_count": 1,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.547Z"
+                },
+                {
+                  "event_id": "event-8900450f-8212-4f4e-8b9b-6eb48d72631d",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "model-service",
+                  "event_type": "gateway.checked",
+                  "payload": {
+                    "execution_allowed": false,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.547Z"
+                },
+                {
+                  "event_id": "event-dbb95e80-1dc5-43b3-bb3a-d25fff12f786",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "core-agent",
+                  "event_type": "workflow.created",
+                  "payload": {
+                    "stage": "MODEL",
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.549Z"
+                },
+                {
+                  "event_id": "event-1ef51046-e66f-4666-826f-2ad3cad668e8",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "funding-guard",
+                  "event_type": "funding.bound",
+                  "payload": {
+                    "funding": {
+                      "guard_version": "funding-plan-demo.v1",
+                      "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                      "revision": 1,
+                      "amount_minor": 400000,
+                      "currency": "CNY",
+                      "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+                      "cash_minor": 1000000,
+                      "protected_purposes": [
+                        {
+                          "purpose_id": "rent",
+                          "label": "虚构房租",
+                          "amount_minor": 400000
+                        }
+                      ]
+                    },
+                    "check": {
+                      "guard_version": "funding-plan-demo.v1",
+                      "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                      "bound_revision": 1,
+                      "current_revision": 1,
+                      "requested_minor": 400000,
+                      "available_minor": 600000,
+                      "protected_minor": 400000,
+                      "allocated_minor": 0,
+                      "deficit_minor": 0,
+                      "execution_allowed": false,
+                      "status": "AVAILABLE",
+                      "code": null,
+                      "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+                    },
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.549Z"
+                },
+                {
+                  "event_id": "event-92df8e37-cec5-4a14-80e1-ef0f05995348",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "core-agent",
+                  "event_type": "proposal.bound",
+                  "payload": {
+                    "source": "model",
+                    "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.549Z"
+                },
+                {
+                  "event_id": "event-c19ce7c2-7c74-4ebe-bfa8-c766cd049347",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "risk-gateway",
+                  "event_type": "risk.handoff.created",
+                  "payload": {
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.549Z"
+                },
+                {
+                  "event_id": "event-fcf5e0f3-1811-4d48-a58f-90411a160093",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "execution-gateway",
+                  "event_type": "execution.blocked",
+                  "payload": {
+                    "reason": "risk_pending",
+                    "execution_allowed": false,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.549Z"
+                },
+                {
+                  "event_id": "event-84271f48-e4fe-4b79-8d9c-3c83db438942",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "risk",
+                  "event_type": "risk.approved",
+                  "payload": {
+                    "approval_required": true,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.555Z"
+                },
+                {
+                  "event_id": "event-3cc11674-a464-46bc-a611-fdcc1eb91d28",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "approval-gateway",
+                  "event_type": "approval.pending",
+                  "payload": {
+                    "approval_id": "approval-4febee4e-58ac-4a7e-9426-2d1172c20e70",
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.555Z"
+                },
+                {
+                  "event_id": "event-8e742931-50c2-4daf-a4f3-e726a137d70d",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "approval",
+                  "event_type": "approval.approved",
+                  "payload": {
+                    "approval_id": "approval-4febee4e-58ac-4a7e-9426-2d1172c20e70",
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.560Z"
+                },
+                {
+                  "event_id": "event-145bc623-e8e7-4462-8e47-8917743b6adf",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "execution-gateway",
+                  "event_type": "execution.ready_for_simulation",
+                  "payload": {
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.560Z"
+                },
+                {
+                  "event_id": "event-34eed5c6-0462-44d9-b2e6-f3e36d3000ea",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "funding-guard",
+                  "event_type": "funding.allocated",
+                  "payload": {
+                    "allocation_id": "allocation-ec83078e-17de-4a8f-b25c-ffdc3681fc5f",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                    "execution_id": "sim-exec-3f0b0fa8-dd09-4961-bbd5-67ae5adc0fa8",
+                    "revision": 1,
+                    "amount_minor": 400000,
+                    "created_at": "2026-10-19T01:43:46.585Z",
+                    "mode": "SIMULATED",
+                    "side_effects": false,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.585Z"
+                },
+                {
+                  "event_id": "event-c6962985-0254-4863-a502-b53242658a3e",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "execution-gateway",
+                  "event_type": "execution.simulated",
+                  "payload": {
+                    "execution_id": "sim-exec-3f0b0fa8-dd09-4961-bbd5-67ae5adc0fa8",
+                    "side_effects": false,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.585Z"
+                }
+              ]
+            },
+            "funding_check": {
+              "guard_version": "funding-plan-demo.v1",
+              "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+              "bound_revision": 1,
+              "current_revision": 1,
+              "requested_minor": 400000,
+              "available_minor": 600000,
+              "protected_minor": 400000,
+              "allocated_minor": 0,
+              "deficit_minor": 0,
+              "execution_allowed": false,
+              "status": "ALLOCATED",
+              "code": null,
+              "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。",
+              "available_after_minor": 200000
+            }
+          }
+        },
+        {
+          "endpoint": "/api/review/simulate",
+          "http_status": 200,
+          "body": {
+            "workflow_version": "review-workflow.v1",
+            "schema_version": "model-review.v1",
+            "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+            "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+            "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+            "source_task_id": null,
+            "data_mode": "SYNTHETIC_REPLAY",
+            "execution_mode": "PAPER",
+            "capability": "REVIEW_ONLY",
+            "scenario": "GENERAL_REVIEW",
+            "output_contract": {
+              "contract_version": "agent-output.v1",
+              "requested_formats": [
+                "json"
+              ],
+              "available_formats": [
+                "json"
+              ],
+              "status": "READY",
+              "pending_formats": [],
+              "side_effects": false
+            },
+            "portfolio_snapshot_id": null,
+            "risk_profile_version": "risk-profile.v1",
+            "plan_id": "plan-2f75fb31-e7ee-4f43-886c-72a2395eaad4",
+            "plan_hash": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+            "policy_version": "risk-policy.v1",
+            "idempotency_key": "disk-transition-first",
+            "request_fingerprint": "2fa40bbb1b4625b171526166c6076fdd0676793e283274a297e7b6afbeb5850b",
+            "memory_consent": false,
+            "memory_write_status": "NOT_REQUESTED",
+            "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+            "status": "SIMULATED",
+            "reviewed_input": {
+              "schema_version": "model-review.v1",
+              "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+              "source_task_id": null,
+              "source": null,
+              "kind": "combined",
+              "text": "虚构磁盘恢复 first",
+              "context": {
+                "demo_funding_snapshot": {
+                  "guard_version": "funding-plan-demo.v1",
+                  "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                  "revision": 1,
+                  "amount_minor": 400000,
+                  "currency": "CNY",
+                  "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+                  "cash_minor": 1000000,
+                  "protected_purposes": [
+                    {
+                      "purpose_id": "rent",
+                      "label": "虚构房租",
+                      "amount_minor": 400000
+                    }
+                  ],
+                  "check": {
+                    "guard_version": "funding-plan-demo.v1",
+                    "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                    "bound_revision": 1,
+                    "current_revision": 1,
+                    "requested_minor": 400000,
+                    "available_minor": 600000,
+                    "protected_minor": 400000,
+                    "allocated_minor": 0,
+                    "deficit_minor": 0,
+                    "execution_allowed": false,
+                    "status": "AVAILABLE",
+                    "code": null,
+                    "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+                  },
+                  "instruction_authority": false
+                }
+              },
+              "action_parameters": {
+                "synthetic": true,
+                "currency": "CNY",
+                "amount": 4000,
+                "funding_plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                "funding_plan_revision": 1
+              },
+              "requested_action": null,
+              "allow_rule_fallback": false,
+              "data_mode": "SYNTHETIC_REPLAY",
+              "execution_mode": "PAPER",
+              "capability": "REVIEW_ONLY",
+              "portfolio_snapshot_id": null,
+              "risk_profile_version": "risk-profile.v1",
+              "plan_id": null,
+              "plan_hash": null,
+              "policy_version": "risk-policy.v1",
+              "idempotency_key": "disk-transition-first",
+              "memory_consent": false,
+              "scenario": "GENERAL_REVIEW",
+              "output_formats": [
+                "json"
+              ]
+            },
+            "model": {
+              "status": "PROPOSED",
+              "source": "model",
+              "model_response": {
+                "provider": "cloudflare_workers_ai",
+                "call_succeeded": true,
+                "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "data_mode": "SYNTHETIC_REPLAY",
+                "execution_mode": "PAPER",
+                "capability": "REVIEW_ONLY",
+                "scenario": "GENERAL_REVIEW",
+                "endpoint": "cloudflare:AI",
+                "api_style": "workers_ai",
+                "response_format": "json_schema",
+                "provider_response_id": "synthetic-disk-transition-1",
+                "raw_text": "{\"summary\":\"虚构状态变更恢复\",\"risk_level\":\"unknown\",\"proposed_action\":\"HOLD_FOR_REVIEW\",\"action_reason\":\"等风控审批\",\"missing_information\":[],\"evidence\":[]}",
+                "raw_text_format": "provider_json_serialized",
+                "proposal": {
+                  "summary": "虚构状态变更恢复",
+                  "risk_level": "unknown",
+                  "proposed_action": "HOLD_FOR_REVIEW",
+                  "action_reason": "等风控审批",
+                  "missing_information": [],
+                  "evidence": []
+                },
+                "usage": null,
+                "attempt_count": 1,
+                "retry_count": 0
+              },
+              "input": {
+                "schema_version": "model-review.v1",
+                "kind": "combined",
+                "source": null,
+                "input_sha256": "07118df84588fc816cae0cb1d3a6b62cd0c23938752c11bcc4754ec450ddb0af",
+                "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                "source_task_id": null,
+                "data_mode": "SYNTHETIC_REPLAY",
+                "execution_mode": "PAPER",
+                "capability": "REVIEW_ONLY",
+                "scenario": "GENERAL_REVIEW",
+                "output_formats": [
+                  "json"
+                ],
+                "portfolio_snapshot_id": null,
+                "risk_profile_version": "risk-profile.v1",
+                "plan_id": null,
+                "plan_hash": null,
+                "policy_version": "risk-policy.v1"
+              }
+            },
+            "proposed_action": {
+              "proposed_action": "HOLD_FOR_REVIEW",
+              "action_reason": "等风控审批",
+              "risk_level": "unknown",
+              "requested_action": null,
+              "action_parameters": {
+                "synthetic": true,
+                "currency": "CNY",
+                "amount": 4000,
+                "funding_plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                "funding_plan_revision": 1
+              },
+              "model_response_id": "synthetic-disk-transition-1",
+              "funding": {
+                "guard_version": "funding-plan-demo.v1",
+                "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                "revision": 1,
+                "amount_minor": 400000,
+                "currency": "CNY",
+                "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+                "cash_minor": 1000000,
+                "protected_purposes": [
+                  {
+                    "purpose_id": "rent",
+                    "label": "虚构房租",
+                    "amount_minor": 400000
+                  }
+                ]
+              },
+              "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb"
+            },
+            "risk_handoff": {
+              "contract_version": "model-review.v1",
+              "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+              "status": "APPROVED",
+              "decision": "APPROVE",
+              "owner": "Unified Risk",
+              "reason": "模型输出只是拟议动作，必须由统一 Risk 决定是否进入审批。",
+              "evidence": {
+                "input_sha256": "07118df84588fc816cae0cb1d3a6b62cd0c23938752c11bcc4754ec450ddb0af",
+                "model_response_id": "synthetic-disk-transition-1",
+                "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                "plan_id": "plan-2f75fb31-e7ee-4f43-886c-72a2395eaad4",
+                "plan_hash": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                "policy_version": "risk-policy.v1"
+              },
+              "execution_allowed": false
+            },
+            "risk_decision": {
+              "risk_decision_id": "risk-decision-c30a5b0d-8d90-43ac-b5d4-5bdc0c84a6f7",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "decision": "APPROVE",
+              "status": "APPROVED",
+              "reviewer": "synthetic-risk",
+              "reason": "Fixture decision",
+              "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+              "decided_at": "2026-10-19T01:43:46.555Z",
+              "auth": {
+                "owner": "risk",
+                "actor": "synthetic-risk",
+                "mode": "DEMO_UNVERIFIED",
+                "verified": false,
+                "signature_header": "X-Risk-Signature"
+              }
+            },
+            "approval": {
+              "approval_id": "approval-4febee4e-58ac-4a7e-9426-2d1172c20e70",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "required": true,
+              "status": "APPROVED",
+              "decision": "APPROVE",
+              "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+              "approver": "synthetic-user",
+              "decided_at": "2026-10-19T01:43:46.560Z",
+              "expires_at": "2026-10-19T01:58:46.555Z",
+              "reason": "Fixture approval",
+              "auth": {
+                "owner": "approval",
+                "actor": "synthetic-user",
+                "mode": "DEMO_UNVERIFIED",
+                "verified": false,
+                "signature_header": "X-Approval-Signature"
+              }
+            },
+            "execution": {
+              "execution_id": "sim-exec-3f0b0fa8-dd09-4961-bbd5-67ae5adc0fa8",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "status": "SIMULATED",
+              "simulation_allowed": false,
+              "execution_allowed": false,
+              "receipt": {
+                "mode": "SIMULATED",
+                "execution_id": "sim-exec-3f0b0fa8-dd09-4961-bbd5-67ae5adc0fa8",
+                "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                "side_effects": false,
+                "funding_allocation": {
+                  "allocation_id": "allocation-ec83078e-17de-4a8f-b25c-ffdc3681fc5f",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                  "execution_id": "sim-exec-3f0b0fa8-dd09-4961-bbd5-67ae5adc0fa8",
+                  "revision": 1,
+                  "amount_minor": 400000,
+                  "created_at": "2026-10-19T01:43:46.585Z",
+                  "mode": "SIMULATED",
+                  "side_effects": false
+                },
+                "message": "模拟执行完成；未调用真实交易、付款或账户网关。",
+                "completed_at": "2026-10-19T01:43:46.585Z"
+              }
+            },
+            "audit": {
+              "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+              "workflow_version": "review-workflow.v1",
+              "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+              "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+              "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+              "events": [
+                {
+                  "event_id": "event-904430c5-4aa8-4559-b02f-2f1c919b3934",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "model-service",
+                  "event_type": "review.received",
+                  "payload": {
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.545Z"
+                },
+                {
+                  "event_id": "event-1031adb7-d99a-4702-9f2c-05e7e5151058",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "model-service",
+                  "event_type": "model.completed",
+                  "payload": {
+                    "source": "model",
+                    "attempt_count": 1,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.547Z"
+                },
+                {
+                  "event_id": "event-8900450f-8212-4f4e-8b9b-6eb48d72631d",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "model-service",
+                  "event_type": "gateway.checked",
+                  "payload": {
+                    "execution_allowed": false,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.547Z"
+                },
+                {
+                  "event_id": "event-dbb95e80-1dc5-43b3-bb3a-d25fff12f786",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "core-agent",
+                  "event_type": "workflow.created",
+                  "payload": {
+                    "stage": "MODEL",
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.549Z"
+                },
+                {
+                  "event_id": "event-1ef51046-e66f-4666-826f-2ad3cad668e8",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "funding-guard",
+                  "event_type": "funding.bound",
+                  "payload": {
+                    "funding": {
+                      "guard_version": "funding-plan-demo.v1",
+                      "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                      "revision": 1,
+                      "amount_minor": 400000,
+                      "currency": "CNY",
+                      "authority": "DEMO_USER_CONFIRMED_NOT_TRUSTED_MEMORY",
+                      "cash_minor": 1000000,
+                      "protected_purposes": [
+                        {
+                          "purpose_id": "rent",
+                          "label": "虚构房租",
+                          "amount_minor": 400000
+                        }
+                      ]
+                    },
+                    "check": {
+                      "guard_version": "funding-plan-demo.v1",
+                      "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+                      "bound_revision": 1,
+                      "current_revision": 1,
+                      "requested_minor": 400000,
+                      "available_minor": 600000,
+                      "protected_minor": 400000,
+                      "allocated_minor": 0,
+                      "deficit_minor": 0,
+                      "execution_allowed": false,
+                      "status": "AVAILABLE",
+                      "code": null,
+                      "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。"
+                    },
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.549Z"
+                },
+                {
+                  "event_id": "event-92df8e37-cec5-4a14-80e1-ef0f05995348",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "core-agent",
+                  "event_type": "proposal.bound",
+                  "payload": {
+                    "source": "model",
+                    "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.549Z"
+                },
+                {
+                  "event_id": "event-c19ce7c2-7c74-4ebe-bfa8-c766cd049347",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "risk-gateway",
+                  "event_type": "risk.handoff.created",
+                  "payload": {
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.549Z"
+                },
+                {
+                  "event_id": "event-fcf5e0f3-1811-4d48-a58f-90411a160093",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "execution-gateway",
+                  "event_type": "execution.blocked",
+                  "payload": {
+                    "reason": "risk_pending",
+                    "execution_allowed": false,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.549Z"
+                },
+                {
+                  "event_id": "event-84271f48-e4fe-4b79-8d9c-3c83db438942",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "risk",
+                  "event_type": "risk.approved",
+                  "payload": {
+                    "approval_required": true,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.555Z"
+                },
+                {
+                  "event_id": "event-3cc11674-a464-46bc-a611-fdcc1eb91d28",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "approval-gateway",
+                  "event_type": "approval.pending",
+                  "payload": {
+                    "approval_id": "approval-4febee4e-58ac-4a7e-9426-2d1172c20e70",
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.555Z"
+                },
+                {
+                  "event_id": "event-8e742931-50c2-4daf-a4f3-e726a137d70d",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "approval",
+                  "event_type": "approval.approved",
+                  "payload": {
+                    "approval_id": "approval-4febee4e-58ac-4a7e-9426-2d1172c20e70",
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.560Z"
+                },
+                {
+                  "event_id": "event-145bc623-e8e7-4462-8e47-8917743b6adf",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "execution-gateway",
+                  "event_type": "execution.ready_for_simulation",
+                  "payload": {
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.560Z"
+                },
+                {
+                  "event_id": "event-34eed5c6-0462-44d9-b2e6-f3e36d3000ea",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "funding-guard",
+                  "event_type": "funding.allocated",
+                  "payload": {
+                    "allocation_id": "allocation-ec83078e-17de-4a8f-b25c-ffdc3681fc5f",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "proposal_sha256": "7e91de1671a963779e0375ace3d8cb84acfb79dcef899a4ba2df64ff82f4fbbb",
+                    "execution_id": "sim-exec-3f0b0fa8-dd09-4961-bbd5-67ae5adc0fa8",
+                    "revision": 1,
+                    "amount_minor": 400000,
+                    "created_at": "2026-10-19T01:43:46.585Z",
+                    "mode": "SIMULATED",
+                    "side_effects": false,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.585Z"
+                },
+                {
+                  "event_id": "event-c6962985-0254-4863-a502-b53242658a3e",
+                  "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                  "actor": "execution-gateway",
+                  "event_type": "execution.simulated",
+                  "payload": {
+                    "execution_id": "sim-exec-3f0b0fa8-dd09-4961-bbd5-67ae5adc0fa8",
+                    "side_effects": false,
+                    "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                    "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                    "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                    "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                    "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                    "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+                    "trace": {
+                      "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+                      "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+                      "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+                      "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+                      "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+                      "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1"
+                    }
+                  },
+                  "timestamp": "2026-10-19T01:43:46.585Z"
+                }
+              ]
+            },
+            "funding_check": {
+              "guard_version": "funding-plan-demo.v1",
+              "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+              "bound_revision": 1,
+              "current_revision": 1,
+              "requested_minor": 400000,
+              "available_minor": 600000,
+              "protected_minor": 400000,
+              "allocated_minor": 0,
+              "deficit_minor": 0,
+              "execution_allowed": false,
+              "status": "ALLOCATED",
+              "code": null,
+              "message": "当前演示余额足够；仍需 Risk 和必要审批，模拟前会再检查。",
+              "available_after_minor": 200000
+            }
+          }
+        }
+      ],
+      "model_calls_before": 2,
+      "model_calls_after": 2,
+      "persisted_workflow_status": "SIMULATED",
+      "allocated_minor": 400000,
+      "markers": [
+        {
+          "transition_version": "review-transition.v1",
+          "transition_id": "transition-bc33896b-7ef2-4f0a-8b61-490fa0f5d810",
+          "state": "COMPLETED",
+          "operation": "/api/review/approval",
+          "keys": [
+            "review-transition:task:review-task-78e64bcf-cdd9-40aa-be24-1dc316b79244"
+          ],
+          "task_id": "review-task-78e64bcf-cdd9-40aa-be24-1dc316b79244",
+          "request_id": "req-356ce70d-b2c5-40a9-842e-334210deb494",
+          "session_id": "session-c4c0e4cb-e1eb-4e90-b609-2cf8033243b1",
+          "run_id": "review-2b63094b-00e9-42ea-95a5-823f66cbaf50",
+          "audit_id": "audit-7a4a378f-9afd-442f-ad3d-38cea4f7dd4b",
+          "handoff_id": "handoff-af86fe93-61ae-4953-97a1-489ca876511d",
+          "plan_id": null,
+          "request_sha256": "c58e50a104dab966d7ab471898f3e573145572eae5a05f898bec79764e41b22c",
+          "created_at": "2026-10-19T01:43:46.576Z",
+          "completed_at": "2026-10-19T01:43:46.578Z"
+        },
+        {
+          "transition_version": "review-transition.v1",
+          "transition_id": "transition-c36142d3-92ff-47e6-90ce-80c23dcdb5bb",
+          "state": "COMPLETED",
+          "operation": "/api/review/simulate",
+          "keys": [
+            "review-transition:task:review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+            "review-transition:funding:funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073"
+          ],
+          "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+          "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+          "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+          "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+          "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+          "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+          "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+          "request_sha256": "1abc523a82e9c66c8d3b1159519d26519722601b934552f58ac85244cf5c3751",
+          "created_at": "2026-10-19T01:43:46.798Z",
+          "completed_at": "2026-10-19T01:43:46.805Z"
+        },
+        {
+          "transition_version": "review-transition.v1",
+          "transition_id": "transition-c36142d3-92ff-47e6-90ce-80c23dcdb5bb",
+          "state": "COMPLETED",
+          "operation": "/api/review/simulate",
+          "keys": [
+            "review-transition:task:review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+            "review-transition:funding:funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073"
+          ],
+          "task_id": "review-task-2f0d8f05-58f7-4ee9-a68a-358747c045d2",
+          "request_id": "req-65f5d7fa-0772-489f-b766-c1700f8036de",
+          "session_id": "session-653e764c-bb64-45d1-8769-b290e89f7e4b",
+          "run_id": "review-bcf153a5-012c-47b9-9104-8a0e21b57331",
+          "audit_id": "audit-90ee9a82-5d52-4873-adf8-0b6af9dac1d2",
+          "handoff_id": "handoff-b9d2c3c1-5047-4591-8c0e-1b93a8fe8fd1",
+          "plan_id": "funding-demo-80e5aeab-94a7-49ed-9c68-48518fc6e073",
+          "request_sha256": "1abc523a82e9c66c8d3b1159519d26519722601b934552f58ac85244cf5c3751",
+          "created_at": "2026-10-19T01:43:46.798Z",
+          "completed_at": "2026-10-19T01:43:46.805Z"
+        }
+      ],
+      "caveat": "Raw database state may be older than a pending transition; it is not a usable API response."
+    }
+  ]
+}

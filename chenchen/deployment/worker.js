@@ -11,6 +11,7 @@ import fundingPlanModule from "../integrations/funding-plan.js";
 import coreErrorModule from "../contracts/core-agent-error.js";
 import bailianBudgetModule from "../integrations/bailian-budget.js";
 import reviewReservationModule from "../integrations/review-reservation.js";
+import reviewTransitionModule from "../integrations/review-transition.js";
 import { reviewDocs } from "./review-docs.js";
 
 const { Harness } = harnessModule;
@@ -175,7 +176,7 @@ function workflowErrorPayload(error) {
     sessionId: error.sessionId || null,
     runId: record?.run_id || error.runId || null,
     auditId: record?.audit?.audit_id || error.auditId || null,
-    handoffId: record?.risk_handoff?.handoff_id || null,
+    handoffId: record?.risk_handoff?.handoff_id || error.handoffId || null,
     operation: "MODEL_REVIEW",
     legacyContractVersion: modelReview.REVIEW_VERSION
   });
@@ -191,6 +192,7 @@ export class ReviewService {
     this.modelBuckets = new Map();
     this.bailianBudget = new bailianBudgetModule.BailianBudget({ storage: this.storage, env });
     this.reservations = new reviewReservationModule.ReviewReservations(this.storage);
+    this.transitions = new reviewTransitionModule.ReviewTransitions(this.storage);
     this.pendingRequests = 0;
   }
 
@@ -203,12 +205,13 @@ export class ReviewService {
     return pending;
   }
 
-  async persist(record, fundingPlans = null, reservation = null) {
+  async persist(record, fundingPlans = null, reservation = null, transition = null) {
     if (!record?.run_id) return;
     const entries = {
       ["run:" + record.run_id]: record,
       ["task:" + record.task_id]: record.run_id,
-      ...this.reservations.completedEntries(reservation, record)
+      ...this.reservations.completedEntries(reservation, record),
+      ...this.transitions.completedEntries(transition, record)
     };
     if (record.idempotency_key) entries["idempotency:" + record.idempotency_key] = record.run_id;
     // One atomic storage operation commits both the simulation receipt and its allocation.
@@ -218,19 +221,25 @@ export class ReviewService {
 
   async loadFundingPlan(store, planId) {
     if (typeof planId !== "string") return;
+    await this.transitions.assertPlan(planId);
     const plan = await this.storage.get("funding:" + planId);
     if (plan) store.save(plan);
   }
 
   async lookupTask(taskId) {
+    await this.transitions.assertTask(taskId);
     const runId = await this.storage.get("task:" + taskId);
-    return runId ? this.storage.get("run:" + runId) : null;
+    const record = runId ? await this.storage.get("run:" + runId) : null;
+    await this.transitions.assertRecord(record);
+    return record;
   }
 
   async lookupIdempotency(key) {
     if (!key) return null;
     const runId = await this.storage.get("idempotency:" + key);
-    return runId ? this.storage.get("run:" + runId) : null;
+    const record = runId ? await this.storage.get("run:" + runId) : null;
+    await this.transitions.assertRecord(record);
+    return record;
   }
 
   async handle(request) {
@@ -238,6 +247,7 @@ export class ReviewService {
     const url = new URL(request.url);
     const fundingPlans = new FundingPlanStore();
     let reservation = null;
+    let transition = null, transitionRecord = null, committing = false;
     try {
       if (request.method === "GET" && url.pathname.startsWith("/api/funding-demo/plan/")) {
         const planId = decodeURIComponent(url.pathname.slice("/api/funding-demo/plan/".length));
@@ -248,6 +258,7 @@ export class ReviewService {
         const handoffRequested = url.pathname.endsWith("/risk-handoff");
         const key = decodeURIComponent(url.pathname.slice("/api/review/".length, handoffRequested ? -"/risk-handoff".length : undefined));
         const result = key.startsWith("task/") ? await this.lookupTask(key.slice(5)) : await this.storage.get("run:" + key);
+        await this.transitions.assertRecord(result);
         if (!result && key.startsWith("task/")) {
           const reserved = await this.reservations.byTask(key.slice(5));
           if (reserved) throw reviewReservationModule.unavailable(reserved);
@@ -265,7 +276,9 @@ export class ReviewService {
       if (["/api/funding-demo/plan", "/api/funding-demo/plan/revise"].includes(url.pathname)) {
         await this.loadFundingPlan(fundingPlans, body.plan_id);
         const plan = url.pathname.endsWith("/revise") ? fundingPlans.revise(body) : fundingPlans.create(body);
-        await this.storage.put({ ["funding:" + plan.plan_id]: fundingPlans.require(plan.plan_id) });
+        if (url.pathname.endsWith("/revise")) transition = await this.transitions.begin({ operation: url.pathname, body, planId: plan.plan_id });
+        committing = true;
+        await this.storage.put({ ["funding:" + plan.plan_id]: fundingPlans.require(plan.plan_id), ...this.transitions.completedEntries(transition) });
         return json(request, env, 200, plan);
       }
       const workflow = new ReviewWorkflowStore({ fundingPlans });
@@ -317,46 +330,58 @@ export class ReviewService {
           }
         });
       } else {
-        const record = await this.lookupTask(body.task_id);
-        if (record) workflow.save(record);
-        await this.loadFundingPlan(fundingPlans, record?.proposed_action?.funding?.plan_id);
-        if (url.pathname === "/api/review/risk-callback") {
-          const actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "risk", body, headers: request.headers, env });
-          const callback = await workflow.receiveRiskCallback(body, actorAuth);
-          await this.persist(callback.workflow);
-          return json(request, env, 200, { callback_version: riskHandoff.CALLBACK_VERSION, ...callback, handoff: riskHandoff.buildRiskHandoffPackage(callback.workflow) });
-        }
-        let method = {
+        const method = {
           "/api/review/risk-decision": "decideRisk",
+          "/api/review/risk-callback": "receiveRiskCallback",
           "/api/review/approval": "decideApproval",
           "/api/review/risk-dispatch": "dispatchRiskHandoff",
           "/api/review/simulate": "simulate",
           "/api/review/cancel": "cancel"
         }[url.pathname];
+        if (!method) return json(request, env, 404, errorPayload(routeNotFoundFailure()));
+        let actorAuth = null;
+        if (["decideRisk", "receiveRiskCallback"].includes(method)) actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "risk", body, headers: request.headers, env });
+        if (method === "decideApproval") actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "approval", body, headers: request.headers, env });
+        const record = await this.lookupTask(body.task_id);
+        if (record) workflow.save(record);
+        await this.loadFundingPlan(fundingPlans, record?.proposed_action?.funding?.plan_id);
+        if (record) {
+          transitionRecord = record;
+          transition = await this.transitions.begin({ operation: url.pathname, body, record,
+            planId: method === "simulate" ? record.proposed_action?.funding?.plan_id || null : null });
+        }
+        if (url.pathname === "/api/review/risk-callback") {
+          const callback = await workflow.receiveRiskCallback(body, actorAuth);
+          committing = true;
+          await this.persist(callback.workflow, fundingPlans, null, transition);
+          return json(request, env, 200, { callback_version: riskHandoff.CALLBACK_VERSION, ...callback, handoff: riskHandoff.buildRiskHandoffPackage(callback.workflow) });
+        }
         if (url.pathname === "/api/review/risk-decision") {
-          const actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "risk", body, headers: request.headers, env });
           result = await workflow.decideRisk(body, actorAuth);
         } else if (url.pathname === "/api/review/approval") {
-          const actorAuth = await ownerBridge.verifyOwnerRequest({ owner: "approval", body, headers: request.headers, env });
           result = await workflow.decideApproval(body, actorAuth);
         } else if (url.pathname === "/api/review/risk-dispatch") {
           result = await workflow.dispatchRiskHandoff(body, handoff => ownerBridge.dispatchRiskHandoff(handoff, env));
         } else if (method) {
           result = await workflow[method](body);
         }
-        if (!method) return json(request, env, 404, errorPayload(routeNotFoundFailure()));
       }
-      await this.persist(result, fundingPlans, reservation);
+      committing = true;
+      await this.persist(result, fundingPlans, reservation, transition);
       return json(request, env, 200, url.pathname === "/api/review/legacy"
         ? legacyReviewAdapter.mapWorkflowToLegacyResponse(result)
         : result);
     } catch (error) {
+      // A storage error can occur after a commit. Never retry it by writing an old snapshot.
+      if (committing && (transition || reservation)) return json(request, env, 503,
+        workflowErrorPayload(transition ? reviewTransitionModule.unavailable(transition) : reviewReservationModule.unavailable(reservation)));
       if (error.name === "ReviewError" || error.name === "WorkflowError") {
-        try { await this.persist(error.workflowRecord || error.record, fundingPlans, reservation); }
-        catch { return json(request, env, 503, workflowErrorPayload(reviewReservationModule.unavailable(reservation))); }
+        try { await this.persist(error.workflowRecord || error.record || (transition ? transitionRecord : null), fundingPlans, reservation, transition); }
+        catch { return json(request, env, 503, workflowErrorPayload(transition ? reviewTransitionModule.unavailable(transition) : reviewReservationModule.unavailable(reservation))); }
         return json(request, env, error.statusCode || 502, workflowErrorPayload(error));
       }
       if (error.code === "INVALID_JSON") return json(request, env, 400, errorPayload(error));
+      if (transition) return json(request, env, 503, workflowErrorPayload(reviewTransitionModule.unavailable(transition)));
       if (reservation) return json(request, env, 503, workflowErrorPayload(reviewReservationModule.unavailable(reservation)));
       return json(request, env, 503, errorPayload(serviceUnavailableFailure()));
     }

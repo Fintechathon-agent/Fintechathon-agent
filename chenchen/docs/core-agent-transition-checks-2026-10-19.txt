@@ -1,0 +1,51 @@
+日期：2026-10-19（北京时间）
+node scripts/check.js；exit=0
+JavaScript syntax checks passed.
+
+wrangler deploy --dry-run；exit=0（之后仅修改测试与文档，运行代码未变）
+
+ ⛅️ wrangler 4.151.1
+────────────────────
+Total Upload: 283.00 KiB / gzip: 61.25 KiB
+Your Worker has access to the following bindings:
+Binding                                                                           Resource
+env.REVIEW_SERVICE (ReviewService)                                                Durable Object
+env.AI                                                                            AI
+env.CORS_ORIGINS ("*")                                                            Environment Variable
+env.RATE_LIMIT_PER_MINUTE ("60")                                                  Environment Variable
+env.MODEL_PROVIDER ("workers_ai")                                                 Environment Variable
+env.MODEL_NAME ("@cf/meta/llama-3.3-70b-instruct-fp8-f...")                       Environment Variable
+env.MODEL_RESPONSE_FORMAT ("json_schema")                                         Environment Variable
+env.MODEL_FALLBACK_TO_RULES ("false")                                             Environment Variable
+env.MODEL_DISABLE_RULE_FALLBACK ("true")                                          Environment Variable
+env.MODEL_TIMEOUT_MS ("45000")                                                    Environment Variable
+env.MODEL_MAX_ATTEMPTS ("2")                                                      Environment Variable
+env.MODEL_REQUESTS_PER_MINUTE ("6")                                               Environment Variable
+
+--dry-run: exiting now.
+
+实际固定 Risk 源码本地联调；exit=0
+{"status":"LOCAL_CHECKS_PASSED_INTEGRATION_PENDING","assertion_groups":9,"synthetic_vendor_calls":6,"paid_model_calls":0,"joint_acceptance":false}
+
+SQLite 真正退出/重启：3 类、6 个进程、3 次强制退出，通过；证据 core-agent-transition-recovery-2026-10-19.json。
+冻结 Handoff Schema 检查：exit=1，仍失败；见 core-risk-transition-blocker-2026-10-19.json。
+
+首次全量回归为 243/244，通过故障证据发现旧用例仍期待未决操作自动继续。保留该用例的资金原子性检查，通过直接读测试存储验证零占用、无回执；将对外 GET 和再次执行要求收紧为 503 且 retryable=false。未删测试，没有改其他 Owner 用例。初次失败片段如下：
+
+pe: 'test'
+  ...
+# Subtest: failed atomic persistence cannot leave orphan allocations or a successful receipt
+not ok 32 - failed atomic persistence cannot leave orphan allocations or a successful receipt
+  ---
+  duration_ms: 18.7677
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\cloudflare-review.test.mjs:412:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'length')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (<TEAM_CHECKOUT>/chenchen/tests/cloudflare-review.test.mjs:428:35)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...

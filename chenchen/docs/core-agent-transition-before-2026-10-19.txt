@@ -1,0 +1,183 @@
+日期：2026-10-19（北京时间）
+基线：2d76dd2dd0fd0b9b6bda4e2a11758fba1ae5680f，仅先添加 8 个故障用例。
+命令：node --test tests/review-transition-recovery.test.mjs
+结果：1 通过、7 失败；exit=1。合成模型和输入，0 外部/付费模型调用。
+本机路径脱敏，去除行尾空白，其余输出保留。
+
+TAP version 13
+# Subtest: failed cancellation save blocks old approval, every read alias and idempotent replay after restart
+not ok 1 - failed cancellation save blocks old approval, every read alias and idempotent replay after restart
+  ---
+  duration_ms: 44.7102
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-transition-recovery.test.mjs:39:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    assertPending (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:34:10)
+    TestContext.<anonymous> (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:43:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: lost Risk callback save prevents replacement by another decision
+not ok 2 - lost Risk callback save prevents replacement by another decision
+  ---
+  duration_ms: 6.4695
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-transition-recovery.test.mjs:54:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    assertPending (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:34:10)
+    TestContext.<anonymous> (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:58:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a lost approval save preserves trace and cannot silently accept a second approver
+not ok 3 - a lost approval save preserves trace and cannot silently accept a second approver
+  ---
+  duration_ms: 6.7918
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-transition-recovery.test.mjs:64:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    assertPending (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:34:10)
+    TestContext.<anonymous> (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:68:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: uncertain simulation blocks other tasks and revisions sharing its funding plan
+not ok 4 - uncertain simulation blocks other tasks and revisions sharing its funding plan
+  ---
+  duration_ms: 17.7712
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-transition-recovery.test.mjs:77:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    assertPending (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:34:10)
+    TestContext.<anonymous> (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:82:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: uncertain funding revision blocks the old plan and existing approved task
+not ok 5 - uncertain funding revision blocks the old plan and existing approved task
+  ---
+  duration_ms: 8.9671
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-transition-recovery.test.mjs:92:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    assertPending (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:34:10)
+    TestContext.<anonymous> (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:96:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a completed simulation whose acknowledgement is lost replays one durable receipt and allocation
+not ok 6 - a completed simulation whose acknowledgement is lost replays one durable receipt and allocation
+  ---
+  duration_ms: 9.2169
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-transition-recovery.test.mjs:101:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    assertPending (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:34:10)
+    TestContext.<anonymous> (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:109:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: failed admission cannot mutate workflow and rejected signatures cannot create a pending transition
+not ok 7 - failed admission cannot mutate workflow and rejected signatures cannot create a pending transition
+  ---
+  duration_ms: 5.8736
+  type: 'test'
+  location: '<TEAM_CHECKOUT>\\chenchen\\tests\\review-transition-recovery.test.mjs:118:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    true !== false
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    assertPending (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:34:10)
+    TestContext.<anonymous> (<TEAM_CHECKOUT>/chenchen/tests/review-transition-recovery.test.mjs:126:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: business rejection remains auditable and does not leave an unresolved transition
+ok 8 - business rejection remains auditable and does not leave an unresolved transition
+  ---
+  duration_ms: 7.1393
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 1
+# fail 7
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 268.8357

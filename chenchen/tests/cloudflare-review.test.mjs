@@ -423,11 +423,20 @@ test("failed atomic persistence cannot leave orphan allocations or a successful 
   };
   const failed = await worker.fetch(req("/api/review/simulate", task.base), app.env);
   assert.equal(failed.status, 503);
+  assert.equal((await failed.json()).error.retryable, false);
   app.restart();
-  const ledger = await worker.fetch(req("/api/funding-demo/plan/" + plan.plan_id), app.env).then(r => r.json());
+  // Inspect storage directly to retain the atomicity check. An unresolved
+  // transition must not expose this older snapshot as usable API state.
+  const ledger = await app.storage.get("funding:" + plan.plan_id);
   assert.equal(ledger.allocations.length, 0);
-  const record = await worker.fetch(req("/api/review/task/" + task.created.task_id), app.env).then(r => r.json());
+  const record = await app.storage.get("run:" + task.created.run_id);
   assert.equal(record.status, "READY_FOR_SIMULATION");
+  assert.equal(record.execution.receipt, null);
+  for (const endpoint of ["/api/funding-demo/plan/" + plan.plan_id, "/api/review/task/" + task.created.task_id]) {
+    const response = await worker.fetch(req(endpoint), app.env);
+    assert.equal(response.status, 503);
+    assert.equal((await response.json()).error.retryable, false);
+  }
   app.storage.put = originalPut;
-  assert.equal((await worker.fetch(req("/api/review/simulate", task.base), app.env)).status, 200);
+  assert.equal((await worker.fetch(req("/api/review/simulate", task.base), app.env)).status, 503);
 });
