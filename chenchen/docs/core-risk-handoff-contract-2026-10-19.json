@@ -1,0 +1,26 @@
+{
+  "report_version": "core-risk-handoff-contract-check.v1",
+  "checked_at": "2026-10-19T03:52:52.314Z",
+  "status": "PASS",
+  "schema_modified": false,
+  "runtime_change": "Removed one undeclared top-level source_task_id alias from the Risk Handoff package.",
+  "source_task_retained_in": [
+    "reviewed_input.source_task_id",
+    "workflow record returned by the task endpoint"
+  ],
+  "validator": "AJV 8.17.1",
+  "schema": "risk-handoff.v1#/$defs/HandoffPackage",
+  "owner_risk_commit": "ba5056621224f969eca75ce946403f8f70e95d23",
+  "records_checked": 1,
+  "callback_bindings_checked": 6,
+  "execution_allowed": false,
+  "paid_model_calls": 0,
+  "real_risk_requests": 0,
+  "joint_acceptance": false,
+  "remaining_blockers": [
+    "The current Risk consumer still requires a non-empty provider_response_id when a real model response is used.",
+    "Formal Risk URL, callback signature and trusted approval identity are not configured.",
+    "No real execution gateway has been connected."
+  ],
+  "historical_failure": "core-risk-transition-blocker-2026-10-19.json"
+}

@@ -23,7 +23,6 @@ function buildRiskHandoffPackage(record) {
     task_id: record.task_id,
     request_id: record.request_id,
     session_id: record.session_id || null,
-    source_task_id: record.source_task_id || null,
     run_id: record.run_id,
     audit_id: record.audit.audit_id,
     data_mode: record.data_mode || "FIXTURE",

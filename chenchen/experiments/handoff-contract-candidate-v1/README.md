@@ -1,12 +1,12 @@
 # Risk 交接字段修复候选 v1
 
-状态：**候选验证通过，尚未应用**。正式运行代码的严格接口检查仍失败，不可据此宣布联调验收完成。
+状态：**历史候选已被主线采用**。本目录保留当时的单行候选、验证器和失败前提，便于回溯；当前正式运行代码已直接移除该未声明别名，严格 Handoff 检查通过。
 
 ## 建议负责人确认的选择
 
 当前运行代码在 Handoff 顶层增加了 `source_task_id`，冻结的 `risk-handoff.v1` 不允许这个字段。本候选仅删除交接包中的这一处重复导出，不改 Schema。新记录的来源编号仍在 `reviewed_input.source_task_id`；原工作流及 `GET /api/review/task/{task_id}` 仍保留顶层来源编号。模型提议、任务编号、审批、回调绑定及执行阻断不变。
 
-需要 Core/Backend 与 Risk 确认：所有消费者是否可以使用上述位置，是否有人依赖旧 Handoff 顶层字段。如果必须继续使用顶层字段，应另行决定接口升级，不能静默放宽冻结 Schema。没有获得双方确认前，不应用本目录补丁，不将候选挂到线上路由。
+如果消费者必须继续使用顶层字段，应另行决定接口升级，不能静默放宽冻结 Schema。当前主线不再从 Handoff 顶层导出该别名；来源仍可从 `reviewed_input` 或原工作流记录读取。
 
 旧记录可能没有 `reviewed_input`。本候选保留 null，不伪造来源。此类记录要通过原工作流查询来源，或者由双方选择另一版本方案；不能声称旧消费者无须调整。供应商回执编号为空时的消费者拒绝问题也没有由本补丁解决。
 
@@ -26,6 +26,6 @@
 node experiments/handoff-contract-candidate-v1/verify.mjs --snapshot <准备好的快照目录> --evidence docs/core-risk-local-integration-2026-10-19.json --output <新的证据文件.json>
 ```
 
-输出文件必须不存在，避免覆盖历史。退出码 0 只代表候选验证通过；报告同时保留 `live_contract_status=BLOCKED_SOURCE_TASK_ID_UNDECLARED`。正式冻结接口检查仍用原 `owner-integration-v1/check-contract.mjs`，不要用候选结果替换它。
+输出文件必须不存在，避免覆盖历史。本目录验证器针对“修复前运行代码”的历史前提，当前不再作为主线验收入口；正式冻结接口检查使用 `owner-integration-v1/check-contract.mjs`。
 
 本目录用于临时共创审核。没有改 Risk Owner 源码、Memory 规则或公共 Schema；没有真实模型、正式审批身份或资金执行验收。

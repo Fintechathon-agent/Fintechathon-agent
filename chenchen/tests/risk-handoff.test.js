@@ -34,6 +34,7 @@ test("handoff is a detached export with trace identifiers and model evidence", a
   assert.equal(handoff.audit_id, record.audit.audit_id);
   assert.equal(handoff.request_id, record.request_id);
   assert.equal(handoff.evidence.proposal_sha256, record.proposed_action.proposal_sha256);
+  assert.equal(Object.hasOwn(handoff, "source_task_id"), false);
   assert.equal(handoff.model.call_succeeded, true);
   // Records made before retry instrumentation must not invent a historical count.
   assert.equal("attempt_count" in handoff.model, false);

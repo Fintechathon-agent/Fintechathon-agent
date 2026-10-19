@@ -24,7 +24,7 @@
 | 全量 Core 回归 | **246/246 通过，0 失败、0 跳过**；新增 14 项，[完整 TXT](core-agent-transition-tests-2026-10-19.txt) |
 | 真正退出进程后重启 | 3 类故障、6 个子进程、3 次强制退出全部通过；[SQLite 证据](core-agent-transition-recovery-2026-10-19.json) |
 | 当前 Core × 固定 Risk 源码 | 9 组本地检查通过；[请求/响应证据](core-risk-transition-integration-2026-10-19.json) |
-| 运行版严格 Handoff Schema | **仍失败**，多余 source_task_id；[实际错误](core-risk-transition-blocker-2026-10-19.json) |
+| 运行版严格 Handoff Schema | **通过**，移除未声明的顶层 source_task_id 别名；[本轮证据](core-risk-handoff-contract-2026-10-19.json) |
 | 语法及 Worker 构建 | 通过；[检查日志及旧用例调整理由](core-agent-transition-checks-2026-10-19.txt) |
 
 固定 Risk 提交仍为 ba5056621224f969eca75ce946403f8f70e95d23，未改 Owner 代码。Risk 联调沿用 10 月 18 日夹具日期，recorded_at/checked_at 是本轮 UTC 时间，不是当日行情。磁盘试验与 Risk 联调各 6 次合成模型响应，外部/付费模型调用为 0。真实模型、真实账户、正式审批身份与正式执行网关均未验收。
@@ -33,7 +33,7 @@
 
 ## 需要团队进一步落实
 
-1. **Core/Backend 与 Risk：确认交接字段位置。** 上一轮候选补丁保留且未应用；本轮严格检查仍失败，不把 Core 单测全绿说成正式接通。
+1. **Core/Backend 与 Risk：确认来源编号的消费位置。** Handoff 顶层多余别名已移除，来源编号仍在 `reviewed_input.source_task_id` 和原工作流记录中；如果正式消费者必须读取顶层字段，需要双方另行升级版本，不能重新塞回冻结 Schema。
 2. **Risk 与身份接入：提供正式接收地址、签名回写和审批身份。** 当前实际 Owner 源码本地联调仍是关联的两个任务，线上未形成正式同任务闭环。
 3. **模型服务：对齐真实供应商回执编号并落实百炼开通、预算授权。** 不填假编号，不进行未经授权的付费调用。
 4. **UI/调用方：遇到 retryable:false 时显示“记录待核查”，保留编号。** 不自动重发、不换键新建任务绕过阻断；共用资金计划时可能需要等原任务核查完。
