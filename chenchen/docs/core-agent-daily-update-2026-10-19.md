@@ -14,6 +14,8 @@
 
 模型交接补充：HTTP 模型服务返回的 `id`、`response_id`、`x-request-id` 或 `x-correlation-id` 会被原样纳入 `provider_response_id`；没有返回就保持为空，不生成假编号。[测试记录](core-agent-model-receipt-tests-2026-10-19.txt)。
 
+能力状态补充：新增 `GET /api/review/capabilities`，只读返回模型、Risk、审批和执行边界。当前会显示模型配置存在但未做推理探针，Risk 派发未就绪、审批身份未可信、执行网关未连接、联合验收未完成。[测试记录](core-agent-capabilities-tests-2026-10-19.txt)。
+
 ## 最新补充：旧入口重试与可读审计
 
 修复旧版入口丢掉重复请求标识、超长文本静默截断的问题；新增离线 TXT 任务记录导出工具。全量 **232/232 通过**，新增 12 项回归；5 类本地签名链路案例及原始请求/响应已留档。模型与判定均为测试替身，外部/付费模型调用 0，不代表正式 Risk 已回写或联合验收完成。

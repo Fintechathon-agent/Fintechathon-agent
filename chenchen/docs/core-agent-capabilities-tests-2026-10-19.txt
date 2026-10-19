@@ -1,0 +1,30 @@
+Core Agent capabilities endpoint evidence · 2026-10-19
+
+Endpoint:
+  GET /api/review/capabilities
+
+Behavior:
+  Read-only status for model configuration, Risk dispatch, approval identity and PAPER execution.
+  It does not call a model, send a Risk handoff, call an approval service, or execute a financial action.
+  It distinguishes configured from verified and keeps joint_acceptance=false until external Owners complete acceptance.
+
+Focused command:
+  node --test tests/cloudflare-review.test.mjs
+
+Result:
+  20 passed, 0 failed, 0 skipped
+
+Full regression:
+  node --test
+  248 passed, 0 failed, 0 skipped
+
+Expected current deployment status:
+  model.configured=true (Workers AI binding exists)
+  model.inference_probe=NOT_RUN
+  risk.dispatch_ready=false
+  approval.trusted_identity_ready=false
+  execution.allowed=false
+  execution.gateway_connected=false
+  acceptance.joint_acceptance=false
+
+No real or paid model call was made for this check.

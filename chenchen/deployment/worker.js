@@ -129,6 +129,55 @@ function routeNotFoundFailure() {
   return error;
 }
 
+function capabilityStatus(env) {
+  const config = modelReview.resolveModelConfig(env);
+  const provider = String(config.provider || "").toLowerCase();
+  const workersAi = config.style === "workers_ai";
+  const modelConfigured = workersAi
+    ? typeof env.AI?.run === "function"
+    : Boolean(config.apiKey && config.model && !config.configurationIssue);
+  const riskUrlConfigured = Boolean(String(env.RISK_SERVICE_URL || "").trim());
+  const riskSecretConfigured = Boolean(String(env.RISK_SERVICE_HMAC_SECRET || env.RISK_HMAC_SECRET || "").trim());
+  const approvalSecretConfigured = Boolean(String(env.APPROVAL_SERVICE_HMAC_SECRET || env.APPROVAL_HMAC_SECRET || "").trim());
+  return {
+    capability_version: "core-agent-capabilities.v1",
+    service: "core-agent",
+    contract_version: modelReview.REVIEW_VERSION,
+    model: {
+      provider,
+      name: config.model || null,
+      configured: modelConfigured,
+      inference_probe: "NOT_RUN",
+      response_id_sources: ["body.id", "body.response_id", "header.x-request-id", "header.x-correlation-id"],
+      paid_calls_this_check: 0
+    },
+    risk: {
+      handoff_contract: "risk-handoff.v1",
+      dispatch_url_configured: riskUrlConfigured,
+      dispatch_signature_configured: riskSecretConfigured,
+      dispatch_ready: riskUrlConfigured && riskSecretConfigured,
+      callback_signature_configured: riskSecretConfigured
+    },
+    approval: {
+      decision_endpoint: "/api/review/approval",
+      signature_configured: approvalSecretConfigured,
+      trusted_identity_ready: approvalSecretConfigured,
+      demo_actor_labels_allowed: !approvalSecretConfigured && String(env.REQUIRE_TRUSTED_ACTORS || "").toLowerCase() !== "true"
+    },
+    execution: {
+      mode: "PAPER",
+      allowed: false,
+      gateway_connected: false
+    },
+    acceptance: {
+      synthetic_local: true,
+      real_model: false,
+      formal_risk_callback: false,
+      joint_acceptance: false
+    }
+  };
+}
+
 function requestIdentity(request) {
   return request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For")?.split(",")[0].trim() || "anonymous";
 }
@@ -421,17 +470,19 @@ export default {
         execution_allowed: false
       });
     }
+    const isCapabilitiesRead = request.method === "GET" && url.pathname === "/api/review/capabilities";
     const isReviewRead = request.method === "GET" && (url.pathname.startsWith("/api/review/") || url.pathname.startsWith("/api/funding-demo/plan/"));
     const isKnownPost = request.method === "POST" && [
       "/api/health-check/run", "/api/risk-workbench/handoff", "/api/review", "/api/review/legacy",
       "/api/review/risk-decision", "/api/review/risk-callback", "/api/review/approval", "/api/review/risk-dispatch", "/api/review/simulate", "/api/review/cancel",
       "/api/funding-demo/plan", "/api/funding-demo/plan/revise"
     ].includes(url.pathname);
-    if (!isKnownPost && !isReviewRead) {
+    if (!isKnownPost && !isReviewRead && !isCapabilitiesRead) {
       return json(request, env, 404, errorPayload(routeNotFoundFailure()));
     }
     if (!requiresApiKey(request, env)) return json(request, env, 401, errorPayload(authFailure()), { "WWW-Authenticate": "X-Core-Agent-Key" });
     if (!allowedByRateLimit(request, env)) return json(request, env, 429, errorPayload(rateLimitFailure()), { "Retry-After": "60" });
+    if (isCapabilitiesRead) return json(request, env, 200, capabilityStatus(env));
     if (url.pathname === "/api/review" || url.pathname.startsWith("/api/review/") || url.pathname.startsWith("/api/funding-demo/")) {
       try {
         const service = env.REVIEW_SERVICE.get(env.REVIEW_SERVICE.idFromName("team-review-v1"));

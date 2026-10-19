@@ -40,6 +40,24 @@ test("health does not advertise an incomplete DeepSeek configuration as configur
   }
 });
 
+test("capabilities report demo, real integration and execution boundaries without calling services", async () => {
+  const app = setup();
+  const response = await worker.fetch(req("/api/review/capabilities"), app.env);
+  assert.equal(response.status, 200);
+  const capabilities = await response.json();
+  assert.equal(capabilities.capability_version, "core-agent-capabilities.v1");
+  assert.equal(capabilities.model.configured, true);
+  assert.equal(capabilities.model.inference_probe, "NOT_RUN");
+  assert.deepEqual(capabilities.model.response_id_sources, ["body.id", "body.response_id", "header.x-request-id", "header.x-correlation-id"]);
+  assert.equal(capabilities.risk.dispatch_ready, false);
+  assert.equal(capabilities.approval.signature_configured, false);
+  assert.equal(capabilities.approval.trusted_identity_ready, false);
+  assert.equal(capabilities.approval.demo_actor_labels_allowed, true);
+  assert.equal(capabilities.execution.allowed, false);
+  assert.equal(capabilities.execution.gateway_connected, false);
+  assert.equal(capabilities.acceptance.joint_acceptance, false);
+});
+
 test("public review survives cold starts and keeps workflow mutations in the audit", async () => {
   const app = setup();
   const created = await worker.fetch(req("/api/review", { kind: "bill", text: "虚构账单改付个人" }), app.env);
