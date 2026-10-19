@@ -4,7 +4,7 @@
 
 ## 上午补充：状态变更与恢复保护
 
-完成撤回、Risk 决定、审批、派发及模拟执行的存储未决保护；共用资金计划在模拟或用途修改未决时也会阻断。结果已提交但响应丢失则恢复原回执。全量 **248/248 通过**，严格公共 Handoff 格式检查现已通过；固定 Risk 源码 9 组本地检查通过，正式 Risk 回写、审批身份和联合验收仍未完成。
+完成撤回、Risk 决定、审批、派发及模拟执行的存储未决保护；共用资金计划在模拟或用途修改未决时也会阻断。结果已提交但响应丢失则恢复原回执。全量 **249/249 通过**，严格公共 Handoff 格式检查现已通过；固定 Risk 源码 9 组本地检查通过，正式 Risk 回写、审批身份和联合验收仍未完成。
 
 详见 [本轮说明及待协作事项](core-agent-transition-iteration-2026-10-19.md) 和 [团队入口](../../team-staging/core-agent/transition-recovery-v1/DELIVERY.md)。没有外部或付费模型调用；下方历史记录继续保留。
 
@@ -15,6 +15,12 @@
 模型交接补充：HTTP 模型服务返回的 `id`、`response_id`、`x-request-id` 或 `x-correlation-id` 会被原样纳入 `provider_response_id`；没有返回就保持为空，不生成假编号。[测试记录](core-agent-model-receipt-tests-2026-10-19.txt)。
 
 能力状态补充：新增 `GET /api/review/capabilities`，只读返回模型、Risk、审批和执行边界。当前会显示模型配置存在但未做推理探针，Risk 派发未就绪、审批身份未可信、执行网关未连接、联合验收未完成。[测试记录](core-agent-capabilities-tests-2026-10-19.txt)。
+
+## 本轮追加：Golden Path 全链路验证
+
+新增可复跑的本地合成验收：模型提议先进入 `PENDING_RISK`，Risk 通过后进入人工审批，审批通过后才允许生成 `PAPER` 模拟回执；模拟回执明确 `side_effects=false`，且 `execution_allowed=false`。另一条路径由 Risk 拒绝，随后模拟请求仍被阻断。两条路径都校验同一个任务编号、运行编号、审计编号和提议指纹，重启后可回放最终记录。
+
+专项结果：**PASS**；外部/付费模型调用 0，正式 Risk 请求 0，真实执行网关调用 0。[测试证据](core-agent-golden-path-tests-2026-10-19.json) · [逐步日志](../logs/core-agent-golden-path-2026-10-19.jsonl) · [共创入口](../../team-staging/core-agent/golden-path-v1/DELIVERY.md)。这证明 Core 本地链路可复跑，不代表真实系统联合验收完成。
 
 ## 最新补充：旧入口重试与可读审计
 

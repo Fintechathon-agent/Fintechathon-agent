@@ -23,7 +23,7 @@
 | 验证 | 结果与证据 |
 | --- | --- |
 | 基线复现 | 首批 8 个新增用例中 7 失败、1 通过；[修复前 TXT](core-agent-transition-before-2026-10-19.txt) |
-| 全量 Core 回归 | **248/248 通过，0 失败、0 跳过**；本轮新增模型回执和能力状态测试，[能力状态证据](core-agent-capabilities-tests-2026-10-19.txt) |
+| 全量 Core 回归 | **249/249 通过，0 失败、0 跳过**；本轮新增模型回执、能力状态和 Golden Path 回归，[Golden Path 证据](core-agent-golden-path-tests-2026-10-19.json) |
 | 真正退出进程后重启 | 3 类故障、6 个子进程、3 次强制退出全部通过；[SQLite 证据](core-agent-transition-recovery-2026-10-19.json) |
 | 当前 Core × 固定 Risk 源码 | 9 组本地检查通过；[请求/响应证据](core-risk-transition-integration-2026-10-19.json) |
 | 运行版严格 Handoff Schema | **通过**，移除未声明的顶层 source_task_id 别名；[本轮证据](core-risk-handoff-contract-2026-10-19.json) |
