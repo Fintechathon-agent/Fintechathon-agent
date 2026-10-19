@@ -1,0 +1,32 @@
+[
+  {
+    "width": 1440,
+    "status": "passed",
+    "existingWorkspacePreserved": true,
+    "existingWorkspaceProbes": 1,
+    "plans": 3,
+    "legacyRedirects": 4,
+    "apiNetworkRequests": 0,
+    "aiStatus": 503
+  },
+  {
+    "width": 1024,
+    "status": "passed",
+    "existingWorkspacePreserved": true,
+    "existingWorkspaceProbes": 1,
+    "plans": 3,
+    "legacyRedirects": 4,
+    "apiNetworkRequests": 0,
+    "aiStatus": 503
+  },
+  {
+    "width": 375,
+    "status": "passed",
+    "existingWorkspacePreserved": true,
+    "existingWorkspaceProbes": 1,
+    "plans": 3,
+    "legacyRedirects": 4,
+    "apiNetworkRequests": 0,
+    "aiStatus": 503
+  }
+]

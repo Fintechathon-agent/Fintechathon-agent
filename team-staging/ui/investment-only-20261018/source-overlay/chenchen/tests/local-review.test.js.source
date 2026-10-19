@@ -1,0 +1,129 @@
+"use strict";
+
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const { createReviewService } = require("../integrations/local-review");
+const modelReview = require("../integrations/model-review");
+
+const env = {
+  MODEL_API_KEY: "synthetic-secret-for-tests", MODEL_API_URL: "https://synthetic.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/chat/completions",
+  MODEL_NAME: "qwen3.8-flash", MODEL_PROVIDER: "http", MODEL_API_STYLE: "chat_completions", MODEL_RESPONSE_FORMAT: "json_object",
+  MODEL_TIMEOUT_MS: "30000", MODEL_FALLBACK_TO_RULES: "false", MODEL_DISABLE_RULE_FALLBACK: "true"
+};
+const input = { kind: "news", text: "虚构企业发布公告，日期尚未核实。", allow_rule_fallback: true };
+const proposal = { summary: "需要核实公告来源。", risk_level: "unknown", proposed_action: "REQUEST_MORE_INFO", action_reason: "资料不足。", missing_information: ["原始公告"], evidence: ["日期未核实"] };
+const providerResponse = (value = proposal, extra = {}) => new Response(JSON.stringify({ id: "synthetic-response", model: env.MODEL_NAME,
+  choices: [{ message: { content: typeof value === "string" ? value : JSON.stringify(value) } }], usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 }, ...extra }), { status: 200 });
+
+test("review reuses the complete endpoint and JSON contract, stays read-only, and redacts secrets", async () => {
+  let count = 0;
+  const service = createReviewService({ env, fetchImpl: async (url, options) => {
+    count++;
+    assert.equal(url, env.MODEL_API_URL);
+    assert.equal(options.headers.Authorization, "Bearer " + env.MODEL_API_KEY);
+    assert.equal(options.redirect, "error");
+    const body = JSON.parse(options.body);
+    assert.equal(body.model, env.MODEL_NAME);
+    assert.equal(body.stream, false);
+    assert.deepEqual(body.response_format, { type: "json_object" });
+    assert.match(body.messages[0].content, /JSON/);
+    assert.match(body.messages[0].content, /missing_information/);
+    assert.match(body.messages[0].content, /additionalProperties/);
+    return providerResponse({ ...proposal, summary: env.MODEL_API_KEY + " " + env.MODEL_API_URL });
+  } });
+  const result = await service.run(input);
+  assert.equal(result.status, 200);
+  assert.equal(count, 1);
+  assert.equal(result.body.source, "model");
+  assert.equal(result.body.model_response.call_succeeded, true);
+  assert.equal(result.body.gateway.execution_allowed, false);
+  assert.ok(result.body.audit.audit_id);
+  assert.equal(result.body.model_response.usage.total_tokens, 30);
+  assert.equal(result.body.model_response.endpoint, undefined);
+  assert.equal(service.records.size, 1);
+  assert.ok(!JSON.stringify(result).includes(env.MODEL_API_KEY));
+  assert.ok(!JSON.stringify([...service.records]).includes(env.MODEL_API_URL));
+});
+
+for (const [providerStatus, code, status] of [[401, "MODEL_AUTH_FAILED", 502], [403, "MODEL_AUTH_FAILED", 502], [429, "MODEL_RATE_LIMITED", 503], [500, "MODEL_UNAVAILABLE", 502]]) {
+  test("provider HTTP " + providerStatus + " fails safely without fallback", async () => {
+    const service = createReviewService({ env, fetchImpl: async () => new Response(JSON.stringify({ error: { message: env.MODEL_API_KEY, code: "synthetic" } }), { status: providerStatus }) });
+    const result = await service.run(input);
+    assert.equal(result.status, status);
+    assert.equal(result.body.error.code, code);
+    assert.equal(result.body.status, "FAILED");
+    assert.equal(result.body.execution_allowed, false);
+    assert.ok(!JSON.stringify(result).includes(env.MODEL_API_KEY));
+    assert.ok(!JSON.stringify(result).includes("rule_fallback"));
+    assert.ok(service.records.get(result.body.run_id).audit);
+  });
+}
+
+test("abort maps to 504 and actual adapter timer aborts an unresponsive request", async () => {
+  const service = createReviewService({ env, fetchImpl: async () => { throw new DOMException("synthetic timeout", "AbortError"); } });
+  assert.equal((await service.run(input)).status, 504);
+  await assert.rejects(modelReview.runReview(input, { ...env, MODEL_TIMEOUT_MS: "5" }, { fetchImpl: async (url, options) => new Promise((resolve, reject) => {
+    options.signal.addEventListener("abort", () => reject(new DOMException("timeout", "AbortError")), { once: true });
+  }) }), error => error.code === "MODEL_TIMEOUT");
+});
+
+test("malformed JSON, unsafe actions, missing fields and wrong models are rejected", async () => {
+  for (const response of [() => providerResponse("not JSON"), () => providerResponse({ ...proposal, proposed_action: "BUY" }),
+    () => providerResponse({ ...proposal, evidence: undefined }), () => providerResponse({ ...proposal, risk_level: "invented" }),
+    () => providerResponse(proposal, { model: "wrong-model" }), () => new Response("invalid envelope", { status: 200 })]) {
+    const result = await createReviewService({ env, fetchImpl: async () => response() }).run(input);
+    assert.equal(result.status, 502);
+    assert.equal(result.body.status, "FAILED");
+    assert.ok(["MODEL_INVALID_RESPONSE", "MODEL_MISMATCH"].includes(result.body.error.code));
+  }
+});
+
+test("configuration and input errors do not call the provider", async () => {
+  const fetchImpl = async () => { throw new Error("must not call provider"); };
+  for (const changes of [{ MODEL_API_KEY: "" }, { MODEL_API_URL: env.MODEL_API_URL + "/chat/completions" }, { MODEL_NAME: "wrong-model" }, { MODEL_DISABLE_RULE_FALLBACK: "false" }]) {
+    assert.equal((await createReviewService({ env: { ...env, ...changes }, fetchImpl }).run(input)).status, 503);
+  }
+  for (const invalid of [null, [], { text: "" }, { text: "x".repeat(20001) }, { kind: "invalid", text: "x" }]) {
+    assert.equal((await createReviewService({ env, fetchImpl }).run(invalid)).status, 422);
+  }
+});
+
+test("local request limit and concurrency guard prevent extra provider calls", async () => {
+  let count = 0;
+  const service = createReviewService({ env, limit: 1, fetchImpl: async () => { count++; return providerResponse(); } });
+  assert.equal((await service.run(input)).status, 200);
+  assert.equal((await service.run(input)).body.error.code, "LOCAL_RATE_LIMITED");
+  assert.equal(count, 1);
+  let release;
+  const pending = new Promise(resolve => { release = resolve; });
+  const busyService = createReviewService({ env, fetchImpl: async () => { await pending; return providerResponse(); } });
+  const first = busyService.run(input);
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.equal((await busyService.run(input)).body.error.code, "LOCAL_BUSY");
+  release();
+  assert.equal((await first).status, 200);
+});
+
+test("registered local HTTP route, allowed assets and credential isolation", async t => {
+  const { server, reviewService, harness } = require("../server");
+  const originalRun = reviewService.run;
+  reviewService.run = async value => {
+    assert.equal(value.text, input.text);
+    return createReviewService({ env, fetchImpl: async () => providerResponse() }).run(value);
+  };
+  await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+  t.after(async () => { reviewService.run = originalRun; server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); });
+  const base = "http://127.0.0.1:" + server.address().port;
+  assert.equal((await fetch(base + "/api/review")).status, 405);
+  const response = await fetch(base + "/api/review", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) });
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).model_response.call_succeeded, true);
+  assert.equal((await fetch(base + "/api/review", { method: "POST", body: "{" })).status, 400);
+  assert.equal((await fetch(base + "/api/review", { method: "POST", headers: { Origin: "https://untrusted.invalid" }, body: "{}" })).status, 403);
+  for (const asset of ["/versions/ai-review.js", "/versions/ai-review.css"]) assert.equal((await fetch(base + asset)).status, 200);
+  for (const secretPath of ["/.env.local", "/.env.example", "/integrations/model-review.js", "/server.js"]) assert.equal((await fetch(base + secretPath)).status, 404);
+  assert.equal((await fetch(base + "/api/paper-trade/execute", { method: "POST", body: "{}" })).status, 503);
+  const task = harness.runHealthCheck({ risk_profile: { investment_horizon_days: 365, max_drawdown: 0.1, liquidity_need: "medium" } });
+  assert.equal(task.task_state.status, "HANDOFF_REQUIRED");
+  assert.ok(harness.getAudit(task.task_state.task_id));
+});

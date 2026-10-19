@@ -1,0 +1,26 @@
+[
+  {
+    "width": 1440,
+    "status": "passed",
+    "legacy_routes_redirect": true,
+    "plans": 3,
+    "merchant_requests": 0,
+    "paid_model_requests": 0
+  },
+  {
+    "width": 1024,
+    "status": "passed",
+    "legacy_routes_redirect": true,
+    "plans": 3,
+    "merchant_requests": 0,
+    "paid_model_requests": 0
+  },
+  {
+    "width": 375,
+    "status": "passed",
+    "legacy_routes_redirect": true,
+    "plans": 3,
+    "merchant_requests": 0,
+    "paid_model_requests": 0
+  }
+]
