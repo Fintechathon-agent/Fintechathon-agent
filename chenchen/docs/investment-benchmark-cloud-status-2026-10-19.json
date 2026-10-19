@@ -1,0 +1,21 @@
+{
+  "checked_on": "2026-10-19",
+  "timezone": "Asia/Shanghai",
+  "method": "READ_ONLY_HTTP_GET",
+  "new_deployment_performed": false,
+  "inference_requests": 0,
+  "paid_model_calls": 0,
+  "checks": [
+    {"url": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/health", "http_status": 200, "status": "ok", "service": "core-agent", "audit_storage": "durable_object"},
+    {"url": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/api/review/capabilities", "http_status": 200,
+      "observed": {
+        "model": {"configured": true, "inference_probe": "NOT_RUN"},
+        "risk": {"dispatch_url_configured": false, "dispatch_signature_configured": false, "dispatch_ready": false, "callback_signature_configured": false},
+        "approval": {"signature_configured": false, "trusted_identity_ready": false, "demo_actor_labels_allowed": true},
+        "execution": {"mode": "PAPER", "allowed": false, "gateway_connected": false},
+        "acceptance": {"synthetic_local": true, "real_model": false, "formal_risk_callback": false, "joint_acceptance": false}
+      }
+    }
+  ],
+  "note": "Selected non-secret fields from actual responses. Health and configuration checks do not prove model inference or joint acceptance."
+}

@@ -1,0 +1,21 @@
+﻿投资助手 1000 例模拟测试
+通过：870；失败：130；跳过：0
+固定种子：20261019；参数化模板：46
+数据指纹：e97599491e25877ec362159d8bf0bffa5a299c377a7d6bf5e6781cac54c7f794
+small_amount：50/150
+life_semantics：70/100
+account_summary：150/150
+portfolio_validation：100/100
+portfolio_chain：50/50
+funding_conflict：100/100
+funding_multitask：50/50
+risk_workflow：100/100
+reliability：100/100
+quote_subscription：100/100
+
+全部是虚构测试输入；模型和 Risk 均为替身。没有付费调用，没有训练模型，没有完成真实系统联合验收。
+只覆盖所列模板及参数，不能外推任意中文识别准确率
+持仓分析沿用原七日合成行情；未生成真实行情或重新实现 Quant
+未调用真实模型、真实账户或正式 Risk/审批
+耗时仅为本机软件测试，不代表中国内地公网响应速度
+没有模拟真实用户并发、手机浏览器或公测容量

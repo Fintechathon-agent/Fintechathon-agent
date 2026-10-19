@@ -3,6 +3,7 @@
 const { createHash, randomUUID } = require("node:crypto");
 const { previewConversation } = require("../conversation-intake/preview");
 const { normalizeReviewInput } = require("../../integrations/model-review");
+const { extractMoneyMentions } = require("./money-mentions");
 const VERSION = "life-intake.draft.v1";
 const MODES = ["FIXTURE", "LIVE", "SYNTHETIC_REPLAY", "REFERENCE_FIXTURE"];
 const hash = value => createHash("sha256").update(JSON.stringify(value)).digest("hex");
@@ -28,7 +29,7 @@ function classify(text, inherited) {
   const rules = [
     ["CONDITIONAL", /如果|假如|假设|假定|要是/u],
     ["CANCELLED", /取消|撤销|作废|不再|不打算|不准备/u],
-    ["NEGATED", /没(?:有)?(?:买|付|交|投|到账|扣)|未(?:付|交|买|到账|扣)|不是|不买|不投/u],
+    ["NEGATED", /没(?:有)?(?:买|付|交|投|到账|扣)|未(?:付|交|买|到账|扣)|不是|不买|不投|(?:不(?:想|愿意|打算|准备|计划)|没(?:有)?(?:想|打算|准备|计划)|未(?:打算|计划))\s*(?:再|继续)?(?:买|投|付|交)/u],
     ["COMPLETED", /已经|已(?:经)?(?:付|交|买|到账|扣)|付过|交过|买过/u],
     ["PLANNED", /想|打算|准备|计划|将|要交|要付|待付|下月|下个月|明天|每月|续费|自动扣/u]
   ];
@@ -36,7 +37,7 @@ function classify(text, inherited) {
   const correction = /改成|改为|更正|说错|不是.+(?:而是|是)/u.test(text);
   // Hints are deliberately not interpreted as confirmed facts or financial instructions.
   const cancellationRequested = /(?:申请|想|准备|打算|计划)取消|取消申请|取消.{0,6}(?:失败|未成功|没成功)/u.test(text);
-  const cancellationNegated = /(?:不|没(?:有)?|未)(?:打算|准备|申请)?取消/u.test(text);
+  const cancellationNegated = /(?:不|没(?:有)?|未)(?:想|愿意|打算|计划|准备|申请)?取消/u.test(text);
   const status = correction ? "CORRECTION" : hints.includes("CONDITIONAL") ? "CONDITIONAL"
     : cancellationNegated ? "NEGATED"
     : cancellationRequested ? "CANCELLATION_REQUESTED"
@@ -54,6 +55,10 @@ function extract(input, options) {
   let previous = null;
   let clauseScope = null;
   const candidates = original.candidates.map(item => {
+    // Re-read complete phrases in v1; do not inherit v0's truncated sub-yuan amounts.
+    item.amount_mentions = extractMoneyMentions(item.text, item.source_span.start);
+    item.confirmation_questions = item.confirmation_questions.filter(question => !question.startsWith("金额是多少") && !question.startsWith("每个金额分别"));
+    item.confirmation_questions.push(item.amount_mentions.length ? "每个金额分别代表预算、价格、余额还是已经发生的收支？" : "金额是多少？没有明确金额时不要猜。");
     const gap = previous ? text.slice(previous.source_span.end, item.source_span.start) : "";
     const continuation = previous && !/[。！？；;\n]/u.test(gap);
     if (!continuation) clauseScope = null;
