@@ -8,6 +8,8 @@ workers_dev = false
 [vars]
 MODEL_PROVIDER = "aliyun_bailian"
 MODEL_NAME = "qwen3.8-flash"
+# Future explicit switch: qwen3.8-max needs Owner approval and at least CNY 0.50
+# per attempt in the durable test reservation. No model is selected automatically.
 MODEL_API_STYLE = "chat_completions"
 MODEL_RESPONSE_FORMAT = "json_object"
 MODEL_TIMEOUT_MS = "30000"

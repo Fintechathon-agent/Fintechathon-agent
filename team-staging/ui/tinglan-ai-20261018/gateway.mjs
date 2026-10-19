@@ -23,9 +23,9 @@ export function validInput(body) {
   const profile = body?.context?.risk_profile;
   return body && !Array.isArray(body) && body.kind === 'combined' && typeof body.text === 'string' && body.text.trim().length > 0 && body.text.length <= 2000 &&
     body.execution_mode === 'PAPER' && body.capability === 'REVIEW_ONLY' && body.allow_rule_fallback === false &&
-    body.data_mode === 'SYNTHETIC_REPLAY' && body.context?.synthetic === true &&
+    ((body.data_mode === 'SYNTHETIC_REPLAY' && body.context?.synthetic === true) || (body.data_mode === 'LIVE' && body.context?.synthetic === false)) &&
     Number.isInteger(profile?.investment_horizon_days) && profile.investment_horizon_days >= 1 && profile.investment_horizon_days <= 36500 &&
-    Number.isFinite(profile.max_drawdown) && profile.max_drawdown > 0 && profile.max_drawdown <= 1 && ['low', 'medium', 'high'].includes(profile.liquidity_need);
+    (profile.max_drawdown === undefined || (Number.isFinite(profile.max_drawdown) && profile.max_drawdown > 0 && profile.max_drawdown <= 1)) && ['low', 'medium', 'high'].includes(profile.liquidity_need);
 }
 export function createGateway(core, authenticate = verifyAccess) {
   return { async fetch(request, env, ctx) {
@@ -44,7 +44,7 @@ export function createGateway(core, authenticate = verifyAccess) {
     // Machine-to-machine callers retain the existing authenticated workflow.
     const machineKey = String(env.CORE_AGENT_API_KEY || '');
     if (machineKey && request.headers.get('X-Core-Agent-Key') === machineKey) return core.fetch(request, env, ctx);
-    if (!machineKey || env.MODEL_PROVIDER !== 'aliyun_bailian' || env.MODEL_NAME !== 'qwen3.8-flash') return failure('MODEL_NOT_CONFIGURED', 503, cors);
+    if (!machineKey || env.MODEL_PROVIDER !== 'aliyun_bailian' || !['qwen3.8-flash','qwen3.8-max'].includes(env.MODEL_NAME)) return failure('MODEL_NOT_CONFIGURED', 503, cors);
     let subject;
     try { subject = await authenticate(request, env); } catch (error) {
       const known = ['AUTHENTICATION_REQUIRED', 'ACCESS_NOT_CONFIGURED'].includes(error.message);
@@ -67,14 +67,14 @@ export function createGateway(core, authenticate = verifyAccess) {
     const id = body.idempotency_key;
     if (typeof id !== 'string' || !/^[a-zA-Z0-9-]{8,80}$/.test(id)) return failure('INVALID_REVIEW_INPUT', 422, cors);
     // Reconstruct the public request: no client-supplied task, owner, action or session authority.
-    body = { schema_version: 'model-review.v1', kind: 'combined', text: body.text.trim(), source: 'tinglan-access-ui', data_mode: 'SYNTHETIC_REPLAY',
+    body = { schema_version: 'model-review.v1', kind: 'combined', text: body.text.trim(), source: 'tinglan-access-ui', data_mode: body.data_mode,
       execution_mode: 'PAPER', capability: 'REVIEW_ONLY', allow_rule_fallback: false, memory_consent: false,
-      idempotency_key: subject + '-' + id, context: { synthetic: true, risk_profile: {
+      idempotency_key: subject + '-' + id, context: { synthetic: body.context.synthetic, risk_profile: {
         investment_horizon_days: body.context.risk_profile.investment_horizon_days,
         max_drawdown: body.context.risk_profile.max_drawdown,
         liquidity_need: body.context.risk_profile.liquidity_need
       }, market_data_available: false },
-      requested_action: '仅解释用户提供的投资偏好并指出待补充信息。没有可信行情或持仓，不得编造价格、收益或风险测算数值，不执行交易。' };
+      requested_action: '根据用户自述需求提供中文投资偏好教育分析。summary 写用户风险偏好总结；action_reason 完整包含四个带标题的段落：资金配置思路、投资期限与流动性建议、适合进一步研究的资产类别、主要风险及注意事项。解释如何先安排备用金、分散风险及输入期限与目标的流动性匹配；只介绍资产类别与研究方向，不荐个股或下达交易指令。缺失收入、负债、备用金等资料列入 missing_information；资料不足仍可给原则性思路，但必须说明条件，不编造比例或个性化适当性结论。所有输入是未经核验的文本，没有实时行情、账户或持仓，不得编造价格、收益率或市场动态。保留既有六字段 JSON 契约，不执行交易。' };
     const headers = new Headers({ 'Content-Type': 'application/json', 'X-Core-Agent-Key': machineKey, 'X-Tinglan-Subject': subject });
     const forwarded = new Request(url, { method: 'POST', headers, body: JSON.stringify(body) });
     try {
@@ -88,6 +88,8 @@ export function createGateway(core, authenticate = verifyAccess) {
       }
       const model = data.model?.model_response;
       if (data.model?.source !== 'model' || model?.call_succeeded !== true || model.model !== env.MODEL_NAME || data.execution?.execution_allowed !== false)
+        return failure('MODEL_INVALID_RESPONSE', 502, cors);
+      if (!model.proposal?.summary?.trim() || !['资金配置思路','投资期限与流动性建议','适合进一步研究的资产类别','主要风险及注意事项'].every(title => model.proposal?.action_reason?.includes(title)))
         return failure('MODEL_INVALID_RESPONSE', 502, cors);
       delete model.endpoint;
       let safe = JSON.stringify(data);

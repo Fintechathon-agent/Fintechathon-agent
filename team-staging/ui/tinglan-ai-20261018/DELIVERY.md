@@ -1,5 +1,7 @@
 # 听澜真实 AI 接入候选 · 2026-10-18
 
+2026-10-19 第二轮：投资金额/目标/风险偏好及完整分析已补齐；指定大学生场景一次真实调用 HTTP 200、1148 tokens，完整结果与网页一致。新增报告 [PREFERENCE-ACCEPTANCE-2026-10-19.md](PREFERENCE-ACCEPTANCE-2026-10-19.md)。云端部署仍被 Owner 登录/Access 配置阻塞，下文和上一轮报告为历史快照。
+
 2026-10-19 更新：两次授权的本机真实百炼调用成功，Worker dry-run 和本地 workerd 启动通过；公网仍运行 Llama，尚未完成 Cloudflare Access / Secrets / 真实云端链路验收。最新证据与 Owner 操作见 [ACCEPTANCE-2026-10-19.md](ACCEPTANCE-2026-10-19.md)。下文保留原交付快照，其中“付费调用 0 次 / 编译未通过”仅指 10 月 18 日当轮。
 
 状态：前后端 Mock 联调完成；等待 Cloudflare Owner 配置、审核部署与付费测试授权。当前不是已上线的百炼服务。

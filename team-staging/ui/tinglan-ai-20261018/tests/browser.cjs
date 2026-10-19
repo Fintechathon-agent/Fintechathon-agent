@@ -8,13 +8,13 @@ const {pathToFileURL}=require('node:url');const {chromium}=require('playwright')
  const {ReviewService}=await import(pathToFileURL(path.join(moduleRoot,'worker-entry.mjs')));
  let mode='success',app,networkRequests=0,providerCalls=0;
  const originalFetch=global.fetch;
- global.fetch=async(_url,options)=>{providerCalls++;await new Promise(resolve=>setTimeout(resolve,60));
+ global.fetch=async(_url,options)=>{providerCalls++;await new Promise(resolve=>setTimeout(resolve,200));
   if(mode==='timeout')throw new DOMException('synthetic timeout','AbortError');
   if(mode==='invalid')return new Response('{');
   if(mode==='provider-auth')return new Response('{}',{status:401});
   if(mode==='network')throw new TypeError('synthetic network failure');
   const sent=JSON.parse(options.body);assert.match(options.body,/investment_horizon_days/);
-  return Response.json({model:sent.model,id:'MOCK-BROWSER',usage:{prompt_tokens:80,completion_tokens:40,total_tokens:120},choices:[{message:{content:JSON.stringify({summary:'MOCK：根据你填写的 365 天期限和备用金需求，请补充持仓。',risk_level:'unknown',proposed_action:'REQUEST_MORE_INFO',action_reason:'MOCK：没有实时行情，不计算预期收益。',missing_information:['持仓明细'],evidence:['模拟投资偏好']})}}]});
+  return Response.json({model:sent.model,id:'MOCK-BROWSER',usage:{prompt_tokens:80,completion_tokens:40,total_tokens:120},choices:[{message:{content:JSON.stringify({summary:'MOCK：根据你填写的 365 天期限和备用金需求，请补充持仓。',risk_level:'unknown',proposed_action:'REQUEST_MORE_INFO',action_reason:'MOCK：资金配置思路：了解备用金。\n投资期限与流动性建议：核实用途。\n适合进一步研究的资产类别：了解风险。\n主要风险及注意事项：没有实时行情，不计算预期收益。',missing_information:['持仓明细'],evidence:['模拟投资偏好']})}}]});
  };
  function reset(){const data=new Map();const storage={get:async key=>structuredClone(data.get(key)),put:async(key,value)=>{for(const [k,v]of Object.entries(typeof key==='string'?{[key]:value}:key))data.set(k,structuredClone(v));}};
   const env={MODEL_PROVIDER:'aliyun_bailian',MODEL_NAME:'qwen3.8-flash',MODEL_MAX_ATTEMPTS:'1',MODEL_TIMEOUT_MS:'30000',DASHSCOPE_API_KEY:'synthetic-browser-key',CORE_AGENT_API_KEY:'synthetic-machine-key',BAILIAN_WORKSPACE_ID:'synthetic-workspace',BAILIAN_ALLOW_PAID_CALLS:'true',BAILIAN_TEST_BUDGET_CNY:'0.05',BAILIAN_MAX_OUTPUT_TOKENS:'800'};
@@ -36,8 +36,9 @@ const {pathToFileURL}=require('node:url');const {chromium}=require('playwright')
  try{for(const width of [1440,1024,375]){
   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce'}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   const open=async()=>{reset();await page.goto(base+'/investment-only/investment.html');await page.locator('#tinglan-form button:not([disabled])').waitFor();
-   await page.locator('[name=horizon]').fill('365');await page.locator('[name=drawdown]').fill('10');await page.locator('[name=liquidity]').selectOption('medium');await page.locator('[name=text]').fill('虚构示例：请分析备用金需求。');await page.locator('[name=synthetic]').check();};
-  mode='success';await open();const before=networkRequests;await page.locator('#tinglan-form button').click();await page.locator('#tinglan-result:not([hidden])').waitFor();
+   await page.locator('[name=amount]').fill('10000');await page.locator('[name=risk]').selectOption('medium_low');await page.locator('[name=goal]').fill('三年学习生活备用金');await page.locator('[name=inputMode]').selectOption('sample');
+   await page.locator('[name=horizon]').fill('365');await page.locator('[name=drawdown]').fill('10');await page.locator('[name=liquidity]').selectOption('medium');await page.locator('[name=text]').fill('虚构示例：请分析备用金需求。');await page.locator('[name=consent]').check();};
+  mode='success';await open();const before=networkRequests;await page.locator('#tinglan-form button').click();assert.equal(await page.locator('#tinglan-form').getAttribute('aria-busy'),'true');await page.locator('#tinglan-result:not([hidden])').waitFor();
   assert.equal(networkRequests,before+1);assert.match(await page.locator('[data-result=summary]').innerText(),/MOCK/);assert.match(await page.locator('[data-result=meta]').innerText(),/qwen3.8-flash/);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
   await page.locator('#demo-profile').click();await page.locator('#run').click();await page.locator('#results:not([hidden])').waitFor();assert.equal(await page.locator('.plan-card').count(),3);

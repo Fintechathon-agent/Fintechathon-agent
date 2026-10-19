@@ -6,7 +6,8 @@ import { createGateway, reserveUser } from '../gateway.mjs';
 import { verifyAccess } from '../access.mjs';
 import { buildInput, analyze, readResult } from '../frontend/client.mjs';
 
-const input = () => buildInput({ horizon:365,drawdown:10,liquidity:'medium',text:'虚构示例：希望保留备用金，尚未提供持仓。',synthetic:true },crypto.randomUUID());
+const preferences = { amount:10000,horizon:1095,risk:'medium_low',goal:'未来三年稳健积累并保留备用金',drawdown:10,liquidity:'medium',text:'虚构示例：希望保留备用金，尚未提供持仓。',inputMode:'sample',consent:true };
+const input = () => buildInput(preferences,crypto.randomUUID());
 const request = (body = input(), origin = 'https://preview.example') => new Request('https://api.example/api/review', {method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:typeof body === 'string'?body:JSON.stringify(body)});
 function setup(overrides = {}) {
   const entries = new Map();
@@ -18,7 +19,7 @@ function setup(overrides = {}) {
   env.REVIEW_SERVICE={idFromName:x=>x,get:()=>service};
   return {env,storage,entries,restart:()=>{service=new ReviewService({storage},env);},gateway:createGateway(core,async()=> 'a'.repeat(64))};
 }
-function provider(model='qwen3.8-flash') {return Response.json({model,id:'synthetic-response',usage:{prompt_tokens:80,completion_tokens:30,total_tokens:110},choices:[{message:{content:JSON.stringify({summary:'MOCK：需补充持仓与资金安排。',risk_level:'unknown',proposed_action:'REQUEST_MORE_INFO',action_reason:'没有可信行情，不计算收益。',missing_information:['持仓'],evidence:['虚构输入']})}}]});}
+function provider(model='qwen3.8-flash',reason='MOCK：资金配置思路：先了解备用金。\n投资期限与流动性建议：核实资金用途。\n适合进一步研究的资产类别：先了解风险。\n主要风险及注意事项：没有可信行情，不计算收益。') {return Response.json({model,id:'synthetic-response',usage:{prompt_tokens:80,completion_tokens:30,total_tokens:110},choices:[{message:{content:JSON.stringify({summary:'MOCK：需补充持仓与资金安排。',risk_level:'unknown',proposed_action:'REQUEST_MORE_INFO',action_reason:reason,missing_information:['持仓'],evidence:['虚构输入']})}}]});}
 
 test('Mock full existing workflow, preference context, audit, replay and durable budget', async t=>{
   const app=setup();let calls=0;
@@ -72,4 +73,40 @@ test('Browser client rejects fallback, invalid model, missing config and maps HT
     await assert.rejects(analyze(config,input(),async()=>Response.json({}, {status}),'https://preview.example'),new RegExp(code));
   await assert.rejects(analyze({endpoint:null},input(),async()=>{throw new Error('must not call');},'https://preview.example'),/UNCONFIGURED/);
   assert.throws(()=>readResult({source:'rule_fallback'},'qwen3.8-flash'),/MODEL_INVALID_RESPONSE/);
+});
+
+test('Preference inputs preserve amount, risk, goal and truthful source without changing the shared envelope',()=>{
+  const sample=input(),live=buildInput({...preferences,inputMode:'self_reported'},crypto.randomUUID());
+  assert.equal(sample.data_mode,'SYNTHETIC_REPLAY');assert.equal(sample.context.synthetic,true);
+  assert.equal(live.data_mode,'LIVE');assert.equal(live.context.synthetic,false);
+  const unspecified=buildInput({...preferences,drawdown:''},crypto.randomUUID());assert.equal(unspecified.context.risk_profile.max_drawdown,undefined);assert.match(unspecified.text,/未提供，不能由风险偏好推算/);
+  for(const text of ['10000','中低','未来三年','1095'])assert(live.text.includes(text));
+  for(const change of [{amount:0},{amount:NaN},{amount:1.001},{amount:100000001},{goal:''},{risk:'unknown'},{inputMode:'fake'},{consent:false}])
+    assert.throws(()=>buildInput({...preferences,...change},crypto.randomUUID()),/INVALID_REVIEW_INPUT/);
+});
+
+test('Self-reported preference uses existing LIVE mode and server-authored five-part instructions',async t=>{
+  const app=setup();let calls=0;t.mock.method(console,'log',()=>{});
+  t.mock.method(globalThis,'fetch',async(_url,options)=>{calls++;const sent=JSON.parse(options.body);
+    assert.match(options.body,/10000/);assert.match(options.body,/资金配置思路/);assert.match(options.body,/主要风险及注意事项/);
+    const content=JSON.parse(sent.messages[1].content.split('\n').at(-1));assert.equal(content.context.synthetic,false);return provider(sent.model);});
+  const body=buildInput({...preferences,inputMode:'self_reported'},crypto.randomUUID());
+  assert.equal((await app.gateway.fetch(request(body),app.env)).status,200);assert.equal(calls,1);
+  assert.equal((await app.gateway.fetch(request({...body,context:{...body.context,synthetic:true}}),app.env)).status,422);
+});
+
+test('Explicit Max has its own conservative reservation and never falls back to another model',async t=>{
+  let calls=0;t.mock.method(console,'log',()=>{});t.mock.method(globalThis,'fetch',async(_url,options)=>{calls++;assert.equal(JSON.parse(options.body).model,'qwen3.8-max');return provider('qwen3.8-max');});
+  const small=setup({MODEL_NAME:'qwen3.8-max',BAILIAN_TEST_BUDGET_CNY:'0.02'});
+  assert.equal((await small.gateway.fetch(request(),small.env)).status,429);assert.equal(calls,0);
+  const allowed=setup({MODEL_NAME:'qwen3.8-max',BAILIAN_TEST_BUDGET_CNY:'0.50'});
+  const response=await allowed.gateway.fetch(request(),allowed.env);assert.equal(response.status,200);assert.equal(calls,1);
+  assert.equal(readResult(await response.json(),'qwen3.8-max').model,'qwen3.8-max');
+  assert.equal(allowed.entries.get('bailian-budget:v1').reserved_cents,50);
+  const other=setup({MODEL_NAME:'qwen3.7-flash'});assert.equal((await other.gateway.fetch(request(),other.env)).status,503);assert.equal(calls,1);
+});
+
+test('Incomplete model analysis fails visibly rather than becoming a successful fixed answer',async t=>{
+  const app=setup();let calls=0;t.mock.method(console,'log',()=>{});t.mock.method(globalThis,'fetch',async()=>{calls++;return provider('qwen3.8-flash','MOCK：只有一句话，没有完整分析。');});
+  const response=await app.gateway.fetch(request(),app.env);assert.equal(response.status,502);assert.equal((await response.json()).error.code,'MODEL_INVALID_RESPONSE');assert.equal(calls,1);
 });
