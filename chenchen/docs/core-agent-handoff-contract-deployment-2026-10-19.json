@@ -1,0 +1,96 @@
+{
+  "release": "core-agent-risk-handoff-schema-alignment-v1",
+  "date": "2026-10-19",
+  "recorded_at": "2026-10-19T03:59:32.481Z",
+  "worker": {
+    "url": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+    "version_id": "a85cb83d-a043-4e8e-852e-06572d015f29",
+    "previous_version_id": "c8fdc1ba-78ef-4151-93d6-943c7bcac1dc",
+    "deploy_exit_code": 0,
+    "uploaded_kib": 282.94,
+    "gzip_kib": 61.24
+  },
+  "source": {
+    "team": {
+      "repository": "https://github.com/Fintechathon-agent/Fintechathon-agent",
+      "commit": "923967a73a3283ef7371c2e9b92d2fb47ab98c02",
+      "remote_main_verified": true
+    },
+    "personal": {
+      "repository": "https://github.com/realchenchenluo/agent",
+      "commit": "24de1e6fee1364f468027f126a560d1ab1f45378",
+      "remote_main_verified": true
+    },
+    "changed_files": 8,
+    "mirrored_file_bytes_verified": true,
+    "scope": ["chenchen/", "team-staging/core-agent/"],
+    "team_release_modified": false,
+    "other_owner_files_modified": false
+  },
+  "validation": {
+    "full_node_tests": {"passed": 246, "failed": 0, "skipped": 0},
+    "syntax": "PASS",
+    "worker_dry_run": "PASS",
+    "strict_handoff": {
+      "passed": true,
+      "validator": "AJV 8.17.1",
+      "schema": "risk-handoff.v1#/$defs/HandoffPackage",
+      "records_checked": 1,
+      "callback_bindings_checked": 6,
+      "schema_modified": false
+    },
+    "public_get": {
+      "checks": [
+        {
+          "endpoint": "/health",
+          "status": 200,
+          "attempt": 2,
+          "elapsed_ms": 1177,
+          "content_type": "application/json; charset=utf-8",
+          "bytes": 272,
+          "sha256": "3ccb3bd10e0d3608bc46aee544c749d9cc6044736af35ceff40cd8f0d3198145",
+          "model_configured": true,
+          "model_inference_called": false
+        },
+        {
+          "endpoint": "/docs",
+          "status": 200,
+          "attempt": 1,
+          "elapsed_ms": 485,
+          "content_type": "text/html; charset=utf-8",
+          "bytes": 11399,
+          "sha256": "682131dd2fbac2780fbe4acfbd50ccfdeead4539df7fc3f53b65262416af6a1c"
+        }
+      ]
+    }
+  },
+  "model": {
+    "configuration_changed": false,
+    "external_inference_calls_this_iteration": 0,
+    "paid_inference_calls_this_iteration": 0,
+    "bailian_enabled_by_this_iteration": false
+  },
+  "acceptance": {
+    "local_synthetic_tests": true,
+    "public_code_deployed": true,
+    "public_health_and_docs": true,
+    "public_model_call_tested": false,
+    "formal_risk_callback_and_approval_tested": false,
+    "real_execution_gateway_tested": false,
+    "joint_acceptance": false
+  },
+  "remaining_blockers": [
+    "The current Risk consumer still requires a non-empty provider_response_id for real model evidence.",
+    "Formal Risk URL, signed callback and trusted approval identity are not configured.",
+    "No real execution gateway is connected."
+  ],
+  "rollback": {
+    "automatic": false,
+    "instruction": "Pause new mutations and reconcile pending task/funding markers before rollback. Never clear storage or resume execution from an old state."
+  },
+  "evidence": [
+    "core-risk-handoff-contract-2026-10-19.json",
+    "core-agent-transition-tests-2026-10-19.txt",
+    "core-agent-transition-checks-2026-10-19.txt"
+  ]
+}
