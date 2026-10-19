@@ -1,7 +1,7 @@
 'use strict';
 const fs = require('node:fs'), path = require('node:path'), os = require('node:os'), cp = require('node:child_process');
 const repository = cp.execFileSync('git', ['rev-parse','--show-toplevel'], {cwd:__dirname,encoding:'utf8'}).trim();
-const base = 'c243950a8b3bba1b38fd18647e336627d982d14f';
+const base = '922d8a34d54c862d0353b14bb3a01ceba67b2476';
 const git = args => cp.execFileSync('git', args, {cwd:repository,maxBuffer:20*1024*1024});
 const target = fs.mkdtempSync(path.join(os.tmpdir(),'tinglan-owner-candidate-'));
 const entries = git(['ls-tree','-rz',base,'--','chenchen']).toString().split('\0').filter(Boolean);

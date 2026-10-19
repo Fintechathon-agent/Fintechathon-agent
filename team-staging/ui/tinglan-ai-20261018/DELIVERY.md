@@ -6,7 +6,7 @@
 
 ## 已核实的现状与报错
 
-团队基线为 c243950a8b3bba1b38fd18647e336627d982d14f。现有 chenchen/deployment/worker.js 已部署，复用 POST /api/review、ReviewWorkflowStore、BailianBudget 与 SQLite Durable Object；没有另建云服务器或模型后端。
+团队基线为 922d8a34d54c862d0353b14bb3a01ceba67b2476。现有 chenchen/deployment/worker.js 已部署，复用 POST /api/review、ReviewWorkflowStore、BailianBudget 与 SQLite Durable Object；没有另建云服务器或模型后端。
 
 2026-10-18 浏览器 GET https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/health 返回 200，约 1922ms。当前 provider=cloudflare_workers_ai，model=@cf/meta/llama-3.3-70b-instruct-fp8-fast，audit_storage=durable_object。此前 Node 直连 GET/OPTIONS 失败；连接质量存在不确定性，不能声称大陆稳定可达。本轮没有发送公网推理请求。
 
@@ -51,13 +51,13 @@ node --test
 node team-staging/ui/tinglan-ai-20261018/tests/browser.cjs
 ```
 
-结果：新增 11/11、原回归 193/193；1440/1024/375px 正常链路和鉴权、限流、超时、非法 JSON、网络失败、供应商鉴权、未配置等七类失败通过。测试验证真实 HTTP 传输到本机候选，再由 Mock 供应商响应；真实百炼付费调用数为 0。浏览器证据见 evidence/browser-mock.json。
+结果：新增 11/11、原回归 249/249；1440/1024/375px 正常链路和鉴权、限流、超时、非法 JSON、网络失败、供应商鉴权、未配置等七类失败通过。测试验证真实 HTTP 传输到本机候选，再由 Mock 供应商响应；真实百炼付费调用数为 0。浏览器证据见 evidence/browser-mock.json。
 
 ## Owner 必须完成
 
 1. 确认拥有现有 Worker 与 Zero Trust 管理权限，审核提案和隔离候选。当前机器未找到可用 Wrangler 登录配置；没有据此断言用户账号一定无权限。我们没有登录或修改团队 Cloudflare。
 2. 审核 prepare.cjs 的两项最小后端修改：放行明确模型 qwen3.8-flash（仍保留 3.7 系列），校验供应商响应 model；再把 wrapper 纳入同一 Worker 的入口。不要将旧本机 http provider 覆盖团队百炼适配器，不绕过预算。
-3. 备份现有 Wrangler 配置、Worker version 和 Secrets 清单。采用示例配置时保留真实 account_id、绑定与原迁移记录；使用同一个 Worker，不重建或删除 Durable Object。先 dry-run 编译，再由 Owner 发布。此处尚未执行 Wrangler 编译或部署。
+3. 备份现有 Wrangler 配置、Worker version 和 Secrets 清单。采用示例配置时保留真实 account_id、绑定与原迁移记录；使用同一个 Worker，不重建或删除 Durable Object。先 dry-run 编译，再由 Owner 发布。本轮尝试本地 dry-run，但 workerd Windows 依赖下载失败，未获得编译通过证据；没有部署。
 4. 在 Worker Settings → Variables and Secrets 增加加密 DASHSCOPE_API_KEY、CORE_AGENT_API_KEY。前者对应本机 MODEL_API_KEY 的百炼 Key；后者是独立服务凭证，不能发给浏览器。CLI 可交互执行 wrangler secret put，不将值放命令行、聊天、配置或 Git。
 5. BAILIAN_WORKSPACE_ID 从已有北京完整 Host 取得，仅因现有专属域名适配器需要。不要二次追加 /chat/completions，不猜 WorkspaceId；MODEL_API_URL 可不设，若设置必须是同一个完整 URL。模型以该账号已验证的 qwen3.8-flash 为准。
 6. 使用团队受控 HTTPS 自定义域名与 Access 应用，Allow 策略只允许指定组员；配置 ACCESS_ISSUER、ACCESS_AUD、ACCESS_ALLOWED_EMAILS。禁止 Everyone/Bypass。同一应用应覆盖 /investment-only/*、/api/review* 与 /api/tinglan/*，或使用整个专用域名，让用户打开工作台时先完成登录；OPTIONS 可以不做 Access 登录，但 Worker 仍精确检查 Origin。禁用 workers.dev，防止绕过入口。Owner 须为既有机器调用保留受控的 Service Auth 策略，不让新增 Access 策略中断其他模块。

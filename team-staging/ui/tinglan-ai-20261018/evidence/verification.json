@@ -1,9 +1,9 @@
 {
-  "date": "2026-10-18",
-  "base": "c243950a8b3bba1b38fd18647e336627d982d14f",
+  "date": "2026-10-19",
+  "base": "922d8a34d54c862d0353b14bb3a01ceba67b2476",
   "tests": {
     "candidate": 11,
-    "regression": 193,
+    "regression": 249,
     "failed": 0,
     "provider": "MOCK"
   },
@@ -25,5 +25,18 @@
     "model": "qwen3.8-flash",
     "fullBeijingEndpoint": true,
     "secretPrinted": false
+  },
+  "preview": {
+    "commit": "1abdbba345306c7f5a072cd88a48456431a88b64",
+    "pagesAction": "success",
+    "http": 200,
+    "durationSeconds": 2.23612,
+    "configHttp": 200,
+    "mode": "OWNER_CONFIGURATION_REQUIRED",
+    "endpoint": null
+  },
+  "compile": {
+    "status": "BLOCKED_DEPENDENCY_DOWNLOAD",
+    "deploymentPerformed": false
   }
 }
