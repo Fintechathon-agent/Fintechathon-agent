@@ -338,6 +338,13 @@ async function fetchJson(fetchImpl, endpoint, options, timeoutMs) {
           retry_after_ms: retryAfterMs(response.headers.get("Retry-After")) }
       });
     }
+    if (payload && typeof payload === "object" && !Array.isArray(payload) &&
+        !payload.id && !payload.response_id) {
+      const headerId = response.headers.get("x-request-id") || response.headers.get("x-correlation-id");
+      if (headerId) Object.defineProperty(payload, "__provider_response_id", {
+        value: headerId.trim().slice(0, 200), enumerable: false, configurable: false
+      });
+    }
     return payload;
   } catch (error) {
     if (error.name === "AbortError") throw new ReviewError("MODEL_TIMEOUT", "model provider timed out", { retryable: true, recovery: "Retry the review after the model provider responds." });
@@ -376,6 +383,11 @@ function extractModelText(payload, style) {
   if (typeof content === "string") return content;
   if (Array.isArray(content)) return content.map(part => part?.text || "").join("\n");
   return "";
+}
+
+function readProviderResponseId(payload) {
+  const value = payload?.id || payload?.response_id || payload?.__provider_response_id;
+  return typeof value === "string" && value.trim() ? value.trim().slice(0, 200) : null;
 }
 
 function parseJsonText(rawText) {
@@ -521,14 +533,14 @@ async function runReview(input, env = {}, { fetchImpl = globalThis.fetch, before
           throw error;
         } finally {
           if (bailian) await afterModelAttempt({ reservation, usage: payload?.usage,
-            provider_response_id: payload?.id, elapsed_ms: Date.now() - started,
+            provider_response_id: readProviderResponseId(payload), elapsed_ms: Date.now() - started,
             error_code: providerError?.code || (providerError ? "MODEL_PROVIDER_UNAVAILABLE" : null) });
         }
       }
       rawText = extractModelText(payload, config.style);
       if (!rawText) throw new ReviewError("MODEL_EMPTY_RESPONSE", "model provider returned no text", { retryable: true, recovery: "Retry the review or use a model that returns text output." });
       proposal = normalizeProposal(parseJsonText(rawText));
-      providerResponseId = payload.id || null;
+      providerResponseId = readProviderResponseId(payload);
       usage = payload.usage || null;
       break;
     } catch (error) {

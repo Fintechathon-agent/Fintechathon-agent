@@ -11,6 +11,7 @@
 - [严格接口失败证据](../../../chenchen/docs/core-risk-contract-blocker-2026-10-18.json)
 - [本轮严格 Handoff 通过证据](../../../chenchen/docs/core-risk-handoff-contract-2026-10-19.json)
 - [本轮代码提交、部署版本与公网检查](../../../chenchen/docs/core-agent-handoff-contract-deployment-2026-10-19.json)
+- [模型回执编号测试记录](../../../chenchen/docs/core-agent-model-receipt-tests-2026-10-19.txt)
 
 已修复重复请求重复调用模型、晚到风控响应覆盖撤回/拒绝/模拟回执，以及错误响应误当接收成功的问题。测试使用虚构资金和模型替身；实际运行团队 Risk 源码，未重写其规则。
 

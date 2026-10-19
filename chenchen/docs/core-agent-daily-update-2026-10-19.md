@@ -4,13 +4,15 @@
 
 ## 上午补充：状态变更与恢复保护
 
-完成撤回、Risk 决定、审批、派发及模拟执行的存储未决保护；共用资金计划在模拟或用途修改未决时也会阻断。结果已提交但响应丢失则恢复原回执。全量 **246/246 通过**，新增 14 项故障回归；3 类故障、6 个独立进程的 SQLite 恢复通过；固定 Risk 源码 9 组本地检查通过。严格公共 Handoff 格式检查现已通过，正式 Risk 回写、审批身份和联合验收仍未完成。
+完成撤回、Risk 决定、审批、派发及模拟执行的存储未决保护；共用资金计划在模拟或用途修改未决时也会阻断。结果已提交但响应丢失则恢复原回执。全量 **247/247 通过**，严格公共 Handoff 格式检查现已通过；固定 Risk 源码 9 组本地检查通过，正式 Risk 回写、审批身份和联合验收仍未完成。
 
 详见 [本轮说明及待协作事项](core-agent-transition-iteration-2026-10-19.md) 和 [团队入口](../../team-staging/core-agent/transition-recovery-v1/DELIVERY.md)。没有外部或付费模型调用；下方历史记录继续保留。
 
 已同步团队与个人仓库，原后端已部署 a85cb83d-a043-4e8e-852e-06572d015f29；/health、/docs 均 HTTP 200。[部署回执](core-agent-handoff-contract-deployment-2026-10-19.json)包含两边代码 SHA 和公网检查。仅验证健康及文档可访问，未进行公网推理或正式业务验收。
 
 接口兼容补充：移除 Handoff 顶层未声明的 `source_task_id` 别名，来源编号仍保留在 `reviewed_input` 与原工作流记录；冻结 `risk-handoff.v1` 的严格检查现已通过。[契约检查证据](core-risk-handoff-contract-2026-10-19.json)。模型回执编号、正式 Risk 回写、审批身份和执行网关仍待外部 Owner 提供，不能把本次格式通过写成线上联合验收。
+
+模型交接补充：HTTP 模型服务返回的 `id`、`response_id`、`x-request-id` 或 `x-correlation-id` 会被原样纳入 `provider_response_id`；没有返回就保持为空，不生成假编号。[测试记录](core-agent-model-receipt-tests-2026-10-19.txt)。
 
 ## 最新补充：旧入口重试与可读审计
 

@@ -64,6 +64,15 @@ test("model review calls the configured Responses endpoint and stays read-only",
   assert.match(result.audit.input_sha256, /^[0-9a-f]{64}$/);
 });
 
+test("model review keeps a provider request id returned only in response headers", async () => {
+  const result = await runReview({ kind: "bill", text: "无正文编号的虚构账单" }, env, {
+    fetchImpl: async () => new Response(JSON.stringify({
+      output_text: JSON.stringify(proposal)
+    }), { status: 200, headers: { "Content-Type": "application/json", "X-Request-ID": "provider-header-001" } })
+  });
+  assert.equal(result.model_response.provider_response_id, "provider-header-001");
+});
+
 test("chat completions request uses the configured JSON object response format", () => {
   const input = normalizeReviewInput({ kind: "news", text: "市场新闻内容" });
   const body = buildModelRequest(input, {

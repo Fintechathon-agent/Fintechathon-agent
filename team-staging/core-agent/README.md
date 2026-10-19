@@ -4,6 +4,7 @@
 | --- | --- | --- |
 | [状态变更与故障恢复 v1](transition-recovery-v1/DELIVERY.md) | 撤回/审批保存失败阻断、共享资金计划保护 | 246 项回归、6 进程磁盘测试通过；正式接入仍待确认 |
 | [Risk Handoff 契约修复 v1](owner-integration-v1/DELIVERY.md) | 移除冻结 Schema 不允许的顶层来源编号别名 | 严格 Handoff 检查通过；真实 Risk/审批联合验收仍待确认 |
+| [模型服务回执对齐 v1](owner-integration-v1/DELIVERY.md) | 记录供应商响应体或响应头中的真实回执编号 | 247 项回归通过；真实模型调用仍待授权 |
 | [旧入口重试与可读审计 v1](retry-audit-v1/DELIVERY.md) | 防重复模型调用、超长约束保护、TXT 任务记录导出 | 232 项回归、5 类本地签名链路验证；正式联合验收待落实 |
 | [执行保护与交接候选 v1](execution-guards-v1/DELIVERY.md) | 批准过期阻断、重复回执与审计覆盖修复、字段补丁 | 220 项回归通过；公共接口候选未应用，待双方确认 |
 | [任务持久登记与故障恢复 v1](durable-recovery-v1/DELIVERY.md) | 防止重启后重复调用，核查失败记录与 UI 接入条件 | 213 项回归、4 进程磁盘测试通过；正式接入待确认 |

@@ -1,0 +1,18 @@
+Core Agent model receipt evidence · 2026-10-19
+
+Change: HTTP model adapters now retain a provider-supplied id, response_id, x-request-id, or x-correlation-id in provider_response_id. Core never generates a value when the provider supplies none.
+
+Focused command:
+  node --test tests/model-review.test.js
+
+Result:
+  21 passed, 0 failed, 0 skipped
+  New case: model review keeps a provider request id returned only in response headers
+
+Full regression:
+  node --test
+  247 passed, 0 failed, 0 skipped
+
+Scope:
+  No real model call, no paid call, no Risk request, no schema change, no Memory or Quant change.
+  Workers AI fixture without an id still produces provider_response_id=null; the Risk consumer's requirement for a non-empty real-provider id remains visible and blocking.
