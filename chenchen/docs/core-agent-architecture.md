@@ -71,3 +71,7 @@ flowchart LR
 ## 2026-10-18 严格校验补充
 
 本轮自动化无业务代码变更；启动时 main 无今日业务提交，团队后续协作者工作区变动单独保留。完整 Schema 检查发现 Risk 导出 source_task_id 未在严格 HandoffPackage 声明，两仓库一致复现。正式接收联调应先解决该字段归属与版本兼容；未修改 Schema 或绕过 Risk。现有回调必填 request/task/run/audit/handoff，session 由存储记录关联，不能称为六编号均由回调必填。当前完整架构、时序、字段归属与限制见 core-agent-integration-guide-2026-10-18.md 和同名双图 DOCX；历史记录不删除。
+
+## 2026-10-19 晚间复验
+
+顶层 source_task_id 别名已由当天业务提交移除；冻结 Handoff Schema 完整校验现通过。本次 32/32 追踪断言、258/258 回归和新合成 Golden Path 通过。正式 Risk 可信回写/审批/网关仍待验收。健康及模型双链路、Memory 边界、未决存储停止点与字段所有权见 core-agent-integration-guide-2026-10-19.md 及嵌入双图的同名 DOCX。历史结论保留，不代表当前仍有已修复格式阻塞。

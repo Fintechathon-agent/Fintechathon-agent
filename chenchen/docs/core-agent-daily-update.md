@@ -745,3 +745,58 @@ request_id、task_id、session_id、investment-agent.v1、audit_evidence 在本�
 ## Word 验收状态
 
 已生成日报与内嵌架构、时序图的 Word 联调手册，完成 OOXML 文本、图片和页面可用宽度结构检查。已尝试 render_docx.py；环境缺少 LibreOffice soffice.exe，未生成页面 PNG，逐页版式验收未完成。结构检查及源图检查不等于页面验收。日志 daily-closeout-2026-10-18-render.txt。
+
+---
+
+# Core Agent Daily Update 2026-10-19 晚间收尾
+
+## 今日结论与主链路阶段
+
+已实现：今天业务提交补齐持久登记恢复、状态变更未决保护、旧入口幂等与 TXT 审计、供应商回执保留、只读能力状态、账户汇总候选和本地 Golden Path。昨天 source_task_id 顶层多余字段问题已由当天业务提交修正，本次独立严格校验通过。主链路仍停在正式 Risk 交接及 PAPER 边界，不能称正式 Risk 审核闭环完成。本次自动日报只更新文档、图与检查报告，未修改业务代码或运行时 Schema。
+
+## 今日真实产出
+
+两仓库独立运行构建及 258 项回归，复跑完整 Schema 与语义追踪 32 项检查，新增本轮 Golden Path 原始请求响应日志；更新带嵌入图像的架构、时序和统一 Contract 联调手册及 Word 日报。保留当天早先开发记录与历史失败证据，晚间结论以本节为准。
+
+## A 已完成的核心接口
+
+| 接口及版本 | 生产方 → 消费方 | 当前字段状态与证据 |
+| --- | --- | --- |
+| 健康请求响应 investment-agent.v1 | Caller/Backend → Harness/Core → Risk/UI | request_id、trace、task_state、artifacts、tool_results、audit_evidence、risk_handoff 已实现并验证；contracts/investment-agent.v1.schema.json，daily-closeout-2026-10-19-trace.json |
+| 模型请求 model-review.v1 与记录 review-workflow.v1 | Caller → Backend/ReviewWorkflowStore → Risk/UI | request/task/session/run/audit 与提议指纹可关联；session_id 仍非 Schema 必填，健康四字段无统一映射；contracts/model-review.v1.schema.json |
+| 交接 risk-handoff.v1 与回调 risk-callback.v1 | Core → Risk；Risk → Backend | 冻结 Schema 通过；source_task_id 不再置于顶层，原记录/reviewed_input 保留。回调必填五编号及 hash，session 回查存储；contracts/risk-handoff.v1.schema.json |
+| 共享错误 core-agent-error.v1 | Backend/Core → Caller/UI | 版本、operation、request_id、trace、error 必填，未分配编号可 null；contracts/core-agent-error.v1.schema.json |
+| 能力状态 core-agent-capabilities.v1 | Backend → UI/联调方 | GET /api/review/capabilities 已实现，区分配置、探针、Risk、审批、网关就绪；core-agent-capabilities-deployment-2026-10-19.json |
+| 账户候选 复用 model-review.v1 | 独立适配器 → Backend/模型/Risk | context.account_summary_candidate 为未验证调用方资料；不伪造持仓/快照/可投资额度，不授予 Memory consent；core-agent-account-summary-2026-10-19.md |
+
+编号、版本、原始工具数值与审计归生产模块维护，消费方不可改写。完整 required、nullable、状态及字段归属见 core-agent-integration-guide-2026-10-19.md 和同名 Word；运行时 Schema 为约束源。
+
+## B 可验证的集成进度
+
+- 两仓库在 chenchen 运行 npm run check：exit 0；npm test -- --test-reporter=tap：各 258/258 通过，失败/跳过 0；原始日志 daily-closeout-2026-10-19-check.txt、daily-closeout-2026-10-19-tests.txt。
+- 两仓库在 chenchen 运行 python docs/daily-closeout-check-2026-10-19.py：各 32/32 通过；7 个正向对象完整 Draft 2020-12 Schema 全通过。新合成健康成功、同进程 Checkpoint 复用及失败信封可追踪；10 月 17 日留存合成模型记录的 9 条事件六编号与 hash 一致，明确不是新真实模型记录。证据 daily-closeout-2026-10-19-trace.json、synthetic.json。
+- 两仓库在 chenchen 运行 node --input-type=module -e 'import {runGoldenPath} from "./experiments/golden-path-v1/run.mjs"; const value=await runGoldenPath({writeArtifacts:false}); console.log(JSON.stringify(value,null,2));'：本轮新运行 PASS，批准与拒绝两条本地合成路径、原始请求响应和状态留在 daily-closeout-2026-10-19-golden.json；模型替身，正式 Risk/付费模型/真实网关调用均 0。
+- 完整 Schema 校验依赖 Python jsonschema==4.26.0、Node >=22；本机使用工作区 bundled Python/Node，jsonschema 安装在自动化独立 python-deps 并由 PYTHONPATH 加载，未改项目依赖。初次因缺依赖失败，补齐后复跑通过；不是绕过检查。
+- 已复核当天已有部署回执：/health、/docs、/api/review/capabilities 均 HTTP 200，inference_probe=NOT_RUN，Risk/可信审批/执行网关未就绪。本次未重跑公网请求、模型推理或 Risk 派发，不把只读健康结果视为正式联调验收。
+- 提交前运行 git diff --check 和 git diff --cached --check，原始结果见 daily-closeout-2026-10-19-git-check.txt；只提交本轮白名单 docs 文件。团队未跟踪 benchmark 实验保留，不纳入本次验证或提交。
+
+## 金融数据与边界
+
+固定 2026-10-08/09 市场夹具、价格新闻冲突 REVIEW_REQUIRED 和 Quant no-drift 在本轮回归通过，未验证 10 月 19 日实时行情。Core 仅消费现有 diagnosePortfolio.metrics、generateCandidates.target_weights、runSimulation.comparisons；未重算或改写 Quant。账户汇总只做显示一致性与资料缺失检查，不能替代 Quant 收益算法。Memory 的 consent、范围、生命周期、清理规则未修改。Risk 格式通过不等于正式接受；前端 approval 不能授权真实交易，execution_allowed=false。
+
+## C 需要其他 Owner 配合的阻塞项
+
+- Risk：缺正式接收地址、可信服务身份、签名回写与联合验收；期望提供接收/拒绝/补资料/重复/冲突/过期及存储未决的收发样例。现有消费者要求非空 provider_response_id，需确认供应商无编号时的拒绝及恢复协议，Core 不生成假编号。
+- Backend：健康与模型响应仍无版本化统一映射，健康 Session/Checkpoint 仍进程内；期望 task_state/artifacts/tool_results/audit_evidence 对照、持久化和跨实例幂等方案。模型持久登记测试不能证明健康链路跨进程恢复。
+- Backend 与 Risk：可信审批身份、权限与 Safety Action Gateway 缺失；期望受保护入口、可核验审批和执行前再检查 Contract，真实执行持续关闭。
+- UI：候选固定旧 Core 基线，任务找回/脱敏 trace、本人查询、稳定幂等键和 503 retryable:false 仍需对齐；期望最新基线的等待/拒绝/缺资料/过期/409/503 恢复联调回执。本次无新浏览器验收。
+- Memory：缺授权下的可信引用与撤回证据；期望 memory_id、来源/版本和授权样例，不改变既有规则。
+- Quant 与 Data：缺共同冻结的结果版本/日期、账户及持仓来源、真实快照、出入金/冻结资金和时效冲突协议；期望可审计样例，不能以截图差额补成持仓或可投资额度。
+
+## 下一步
+
+优先对齐正式 Risk 消费者的供应商回执要求与可信回调，再与 Backend 冻结两条链路的字段映射；UI 用最新 Core 验证本人任务找回和未决状态。Memory、Quant/Data 提供可信引用及版本时效样例。继续保留 PAPER 和真实执行阻断。
+
+## Word 验收状态
+
+Word 日报与手册已生成，架构和时序以可读图像嵌入，完成 OOXML/ZIP/文本/图片宽度检查。尝试 canonical render_docx.py，当前 bundled 环境缺少 LibreOffice soffice.exe，未生成页面 PNG，逐页版式验收未完成；不能标记版式通过。日志 daily-closeout-2026-10-19-render.txt。

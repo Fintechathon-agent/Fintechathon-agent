@@ -1,0 +1,437 @@
+{
+  "result": {
+    "evidence_version": "core-agent-golden-path.v1",
+    "recorded_at": "2026-10-19T14:05:53.410Z",
+    "mode": "LOCAL_SYNTHETIC",
+    "status": "PASS",
+    "external_model_calls": 0,
+    "paid_model_calls": 0,
+    "formal_risk_service_called": false,
+    "formal_approval_identity_used": false,
+    "real_execution_gateway_called": false,
+    "approved_flow": {
+      "trace": {
+        "task_id": "review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da",
+        "request_id": "req-ff796af2-b92a-4b28-b801-d0ae7be251ce",
+        "run_id": "review-45c889bb-db13-4edb-be04-51e9abe7b619",
+        "audit_id": "audit-67c2e1b9-937c-440e-a3f9-8ccb20c983dd",
+        "handoff_id": "handoff-2d8678ca-8206-462d-93be-437c745c1bba",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "model": {
+        "source": "model",
+        "call_succeeded": true,
+        "provider_response_id": "synthetic-provider-golden-001"
+      },
+      "states": [
+        "PENDING_RISK",
+        "PENDING_APPROVAL",
+        "READY_FOR_SIMULATION",
+        "SIMULATED"
+      ],
+      "execution": {
+        "status": "SIMULATED",
+        "execution_allowed": false,
+        "side_effects": false,
+        "execution_id": "sim-exec-554ea95c-9f62-4494-b5f5-ed43d61441f4"
+      },
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked",
+        "workflow.operation_blocked",
+        "risk.approved",
+        "approval.pending",
+        "risk.callback.recorded",
+        "approval.approved",
+        "execution.ready_for_simulation",
+        "execution.simulated"
+      ]
+    },
+    "rejected_flow": {
+      "trace": {
+        "task_id": "review-task-5ec4ac08-af58-4749-8175-153347bfaf64",
+        "request_id": "req-a0b4a8d9-10a9-4634-b9ad-3288043edce2",
+        "run_id": "review-f4beb36c-e609-4e3f-b3a3-047d6dc5f69e",
+        "audit_id": "audit-62e6c145-27de-40e6-bd14-580cef8cf011",
+        "handoff_id": "handoff-f8a8a108-bc16-44ab-bf19-61600e894ca0",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "states": [
+        "PENDING_RISK",
+        "REJECTED"
+      ],
+      "execution_blocked_after_reject": true,
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked",
+        "risk.rejected",
+        "execution.blocked",
+        "risk.callback.recorded"
+      ]
+    },
+    "assertions": {
+      "same_task_bound_across_handoff_risk_approval_execution": true,
+      "execution_blocked_before_risk": true,
+      "execution_blocked_after_risk_rejection": true,
+      "paper_receipt_has_no_side_effects": true,
+      "replay_kept_same_audit_and_execution_receipt": true
+    },
+    "runtime_log": "logs/core-agent-golden-path-2026-10-19.jsonl"
+  },
+  "log": [
+    {
+      "sequence": 1,
+      "flow": "approved",
+      "step": "model_proposal",
+      "endpoint": "/api/review",
+      "http_status": 200,
+      "status": "PENDING_RISK",
+      "error_code": null,
+      "callback_status": null,
+      "trace": {
+        "task_id": "review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da",
+        "request_id": "req-ff796af2-b92a-4b28-b801-d0ae7be251ce",
+        "run_id": "review-45c889bb-db13-4edb-be04-51e9abe7b619",
+        "audit_id": "audit-67c2e1b9-937c-440e-a3f9-8ccb20c983dd",
+        "handoff_id": "handoff-2d8678ca-8206-462d-93be-437c745c1bba",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked"
+      ]
+    },
+    {
+      "sequence": 2,
+      "flow": "approved",
+      "step": "execution_blocked_before_risk",
+      "endpoint": "/api/review/simulate",
+      "http_status": 409,
+      "status": "PENDING_RISK",
+      "error_code": "EXECUTION_BLOCKED",
+      "callback_status": null,
+      "trace": {
+        "task_id": "review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da",
+        "request_id": "req-ff796af2-b92a-4b28-b801-d0ae7be251ce",
+        "run_id": "review-45c889bb-db13-4edb-be04-51e9abe7b619",
+        "audit_id": "audit-67c2e1b9-937c-440e-a3f9-8ccb20c983dd",
+        "handoff_id": "handoff-2d8678ca-8206-462d-93be-437c745c1bba",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked",
+        "workflow.operation_blocked"
+      ]
+    },
+    {
+      "sequence": 3,
+      "flow": "approved",
+      "step": "risk_handoff_read",
+      "endpoint": "/api/review/task/review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da/risk-handoff",
+      "http_status": 200,
+      "status": "PENDING_REVIEW",
+      "error_code": null,
+      "callback_status": null,
+      "trace": {
+        "task_id": "review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da",
+        "request_id": "req-ff796af2-b92a-4b28-b801-d0ae7be251ce",
+        "run_id": "review-45c889bb-db13-4edb-be04-51e9abe7b619",
+        "audit_id": "audit-67c2e1b9-937c-440e-a3f9-8ccb20c983dd",
+        "handoff_id": "handoff-2d8678ca-8206-462d-93be-437c745c1bba",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": []
+    },
+    {
+      "sequence": 4,
+      "flow": "approved",
+      "step": "risk_approved",
+      "endpoint": "/api/review/risk-callback",
+      "http_status": 200,
+      "status": "PENDING_APPROVAL",
+      "error_code": null,
+      "callback_status": "RECORDED",
+      "trace": {
+        "task_id": "review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da",
+        "request_id": "req-ff796af2-b92a-4b28-b801-d0ae7be251ce",
+        "run_id": "review-45c889bb-db13-4edb-be04-51e9abe7b619",
+        "audit_id": "audit-67c2e1b9-937c-440e-a3f9-8ccb20c983dd",
+        "handoff_id": "handoff-2d8678ca-8206-462d-93be-437c745c1bba",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked",
+        "workflow.operation_blocked",
+        "risk.approved",
+        "approval.pending",
+        "risk.callback.recorded"
+      ]
+    },
+    {
+      "sequence": 5,
+      "flow": "approved",
+      "step": "human_approved",
+      "endpoint": "/api/review/approval",
+      "http_status": 200,
+      "status": "READY_FOR_SIMULATION",
+      "error_code": null,
+      "callback_status": null,
+      "trace": {
+        "task_id": "review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da",
+        "request_id": "req-ff796af2-b92a-4b28-b801-d0ae7be251ce",
+        "run_id": "review-45c889bb-db13-4edb-be04-51e9abe7b619",
+        "audit_id": "audit-67c2e1b9-937c-440e-a3f9-8ccb20c983dd",
+        "handoff_id": "handoff-2d8678ca-8206-462d-93be-437c745c1bba",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked",
+        "workflow.operation_blocked",
+        "risk.approved",
+        "approval.pending",
+        "risk.callback.recorded",
+        "approval.approved",
+        "execution.ready_for_simulation"
+      ]
+    },
+    {
+      "sequence": 6,
+      "flow": "approved",
+      "step": "paper_simulation",
+      "endpoint": "/api/review/simulate",
+      "http_status": 200,
+      "status": "SIMULATED",
+      "error_code": null,
+      "callback_status": null,
+      "trace": {
+        "task_id": "review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da",
+        "request_id": "req-ff796af2-b92a-4b28-b801-d0ae7be251ce",
+        "run_id": "review-45c889bb-db13-4edb-be04-51e9abe7b619",
+        "audit_id": "audit-67c2e1b9-937c-440e-a3f9-8ccb20c983dd",
+        "handoff_id": "handoff-2d8678ca-8206-462d-93be-437c745c1bba",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked",
+        "workflow.operation_blocked",
+        "risk.approved",
+        "approval.pending",
+        "risk.callback.recorded",
+        "approval.approved",
+        "execution.ready_for_simulation",
+        "execution.simulated"
+      ]
+    },
+    {
+      "sequence": 7,
+      "flow": "approved",
+      "step": "audit_replay",
+      "endpoint": "/api/review/task/review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da",
+      "http_status": 200,
+      "status": "SIMULATED",
+      "error_code": null,
+      "callback_status": null,
+      "trace": {
+        "task_id": "review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da",
+        "request_id": "req-ff796af2-b92a-4b28-b801-d0ae7be251ce",
+        "run_id": "review-45c889bb-db13-4edb-be04-51e9abe7b619",
+        "audit_id": "audit-67c2e1b9-937c-440e-a3f9-8ccb20c983dd",
+        "handoff_id": "handoff-2d8678ca-8206-462d-93be-437c745c1bba",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked",
+        "workflow.operation_blocked",
+        "risk.approved",
+        "approval.pending",
+        "risk.callback.recorded",
+        "approval.approved",
+        "execution.ready_for_simulation",
+        "execution.simulated"
+      ]
+    },
+    {
+      "sequence": 8,
+      "flow": "approved",
+      "step": "handoff_replay",
+      "endpoint": "/api/review/task/review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da/risk-handoff",
+      "http_status": 200,
+      "status": "APPROVED",
+      "error_code": null,
+      "callback_status": null,
+      "trace": {
+        "task_id": "review-task-d87b71d6-966c-47a2-a9df-b0f1d7ff51da",
+        "request_id": "req-ff796af2-b92a-4b28-b801-d0ae7be251ce",
+        "run_id": "review-45c889bb-db13-4edb-be04-51e9abe7b619",
+        "audit_id": "audit-67c2e1b9-937c-440e-a3f9-8ccb20c983dd",
+        "handoff_id": "handoff-2d8678ca-8206-462d-93be-437c745c1bba",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": []
+    },
+    {
+      "sequence": 9,
+      "flow": "rejected",
+      "step": "model_proposal",
+      "endpoint": "/api/review",
+      "http_status": 200,
+      "status": "PENDING_RISK",
+      "error_code": null,
+      "callback_status": null,
+      "trace": {
+        "task_id": "review-task-5ec4ac08-af58-4749-8175-153347bfaf64",
+        "request_id": "req-a0b4a8d9-10a9-4634-b9ad-3288043edce2",
+        "run_id": "review-f4beb36c-e609-4e3f-b3a3-047d6dc5f69e",
+        "audit_id": "audit-62e6c145-27de-40e6-bd14-580cef8cf011",
+        "handoff_id": "handoff-f8a8a108-bc16-44ab-bf19-61600e894ca0",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked"
+      ]
+    },
+    {
+      "sequence": 10,
+      "flow": "rejected",
+      "step": "risk_handoff_read",
+      "endpoint": "/api/review/task/review-task-5ec4ac08-af58-4749-8175-153347bfaf64/risk-handoff",
+      "http_status": 200,
+      "status": "PENDING_REVIEW",
+      "error_code": null,
+      "callback_status": null,
+      "trace": {
+        "task_id": "review-task-5ec4ac08-af58-4749-8175-153347bfaf64",
+        "request_id": "req-a0b4a8d9-10a9-4634-b9ad-3288043edce2",
+        "run_id": "review-f4beb36c-e609-4e3f-b3a3-047d6dc5f69e",
+        "audit_id": "audit-62e6c145-27de-40e6-bd14-580cef8cf011",
+        "handoff_id": "handoff-f8a8a108-bc16-44ab-bf19-61600e894ca0",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": []
+    },
+    {
+      "sequence": 11,
+      "flow": "rejected",
+      "step": "risk_rejected",
+      "endpoint": "/api/review/risk-callback",
+      "http_status": 200,
+      "status": "REJECTED",
+      "error_code": null,
+      "callback_status": "RECORDED",
+      "trace": {
+        "task_id": "review-task-5ec4ac08-af58-4749-8175-153347bfaf64",
+        "request_id": "req-a0b4a8d9-10a9-4634-b9ad-3288043edce2",
+        "run_id": "review-f4beb36c-e609-4e3f-b3a3-047d6dc5f69e",
+        "audit_id": "audit-62e6c145-27de-40e6-bd14-580cef8cf011",
+        "handoff_id": "handoff-f8a8a108-bc16-44ab-bf19-61600e894ca0",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked",
+        "risk.rejected",
+        "execution.blocked",
+        "risk.callback.recorded"
+      ]
+    },
+    {
+      "sequence": 12,
+      "flow": "rejected",
+      "step": "execution_blocked_after_reject",
+      "endpoint": "/api/review/simulate",
+      "http_status": 409,
+      "status": "REJECTED",
+      "error_code": "EXECUTION_BLOCKED",
+      "callback_status": null,
+      "trace": {
+        "task_id": "review-task-5ec4ac08-af58-4749-8175-153347bfaf64",
+        "request_id": "req-a0b4a8d9-10a9-4634-b9ad-3288043edce2",
+        "run_id": "review-f4beb36c-e609-4e3f-b3a3-047d6dc5f69e",
+        "audit_id": "audit-62e6c145-27de-40e6-bd14-580cef8cf011",
+        "handoff_id": "handoff-f8a8a108-bc16-44ab-bf19-61600e894ca0",
+        "proposal_sha256": "5e9de5493943ff77d99c3ae0dcb7d8899f81ce8259330803798cf07d7eadf197"
+      },
+      "execution_allowed": false,
+      "audit_event_types": [
+        "review.received",
+        "model.completed",
+        "gateway.checked",
+        "workflow.created",
+        "proposal.bound",
+        "risk.handoff.created",
+        "execution.blocked",
+        "risk.rejected",
+        "execution.blocked",
+        "risk.callback.recorded",
+        "workflow.operation_blocked"
+      ]
+    }
+  ]
+}
