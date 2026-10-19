@@ -2,6 +2,7 @@
 
 | 内容 | 用途 | 状态 |
 | --- | --- | --- |
+| [账户汇总核对 v1](account-summary-v1/DELIVERY.md) | 汇总数字核对、缺资料提示、同任务交接与阻断测试 | 258 项回归与严格 Handoff 检查通过；用户原始数据不公开，候选语义待确认 |
 | [状态变更与故障恢复 v1](transition-recovery-v1/DELIVERY.md) | 撤回/审批保存失败阻断、共享资金计划保护 | 246 项回归、6 进程磁盘测试通过；正式接入仍待确认 |
 | [Risk Handoff 契约修复 v1](owner-integration-v1/DELIVERY.md) | 移除冻结 Schema 不允许的顶层来源编号别名 | 严格 Handoff 检查通过；真实 Risk/审批联合验收仍待确认 |
 | [模型服务回执对齐 v1](owner-integration-v1/DELIVERY.md) | 记录供应商响应体或响应头中的真实回执编号 | 247 项回归通过；真实模型调用仍待授权 |
