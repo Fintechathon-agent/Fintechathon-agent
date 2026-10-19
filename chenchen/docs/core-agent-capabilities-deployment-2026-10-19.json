@@ -1,0 +1,45 @@
+{
+  "release": "core-agent-capabilities-v1",
+  "date": "2026-10-19",
+  "recorded_at": "2026-10-19T04:31:06.2406215Z",
+  "worker": {
+    "url": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+    "version_id": "209a21a4-7245-4a96-bb3a-56a064e61d85",
+    "previous_version_id": "e0f66a82-bb2e-4cba-a141-599d436af924",
+    "deploy_exit_code": 0,
+    "uploaded_kib": 287.14,
+    "gzip_kib": 62.18
+  },
+  "source": {
+    "team": {"repository": "https://github.com/Fintechathon-agent/Fintechathon-agent", "commit": "31aa02abe5a5640be744cbf62b5adb394a1df0fc", "remote_main_verified": true},
+    "personal": {"repository": "https://github.com/realchenchenluo/agent", "commit": "b18949c16cfe1d30d32ff89141087a307d96302", "remote_main_verified": true},
+    "changed_files": 8,
+    "scope": ["chenchen/", "team-staging/core-agent/"],
+    "team_release_modified": false,
+    "other_owner_files_modified": false
+  },
+  "validation": {
+    "focused_cloudflare_tests": {"passed": 20, "failed": 0, "skipped": 0},
+    "full_node_tests": {"passed": 248, "failed": 0, "skipped": 0},
+    "syntax": "PASS",
+    "worker_dry_run": "PASS",
+    "strict_handoff": {"passed": true, "schema_modified": false},
+    "public_get": {
+      "checks": [
+        {"endpoint": "/health", "status": 200, "attempt": 1, "elapsed_ms": 1364, "bytes": 272, "sha256": "3ccb3bd10e0d3608bc46aee544c749d9cc6044736af35ceff40cd8f0d3198145"},
+        {"endpoint": "/docs", "status": 200, "attempt": 1, "elapsed_ms": 881, "bytes": 11830, "sha256": "c9bfb1fe2252478a408136038db08b1d3415044da2d66d69e0b6f6339ba75ac2", "capabilities_path_documented": true},
+        {"endpoint": "/api/review/capabilities", "status": 200, "attempt": 1, "elapsed_ms": 814, "bytes": 887, "sha256": "0c35ebbc5d2a5cf6d91fd8261545d78927b162650db50ad2a770ff779a8e340b", "capability_version": "core-agent-capabilities.v1", "inference_probe": "NOT_RUN", "risk_dispatch_ready": false, "approval_trusted_identity_ready": false, "execution_allowed": false, "joint_acceptance": false}
+      ]
+    }
+  },
+  "model": {"external_inference_calls_this_iteration": 0, "paid_inference_calls_this_iteration": 0, "bailian_enabled_by_this_iteration": false},
+  "acceptance": {"local_synthetic_tests": true, "public_code_deployed": true, "public_health_docs_and_capabilities": true, "public_model_call_tested": false, "formal_risk_callback_and_approval_tested": false, "real_execution_gateway_tested": false, "joint_acceptance": false},
+  "remaining_blockers": [
+    "Workers AI is configured but the public capability probe remains NOT_RUN; no real model call was made in this iteration.",
+    "Formal Risk URL, signed callback and trusted approval identity are not configured.",
+    "No real execution gateway is connected; execution remains PAPER/false.",
+    "The current Risk consumer requires a non-empty real-provider response id; Core captures id, response_id or provider tracing headers and leaves it null when the provider omits one."
+  ],
+  "rollback": {"automatic": false, "instruction": "Pause new mutations and reconcile pending task/funding markers before rollback. Never clear storage or resume execution from an old state."},
+  "evidence": ["core-agent-capabilities-tests-2026-10-19.txt", "core-risk-handoff-contract-2026-10-19.json", "core-agent-transition-iteration-2026-10-19.md"]
+}
