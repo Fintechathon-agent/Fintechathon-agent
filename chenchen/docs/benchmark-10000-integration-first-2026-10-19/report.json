@@ -1,0 +1,262 @@
+{
+  "report_version": "investment-integration-benchmark.v5",
+  "recorded_at": "2026-10-19T15:32:56.992Z",
+  "seed": 2026101906,
+  "total": 10000,
+  "passed": 9750,
+  "failed": 250,
+  "skipped": 0,
+  "templates": 67,
+  "unique_inputs": 10000,
+  "dataset_sha256": "7c7e77360918fa070e4ce5f37445e5e836d0cd98cb66f06ff50202a31001702f",
+  "groups": [
+    {
+      "group": "portfolio_chain",
+      "cases": 500,
+      "passed": 500,
+      "failed": 0
+    },
+    {
+      "group": "funding_multitask",
+      "cases": 500,
+      "passed": 500,
+      "failed": 0
+    },
+    {
+      "group": "risk_workflow",
+      "cases": 500,
+      "passed": 500,
+      "failed": 0
+    },
+    {
+      "group": "reliability",
+      "cases": 500,
+      "passed": 500,
+      "failed": 0
+    },
+    {
+      "group": "investment_lifecycle",
+      "cases": 1000,
+      "passed": 1000,
+      "failed": 0
+    },
+    {
+      "group": "storage_fault",
+      "cases": 1000,
+      "passed": 1000,
+      "failed": 0
+    },
+    {
+      "group": "concurrent_workflow",
+      "cases": 1000,
+      "passed": 1000,
+      "failed": 0
+    },
+    {
+      "group": "funding_batch",
+      "cases": 2500,
+      "passed": 2500,
+      "failed": 0
+    },
+    {
+      "group": "signed_owner_boundary",
+      "cases": 2500,
+      "passed": 2250,
+      "failed": 250
+    }
+  ],
+  "external_network_attempts": 0,
+  "external_model_calls": 0,
+  "paid_model_calls": 0,
+  "training_performed": false,
+  "joint_acceptance": false,
+  "model_mode": "FIXED_TEST_DOUBLES",
+  "risk_mode": "LOCAL_FIXTURES_NOT_FORMAL_OWNER_RULES",
+  "duration_ms": 133150.314,
+  "source_head": "f284b7d81ccb09cfada5465dd50f71cbd7e23540",
+  "source_sha256": {
+    "experiments/investment-benchmark-v1/cases.mjs": "17b6df8d50475f4d3a5c470a329653ba22fae76c1c377b9d1e0081ad200e864c",
+    "experiments/investment-benchmark-v1/run.mjs": "61d9efb2e233f29ef0e2e516cecdba3d057361e1cd2439a9ac73cbf88d6cf74d",
+    "experiments/life-planning-v1/intake.js": "cf3193d388bfe405e9bdbd58dfb87fb3b5a82d346fec0c5c0695b21daf6bc62e",
+    "experiments/life-planning-v1/money-mentions.js": "c200566b314646e997c45a0e0ec7e01516c20637afb834f8bd295a07a3107ada",
+    "experiments/conversation-intake/preview.js": "5b7d0377963158d4a6bc9a67d77793957ad5f48c66715c2f06b614308e4c6564",
+    "integrations/funding-plan.js": "c81862592273804a06a25845d855c54ad14a967c0748bf50bd6e945a5828bbb5",
+    "integrations/review-workflow.js": "069f74083c78391de6c9585289d7b420ee6f932857d66b0d9d944013ae6456d2",
+    "integrations/model-review.js": "8d5a7d8347a42d28ef7257f7407fe2c41e9ba360529cf6ecde14095770f27512",
+    "tools/financial-tools.js": "d9aff4ccf7b3a0a895796a1139f6541b14f2df672c54034c302693e139e49b32",
+    "core/harness.js": "25ced420958fcfe1f1a8201c4a1f1ffbee933edc2a11a8f66f5b5dcb51debc61",
+    "deployment/worker.js": "9dca133e6c176e8f030a5dbe91e36868944a120375d0131ba9921ea204ace86b",
+    "experiments/investment-benchmark-v2/cases.mjs": "76e6a9c97b6ff169755606af09729b6fd11fa80703cd6329da51296ceef1b9de",
+    "experiments/dual-benchmark-v3/cases.mjs": "31ebc9194e2e72399f13051f56bea99628e17c72075e8583f72d0c520eb47c33",
+    "experiments/dual-benchmark-v3/checks.mjs": "d034a6c1d10c98bcf33a2dd342be04a599f55d04b898344e818aeef94b13cd89",
+    "experiments/recovery-benchmark-v4/cases.mjs": "98b33a5b9c058a9e5702b8d67d72a88db9232b0e25920ea9aa2600bffe6e1e55",
+    "experiments/recovery-benchmark-v4/checks.mjs": "7f15680b4378370bb1943068a6bd20b8fab9dbea3e4d1bbc76f5aff33099babe",
+    "experiments/integration-benchmark-v5/cases.mjs": "e00e5e510496ba7700262cc4dd94407575e65f21acca007ed58b409f14c08901",
+    "experiments/integration-benchmark-v5/checks.mjs": "658a5d116e297a68d1a65c4ae897c9fec9f90744aab8017ffebe9a57cb839e3c",
+    "experiments/integration-benchmark-v5/run.mjs": "d4d0ac8ba1a21e9f0610367bec6accd420904e9201b37ee58c572d3408674191",
+    "integrations/review-reservation.js": "9c80cbb238e3d84bb2e98ca4b3e796ca50c5516ca107f0fe2f1b545891238543",
+    "integrations/review-transition.js": "cdfe2e51fe6439b5ca6e2b84bf90984ee009724d8967f0198b031b7849fe6da2",
+    "integrations/owner-bridge.js": "46c4f8fdb3b63c25d42e1620e93761f5b02e0a69b7cd255111ffd3e5b80635e8",
+    "integrations/risk-handoff.js": "f87b8b4c6d06c8508999f4fca3c9c5ad8ab8fb10c481d69de4c8eb2384925bf0",
+    "integrations/review-evidence.js": "1f82320ab1b4b205a0a82511a76b8efe69d8f4546d41aa560ac7d5b3600a1647"
+  },
+  "batches": [
+    {
+      "folder": "batch-01",
+      "total": 1000,
+      "passed": 1000,
+      "failed": 0,
+      "dataset_sha256": "ebb205b3a12df74e886681ef4a6df6c4eaad6044ced342e057b712294ffed244",
+      "evidence_artifact": {
+        "file": "workflow-evidence.jsonl.gz",
+        "encoding": "gzip",
+        "records": 500,
+        "bytes": 1081607,
+        "sha256": "2944db807f2307f28485b06ce0ca9c2f1663d06d037187e606ab170d02a8cc3a",
+        "uncompressed_sha256": "2a5f3166b555d4f59fb552bcaaa51dcead05609b424036fe3d57d9e9be5685d3"
+      }
+    },
+    {
+      "folder": "batch-02",
+      "total": 1000,
+      "passed": 1000,
+      "failed": 0,
+      "dataset_sha256": "80c8cdb88647076b1095aa17f2a037363dd1cdfd648e2dd6ce29e4382458ccde",
+      "evidence_artifact": {
+        "file": "workflow-evidence.jsonl.gz",
+        "encoding": "gzip",
+        "records": 1000,
+        "bytes": 1372951,
+        "sha256": "71f7ac5a566c576b60c1ea3a942682faeb30e7483ab4e764b500db062879d404",
+        "uncompressed_sha256": "437ead928f00a5aa0a7f5c7dd654a84e3f8ea016072959bc461125e891c9ca4a"
+      }
+    },
+    {
+      "folder": "batch-03",
+      "total": 1000,
+      "passed": 1000,
+      "failed": 0,
+      "dataset_sha256": "4842186689bd97629eb99e926e05f3bf6c22b8e25f56a24760fb348b333cd90e",
+      "evidence_artifact": {
+        "file": "workflow-evidence.jsonl.gz",
+        "encoding": "gzip",
+        "records": 900,
+        "bytes": 1032598,
+        "sha256": "3a169e6ece3fba9e0d8a037a983ca257da25846d7374fdb3f258dac6278fd3e5",
+        "uncompressed_sha256": "f9b5ef2a5c98c694abee8b4b9b61e2822b53117cbeabe09340b1fd89320e5bb1"
+      }
+    },
+    {
+      "folder": "batch-04",
+      "total": 1000,
+      "passed": 1000,
+      "failed": 0,
+      "dataset_sha256": "b4870ed1549595788f4d2584e221d8e227b9495735e698bda9fb19e5f76b52ff",
+      "evidence_artifact": {
+        "file": "workflow-evidence.jsonl.gz",
+        "encoding": "gzip",
+        "records": 1000,
+        "bytes": 4631162,
+        "sha256": "b1e361961f2f5764f265fa1493e30eddc1689ab24c6807e8ba7f842a6db311db",
+        "uncompressed_sha256": "7f05793db1255503cf67f720f76550c7645cf5d3cd106853a4e869b09fd73d93"
+      }
+    },
+    {
+      "folder": "batch-05",
+      "total": 1000,
+      "passed": 1000,
+      "failed": 0,
+      "dataset_sha256": "074ead64e1293d072fbb6abfbd4a19f7fa7cc4e6a295c12dcdbc5149404aa2ec",
+      "evidence_artifact": {
+        "file": "workflow-evidence.jsonl.gz",
+        "encoding": "gzip",
+        "records": 1000,
+        "bytes": 1244665,
+        "sha256": "078c12704c0a016e751aefed3005a5ef464353d62c195790e9ae56b4aacb1b82",
+        "uncompressed_sha256": "906e0068c67b56b94107623c9cd64b05e31065893b11da60fab67199ea50229c"
+      }
+    },
+    {
+      "folder": "batch-06",
+      "total": 1000,
+      "passed": 1000,
+      "failed": 0,
+      "dataset_sha256": "002b3644ca38eceed7f1a8ef8d3c52e2ab858c646a2a81557b06163c1fe1b745",
+      "evidence_artifact": {
+        "file": "workflow-evidence.jsonl.gz",
+        "encoding": "gzip",
+        "records": 1000,
+        "bytes": 5347738,
+        "sha256": "6b029a38e680892fa473d904a50e2107cbfe59fbd92fea64e96b942d350e647a",
+        "uncompressed_sha256": "be8070068b9bf2a7d22b5cca6a5a9b4c2ed723432b00417896809c27842b2c27"
+      }
+    },
+    {
+      "folder": "batch-07",
+      "total": 1000,
+      "passed": 1000,
+      "failed": 0,
+      "dataset_sha256": "5acf5e9cf6ac94f374a63e3183c50d8e7efdfe3753559441be785c886792a55a",
+      "evidence_artifact": {
+        "file": "workflow-evidence.jsonl.gz",
+        "encoding": "gzip",
+        "records": 1000,
+        "bytes": 5235934,
+        "sha256": "6153fa8135c97ad9bb89b9047206d5a0832fc9616871127c309b73c87ddaad02",
+        "uncompressed_sha256": "b8ec8406e75d27481f82a9414351f141be56375f58434d3486608d4c213466a9"
+      }
+    },
+    {
+      "folder": "batch-08",
+      "total": 1000,
+      "passed": 950,
+      "failed": 50,
+      "dataset_sha256": "2c5c53501087c176fd2336be36dc63ba82cd69805851f336cbd9f8d6604955c3",
+      "evidence_artifact": {
+        "file": "workflow-evidence.jsonl.gz",
+        "encoding": "gzip",
+        "records": 950,
+        "bytes": 4824745,
+        "sha256": "17bd3aa90f1cce5c0a8f84881655cc0c6c1bf3111b4b3d0b1102036f5de92024",
+        "uncompressed_sha256": "aa8ca33538d1044f3010ac84b8c949738a9b13476e027670d5233e6a646c7762"
+      }
+    },
+    {
+      "folder": "batch-09",
+      "total": 1000,
+      "passed": 900,
+      "failed": 100,
+      "dataset_sha256": "e09efa1b2c0312db229352955dada8ae7436358210968df59d8f19046306866f",
+      "evidence_artifact": {
+        "file": "workflow-evidence.jsonl.gz",
+        "encoding": "gzip",
+        "records": 900,
+        "bytes": 4555216,
+        "sha256": "86f7b9e5733c4c8c227976ef4e5a7b0dd5a4d7f3e2a168444d3c91ddfc966f67",
+        "uncompressed_sha256": "36fa45676e8cf2959c1db86eaa42f24fbcc700c6e16744693dd07c88ce3ee8d5"
+      }
+    },
+    {
+      "folder": "batch-10",
+      "total": 1000,
+      "passed": 900,
+      "failed": 100,
+      "dataset_sha256": "5ec610d85134d2bdde5a97b79da091d761f2e4ffc717dbff346c08d64424ef6f",
+      "evidence_artifact": {
+        "file": "workflow-evidence.jsonl.gz",
+        "encoding": "gzip",
+        "records": 900,
+        "bytes": 4556293,
+        "sha256": "d2903ce3552265a8d7f787cf15e7115bd830621efdc0a896642caf66ee4f49b6",
+        "uncompressed_sha256": "887b1ab01c40e143a206a225cf6fc99be2bbfcd42ca7733dc5869b6854b2a819"
+      }
+    }
+  ],
+  "limits": [
+    "参数化程序测试，不是真实模型准确率或训练",
+    "资金与账户全部虚构，未调用真实交易接口",
+    "存储故障为内存注入和同进程服务对象重建，不是生产宕机演练",
+    "并发是受控异步交错，不是公网压力测试",
+    "真实Risk、登录身份、执行网关、手机端和联合验收本轮未验证"
+  ]
+}

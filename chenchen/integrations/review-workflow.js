@@ -68,17 +68,36 @@ async function hash(value) {
   return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
-async function fingerprint(input) {
+function requestIdentity(input) {
   const canonical = clone(input);
   delete canonical.request_id;
   delete canonical.task_id;
   delete canonical.idempotency_key;
   delete canonical.session_id;
-  return hash(canonical);
+  return canonical;
+}
+
+function orderedKeys(value) {
+  if (Array.isArray(value)) return value.map(orderedKeys);
+  if (value && typeof value === "object") return Object.fromEntries(Object.keys(value).sort().map(key => [key, orderedKeys(value[key])]));
+  return value;
+}
+
+async function fingerprint(input) {
+  return hash(orderedKeys(requestIdentity(input)));
+}
+
+async function matchesFingerprint(expected, input) {
+  if (typeof expected !== "string") return false;
+  const identity = requestIdentity(input);
+  if (expected === await hash(orderedKeys(identity))) return true;
+  // Existing durable records used insertion-order JSON. Accept only the exact
+  // legacy digest, without dropping context, changing values or sorting arrays.
+  return expected === await hash(identity);
 }
 
 async function matchesRequestFingerprint(record, input) {
-  if (record?.request_fingerprint === await fingerprint(input)) return true;
+  if (await matchesFingerprint(record?.request_fingerprint, input)) return true;
   // Only the two newly defaulted fields may be absent from a legacy request.
   // The original stored digest still has to match all remaining input fields.
   if (!record?.reviewed_input || Object.hasOwn(record.reviewed_input, "scenario") ||
@@ -87,7 +106,7 @@ async function matchesRequestFingerprint(record, input) {
   const legacy = clone(input);
   delete legacy.scenario;
   delete legacy.output_formats;
-  return record.request_fingerprint === await fingerprint(legacy);
+  return matchesFingerprint(record.request_fingerprint, legacy);
 }
 
 function event(record, eventType, payload = {}, actor = "core-agent") {
@@ -753,4 +772,4 @@ class ReviewWorkflowStore {
   }
 }
 
-module.exports = { WORKFLOW_VERSION, RISK_DECISIONS, APPROVAL_DECISIONS, WorkflowError, ReviewWorkflowStore, fingerprint, matchesRequestFingerprint };
+module.exports = { WORKFLOW_VERSION, RISK_DECISIONS, APPROVAL_DECISIONS, WorkflowError, ReviewWorkflowStore, fingerprint, matchesFingerprint, matchesRequestFingerprint };

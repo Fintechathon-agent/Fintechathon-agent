@@ -1,7 +1,7 @@
 "use strict";
 
 const { randomUUID, createHash } = require("node:crypto");
-const { fingerprint, WorkflowError } = require("./review-workflow");
+const { fingerprint, matchesFingerprint, WorkflowError } = require("./review-workflow");
 const VERSION = "review-reservation.v1";
 const taskKey = taskId => "review-reservation:task:" + taskId;
 const idempotencyKey = key => "review-reservation:key:" + createHash("sha256").update(key).digest("hex");
@@ -28,7 +28,7 @@ class ReviewReservations {
     const saved = await this.byTask(record.task_id);
     return saved?.reservation_version === VERSION && saved.state === "COMPLETED" &&
       saved.run_id === record.run_id && saved.audit_id === record.audit.audit_id &&
-      saved.request_fingerprint === await fingerprint(input);
+      await matchesFingerprint(saved.request_fingerprint, input);
   }
 
   async assertAvailable(input) {
@@ -37,7 +37,7 @@ class ReviewReservations {
     if (input.task_id) entries.push(await this.byTask(input.task_id));
     for (const existing of entries.filter(Boolean)) {
       if (existing.reservation_version !== VERSION) throw unavailable();
-      if (existing.request_fingerprint !== await fingerprint(input)) {
+      if (!await matchesFingerprint(existing.request_fingerprint, input)) {
         throw new WorkflowError("IDEMPOTENCY_CONFLICT", "请求已经登记，不能用相同任务或幂等键改换内容。", { statusCode: 409, stage: "VALIDATION" });
       }
       // Even COMPLETED without its final workflow record is an integrity failure.

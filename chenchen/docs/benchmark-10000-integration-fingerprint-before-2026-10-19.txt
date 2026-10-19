@@ -1,0 +1,68 @@
+TAP version 13
+# Subtest: request identity ignores nested object key order while preserving values and array order
+not ok 1 - request identity ignores nested object key order while preserving values and array order
+  ---
+  duration_ms: 7.8441
+  type: 'test'
+  location: 'repo:\\tests\\request-fingerprint.test.mjs:44:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+
+    + '9e1aba35efdd3995069a3483cf63426976ff6a92bfc260c75ae5758f6ee5ed21'
+    - '2f94e498fd705728ee3c119486138ea77a535eb563e3ef54c4bfa49b4788bc27'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '2f94e498fd705728ee3c119486138ea77a535eb563e3ef54c4bfa49b4788bc27'
+  actual: '9e1aba35efdd3995069a3483cf63426976ff6a92bfc260c75ae5758f6ee5ed21'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///repo:/tests/request-fingerprint.test.mjs:46:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: funded API retry accepts reordered fields across service reload without duplicate inference
+not ok 2 - funded API retry accepts reordered fields across service reload without duplicate inference
+  ---
+  duration_ms: 39.6131
+  type: 'test'
+  location: 'repo:\\tests\\request-fingerprint.test.mjs:55:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    409 !== 200
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 409
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///repo:/tests/request-fingerprint.test.mjs:59:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: legacy completed funding reservations remain replayable using their original byte-order digest
+ok 3 - legacy completed funding reservations remain replayable using their original byte-order digest
+  ---
+  duration_ms: 10.082
+  type: 'test'
+  ...
+# Subtest: legacy unfinished reservations stay blocked and cannot trigger a fresh model invocation
+ok 4 - legacy unfinished reservations stay blocked and cannot trigger a fresh model invocation
+  ---
+  duration_ms: 3.8268
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 2
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 253.6067
