@@ -8,7 +8,7 @@
 
 详见 [本轮说明及待协作事项](core-agent-transition-iteration-2026-10-19.md) 和 [团队入口](../../team-staging/core-agent/transition-recovery-v1/DELIVERY.md)。没有外部或付费模型调用；下方历史记录继续保留。
 
-已同步团队与个人仓库，原后端已部署 a85cb83d-a043-4e8e-852e-06572d015f29；/health、/docs 均 HTTP 200。[部署回执](core-agent-handoff-contract-deployment-2026-10-19.json)包含两边代码 SHA 和公网检查。仅验证健康及文档可访问，未进行公网推理或正式业务验收。
+已同步团队与个人仓库，原后端已部署 e0f66a82-bb2e-4cba-a141-599d436af924；/health、/docs 均 HTTP 200。[部署回执](core-agent-model-receipt-deployment-2026-10-19.json)包含两边代码 SHA 和公网检查。仅验证健康及文档可访问，未进行公网推理或正式业务验收。
 
 接口兼容补充：移除 Handoff 顶层未声明的 `source_task_id` 别名，来源编号仍保留在 `reviewed_input` 与原工作流记录；冻结 `risk-handoff.v1` 的严格检查现已通过。[契约检查证据](core-risk-handoff-contract-2026-10-19.json)。模型回执编号、正式 Risk 回写、审批身份和执行网关仍待外部 Owner 提供，不能把本次格式通过写成线上联合验收。
 
