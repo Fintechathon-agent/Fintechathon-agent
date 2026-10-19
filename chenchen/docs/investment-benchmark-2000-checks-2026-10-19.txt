@@ -1,0 +1,21 @@
+验证日期：2026-10-19
+工作目录：chenchen/
+运行环境：Node.js v22.21.0，Windows，本地合成验证
+
+命令：npm run check
+退出码：0
+原始输出：
+> portfolio-sentinel@0.13.0 check
+> node scripts/check.js
+JavaScript syntax checks passed.
+
+命令：node --test --test-reporter=tap --test-reporter-destination=docs/investment-benchmark-2000-regression-2026-10-19.txt
+退出码：0
+统计：268 项通过，0 失败、0 取消、0 跳过、0 待办。
+完整 TAP 记录：investment-benchmark-2000-regression-2026-10-19.txt
+
+新批次：2000 例，首轮 1875 通过/125 失败，修复后 2000 通过/0 失败。
+前后数据 SHA256：00c0e41530f7efa8a1a371eb2bf44195b1a2d97c04770c31f6a80ea4cfc2c378
+旧批次复跑：1000 通过/0 失败，原数据 SHA256 不变。
+两批均无跳过或外部网络请求，模型与 Risk 为替身，真实/付费调用 0。
+检查日志只证明本地验证结果，不代表生产部署、模型准确率或正式联合验收。

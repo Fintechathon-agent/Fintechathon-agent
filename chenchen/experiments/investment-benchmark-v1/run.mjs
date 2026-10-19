@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
 import { generateCases, SEED } from "./cases.mjs";
 import intake from "../life-planning-v1/intake.js";
@@ -125,7 +125,9 @@ async function workerCase(c) {
       } else {
         record = await call("/api/review/approval", approval, 200, "approval");
         if (mode === "changed-approval") {
-          await call("/api/review/simulate", { ...binding, amount: 999 }, 409);
+          const change = c.input.execution_change || { amount: 999 };
+          const denied = await call("/api/review/simulate", { ...binding, ...change }, 409);
+          assert.equal(denied.error.code, c.expected.error_code || "UNEXPECTED_ACTION_FIELDS");
         } else if (mode === "expired-approval") {
           record.approval.expires_at = "2000-01-01T00:00:00Z";
           await storage.put({ ["run:" + record.run_id]: record });
@@ -225,9 +227,11 @@ export async function runCase(c) {
   }
 }
 
-export async function runSuite({ outputDirectory, seed = SEED, onProgress = () => {} }) {
-  const cases = generateCases(seed), jsonl = cases.map(c => JSON.stringify(c)).join("\n") + "\n";
-  assert.equal(cases.length, 1000);
+export async function runSuite({ outputDirectory, seed = SEED, onProgress = () => {},
+  caseGenerator = generateCases, expectedCount = 1000, extraSourcePaths = [] }) {
+  const cases = caseGenerator(seed), jsonl = cases.map(c => JSON.stringify(c)).join("\n") + "\n";
+  assert.equal(cases.length, expectedCount);
+  assert.equal(new Set(cases.map(c => c.case_id)).size, expectedCount);
   fs.mkdirSync(outputDirectory);
   const write = (name, text) => fs.writeFileSync(path.join(outputDirectory, name), text, { flag: "wx" });
   write("cases.jsonl", jsonl);
@@ -245,7 +249,8 @@ export async function runSuite({ outputDirectory, seed = SEED, onProgress = () =
         outputs.push({ case_id: c.case_id, group: c.group, template: c.template, passed: true, elapsed_ms: +(performance.now() - start).toFixed(3), observed });
       } catch (error) {
         outputs.push({ case_id: c.case_id, group: c.group, template: c.template, passed: false, elapsed_ms: +(performance.now() - start).toFixed(3),
-          error: { code: error.code || error.name, message: error.message, expected: error.expected ?? null, actual: error.actual ?? null, stack: error.stack } });
+          error: { code: error.code || error.name, message: error.message, expected: error.expected ?? null, actual: error.actual ?? null,
+            stack: error.stack?.replaceAll(pathToFileURL(root).href, "repo:/").replaceAll(root, "repo:/") } });
       }
       if (outputs.length % 100 === 0) onProgress({ finished: outputs.length, failed: outputs.filter(row => !row.passed).length });
     }
@@ -256,7 +261,7 @@ export async function runSuite({ outputDirectory, seed = SEED, onProgress = () =
   });
   const sourcePaths = ["experiments/investment-benchmark-v1/cases.mjs", "experiments/investment-benchmark-v1/run.mjs", "experiments/life-planning-v1/intake.js",
     "experiments/life-planning-v1/money-mentions.js", "experiments/conversation-intake/preview.js", "integrations/funding-plan.js", "integrations/review-workflow.js",
-    "integrations/model-review.js", "tools/financial-tools.js", "core/harness.js", "deployment/worker.js"];
+    "integrations/model-review.js", "tools/financial-tools.js", "core/harness.js", "deployment/worker.js", ...extraSourcePaths];
   const sourceHashes = Object.fromEntries(sourcePaths.map(file => [file, fs.existsSync(path.join(root, file)) ? sha(fs.readFileSync(path.join(root, file))) : null]));
   const durations = outputs.map(row => row.elapsed_ms).sort((a, b) => a - b);
   const report = { report_version: "investment-benchmark.v1", recorded_at: new Date().toISOString(), seed, dataset_sha256: sha(jsonl),
@@ -272,7 +277,7 @@ export async function runSuite({ outputDirectory, seed = SEED, onProgress = () =
   write("results.jsonl", outputs.map(row => JSON.stringify(row)).join("\n") + "\n");
   write("workflow-evidence.jsonl", traces.map(row => JSON.stringify(row)).join("\n") + "\n");
   write("report.json", JSON.stringify(report, null, 2) + "\n");
-  write("测试报告.txt", "\ufeff" + ["投资助手 1000 例模拟测试", "通过：" + report.passed + "；失败：" + report.failed + "；跳过：0",
+  write("测试报告.txt", "\ufeff" + ["投资助手 " + cases.length + " 例模拟测试", "通过：" + report.passed + "；失败：" + report.failed + "；跳过：0",
     "固定种子：" + seed + "；参数化模板：" + report.parameterized_templates, "数据指纹：" + report.dataset_sha256,
     ...groups.map(group => group.group + "：" + group.passed + "/" + group.cases), "",
     "全部是虚构测试输入；模型和 Risk 均为替身。没有付费调用，没有训练模型，没有完成真实系统联合验收。",

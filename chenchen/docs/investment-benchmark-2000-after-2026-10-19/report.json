@@ -1,0 +1,108 @@
+{
+  "report_version": "investment-benchmark.v1",
+  "recorded_at": "2026-10-19T14:30:53.628Z",
+  "seed": 2026101902,
+  "dataset_sha256": "00c0e41530f7efa8a1a371eb2bf44195b1a2d97c04770c31f6a80ea4cfc2c378",
+  "source_head": "ef386d657257d267dba67b143df4dd689dc449fc",
+  "source_sha256": {
+    "experiments/investment-benchmark-v1/cases.mjs": "17b6df8d50475f4d3a5c470a329653ba22fae76c1c377b9d1e0081ad200e864c",
+    "experiments/investment-benchmark-v1/run.mjs": "e580b9aa1eb981a691e56686e2dded076a67a2f7f70304900de22e337a36d9b6",
+    "experiments/life-planning-v1/intake.js": "cf3193d388bfe405e9bdbd58dfb87fb3b5a82d346fec0c5c0695b21daf6bc62e",
+    "experiments/life-planning-v1/money-mentions.js": "1ce6e252dffac6caf726b0849e96966b97acef6a60d2990c784a0a9ce12ca4e0",
+    "experiments/conversation-intake/preview.js": "5b7d0377963158d4a6bc9a67d77793957ad5f48c66715c2f06b614308e4c6564",
+    "integrations/funding-plan.js": "c81862592273804a06a25845d855c54ad14a967c0748bf50bd6e945a5828bbb5",
+    "integrations/review-workflow.js": "4087cec1805d154cb636577e776b2f1ed27ff6d0ea19fc5a80861ce9d88d7681",
+    "integrations/model-review.js": "8d5a7d8347a42d28ef7257f7407fe2c41e9ba360529cf6ecde14095770f27512",
+    "tools/financial-tools.js": "d9aff4ccf7b3a0a895796a1139f6541b14f2df672c54034c302693e139e49b32",
+    "core/harness.js": "25ced420958fcfe1f1a8201c4a1f1ffbee933edc2a11a8f66f5b5dcb51debc61",
+    "deployment/worker.js": "9dca133e6c176e8f030a5dbe91e36868944a120375d0131ba9921ea204ace86b",
+    "experiments/investment-benchmark-v2/cases.mjs": "76e6a9c97b6ff169755606af09729b6fd11fa80703cd6329da51296ceef1b9de",
+    "experiments/investment-benchmark-v2/run.mjs": "5f2cdb3ba5b6b4b1f622bed0f45fa76dcf1d1cd9f1156c567a70cc18e75a0049"
+  },
+  "total": 2000,
+  "passed": 2000,
+  "failed": 0,
+  "skipped": 0,
+  "parameterized_templates": 71,
+  "groups": [
+    {
+      "group": "small_amount",
+      "cases": 300,
+      "passed": 300,
+      "failed": 0
+    },
+    {
+      "group": "life_semantics",
+      "cases": 200,
+      "passed": 200,
+      "failed": 0
+    },
+    {
+      "group": "account_summary",
+      "cases": 300,
+      "passed": 300,
+      "failed": 0
+    },
+    {
+      "group": "portfolio_validation",
+      "cases": 200,
+      "passed": 200,
+      "failed": 0
+    },
+    {
+      "group": "portfolio_chain",
+      "cases": 100,
+      "passed": 100,
+      "failed": 0
+    },
+    {
+      "group": "funding_conflict",
+      "cases": 200,
+      "passed": 200,
+      "failed": 0
+    },
+    {
+      "group": "funding_multitask",
+      "cases": 100,
+      "passed": 100,
+      "failed": 0
+    },
+    {
+      "group": "risk_workflow",
+      "cases": 200,
+      "passed": 200,
+      "failed": 0
+    },
+    {
+      "group": "reliability",
+      "cases": 200,
+      "passed": 200,
+      "failed": 0
+    },
+    {
+      "group": "quote_subscription",
+      "cases": 200,
+      "passed": 200,
+      "failed": 0
+    }
+  ],
+  "duration_ms": 5593.618,
+  "local_case_p50_ms": 0.061,
+  "local_case_p95_ms": 12.731,
+  "external_network_attempts": 0,
+  "external_model_calls": 0,
+  "paid_model_calls": 0,
+  "model_mode": "FIXED_TEST_DOUBLES",
+  "risk_mode": "LOCAL_FIXTURES_NOT_FORMAL_OWNER_RULES",
+  "account_mode": "SYNTHETIC_ONLY",
+  "evaluation_scope": "PARAMETERIZED_SOFTWARE_REGRESSION_NOT_MODEL_INTELLIGENCE_OR_TRAINING",
+  "training_performed": false,
+  "joint_acceptance": false,
+  "limits": [
+    "只覆盖所列模板及参数，不能外推任意中文识别准确率",
+    "持仓分析沿用原七日合成行情；未生成真实行情或重新实现 Quant",
+    "未调用真实模型、真实账户或正式 Risk/审批",
+    "耗时仅为本机软件测试，不代表中国内地公网响应速度",
+    "没有模拟真实用户并发、手机浏览器或公测容量"
+  ]
+}

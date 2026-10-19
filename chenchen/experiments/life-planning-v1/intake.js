@@ -38,7 +38,16 @@ function classify(text, inherited) {
   // Hints are deliberately not interpreted as confirmed facts or financial instructions.
   const cancellationRequested = /(?:申请|想|准备|打算|计划)取消|取消申请|取消.{0,6}(?:失败|未成功|没成功)/u.test(text);
   const cancellationNegated = /(?:不|没(?:有)?|未)(?:想|愿意|打算|计划|准备|申请)?取消/u.test(text);
+  // Complex polarity is a clarification cue, never inferred permission to act.
+  const doubleNegation = /(?:不是|并非|没(?:有)?说)\s*(?:不|没|未)/u.test(text);
+  const uncertainty = /不一定|未必|可能|也许|或许|是否|要不要|会不会|能不能/u.test(text);
+  const withoutNegativeIntent = text.replace(/(?:不|没(?:有)?|未)(?:想|愿意|打算|准备|计划)\s*(?:再|继续)?(?:买|投|付|交)/gu, "");
+  const conflictingIntent = hints.includes("NEGATED") &&
+    /(?:想|愿意|打算|准备|计划)\s*(?:再|继续)?(?:买|投|付|交)/u.test(withoutNegativeIntent);
+  const ambiguous = doubleNegation || uncertainty || conflictingIntent;
+  if (ambiguous) hints.push("NEEDS_INTENT_CLARIFICATION");
   const status = correction ? "CORRECTION" : hints.includes("CONDITIONAL") ? "CONDITIONAL"
+    : ambiguous ? "AMBIGUOUS"
     : cancellationNegated ? "NEGATED"
     : cancellationRequested ? "CANCELLATION_REQUESTED"
     : hints.includes("CANCELLED") ? "CANCELLED" : hints.includes("NEGATED") ? "NEGATED"
@@ -84,6 +93,10 @@ function extract(input, options) {
       warnings: ["识别结果需要核对；不是账户事实、风险结论或执行授权。"]
     };
     if (classification.status === "CORRECTION") result.warnings.push("金额有更正，原句保留；不会自动采用较小的金额。");
+    if (classification.status === "AMBIGUOUS") {
+      result.warnings.push("这句话包含不确定或冲突的意图，不能当成已决定的收支。");
+      result.confirmation_questions.push("你最终是决定进行、决定不进行，还是暂时只想咨询？请明确后再继续。");
+    }
     if (item.amount_mentions.length > 1) result.warnings.push("一句话有多个金额，请分别对应具体用途。");
     if (classification.subject === "THIRD_PARTY") result.warnings.push("可能是他人的情况，不计入你的收支。");
     previous = result;
