@@ -1,0 +1,105 @@
+{
+  "report_version": "investment-benchmark.v1",
+  "suite_name": "investment-recovery",
+  "recorded_at": "2026-10-19T15:11:50.588Z",
+  "seed": 2026101905,
+  "dataset_sha256": "1652341ad2690323241191e3f3afe3488ee04bf1d6960b80be65aafb6de305a9",
+  "source_head": "ab8d7d3dffce7e449fc91697e02236be1089c72d",
+  "source_sha256": {
+    "experiments/investment-benchmark-v1/cases.mjs": "17b6df8d50475f4d3a5c470a329653ba22fae76c1c377b9d1e0081ad200e864c",
+    "experiments/investment-benchmark-v1/run.mjs": "61d9efb2e233f29ef0e2e516cecdba3d057361e1cd2439a9ac73cbf88d6cf74d",
+    "experiments/life-planning-v1/intake.js": "cf3193d388bfe405e9bdbd58dfb87fb3b5a82d346fec0c5c0695b21daf6bc62e",
+    "experiments/life-planning-v1/money-mentions.js": "c200566b314646e997c45a0e0ec7e01516c20637afb834f8bd295a07a3107ada",
+    "experiments/conversation-intake/preview.js": "5b7d0377963158d4a6bc9a67d77793957ad5f48c66715c2f06b614308e4c6564",
+    "integrations/funding-plan.js": "c81862592273804a06a25845d855c54ad14a967c0748bf50bd6e945a5828bbb5",
+    "integrations/review-workflow.js": "4087cec1805d154cb636577e776b2f1ed27ff6d0ea19fc5a80861ce9d88d7681",
+    "integrations/model-review.js": "8d5a7d8347a42d28ef7257f7407fe2c41e9ba360529cf6ecde14095770f27512",
+    "tools/financial-tools.js": "d9aff4ccf7b3a0a895796a1139f6541b14f2df672c54034c302693e139e49b32",
+    "core/harness.js": "25ced420958fcfe1f1a8201c4a1f1ffbee933edc2a11a8f66f5b5dcb51debc61",
+    "deployment/worker.js": "9dca133e6c176e8f030a5dbe91e36868944a120375d0131ba9921ea204ace86b",
+    "experiments/investment-benchmark-v2/cases.mjs": "76e6a9c97b6ff169755606af09729b6fd11fa80703cd6329da51296ceef1b9de",
+    "experiments/dual-benchmark-v3/cases.mjs": "31ebc9194e2e72399f13051f56bea99628e17c72075e8583f72d0c520eb47c33",
+    "experiments/dual-benchmark-v3/checks.mjs": "d034a6c1d10c98bcf33a2dd342be04a599f55d04b898344e818aeef94b13cd89",
+    "experiments/recovery-benchmark-v4/cases.mjs": "98b33a5b9c058a9e5702b8d67d72a88db9232b0e25920ea9aa2600bffe6e1e55",
+    "experiments/recovery-benchmark-v4/checks.mjs": "7f15680b4378370bb1943068a6bd20b8fab9dbea3e4d1bbc76f5aff33099babe",
+    "experiments/recovery-benchmark-v4/run.mjs": "21ec77597e930734eb8a83caec45a8b409666dfecb7d3a9e1f6a8f9f47deac89",
+    "integrations/owner-bridge.js": "46c4f8fdb3b63c25d42e1620e93761f5b02e0a69b7cd255111ffd3e5b80635e8",
+    "integrations/review-evidence.js": "1f82320ab1b4b205a0a82511a76b8efe69d8f4546d41aa560ac7d5b3600a1647"
+  },
+  "total": 5000,
+  "passed": 4800,
+  "failed": 200,
+  "skipped": 0,
+  "parameterized_templates": 47,
+  "groups": [
+    {
+      "group": "portfolio_chain",
+      "cases": 500,
+      "passed": 500,
+      "failed": 0
+    },
+    {
+      "group": "funding_multitask",
+      "cases": 500,
+      "passed": 500,
+      "failed": 0
+    },
+    {
+      "group": "risk_workflow",
+      "cases": 500,
+      "passed": 500,
+      "failed": 0
+    },
+    {
+      "group": "reliability",
+      "cases": 500,
+      "passed": 500,
+      "failed": 0
+    },
+    {
+      "group": "investment_lifecycle",
+      "cases": 1000,
+      "passed": 1000,
+      "failed": 0
+    },
+    {
+      "group": "storage_fault",
+      "cases": 1000,
+      "passed": 1000,
+      "failed": 0
+    },
+    {
+      "group": "concurrent_workflow",
+      "cases": 1000,
+      "passed": 800,
+      "failed": 200
+    }
+  ],
+  "duration_ms": 25470.518,
+  "local_case_p50_ms": 3.443,
+  "local_case_p95_ms": 12.445,
+  "external_network_attempts": 0,
+  "external_model_calls": 0,
+  "paid_model_calls": 0,
+  "model_mode": "FIXED_TEST_DOUBLES",
+  "risk_mode": "LOCAL_FIXTURES_NOT_FORMAL_OWNER_RULES",
+  "account_mode": "SYNTHETIC_ONLY",
+  "evaluation_scope": "PARAMETERIZED_SOFTWARE_REGRESSION_NOT_MODEL_INTELLIGENCE_OR_TRAINING",
+  "training_performed": false,
+  "joint_acceptance": false,
+  "limits": [
+    "只覆盖所列模板及参数，不能外推任意中文识别准确率",
+    "持仓分析沿用原七日合成行情；未生成真实行情或重新实现 Quant",
+    "未调用真实模型、真实账户或正式 Risk/审批",
+    "耗时仅为本机软件测试，不代表中国内地公网响应速度",
+    "没有模拟真实用户并发、手机浏览器或公测容量"
+  ],
+  "evidence_artifact": {
+    "file": "workflow-evidence.jsonl.gz",
+    "encoding": "gzip",
+    "records": 4200,
+    "bytes": 8885608,
+    "sha256": "099882a6d801f6a91ca5d596b1b2992eefef92dbe345b90b85c861bb0f298cb0",
+    "uncompressed_sha256": "ea65d00c8c5233f3b6b5d4fa4e309d40933cb33838263d829800e48468ba8668"
+  }
+}

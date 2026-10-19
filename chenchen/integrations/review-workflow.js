@@ -253,6 +253,9 @@ class ReviewWorkflowStore {
   }
 
   async startNew(input, taskId, env, options) {
+    // Idempotency binds the caller's normalized request, not the funding context
+    // added below for model review. Keep that identity for success and failure.
+    const requestInput = clone(input);
     const requestId = input.request_id || id("req-");
     const sessionId = input.session_id || id("session-");
     const modelInput = { ...input, task_id: taskId, request_id: requestId, session_id: sessionId };
@@ -266,7 +269,7 @@ class ReviewWorkflowStore {
       review = await this.modelRunner(modelInput, env, options);
     } catch (error) {
       const failed = completeErrorRecord(error, modelInput, taskId, error.reviewRecord?.run_id || runId, error.reviewRecord?.audit?.audit_id || error.auditId || id("audit-"));
-      failed.request_fingerprint = await fingerprint(modelInput);
+      failed.request_fingerprint = await fingerprint(requestInput);
       if (error.reviewRecord) {
         failed.model.response = clone(error.reviewRecord);
         failed.model.status = "FAILED";
@@ -302,7 +305,7 @@ class ReviewWorkflowStore {
       plan_hash: proposalSha256,
       policy_version: modelInput.policy_version,
       idempotency_key: modelInput.idempotency_key,
-      request_fingerprint: await fingerprint(modelInput),
+      request_fingerprint: await fingerprint(requestInput),
       memory_consent: modelInput.memory_consent === true,
       memory_write_status: modelInput.memory_consent === true ? "PENDING" : "NOT_REQUESTED",
       run_id: review.run_id,

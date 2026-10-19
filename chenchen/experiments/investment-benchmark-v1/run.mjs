@@ -4,6 +4,7 @@ import path from "node:path";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
+import { gzipSync } from "node:zlib";
 import { generateCases, SEED } from "./cases.mjs";
 import intake from "../life-planning-v1/intake.js";
 import planning from "../life-planning-v1/planning.js";
@@ -229,7 +230,8 @@ export async function runCase(c) {
 
 export async function runSuite({ outputDirectory, seed = SEED, onProgress = () => {},
   caseGenerator = generateCases, caseRunner = runCase, expectedCount = 1000, extraSourcePaths = [],
-  suiteName = "investment", suiteTitle = "投资助手" }) {
+  suiteName = "investment", suiteTitle = "投资助手", evidenceEncoding = "jsonl" }) {
+  if (!["jsonl", "gzip"].includes(evidenceEncoding)) throw new TypeError("Unsupported evidence encoding");
   const cases = caseGenerator(seed), jsonl = cases.map(c => JSON.stringify(c)).join("\n") + "\n";
   assert.equal(cases.length, expectedCount);
   assert.equal(new Set(cases.map(c => c.case_id)).size, expectedCount);
@@ -276,7 +278,12 @@ export async function runSuite({ outputDirectory, seed = SEED, onProgress = () =
     limits: ["只覆盖所列模板及参数，不能外推任意中文识别准确率", "持仓分析沿用原七日合成行情；未生成真实行情或重新实现 Quant",
       "未调用真实模型、真实账户或正式 Risk/审批", "耗时仅为本机软件测试，不代表中国内地公网响应速度", "没有模拟真实用户并发、手机浏览器或公测容量"] };
   write("results.jsonl", outputs.map(row => JSON.stringify(row)).join("\n") + "\n");
-  write("workflow-evidence.jsonl", traces.map(row => JSON.stringify(row)).join("\n") + "\n");
+  const traceText = traces.map(row => JSON.stringify(row)).join("\n") + "\n";
+  const evidenceFile = evidenceEncoding === "gzip" ? "workflow-evidence.jsonl.gz" : "workflow-evidence.jsonl";
+  const traceBytes = evidenceEncoding === "gzip" ? gzipSync(traceText) : Buffer.from(traceText);
+  report.evidence_artifact = { file: evidenceFile, encoding: evidenceEncoding, records: traces.length,
+    bytes: traceBytes.length, sha256: sha(traceBytes), uncompressed_sha256: sha(traceText) };
+  write(evidenceFile, traceBytes);
   write("report.json", JSON.stringify(report, null, 2) + "\n");
   write("测试报告.txt", "\ufeff" + [suiteTitle + " " + cases.length + " 例模拟测试", "通过：" + report.passed + "；失败：" + report.failed + "；跳过：0",
     "固定种子：" + seed + "；参数化模板：" + report.parameterized_templates, "数据指纹：" + report.dataset_sha256,

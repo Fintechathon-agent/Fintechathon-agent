@@ -1,0 +1,136 @@
+{
+  "verification_version": "investment-recovery-evidence.v1",
+  "verified_at": "2026-10-19T15:16:51.225Z",
+  "total": 5000,
+  "before_passed": 4800,
+  "after_passed": 5000,
+  "unchanged_input_and_expectations": true,
+  "changed_sources": [
+    "integrations/review-workflow.js"
+  ],
+  "templates": 47,
+  "unique_inputs": 4999,
+  "seed": 2026101905,
+  "dataset_sha256": "1652341ad2690323241191e3f3afe3488ee04bf1d6960b80be65aafb6de305a9",
+  "original_failures": {
+    "same-key": 100,
+    "model-failure": 100
+  },
+  "regression_tests": 274,
+  "source_head_is_prechange_base": true,
+  "external_network_attempts": 0,
+  "paid_model_calls": 0,
+  "joint_acceptance": false,
+  "fault_test_mode": "IN_MEMORY_STORAGE_AND_SAME_PROCESS_SERVICE_RECONSTRUCTION",
+  "concurrency_test_mode": "CONTROLLED_ASYNC_INTERLEAVING_NOT_PUBLIC_LOAD",
+  "runs": [
+    {
+      "folder": "benchmark-5000-recovery-first-2026-10-19",
+      "passed": 4800,
+      "failed": 200,
+      "groups": [
+        {
+          "group": "portfolio_chain",
+          "cases": 500,
+          "passed": 500,
+          "failed": 0
+        },
+        {
+          "group": "funding_multitask",
+          "cases": 500,
+          "passed": 500,
+          "failed": 0
+        },
+        {
+          "group": "risk_workflow",
+          "cases": 500,
+          "passed": 500,
+          "failed": 0
+        },
+        {
+          "group": "reliability",
+          "cases": 500,
+          "passed": 500,
+          "failed": 0
+        },
+        {
+          "group": "investment_lifecycle",
+          "cases": 1000,
+          "passed": 1000,
+          "failed": 0
+        },
+        {
+          "group": "storage_fault",
+          "cases": 1000,
+          "passed": 1000,
+          "failed": 0
+        },
+        {
+          "group": "concurrent_workflow",
+          "cases": 1000,
+          "passed": 800,
+          "failed": 200
+        }
+      ],
+      "evidence_verified": true,
+      "evidence_records": 4200,
+      "compressed_bytes": 8885608,
+      "uncompressed_bytes": 167134147,
+      "evidence_sha256": "099882a6d801f6a91ca5d596b1b2992eefef92dbe345b90b85c861bb0f298cb0"
+    },
+    {
+      "folder": "benchmark-5000-recovery-after-2026-10-19",
+      "passed": 5000,
+      "failed": 0,
+      "groups": [
+        {
+          "group": "portfolio_chain",
+          "cases": 500,
+          "passed": 500,
+          "failed": 0
+        },
+        {
+          "group": "funding_multitask",
+          "cases": 500,
+          "passed": 500,
+          "failed": 0
+        },
+        {
+          "group": "risk_workflow",
+          "cases": 500,
+          "passed": 500,
+          "failed": 0
+        },
+        {
+          "group": "reliability",
+          "cases": 500,
+          "passed": 500,
+          "failed": 0
+        },
+        {
+          "group": "investment_lifecycle",
+          "cases": 1000,
+          "passed": 1000,
+          "failed": 0
+        },
+        {
+          "group": "storage_fault",
+          "cases": 1000,
+          "passed": 1000,
+          "failed": 0
+        },
+        {
+          "group": "concurrent_workflow",
+          "cases": 1000,
+          "passed": 1000,
+          "failed": 0
+        }
+      ],
+      "evidence_verified": true,
+      "evidence_records": 4400,
+      "compressed_bytes": 9025448,
+      "uncompressed_bytes": 169706129,
+      "evidence_sha256": "a817c1aa41b7f58470a1a806f1c0fce32f9497d47500e93f32acf7b49983f4c0"
+    }
+  ]
+}
