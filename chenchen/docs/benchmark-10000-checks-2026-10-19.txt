@@ -1,0 +1,21 @@
+日期：2026-10-19
+工作目录：chenchen/
+环境：Windows，Node.js 22；本地合成输入和服务替身。
+
+命令：npm run check
+退出码：0
+输出：
+> portfolio-sentinel@0.13.0 check
+> node scripts/check.js
+JavaScript syntax checks passed.
+
+命令：node --test --test-reporter=tap --test-reporter-destination=docs/benchmark-10000-regression-2026-10-19.txt
+退出码：0
+结果：271通过，0失败、0取消、0跳过、0待办。
+完整原始日志：benchmark-10000-regression-2026-10-19.txt
+
+命令：node experiments/dual-benchmark-v3/verify-results.mjs --output docs/benchmark-10000-verification-2026-10-19.json
+退出码：0
+核验：两批各5000例；前后数据指纹、预期和执行器一致；唯一变化的被测模块为money-mentions.js。
+投资前后5000通过；其他功能4880→5000通过。
+两批均0外部请求、0付费调用、0跳过；不代表真实模型准确率和正式系统联合验收。

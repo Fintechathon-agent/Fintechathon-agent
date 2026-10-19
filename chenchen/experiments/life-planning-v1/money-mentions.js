@@ -7,6 +7,9 @@ const FRACTION_NUMBER = String.raw`(?:\d+|[零〇一二两三四五六七八九�
 const FEN = String.raw`分(?!钟|之|秒|[\d零一二三四五六七八九十]+秒)`;
 const UNIT = String.raw`(?:(?:元|块(?:钱)?)(?:\s*${FRACTION_NUMBER}角)?(?:\s*${FRACTION_NUMBER}${FEN})?|角(?:\s*${FRACTION_NUMBER}${FEN})?|${FEN})`;
 const MONEY = new RegExp(String.raw`(?<![\d.,])(?:[¥￥]\s*${NUMBER}(?:\s*${UNIT})?|${NUMBER}\s*${UNIT})(?![\d.])`, "gu");
+// Unsupported numeric syntax must not contribute a plausible-looking suffix.
+// Preserve source text for clarification; do not evaluate scientific/hex/fraction notation.
+const UNSUPPORTED_NUMBER = /(?:[¥￥]\s*)?[-+]?(?:\d+(?:\.\d+)?[eE][+-]?\d+|0[xX][0-9a-fA-F]+|\d+(?:\s*\/\s*\d+(?:\.\d+)?)+|\d+(?:\.\d+)?\.{2,}\d+)/gu;
 
 function isNonMonetaryFen(match, text) {
   // Only disambiguate bare fen. Explicit currency, yuan and jiao remain evidence.
@@ -17,7 +20,10 @@ function isNonMonetaryFen(match, text) {
 
 function extractMoneyMentions(text, offset = 0) {
   if (typeof text !== "string" || !Number.isSafeInteger(offset) || offset < 0) throw new TypeError("Invalid monetary source span");
-  return [...text.matchAll(MONEY)].filter(match => !isNonMonetaryFen(match, text)).map(match => ({ text: match[0],
+  const unsupported = [...text.matchAll(UNSUPPORTED_NUMBER)].map(match => [match.index, match.index + match[0].length]);
+  return [...text.matchAll(MONEY)].filter(match =>
+    !unsupported.some(([start, end]) => match.index < end && match.index + match[0].length > start) &&
+    !isNonMonetaryFen(match, text)).map(match => ({ text: match[0],
     source_span: { start: offset + match.index, end: offset + match.index + match[0].length }, status: "NEEDS_CONFIRMATION" }));
 }
 

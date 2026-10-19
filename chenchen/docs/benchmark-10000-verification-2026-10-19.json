@@ -1,0 +1,337 @@
+{
+  "verification_version": "dual-benchmark-evidence.v1",
+  "total_after": 10000,
+  "passed_after": 10000,
+  "skipped": 0,
+  "external_network_attempts": 0,
+  "paid_model_calls": 0,
+  "model_accuracy_measured": false,
+  "training_performed": false,
+  "joint_acceptance": false,
+  "results": [
+    {
+      "suite": "investment",
+      "input_and_expectations_unchanged": true,
+      "runner_unchanged": true,
+      "changed_sources": [
+        "experiments/life-planning-v1/money-mentions.js"
+      ],
+      "runs": [
+        {
+          "phase": "before",
+          "folder": "benchmark-5000-investment-before-2026-10-19",
+          "total": 5000,
+          "passed": 5000,
+          "failed": 0,
+          "templates": 48,
+          "unique_inputs": 4832,
+          "dataset_sha256": "f017908fd6bef5174483ddd9a8c4ca7e72317550ca5cff4480e023257da17db8",
+          "groups": [
+            {
+              "group": "account_summary",
+              "cases": 1000,
+              "passed": 1000,
+              "failed": 0
+            },
+            {
+              "group": "portfolio_validation",
+              "cases": 1000,
+              "passed": 1000,
+              "failed": 0
+            },
+            {
+              "group": "portfolio_chain",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            },
+            {
+              "group": "funding_multitask",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            },
+            {
+              "group": "risk_workflow",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            },
+            {
+              "group": "reliability",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            },
+            {
+              "group": "investment_lifecycle",
+              "cases": 1000,
+              "passed": 1000,
+              "failed": 0
+            }
+          ],
+          "files": [
+            {
+              "name": "cases.jsonl",
+              "bytes": 2255373
+            },
+            {
+              "name": "report.json",
+              "bytes": 4178
+            },
+            {
+              "name": "results.jsonl",
+              "bytes": 5709790
+            },
+            {
+              "name": "workflow-evidence.jsonl",
+              "bytes": 64612360
+            },
+            {
+              "name": "测试报告.txt",
+              "bytes": 902
+            }
+          ]
+        },
+        {
+          "phase": "after",
+          "folder": "benchmark-5000-investment-after-2026-10-19",
+          "total": 5000,
+          "passed": 5000,
+          "failed": 0,
+          "templates": 48,
+          "unique_inputs": 4832,
+          "dataset_sha256": "f017908fd6bef5174483ddd9a8c4ca7e72317550ca5cff4480e023257da17db8",
+          "groups": [
+            {
+              "group": "account_summary",
+              "cases": 1000,
+              "passed": 1000,
+              "failed": 0
+            },
+            {
+              "group": "portfolio_validation",
+              "cases": 1000,
+              "passed": 1000,
+              "failed": 0
+            },
+            {
+              "group": "portfolio_chain",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            },
+            {
+              "group": "funding_multitask",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            },
+            {
+              "group": "risk_workflow",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            },
+            {
+              "group": "reliability",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            },
+            {
+              "group": "investment_lifecycle",
+              "cases": 1000,
+              "passed": 1000,
+              "failed": 0
+            }
+          ],
+          "files": [
+            {
+              "name": "cases.jsonl",
+              "bytes": 2255373
+            },
+            {
+              "name": "report.json",
+              "bytes": 4176
+            },
+            {
+              "name": "results.jsonl",
+              "bytes": 5709981
+            },
+            {
+              "name": "workflow-evidence.jsonl",
+              "bytes": 64612360
+            },
+            {
+              "name": "测试报告.txt",
+              "bytes": 902
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "suite": "other",
+      "input_and_expectations_unchanged": true,
+      "runner_unchanged": true,
+      "changed_sources": [
+        "experiments/life-planning-v1/money-mentions.js"
+      ],
+      "runs": [
+        {
+          "phase": "before",
+          "folder": "benchmark-5000-other-before-2026-10-19",
+          "total": 5000,
+          "passed": 4880,
+          "failed": 120,
+          "templates": 79,
+          "unique_inputs": 4672,
+          "dataset_sha256": "061a3d0cd568f7d497133f786975aed39908354524372b3e4edd0a766a726d0a",
+          "groups": [
+            {
+              "group": "small_amount",
+              "cases": 1000,
+              "passed": 880,
+              "failed": 120
+            },
+            {
+              "group": "life_semantics",
+              "cases": 800,
+              "passed": 800,
+              "failed": 0
+            },
+            {
+              "group": "quote_subscription",
+              "cases": 800,
+              "passed": 800,
+              "failed": 0
+            },
+            {
+              "group": "intake_lifecycle",
+              "cases": 800,
+              "passed": 800,
+              "failed": 0
+            },
+            {
+              "group": "quote_edges",
+              "cases": 600,
+              "passed": 600,
+              "failed": 0
+            },
+            {
+              "group": "subscription_edges",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            },
+            {
+              "group": "merchant_ledger",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            }
+          ],
+          "files": [
+            {
+              "name": "cases.jsonl",
+              "bytes": 3093157
+            },
+            {
+              "name": "report.json",
+              "bytes": 4162
+            },
+            {
+              "name": "results.jsonl",
+              "bytes": 7592607
+            },
+            {
+              "name": "workflow-evidence.jsonl",
+              "bytes": 1
+            },
+            {
+              "name": "测试报告.txt",
+              "bytes": 892
+            }
+          ]
+        },
+        {
+          "phase": "after",
+          "folder": "benchmark-5000-other-after-2026-10-19",
+          "total": 5000,
+          "passed": 5000,
+          "failed": 0,
+          "templates": 79,
+          "unique_inputs": 4672,
+          "dataset_sha256": "061a3d0cd568f7d497133f786975aed39908354524372b3e4edd0a766a726d0a",
+          "groups": [
+            {
+              "group": "small_amount",
+              "cases": 1000,
+              "passed": 1000,
+              "failed": 0
+            },
+            {
+              "group": "life_semantics",
+              "cases": 800,
+              "passed": 800,
+              "failed": 0
+            },
+            {
+              "group": "quote_subscription",
+              "cases": 800,
+              "passed": 800,
+              "failed": 0
+            },
+            {
+              "group": "intake_lifecycle",
+              "cases": 800,
+              "passed": 800,
+              "failed": 0
+            },
+            {
+              "group": "quote_edges",
+              "cases": 600,
+              "passed": 600,
+              "failed": 0
+            },
+            {
+              "group": "subscription_edges",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            },
+            {
+              "group": "merchant_ledger",
+              "cases": 500,
+              "passed": 500,
+              "failed": 0
+            }
+          ],
+          "files": [
+            {
+              "name": "cases.jsonl",
+              "bytes": 3093157
+            },
+            {
+              "name": "report.json",
+              "bytes": 4158
+            },
+            {
+              "name": "results.jsonl",
+              "bytes": 7523857
+            },
+            {
+              "name": "workflow-evidence.jsonl",
+              "bytes": 1
+            },
+            {
+              "name": "测试报告.txt",
+              "bytes": 891
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

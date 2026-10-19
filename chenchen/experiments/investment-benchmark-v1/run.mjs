@@ -228,7 +228,8 @@ export async function runCase(c) {
 }
 
 export async function runSuite({ outputDirectory, seed = SEED, onProgress = () => {},
-  caseGenerator = generateCases, expectedCount = 1000, extraSourcePaths = [] }) {
+  caseGenerator = generateCases, caseRunner = runCase, expectedCount = 1000, extraSourcePaths = [],
+  suiteName = "investment", suiteTitle = "投资助手" }) {
   const cases = caseGenerator(seed), jsonl = cases.map(c => JSON.stringify(c)).join("\n") + "\n";
   assert.equal(cases.length, expectedCount);
   assert.equal(new Set(cases.map(c => c.case_id)).size, expectedCount);
@@ -243,7 +244,7 @@ export async function runSuite({ outputDirectory, seed = SEED, onProgress = () =
     for (const c of cases) {
       const start = performance.now();
       try {
-        const result = await runCase(c);
+        const result = await caseRunner(c);
         const { evidence, records, ...observed } = result;
         if (evidence || records) traces.push({ case_id: c.case_id, evidence, records });
         outputs.push({ case_id: c.case_id, group: c.group, template: c.template, passed: true, elapsed_ms: +(performance.now() - start).toFixed(3), observed });
@@ -264,7 +265,7 @@ export async function runSuite({ outputDirectory, seed = SEED, onProgress = () =
     "integrations/model-review.js", "tools/financial-tools.js", "core/harness.js", "deployment/worker.js", ...extraSourcePaths];
   const sourceHashes = Object.fromEntries(sourcePaths.map(file => [file, fs.existsSync(path.join(root, file)) ? sha(fs.readFileSync(path.join(root, file))) : null]));
   const durations = outputs.map(row => row.elapsed_ms).sort((a, b) => a - b);
-  const report = { report_version: "investment-benchmark.v1", recorded_at: new Date().toISOString(), seed, dataset_sha256: sha(jsonl),
+  const report = { report_version: "investment-benchmark.v1", suite_name: suiteName, recorded_at: new Date().toISOString(), seed, dataset_sha256: sha(jsonl),
     source_head: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(), source_sha256: sourceHashes,
     total: cases.length, passed: outputs.filter(row => row.passed).length, failed: outputs.filter(row => !row.passed).length, skipped: 0,
     parameterized_templates: new Set(cases.map(c => c.group + ":" + c.template)).size, groups,
@@ -277,7 +278,7 @@ export async function runSuite({ outputDirectory, seed = SEED, onProgress = () =
   write("results.jsonl", outputs.map(row => JSON.stringify(row)).join("\n") + "\n");
   write("workflow-evidence.jsonl", traces.map(row => JSON.stringify(row)).join("\n") + "\n");
   write("report.json", JSON.stringify(report, null, 2) + "\n");
-  write("测试报告.txt", "\ufeff" + ["投资助手 " + cases.length + " 例模拟测试", "通过：" + report.passed + "；失败：" + report.failed + "；跳过：0",
+  write("测试报告.txt", "\ufeff" + [suiteTitle + " " + cases.length + " 例模拟测试", "通过：" + report.passed + "；失败：" + report.failed + "；跳过：0",
     "固定种子：" + seed + "；参数化模板：" + report.parameterized_templates, "数据指纹：" + report.dataset_sha256,
     ...groups.map(group => group.group + "：" + group.passed + "/" + group.cases), "",
     "全部是虚构测试输入；模型和 Risk 均为替身。没有付费调用，没有训练模型，没有完成真实系统联合验收。",
