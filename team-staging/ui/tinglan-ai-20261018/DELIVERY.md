@@ -1,5 +1,7 @@
 # 听澜真实 AI 接入候选 · 2026-10-18
 
+2026-10-19 更新：两次授权的本机真实百炼调用成功，Worker dry-run 和本地 workerd 启动通过；公网仍运行 Llama，尚未完成 Cloudflare Access / Secrets / 真实云端链路验收。最新证据与 Owner 操作见 [ACCEPTANCE-2026-10-19.md](ACCEPTANCE-2026-10-19.md)。下文保留原交付快照，其中“付费调用 0 次 / 编译未通过”仅指 10 月 18 日当轮。
+
 状态：前后端 Mock 联调完成；等待 Cloudflare Owner 配置、审核部署与付费测试授权。当前不是已上线的百炼服务。
 
 个人预览分支 preview 已推送 1abdbba345306c7f5a072cd88a48456431a88b64，入口：https://lixjanus526-art.github.io/finance-lab-ui-preview/investment-only/investment.html#ai-assistant 。默认未配置付费入口。
