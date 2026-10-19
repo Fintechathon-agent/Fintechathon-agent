@@ -9,5 +9,6 @@
 - [3 类强制退出、6 进程磁盘恢复证据](../../../chenchen/docs/core-agent-transition-recovery-2026-10-19.json)
 - [固定 Risk 源码的 9 组本地联调](../../../chenchen/docs/core-risk-transition-integration-2026-10-19.json)
 - [严格接口仍失败的证据](../../../chenchen/docs/core-risk-transition-blocker-2026-10-19.json)
+- [双仓代码提交、部署版本与公网检查](../../../chenchen/docs/core-agent-transition-deployment-2026-10-19.json)
 
 一句话：撤回、拒绝、审批或模拟结果未存清楚时，不能用旧状态继续；共用资金计划的任务也不能抢用旧余额。全部输入与模型响应均为合成测试数据。

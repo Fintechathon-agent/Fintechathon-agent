@@ -1,0 +1,140 @@
+{
+  "release": "core-agent-transition-recovery-v1",
+  "date": "2026-10-19",
+  "recorded_at": "2026-10-19T01:51:13.759Z",
+  "worker": {
+    "url": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev",
+    "version_id": "c8fdc1ba-78ef-4151-93d6-943c7bcac1dc",
+    "previous_version_id": "9f7dc143-b3fa-4a5d-88d1-d8a132385ce3",
+    "deploy_exit_code": 0,
+    "uploaded_kib": 283,
+    "gzip_kib": 61.25
+  },
+  "source": {
+    "team": {
+      "repository": "https://github.com/Fintechathon-agent/Fintechathon-agent",
+      "commit": "5629f88de7f670ae10e3beee067363557df2ed51",
+      "remote_main_verified": true
+    },
+    "personal": {
+      "repository": "https://github.com/realchenchenluo/agent",
+      "commit": "6545441043a27a4ca717bc6ce53145ad4409ce72",
+      "remote_main_verified": true
+    },
+    "changed_files": 16,
+    "mirrored_file_bytes_verified": true,
+    "scope": [
+      "chenchen/",
+      "team-staging/core-agent/"
+    ],
+    "team_release_modified": false,
+    "other_owner_files_modified": false
+  },
+  "validation": {
+    "full_node_tests": {
+      "passed": 246,
+      "failed": 0,
+      "skipped": 0,
+      "new_transition_cases": 14
+    },
+    "syntax": "PASS",
+    "worker_dry_run": "PASS",
+    "sqlite_process_recovery": {
+      "cases": 3,
+      "subprocesses": 6,
+      "forced_exits": 3,
+      "passed": 3,
+      "real_cloud_storage_fault_injection": false
+    },
+    "owner_source_local_integration": {
+      "risk_commit": "ba5056621224f969eca75ce946403f8f70e95d23",
+      "groups_passed": 9,
+      "status": "LOCAL_CHECKS_PASSED_INTEGRATION_PENDING"
+    },
+    "strict_handoff": {
+      "passed": false,
+      "reason": "source_task_id is not declared by frozen top-level schema; isolated candidate remains unapplied pending Owner confirmation"
+    },
+    "public_get": {
+      "checked_at": "2026-10-19T01:51:13.759Z",
+      "checks": [
+        {
+          "status": "fulfilled",
+          "value": {
+            "endpoint": "/health",
+            "status": 200,
+            "elapsed_ms": 964,
+            "content_type": "application/json; charset=utf-8",
+            "bytes": 272,
+            "sha256": "3ccb3bd10e0d3608bc46aee544c749d9cc6044736af35ceff40cd8f0d3198145",
+            "body": {
+              "status": "ok",
+              "service": "core-agent",
+              "contract_version": "investment-agent.v1",
+              "review_endpoint": "/api/review",
+              "docs": "/docs",
+              "model": {
+                "provider": "cloudflare_workers_ai",
+                "name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "configured": true
+              },
+              "audit_storage": "durable_object"
+            }
+          }
+        },
+        {
+          "status": "fulfilled",
+          "value": {
+            "endpoint": "/docs",
+            "status": 200,
+            "elapsed_ms": 955,
+            "content_type": "text/html; charset=utf-8",
+            "bytes": 11399,
+            "sha256": "682131dd2fbac2780fbe4acfbd50ccfdeead4539df7fc3f53b65262416af6a1c",
+            "has_review_api": true
+          }
+        }
+      ]
+    }
+  },
+  "model": {
+    "configuration_changed": false,
+    "provider": "cloudflare_workers_ai",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "external_inference_calls_this_iteration": 0,
+    "paid_inference_calls_this_iteration": 0,
+    "bailian_enabled_by_this_iteration": false,
+    "configured_true_is_not_inference_acceptance": true
+  },
+  "acceptance": {
+    "local_synthetic_tests": true,
+    "public_code_deployed": true,
+    "public_health_and_docs": true,
+    "public_model_call_tested": false,
+    "formal_risk_callback_and_approval_tested": false,
+    "real_execution_gateway_tested": false,
+    "joint_acceptance": false
+  },
+  "preservation": {
+    "git_history_retained": true,
+    "old_test_evidence_retained": true,
+    "storage_cleared": false,
+    "old_worker_version_retained": true
+  },
+  "rollback": {
+    "automatic": false,
+    "instruction": "Pause new mutations and reconcile all pending task/funding transition markers with Backend and Risk before rollback. Previous Worker does not understand the new markers. Never clear storage or resume execution from an old state."
+  },
+  "limitations": [
+    "New PENDING markers have no automatic expiry or force-release API; authorized manual reconciliation is still needed.",
+    "Health/docs GET only; no public business workflow, fault injection, throughput or latency acceptance.",
+    "No guarantees for local memory demo server, another deployment, multi-region writers, direct database writes or external exactly-once execution."
+  ],
+  "evidence": [
+    "core-agent-transition-tests-2026-10-19.txt",
+    "core-agent-transition-checks-2026-10-19.txt",
+    "core-agent-transition-recovery-2026-10-19.json",
+    "core-risk-transition-integration-2026-10-19.json",
+    "core-risk-transition-blocker-2026-10-19.json"
+  ]
+}

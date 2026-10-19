@@ -47,4 +47,6 @@
 
 代码在 chenchen/；团队入口在 team-staging/core-agent/transition-recovery-v1/。公共 Schema、UI、其他 Owner 目录和 team-release/ 未改。语音、实时比价、多格式正式转换、真实模型联调等原有未完成事项本轮未冒充完成。
 
-上线沿用原后端和模型配置，部署回执另行记录。旧 Worker 9f7dc143-b3fa-4a5d-88d1-d8a132385ce3 保留，但不识别本轮登记；回退前须暂停新变更并核查未决任务和资金计划。不要直接回退后恢复执行，也不要清空存储。
+已上传两边仓库并更新原后端，模型配置未改。[部署及公网检查回执](core-agent-transition-deployment-2026-10-19.json)记录了代码提交、Worker 版本 c8fdc1ba-78ef-4151-93d6-943c7bcac1dc，以及 /health、/docs 的 HTTP 200。健康检查不代表真实模型或业务闭环已验收；本轮未发起公网模型请求。
+
+旧 Worker 9f7dc143-b3fa-4a5d-88d1-d8a132385ce3 保留，但不识别本轮登记；回退前须暂停新变更并核查未决任务和资金计划。不要直接回退后恢复执行，也不要清空存储。

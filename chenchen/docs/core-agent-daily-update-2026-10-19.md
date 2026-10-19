@@ -8,6 +8,8 @@
 
 详见 [本轮说明及待协作事项](core-agent-transition-iteration-2026-10-19.md) 和 [团队入口](../../team-staging/core-agent/transition-recovery-v1/DELIVERY.md)。没有外部或付费模型调用；下方历史记录继续保留。
 
+已同步团队与个人仓库，原后端已部署 c8fdc1ba-78ef-4151-93d6-943c7bcac1dc；/health、/docs 均 HTTP 200。[部署回执](core-agent-transition-deployment-2026-10-19.json)包含两边代码 SHA 和公网检查。仅验证健康及文档可访问，未进行公网推理或正式业务验收。
+
 ## 最新补充：旧入口重试与可读审计
 
 修复旧版入口丢掉重复请求标识、超长文本静默截断的问题；新增离线 TXT 任务记录导出工具。全量 **232/232 通过**，新增 12 项回归；5 类本地签名链路案例及原始请求/响应已留档。模型与判定均为测试替身，外部/付费模型调用 0，不代表正式 Risk 已回写或联合验收完成。
