@@ -75,3 +75,7 @@ flowchart LR
 ## 2026-10-19 晚间复验
 
 顶层 source_task_id 别名已由当天业务提交移除；冻结 Handoff Schema 完整校验现通过。本次 32/32 追踪断言、258/258 回归和新合成 Golden Path 通过。正式 Risk 可信回写/审批/网关仍待验收。健康及模型双链路、Memory 边界、未决存储停止点与字段所有权见 core-agent-integration-guide-2026-10-19.md 及嵌入双图的同名 DOCX。历史结论保留，不代表当前仍有已修复格式阻塞。
+
+## 2026-10-20 晚间收尾
+
+双链路与停止点维持不变。本次独立 284/284 回归、32/32 Schema/语义追踪；UI 只读投影消费健康结果，缺数据停止，不产生交易授权。团队投资总览 UI 提交尚未进入个人 main。字段归属、可选 session、进程内 checkpoint 与正式 Risk 待验收限制见 core-agent-integration-guide-2026-10-20.md 与同名 Word，含可读架构及模块时序图。

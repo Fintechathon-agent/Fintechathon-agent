@@ -1,0 +1,3 @@
+git diff --check exit=0
+git diff --cached --check exit=0
+Only the explicit 20-file daily documentation and evidence allowlist staged.

@@ -1,0 +1,32 @@
+{
+  "run_time": "2026-10-20T14:07:31.692481+00:00",
+  "baseline": "6ead62e8ab11ac37fbd7010fc6820a9985ec0fe6",
+  "business_changes_by_automation": false,
+  "check_exit": 0,
+  "tests": 284,
+  "test_failures": 0,
+  "trace_checks": 32,
+  "trace_failures": 0,
+  "positive_full_schema_cases": 7,
+  "benchmark_action": "Reverified retained same-day evidence; not rerun scenarios",
+  "benchmark_before": 9900,
+  "benchmark_after": 10000,
+  "benchmark_templates": 87,
+  "external_calls": 0,
+  "risk_joint_acceptance": false,
+  "docx_structural_check": "PASS",
+  "page_layout_acceptance": "INCOMPLETE missing bundled soffice.exe",
+  "commands": [
+    "npm run check",
+    "npm test -- --test-reporter=tap",
+    "python docs/daily-closeout-check-2026-10-20.py",
+    "node experiments/report-benchmark-v6/verify.mjs --output docs/daily-closeout-2026-10-20-benchmark.json",
+    "git diff --check",
+    "git diff --cached --check"
+  ],
+  "environment": {
+    "CORE_AGENT_NODE": "C:\\Users\\33183\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "PYTHONPATH": "C:\\Users\\33183\\.codex\\automations\\core-agent-daily-update\\python-deps",
+    "python": "C:\\Users\\33183\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe"
+  }
+}

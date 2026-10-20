@@ -1,0 +1,162 @@
+{
+  "checked_at": "2026-10-20T14:05:06.574091+00:00",
+  "scope": "New offline synthetic health success/reuse/failure plus October 17 retained synthetic model evidence. Full Draft 2020-12 structural validation with local references and separate semantic trace checks. No public request, model call, Risk dispatch, actual trade or independent Owner acceptance.",
+  "validator": "jsonschema 4.26.0 Draft202012Validator with FormatChecker; local referencing registry only",
+  "retained_source": "core-agent-public-evidence-2026-10-17.json",
+  "retained_source_sha256": "97bd2689b4f810d1432d74416c45521d19cc98e1290fbcffaf7eb3e8407f0fab",
+  "schema_sha256": {
+    "agent-output.v1.schema.json": "cf6a3c18ce1c5b356cebd03201d6a42e1c0aabb8013b438e0e9b7235e17faf4c",
+    "core-agent-error.v1.schema.json": "81e090c8c5aeb0787eb30701369678ec256b19d36f3ab092927d639402555742",
+    "funding-plan-demo.v1.schema.json": "ee9696eff492e1142ce63f85f301b9df33fff2f2730904a3d4a3e76f4ac77755",
+    "investment-agent.v1.schema.json": "30554f12a41fcd80ed7ff714dad86ff53e673e2e1c81e030c2cdc88dcf7e2eec",
+    "model-review.v1.schema.json": "9f01bb767b9b0e79889b2166f6f25426ffeeeedec10570658bfc1ea371c61be5",
+    "owner-bridge.v1.schema.json": "215da23de3c6108c2d0e47b4f72ef2ef1737475648f6aedb0ee51727c50a5d56",
+    "risk-handoff.v1.schema.json": "c19c116260d88fcc0ee5859bb01e094dc5064c49e84cf79d53d1c3bd4fbcc0fa"
+  },
+  "positive_schema_cases": 7,
+  "retained_audit_events": 9,
+  "passed": 32,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "full schema new health request",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "full schema new health response",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "full schema new reused health response",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "full schema new failure shared envelope",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "full schema retained model request",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "full schema retained workflow record",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "full schema exported retained Risk handoff",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "health request/version trace",
+      "passed": true
+    },
+    {
+      "name": "health task_id binding",
+      "passed": true
+    },
+    {
+      "name": "health session_id binding",
+      "passed": true
+    },
+    {
+      "name": "health audit handoff binding",
+      "passed": true
+    },
+    {
+      "name": "health checkpoint result references",
+      "passed": true
+    },
+    {
+      "name": "health all four stages completed",
+      "passed": true
+    },
+    {
+      "name": "reuse task/session/checkpoint",
+      "passed": true
+    },
+    {
+      "name": "reuse latest request binding",
+      "passed": true
+    },
+    {
+      "name": "failure task/session/audit assigned",
+      "passed": true
+    },
+    {
+      "name": "failure request remains bound",
+      "passed": true
+    },
+    {
+      "name": "health and model execution remain blocked",
+      "passed": true
+    },
+    {
+      "name": "model handoff six-ID request_id",
+      "passed": true
+    },
+    {
+      "name": "model handoff six-ID task_id",
+      "passed": true
+    },
+    {
+      "name": "model handoff six-ID session_id",
+      "passed": true
+    },
+    {
+      "name": "model handoff six-ID run_id",
+      "passed": true
+    },
+    {
+      "name": "model handoff six-ID audit_id",
+      "passed": true
+    },
+    {
+      "name": "model handoff six-ID handoff_id",
+      "passed": true
+    },
+    {
+      "name": "model every retained audit trace",
+      "passed": true
+    },
+    {
+      "name": "model proposal hash binding",
+      "passed": true
+    },
+    {
+      "name": "retained Risk still waiting after dispatch failure",
+      "passed": true
+    },
+    {
+      "name": "schema rejects missing required request ID",
+      "passed": true
+    },
+    {
+      "name": "schema rejects execution authorization",
+      "passed": true
+    },
+    {
+      "name": "broken checkpoint is structurally valid",
+      "passed": true
+    },
+    {
+      "name": "semantic validator rejects broken checkpoint",
+      "passed": true
+    },
+    {
+      "name": "documented limitation session remains schema optional",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "WorkflowRecord.session_id optional; health task_state/artifacts/tool_results/audit_evidence lack a versioned model mapping.",
+    "Health Session/Checkpoint remain process-local; same-process reuse is not restart recovery.",
+    "Schema validates declared constraints only; semantic validators and trusted Owner callbacks remain necessary."
+  ]
+}
