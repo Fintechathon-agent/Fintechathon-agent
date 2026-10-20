@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>个人投资顾问 · 持仓健康管理</title><link rel="stylesheet" href="/versions/style.css"><link rel="stylesheet" href="/versions/product-overrides.css"></head>
 <body class="investment-product">
-<header class="product-header"><a class="brand" href="/investment"><span class="brand-mark">01</span><span class="brand-copy">个人投资顾问<small>YOUR FUND MANAGER</small></span></a><nav class="product-nav"><span class="product-label">持仓健康管理</span><a class="back-link" href="/merchant">店主财务助手</a></nav></header>
+<header class="product-header"><a class="brand" href="/investment"><span class="brand-mark">K</span><span class="brand-copy">金融 AI 安全任务台<small>FINANCE LAB · CORE AGENT</small></span></a><nav class="product-nav"><span class="product-label">理财深度模块</span><a class="back-link" href="/workspace.html">统一工作台</a><a class="back-link" href="/risk-workbench">风控工作台</a></nav></header>
 <main class="compact-main">
 <section class="hero compact-hero"><div><p class="eyebrow">看收益 · 找风险 · 比方案</p><h1>你的组合，现在怎么样？</h1><p class="muted hero-lede">先看关键数字，点开再看计算依据。</p></div><span class="product-stamp" id="portfolio-stamp">固定虚构演示</span></section>
 <div class="data-strip" id="portfolio-health"><span>正在读取数据日期…</span></div>
@@ -25,6 +25,17 @@
 <article class="focus-card"><span class="focus-icon" aria-hidden="true">02</span><h3>现金缓冲</h3><strong class="focus-value" id="focus-cash-value">—</strong><p id="focus-cash-copy">组合中暂时留在现金里的比例。</p><details class="compact-detail"><summary>小提示</summary><p class="small">现金比例不能证明房租、学费等生活用钱已经留够。</p></details></article>
 <article class="focus-card"><span class="focus-icon" aria-hidden="true">03</span><h3>先关注什么</h3><strong class="focus-value focus-value-text" id="focus-risk-value">—</strong><p id="focus-risk-copy">分析后给出的第一项核对顺序。</p><details class="compact-detail"><summary>小提示</summary><p class="small">这里只给核对顺序，不会自动改变组合，也不会代替风控审批。</p></details></article>
 </div>
+<div class="finance-kpi-grid" id="finance-kpi-grid" aria-label="资产总览">
+<article class="finance-kpi"><small>组合总资产</small><strong id="finance-total-value">—</strong><span>固定演示组合</span></article>
+<article class="finance-kpi"><small>现金占比</small><strong id="finance-cash-value">—</strong><span>先留意生活用钱</span></article>
+<article class="finance-kpi"><small>最大单项仓位</small><strong id="finance-top-value">—</strong><span id="finance-top-name">等待分析</span></article>
+<article class="finance-kpi"><small>数据状态</small><strong id="finance-as-of">—</strong><span>非实时 · 固定价格</span></article>
+</div>
+<section class="finance-risk-workbench" id="finance-risk-workbench" aria-labelledby="finance-risk-title">
+<div class="finance-card-head"><div><p class="section-kicker">已内嵌在投资组合中</p><h2 id="finance-risk-title">风控工作台</h2><p class="finance-risk-subtitle">Core Agent 只提出分析，当前任务仍等待 Risk 复核。</p></div><span class="tag" id="finance-risk-status">等待分析</span></div>
+<div class="finance-risk-overview"><div class="finance-risk-state"><small>当前任务状态</small><strong id="finance-risk-state">等待风控复核</strong><p id="finance-risk-caption">需要 Risk 判断和必要的人工确认后，才可能进入下一步。</p></div><div class="finance-risk-metrics"><div><span>历史最大回撤</span><b id="finance-risk-drawdown">—</b><small>这段样例最多跌多少</small></div><div><span>最大仓位</span><b id="finance-risk-concentration">—</b><small>单项证券占比</small></div><div><span>短样本波动</span><b id="finance-risk-volatility">—</b><small>固定窗口估算</small></div><div><span>同向波动</span><b id="finance-risk-correlation">—</b><small>相关组合提示</small></div></div></div>
+<div class="finance-risk-columns"><div><h3>当前风险提示</h3><div id="finance-risk-warning-list" class="finance-risk-list"><span class="muted">运行分析后显示。</span></div></div><div><h3>下一步</h3><div id="finance-risk-next-actions" class="finance-risk-list"><span class="muted">运行分析后显示。</span></div></div></div>
+</section>
 </section>
 <section class="snapshot-card" id="result-summary"><div id="report-overview"></div><button class="secondary" id="export-readable" type="button">下载易读报告 TXT</button><p class="small muted">分析完成后仍需风控复核和必要的人工确认；没有执行交易。</p></section>
 <section class="panel next-steps-panel" id="next-steps-panel"><div class="row"><div><p class="section-kicker">看懂之后 / 下一步</p><h2>现在先检查什么？</h2></div><span class="tag">只给核对顺序</span></div><p class="small muted" id="next-steps-intro">根据刚才的偏好与持仓，先做这三件小事；它们不会自动改变你的组合。</p><div class="next-step-grid" id="next-steps-list"></div><details class="compact-detail"><summary>什么时候需要重新检查？</summary><p class="small muted">投资期限、近期用钱计划、能承受的下跌幅度或组合中的最大仓位发生明显变化时，再重新运行一次。数据日期变旧时，也要先核对数据来源。</p></details></section>

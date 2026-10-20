@@ -27,7 +27,7 @@ function renderNextSteps(report) {
   $("#next-steps-list").innerHTML = report.priorities.map((step, index) => '<article class="next-step"><span class="next-step-number">0' + (index + 1) + '</span><h3>' + esc(step.title) + '</h3><details class="compact-detail"><summary>原因与处理办法</summary><p>' + esc(step.reason) + '</p><p>' + esc(step.next) + '</p></details></article>').join("");
   $("#next-steps-intro").textContent = "先看这三件事。点开后看原因和处理办法。";
 }
-function renderDashboard(report) {
+function renderDashboard(report, snapshot, health) {
   const [change, drawdown, cash] = report.metrics;
   const first = report.priorities[0];
   $("#dashboard-decision").textContent = report.headline;
@@ -39,6 +39,21 @@ function renderDashboard(report) {
   $("#focus-cash-copy").textContent = cash?.help || "现金比例待核对。";
   $("#focus-risk-value").textContent = first?.title || "先补齐资料";
   $("#focus-risk-copy").textContent = first?.reason || "当前还没有可用的核对结论。";
+  $("#finance-total-value").textContent = money(snapshot.total_value * 100);
+  $("#finance-cash-value").textContent = cash?.value || "待核对";
+  $("#finance-top-value").textContent = pct(health.concentration.top_1);
+  $("#finance-top-name").textContent = health.concentration.largest_instrument || "待核对";
+  $("#finance-as-of").textContent = String(snapshot.as_of || "待核对").slice(0, 10);
+  $("#finance-risk-status").textContent = "等待 Risk 复核";
+  $("#finance-risk-state").textContent = "HANDOFF_REQUIRED";
+  $("#finance-risk-caption").textContent = "Core Agent 已完成分析，Risk 决定和人工确认完成前不会执行。";
+  $("#finance-risk-drawdown").textContent = drawdown?.value || "待核对";
+  $("#finance-risk-concentration").textContent = pct(health.concentration.top_1);
+  $("#finance-risk-volatility").textContent = pct(health.metrics.annualized_volatility);
+  $("#finance-risk-correlation").textContent = health.hidden_clusters?.length ? health.hidden_clusters.length + " 组" : "未发现";
+  const warnings = health.attention_points?.length ? health.attention_points : ["当前没有结构化风险提示。"];
+  $("#finance-risk-warning-list").innerHTML = warnings.map(item => '<div class="finance-risk-item">' + esc(item) + '</div>').join("");
+  $("#finance-risk-next-actions").innerHTML = report.priorities.slice(0, 3).map((item, index) => '<div class="finance-risk-item"><b>0' + (index + 1) + '</b> ' + esc(item.title) + '</div>').join("");
 }
 $("#check-form").addEventListener("input",invalidate);
 $("#demo-profile").onclick=()=>{ invalidate(); $("#horizon").value=365;$("#drawdown").value=10;$("#liquidity").value="medium";toast("已填入虚构偏好，可修改。"); };
@@ -57,7 +72,7 @@ $("#check-form").onsubmit=async event=>{
     if(!view.best||!view.baseline)throw new Error("模拟缺少有效结果，暂不展示结论。");
     renderHoldings(a.portfolio_snapshot);
     renderNextSteps(readableReport);
-    renderDashboard(readableReport);
+    renderDashboard(readableReport, a.portfolio_snapshot, a.health_report);
     $("#report-overview").innerHTML=investmentReportHtml(readableReport);
     $("#findings").innerHTML='<p>最大证券仓位 <b>'+esc(a.health_report.concentration.largest_instrument)+'</b>，占 <b>'+pct(a.health_report.concentration.top_1)+'</b>。</p><p class="small">短样本年化波动率 '+pct(m.annualized_volatility)+'。</p>'+
       a.health_report.hidden_clusters.map(c=>'<p class="small">'+esc(c.instruments.join(" / "))+' · 相关系数 '+c.correlation.toFixed(3)+'</p>').join("");

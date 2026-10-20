@@ -72,4 +72,7 @@ test("investment page serves the real report module and exports readable text", 
   assert.match(page, /id="dashboard-overview"/);
   assert.match(page, /href="#concentration-panel"/);
   assert.match(page, /id="focus-risk-value"/);
+  assert.match(page, /id="finance-risk-workbench"/);
+  assert.match(page, /id="finance-total-value"/);
+  assert.match(page, /id="finance-risk-warning-list"/);
 });
