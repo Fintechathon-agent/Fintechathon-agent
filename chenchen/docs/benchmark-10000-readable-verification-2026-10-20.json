@@ -1,0 +1,322 @@
+{
+  "verification_version": "readable-report-evidence.v6",
+  "verified_at": "2026-10-20T04:15:06.289Z",
+  "before_passed": 9900,
+  "after_passed": 10000,
+  "total": 10000,
+  "skipped": 0,
+  "templates": 87,
+  "unique_inputs": 10000,
+  "seed": 2026102001,
+  "dataset_sha256": "e884eb8c2c30e8e8e75a0d36fd49eaebb0037c5e78e2f532a4b9f891653c53d5",
+  "unchanged_input_and_expectations": true,
+  "changed_sources": [
+    "versions/presentation.mjs"
+  ],
+  "original_failures": {
+    "null-plan": 100
+  },
+  "regression_tests": 284,
+  "external_network_attempts": 0,
+  "paid_model_calls": 0,
+  "joint_acceptance": false,
+  "source_head_is_prechange_base": true,
+  "readable_summaries": [
+    {
+      "folder": "benchmark-10000-readable-first-2026-10-20",
+      "text_sha256": "79fc9b9449f9b206ff8a4e94964108a3056ef8d432c7915d44f604a30ee8c0cb",
+      "html_sha256": "01399ef7cd07923fc69cd4b70c828441c708f608bd01e7fdd0b0a8014c36ce83"
+    },
+    {
+      "folder": "benchmark-10000-readable-after-2026-10-20",
+      "text_sha256": "b7bef5026c590536dc7020bba5a338531b8d74407a4db64cd3bd44758fc7d4ee",
+      "html_sha256": "812251eb8941917e4ebb409267134ec43109086d19c5063272748c088f5f710e"
+    }
+  ],
+  "final_visual_styles_sha256": "918d15fb375c84576c84d083c437448a19eaf20b12dafd03337025d820f3d9bb",
+  "visual_styles_note": "Style-only contrast fix verified by browser; styles are not executed by the 10000-case runner.",
+  "runs": [
+    {
+      "folder": "benchmark-10000-readable-first-2026-10-20",
+      "passed": 9900,
+      "failed": 100,
+      "groups": [
+        {
+          "group": "portfolio_chain",
+          "cases": 400,
+          "passed": 400,
+          "failed": 0
+        },
+        {
+          "group": "funding_multitask",
+          "cases": 400,
+          "passed": 400,
+          "failed": 0
+        },
+        {
+          "group": "risk_workflow",
+          "cases": 400,
+          "passed": 400,
+          "failed": 0
+        },
+        {
+          "group": "reliability",
+          "cases": 400,
+          "passed": 400,
+          "failed": 0
+        },
+        {
+          "group": "investment_lifecycle",
+          "cases": 800,
+          "passed": 800,
+          "failed": 0
+        },
+        {
+          "group": "storage_fault",
+          "cases": 800,
+          "passed": 800,
+          "failed": 0
+        },
+        {
+          "group": "concurrent_workflow",
+          "cases": 800,
+          "passed": 800,
+          "failed": 0
+        },
+        {
+          "group": "funding_batch",
+          "cases": 2000,
+          "passed": 2000,
+          "failed": 0
+        },
+        {
+          "group": "signed_owner_boundary",
+          "cases": 2000,
+          "passed": 2000,
+          "failed": 0
+        },
+        {
+          "group": "readable_report",
+          "cases": 2000,
+          "passed": 1900,
+          "failed": 100
+        }
+      ],
+      "evidence_records": 7520,
+      "evidence_verified": true,
+      "artifacts": [
+        {
+          "folder": "batch-01",
+          "records": 600,
+          "compressed_bytes": 1112185,
+          "uncompressed_bytes": 20877128,
+          "sha256": "454c09d230b359679706ea83e0cfa56efcbf6a7ba8f0e9e9beeb9c5505945f05"
+        },
+        {
+          "folder": "batch-02",
+          "records": 1000,
+          "compressed_bytes": 1074170,
+          "uncompressed_bytes": 24315244,
+          "sha256": "a083ac6411ed51a51d98dcb532e12f8ac3bf09d8e45099d85e8bc7666ff688cd"
+        },
+        {
+          "folder": "batch-03",
+          "records": 920,
+          "compressed_bytes": 2745915,
+          "uncompressed_bytes": 53004407,
+          "sha256": "bdd385d98c4875d3e99ee6283cd6831109705f81146b1348e8af044dbedf0ff4"
+        },
+        {
+          "folder": "batch-04",
+          "records": 1000,
+          "compressed_bytes": 1755601,
+          "uncompressed_bytes": 37569028,
+          "sha256": "3b604c0dcc1fade0c0fc39da698ebb182e43ee9a03458ec722121f988b05e964"
+        },
+        {
+          "folder": "batch-05",
+          "records": 1000,
+          "compressed_bytes": 4968624,
+          "uncompressed_bytes": 92042405,
+          "sha256": "47a4e76f3d97de7c155e6105c76fee9a18820b18d5fe50b24b507b74b9344291"
+        },
+        {
+          "folder": "batch-06",
+          "records": 1000,
+          "compressed_bytes": 5399310,
+          "uncompressed_bytes": 97402998,
+          "sha256": "d33be9360a81d4af16beb5603db8f15f9d478267e9e350d0649d8cacfc253b00"
+        },
+        {
+          "folder": "batch-07",
+          "records": 1000,
+          "compressed_bytes": 5010916,
+          "uncompressed_bytes": 56680914,
+          "sha256": "3ce577407a1d0534c63dbbff18a17729f96e5c5308f5d9f0b58de3c677e1ab79"
+        },
+        {
+          "folder": "batch-08",
+          "records": 1000,
+          "compressed_bytes": 5220073,
+          "uncompressed_bytes": 57786084,
+          "sha256": "147bb529e385c2fe0598b088abaab185043a9fad8f77dff863a7fa67f39d8e23"
+        },
+        {
+          "folder": "batch-09",
+          "records": 0,
+          "compressed_bytes": 21,
+          "uncompressed_bytes": 1,
+          "sha256": "e60279ead20d25e803ed9161ecaf669fda433283e5f53d3fb148a022e92aa86e"
+        },
+        {
+          "folder": "batch-10",
+          "records": 0,
+          "compressed_bytes": 21,
+          "uncompressed_bytes": 1,
+          "sha256": "e60279ead20d25e803ed9161ecaf669fda433283e5f53d3fb148a022e92aa86e"
+        }
+      ]
+    },
+    {
+      "folder": "benchmark-10000-readable-after-2026-10-20",
+      "passed": 10000,
+      "failed": 0,
+      "groups": [
+        {
+          "group": "portfolio_chain",
+          "cases": 400,
+          "passed": 400,
+          "failed": 0
+        },
+        {
+          "group": "funding_multitask",
+          "cases": 400,
+          "passed": 400,
+          "failed": 0
+        },
+        {
+          "group": "risk_workflow",
+          "cases": 400,
+          "passed": 400,
+          "failed": 0
+        },
+        {
+          "group": "reliability",
+          "cases": 400,
+          "passed": 400,
+          "failed": 0
+        },
+        {
+          "group": "investment_lifecycle",
+          "cases": 800,
+          "passed": 800,
+          "failed": 0
+        },
+        {
+          "group": "storage_fault",
+          "cases": 800,
+          "passed": 800,
+          "failed": 0
+        },
+        {
+          "group": "concurrent_workflow",
+          "cases": 800,
+          "passed": 800,
+          "failed": 0
+        },
+        {
+          "group": "funding_batch",
+          "cases": 2000,
+          "passed": 2000,
+          "failed": 0
+        },
+        {
+          "group": "signed_owner_boundary",
+          "cases": 2000,
+          "passed": 2000,
+          "failed": 0
+        },
+        {
+          "group": "readable_report",
+          "cases": 2000,
+          "passed": 2000,
+          "failed": 0
+        }
+      ],
+      "evidence_records": 7520,
+      "evidence_verified": true,
+      "artifacts": [
+        {
+          "folder": "batch-01",
+          "records": 600,
+          "compressed_bytes": 1115348,
+          "uncompressed_bytes": 20877128,
+          "sha256": "f3e823881e585ab5aab6fb9e1017a5f52afa0f4b85f91a99da980040f09e60b1"
+        },
+        {
+          "folder": "batch-02",
+          "records": 1000,
+          "compressed_bytes": 1075104,
+          "uncompressed_bytes": 24315244,
+          "sha256": "fa9e1efff2c0e995e4238668c2ed84179bedafda7c272678047b8bee64a9e871"
+        },
+        {
+          "folder": "batch-03",
+          "records": 920,
+          "compressed_bytes": 2747466,
+          "uncompressed_bytes": 53004407,
+          "sha256": "48bc35fc8e6a90bd78435ef919408599a8b3d49839b17dde76cb2fa24dd45b69"
+        },
+        {
+          "folder": "batch-04",
+          "records": 1000,
+          "compressed_bytes": 1756327,
+          "uncompressed_bytes": 37569028,
+          "sha256": "fb7d1190d24894febe37a85bf1791994552f60f22c7dfb55253e1c5b497aaf43"
+        },
+        {
+          "folder": "batch-05",
+          "records": 1000,
+          "compressed_bytes": 4966443,
+          "uncompressed_bytes": 92042405,
+          "sha256": "886176c2324bd870b29dc5b372d006d396e095166e64f28180f9c656b76dba0c"
+        },
+        {
+          "folder": "batch-06",
+          "records": 1000,
+          "compressed_bytes": 5398364,
+          "uncompressed_bytes": 97402998,
+          "sha256": "43c63a2485730ce632d1d7388e63acf4323d7a5abed7ba15fe4ff2fa773bfa57"
+        },
+        {
+          "folder": "batch-07",
+          "records": 1000,
+          "compressed_bytes": 5011357,
+          "uncompressed_bytes": 56680914,
+          "sha256": "b015fef31c81b11632c18855a034a7a44e88080ed9a813ea38fa2016e0ce6f15"
+        },
+        {
+          "folder": "batch-08",
+          "records": 1000,
+          "compressed_bytes": 5220045,
+          "uncompressed_bytes": 57786084,
+          "sha256": "e2ba17ece2c88070e4b2a49d8adaee030725583822c5c632e84faadc3b05b129"
+        },
+        {
+          "folder": "batch-09",
+          "records": 0,
+          "compressed_bytes": 21,
+          "uncompressed_bytes": 1,
+          "sha256": "e60279ead20d25e803ed9161ecaf669fda433283e5f53d3fb148a022e92aa86e"
+        },
+        {
+          "folder": "batch-10",
+          "records": 0,
+          "compressed_bytes": 21,
+          "uncompressed_bytes": 1,
+          "sha256": "e60279ead20d25e803ed9161ecaf669fda433283e5f53d3fb148a022e92aa86e"
+        }
+      ]
+    }
+  ]
+}

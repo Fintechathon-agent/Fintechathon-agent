@@ -1,0 +1,62 @@
+TAP version 13
+# Subtest: report consumes Harness facts without recalculation or task changes
+ok 1 - report consumes Harness facts without recalculation or task changes
+  ---
+  duration_ms: 49.1014
+  type: 'test'
+  ...
+# Subtest: incomplete results never manufacture zero, approval or a successful report
+not ok 2 - incomplete results never manufacture zero, approval or a successful report
+  ---
+  duration_ms: 51.938
+  type: 'test'
+  location: 'repo:\\tests\\readable-report.test.mjs:22:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of null (reading 'plan_id')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    file:///repo:/versions/presentation.mjs:22:74
+    Array.filter (<anonymous>)
+    planComparison (file:///repo:/versions/presentation.mjs:22:29)
+    buildInvestmentReport (file:///repo:/versions/investment-report.mjs:26:16)
+    TestContext.<anonymous> (file:///repo:/tests/readable-report.test.mjs:27:20)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+  ...
+# Subtest: presentation does not claim improvement when every alternative falls more
+ok 3 - presentation does not claim improvement when every alternative falls more
+  ---
+  duration_ms: 13.929
+  type: 'test'
+  ...
+# Subtest: HTML escapes labels, all explanations start collapsed, plain text retains detail
+ok 4 - HTML escapes labels, all explanations start collapsed, plain text retains detail
+  ---
+  duration_ms: 14.0919
+  type: 'test'
+  ...
+# Subtest: team report counts failures accurately and rejects contradictory totals
+ok 5 - team report counts failures accurately and rejects contradictory totals
+  ---
+  duration_ms: 0.9391
+  type: 'test'
+  ...
+# Subtest: investment page serves the real report module and exports readable text
+ok 6 - investment page serves the real report module and exports readable text
+  ---
+  duration_ms: 74.0402
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 5
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 391.487

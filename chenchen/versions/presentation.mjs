@@ -15,11 +15,12 @@ export function dateStatus(asOf, observedOn) {
     label: ageDays < 0 ? "基准日期晚于今日" : ageDays === 0 ? "截至今日 · 非实时" : "距今日 " + ageDays + " 天 · 非实时" };
 }
 export function planComparison(comparisons) {
+  if (!Array.isArray(comparisons)) comparisons = [];
   const valid = item => item && Number.isFinite(item.metrics?.max_drawdown) &&
     item.metrics.max_drawdown <= 0 && Number.isFinite(item.metrics?.cumulative_return) &&
     Number.isFinite(item.turnover) && item.turnover >= 0;
-  const baseline = comparisons.find(item => item.plan_id === "CURRENT" && valid(item)) || null;
-  const plans = comparisons.filter(item => ["A", "B", "C"].includes(item.plan_id) && valid(item));
+  const baseline = comparisons.find(item => item?.plan_id === "CURRENT" && valid(item)) || null;
+  const plans = comparisons.filter(item => ["A", "B", "C"].includes(item?.plan_id) && valid(item));
   const best = plans.reduce((chosen, item) => !chosen ||
     item.metrics.max_drawdown > chosen.metrics.max_drawdown ||
     (item.metrics.max_drawdown === chosen.metrics.max_drawdown && item.turnover < chosen.turnover) ? item : chosen, null);

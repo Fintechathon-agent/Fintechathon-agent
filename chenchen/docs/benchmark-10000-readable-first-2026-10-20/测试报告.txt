@@ -1,0 +1,146 @@
+﻿投资助手 · 10,000 例测试易读报告
+
+一、一眼看结果
+发现 100 例未通过，需要处理后用原案例重新验证。
+共 10000 例；通过 9900 例；未通过 100 例；跳过 0 例。
+
+二、具体检查了什么
+持仓分析：400/400 通过，未通过 0。
+  从输入持仓到生成分析，并检查易读报告能否使用同一份结果。
+多笔投资同时用钱：400/400 通过，未通过 0。
+  多项任务不能重复占用同一笔钱。
+风控与人工确认：400/400 通过，未通过 0。
+  未通过风控、未确认或已拒绝时，模拟执行必须停住。
+请求失败与重复提交：400/400 通过，未通过 0。
+  模型超时、重复点击等情况下，不能假装成功。
+投资与生活费冲突：800/800 通过，未通过 0。
+  房租学费已预留、金额变化、撤回等情况下如何处理。
+保存记录时出错：800/800 通过，未通过 0。
+  没有确认保存成功时，不能继续放行。
+多个操作交错发生：800/800 通过，未通过 0。
+  取消、审批、回调或重复请求交错时，记录仍保持一致。
+多任务资金安排：2000/2000 通过，未通过 0。
+  差一分钱、房租上调、审批过期时也要拦住。
+是谁批准了哪件事：2000/2000 通过，未通过 0。
+  不能把别人的审批、被改过的回调用到当前任务。
+报告是否说清楚：1900/2000 通过，未通过 100。
+  缺数据不编数字，涨跌不说反，旧日期和模拟边界说清楚。
+
+三、发现的问题
+readable-08012｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08032｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08052｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08072｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08092｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08112｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08132｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08152｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08172｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08192｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08212｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08232｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08252｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08272｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08292｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08312｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08332｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08352｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08372｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08392｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08412｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08432｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08452｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08472｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08492｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08512｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08532｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08552｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08572｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08592｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08612｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08632｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08652｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08672｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08692｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08712｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08732｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08752｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08772｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08792｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08812｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08832｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08852｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08872｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08892｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08912｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08932｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08952｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08972｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+readable-08992｜报告是否说清楚｜null-plan
+  Cannot read properties of null (reading 'plan_id')
+这里列前 50 例，全部失败保存在 failures.jsonl。
+
+四、哪些可以确认，哪些还不能
+本轮使用虚构数据和本地模型、风控替身；没有花钱调用模型，也没有真实交易。
+这 10,000 例是不同参数的程序检查，不是 10,000 位用户，也不是模型答题正确率。
+真实模型、正式风控、身份登录和公网手机操作，还没有通过本轮联合验收。
+本轮没有修改投资计算方法、记忆规则或审批门槛。
+
+五、下一步
+先修复上面的问题，再使用同一组数据复测，保留首轮失败记录。
+
+六、详细记录在哪里
+每批 1,000 例，存放在 batch-01 至 batch-10。cases.jsonl 是输入，results.jsonl 是逐例结果。
+压缩的 workflow-evidence.jsonl.gz 保存完整流程证据；report.json 保存统计。
+模板数：87；不同完整输入：10000；固定种子：2026102001
+数据指纹：e884eb8c2c30e8e8e75a0d36fd49eaebb0037c5e78e2f532a4b9f891653c53d5
+生成时间（UTC）：2026-10-20T04:09:58.821Z
