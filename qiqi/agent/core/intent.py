@@ -130,7 +130,12 @@ def parse_intent(
             missing.append("适当性复核")
         message = ""
         if missing:
-            message = "执行前还需要确认：" + "、".join(dict.fromkeys(missing)) + "。"
+            # missing 里的键名供程序判断，回给用户时换成听得懂的说法。
+            plain = {"标的": "具体买哪只、卖哪只", "调整比例或数量": "买卖多少",
+                     "适当性复核": "这笔买入是否在你的风险承受范围内"}
+            message = "执行前还需要确认：" + "、".join(
+                dict.fromkeys(plain.get(item, item) for item in missing)
+            ) + "。"
         return IntentResult(
             name="execute",
             label="理财操作",

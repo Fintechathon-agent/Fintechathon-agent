@@ -445,6 +445,10 @@ function renderRecommendation(data) {
   const evidence = (r.evidence || []).length
     ? `<div class="rec-section"><h4>判断依据（数字来自工具层，LLM 不改写数值）</h4><ul>${r.evidence.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></div>`
     : '';
+  // 模型回答没讲清楚时如实提示，不假装是一份可执行的分析。
+  const voiceWarning = (data.advisor_voice_issues || []).length
+    ? `<div class="alert bad">这次分析没讲清楚：${esc(data.advisor_voice_issues.join('；'))}。上面的数字和结论建议再核对，或重新问一次。</div>`
+    : '';
 
   let actionsHtml = '';
   let doneHtml = '';
@@ -494,6 +498,7 @@ function renderRecommendation(data) {
       ${doneHtml}
       ${actionsHtml}
     </div>
+    ${voiceWarning}
     ${alertBox}`;
 
   const cb = $('#btn-confirm');

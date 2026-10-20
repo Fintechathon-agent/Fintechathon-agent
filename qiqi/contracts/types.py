@@ -239,6 +239,7 @@ class AgentResponse:
     decision_source: str = ""          # 决策来源："llm" | "rules" | ""（模型失败且不回退）
     model_status: str = ""             # 模型状态："ok" | "unavailable" | "not_configured"
     model_raw: dict = field(default_factory=dict)  # 模型实际返回内容（联调模式透传，用于界面展示）
+    advisor_voice_issues: list[str] = field(default_factory=list)  # 回答不像顾问的具体问题（空 = 合格）
 
 
 # ============================================================

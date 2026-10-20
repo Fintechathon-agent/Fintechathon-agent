@@ -502,6 +502,8 @@ class DemoApp:
             data["decision_source"] = resp.decision_source
             data["model_status"] = resp.model_status
             data["model_raw"] = dict(resp.model_raw or {})
+            # 回答不像顾问时把问题带出来，让界面能提示"这次没讲清楚"，而不是照常展示。
+            data["advisor_voice_issues"] = list(getattr(resp, "advisor_voice_issues", []) or [])
             # 审批/执行状态显式区分：等待审批绝不等于交易完成
             data["execution_state"] = (
                 "awaiting_approval" if queued

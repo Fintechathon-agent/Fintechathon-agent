@@ -65,6 +65,7 @@ class DecisionMaker:
         self.last_source = ""          # "llm" | "rules"
         self.last_raw: dict = {}       # 模型实际返回内容
         self.last_model_error = ""     # 最近一次模型错误（空 = 无错误）
+        self.last_voice_issues: list[str] = []   # 模型回答不像顾问时的具体问题
 
         if self._llm is not None:
             try:
@@ -112,6 +113,7 @@ class DecisionMaker:
             risk_report=risk_report_text,
         )
         self.last_raw = result if isinstance(result, dict) else {}
+        self.last_voice_issues = []
 
         action_map = {
             "买入": ActionType.BUY,
@@ -132,6 +134,12 @@ class DecisionMaker:
             confidence=float(result.get("recommendation", {}).get("confidence", 0)),
             risk_impact=result.get("recommendation", {}).get("risk_impact", ""),
             alternative=result.get("recommendation", {}).get("alternative", ""),
+        )
+        # 口吻不达标不拦建议（数字与闸门仍由下游校验），但要留痕，
+        # 让上层能把"这次回答不好懂"暴露出来，而不是当作正常结论。
+        from ..tools.financial_llm import advisor_voice_issues
+        self.last_voice_issues = advisor_voice_issues(
+            rec.reason, detail=f"{rec.risk_impact}{rec.alternative}"
         )
         return rec
 
@@ -348,6 +356,7 @@ class Orchestrator:
         dm = self.decision_maker
         response.decision_source = dm.last_source or ""
         response.model_raw = dict(dm.last_raw or {})
+        response.advisor_voice_issues = list(getattr(dm, "last_voice_issues", []) or [])
         if dm.last_source == "llm":
             response.model_status = "ok"
         elif dm.last_source == "rules":
