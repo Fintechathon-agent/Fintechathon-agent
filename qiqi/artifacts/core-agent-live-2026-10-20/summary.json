@@ -29,5 +29,25 @@
     "模型只输出提议，等待独立 Risk；execution_allowed=false。",
     "本轮未配置正式 Risk Owner，未发生真实资金动作。",
     "curl 在 Windows 下会把中文命令行参数转码坏，证据改用 Python 客户端采集并核对了回显一致。"
-  ]
+  ],
+  "deployment_audit": {
+    "checked_at": "2026-10-20T10:30:03+08:00",
+    "live_deployment_id": "6d8b50e9-aabc-444f-9e95-e8c7d4ac2ac0",
+    "live_deployed_at": "2026-10-19T04:28:41.915Z",
+    "live_author": "realchenchenluo@gmail.com",
+    "commits_after_deployment": 8,
+    "behaviour_changes_after_deployment": 5,
+    "latest_main_commit": "11aaa0e",
+    "reproduced_on_live": {
+      "case": "同一 idempotency_key、内容相同、仅嵌套 context 键顺序不同",
+      "live_result": "409 IDEMPOTENCY_CONFLICT",
+      "main_code_result": "指纹相同（orderedKeys 规范化），应复用同一任务"
+    },
+    "dry_run": {
+      "ok": true,
+      "upload": "236.71 KiB",
+      "gzip": "51.44 KiB"
+    },
+    "action_taken": "仅只读核对与 dry-run；未部署共享后端，待 Owner 通知后发布"
+  }
 }
