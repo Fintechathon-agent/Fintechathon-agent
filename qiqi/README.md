@@ -74,6 +74,48 @@ python web/launch.py --no-key        # 强制规则决策引擎（无 key 也能
 | GET | `/api/brief` | 今日简报 |
 | POST | `/api/reset` | 重置演示状态（清空审批与纸交易，长期记忆保留） |
 | POST | `/api/breaker/reset` | 人工确认异常原因后恢复资金执行链路 |
+| GET | `/mcp` | MCP 能力中心控制台（能力发现、调用、JSON-RPC 轨迹） |
+| POST | `/mcp` | MCP Server JSON-RPC 2.0 端点（单条/批量） |
+| GET | `/api/mcp/manifest` | MCP 能力清单、权限级别、来源映射与确认策略 |
+| GET | `/api/mcp/tools` | `tools/list` 的 HTTP 便捷入口 |
+| GET | `/api/core-agent/status` | 统一后端探活与能力清单（不调模型、不发 Risk） |
+| POST | `/api/core-agent/review` | 转发到团队 Cloudflare 统一后端做真实模型复核 |
+
+### 统一后端联调（2026-10-20 新增）
+
+团队统一后端：`https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev`。
+
+- `POST /api/core-agent/review` 把问题包装成 `model-review.v1` 真实转发；
+  模型返回后进入 `PENDING_RISK`，`execution_allowed` 固定为 `false`；
+- **失败不回退**：后端 4xx/5xx 或网络不可达时原样返回错误，不会换成规则结果假装成功；
+- 模型没成功时不展示 `recommendation`，避免把异常路径包装成模型结论；
+- 配置见 [统一后端联调记录](docs/统一后端联调记录_2026-10-20.md)：`CORE_AGENT_BASE_URL`、
+  `CORE_AGENT_API_KEY`、`CORE_AGENT_TIMEOUT`、`CORE_AGENT_PROXY`（仅本机调试用）；
+- 真实联调证据：`artifacts/core-agent-live-2026-10-20/`（合成输入，PAPER 模式）。
+
+### 随手记：生活与投资统一入口（2026-10-17 新增）
+
+访问 `http://127.0.0.1:8765/team/journal.html`，或从工作台侧栏点击「随手记」。
+
+- 一段话整理工资、生活支出、订阅、投资计划与优惠需求，按时间归档，支持修改、删除和 CSV 表格导出；
+- 投资计划与已发生收支分开，人民币与美元分列；自填生活预留后提示预算缺口；
+- 重要事项形成可见、可纠正的本地记忆摘要；生活金额可以隐藏；
+- 当前为规则识别试用版，结构化记录保存在此浏览器。未接真实账户、模型、多平台优惠券或自动交易，未部署公网；
+- 新接口 `POST /api/journal/parse` 仅解析文本，不改变现有投资、审批与交易接口。
+
+产品规格、设计规范、Agent 接入分工和已核对的开源参考见 [随手记交付说明](docs/随手记_生活投资统一入口_2026-10-17.md)。
+
+### MCP 能力中心（2026-10-17 新增）
+
+把六场景业务系统**逆向蒸馏**为 12 个 MCP 能力，供前端 Agent 平台或 Claude Desktop 发现与调用：
+
+- **控制台**：启动服务后访问 `http://127.0.0.1:8765/mcp`；
+- **stdio**：`python -m mcp_center.server --stdio`（能力清单：`--manifest`）；
+- **能力构成**：7 项只读查询、4 项业务动作、1 项联动计划；
+- **治理红线**：查询自动执行；转账/卡片/订阅/跨场景动作只进入待确认队列，
+  MCP **不提供 `confirm` 工具**，确认与红色强验证只能在前端人审界面完成；
+- **方案与能力映射**：[docs/MCP能力中心_逆向蒸馏与接入方案_2026-10-17.md](docs/MCP能力中心_逆向蒸馏与接入方案_2026-10-17.md)；
+- **测试**：`python -m unittest tests.test_mcp_center -v`（26 项，含 stdio/HTTP 传输与“只入队不扣款”断言）。
 
 ### 零输入使用路径
 
@@ -188,7 +230,7 @@ python -m unittest discover -s tests -v
 python -m evals.run_safety_eval
 ```
 
-当前结果：118 个本地回归测试通过；自然语言入口安全集 54/54 攻击拦截（100%），20 条正常金融表达误伤 0 条（0%）。该评测是本地规则集结果，不代表对所有未知攻击的泛化保证。
+当前结果：212 个本地回归测试通过；自然语言入口安全集 54/54 攻击拦截（100%），20 条正常金融表达误伤 0 条（0%）。该评测是本地规则集结果，不代表对所有未知攻击的泛化保证。
 
 ---
 

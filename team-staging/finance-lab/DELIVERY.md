@@ -3,8 +3,8 @@
 - 维护账号：`jinyihan77-create`（仅使用账号标识）
 - 阶段：已本地自动化验证，待团队联合验收；不代表公网服务或完整产品已经上线。
 - 源目录：[`qiqi/`](../../qiqi/)
-- 源提交：`1401d84`（报告产物导出契约）；上一登记来源 `1d97ac2`
-- 变更范围：银行六场景路由、自然语言意图与任务 DAG、黄色/红色确认、原子账本与回执、审批一次性执行、熔断持久化、模型 demo/live 透明状态、测试和审计证据；本次新增报告产物统一导出契约（PDF / PPT / Word / Excel / 图形 / HTML 共用同一份结构化产物）。
+- 源提交：`90dcec4`（接入团队统一后端 Core Agent）；上一登记来源 `1401d84`、`1d97ac2`
+- 变更范围：银行六场景路由、自然语言意图与任务 DAG、黄色/红色确认、原子账本与回执、审批一次性执行、熔断持久化、模型 demo/live 透明状态、测试和审计证据；报告产物统一导出契约；随手记统一入口；MCP 能力中心；本次新增团队统一后端适配层（`web/core_agent.py`）与两条联调路由。
 
 ## 本地运行
 
@@ -30,11 +30,20 @@ python web/app.py --port 8765
 
 ## 实际验证
 
-- `python -m unittest discover -s qiqi/tests -q`：171 项通过（含新增 17 项导出契约测试）。
+- `python -m unittest discover -s qiqi/tests -q`：222 项通过（含 10 项统一后端适配测试、15 项随手记、26 项 MCP）。
 - `python -m unittest discover -s qiqi/tests -p "test_report_contract.py" -q`：17 项通过，覆盖表格列数、图表点数、饼图单序列、外链图片、demo 无免责声明、live 混 demo 来源、JSON 往返。
 - `python qiqi/tests/run_isolated_checks.py`：单元测试与安全评测均通过，固定样本 54/54 拦截、0/20 误伤。
 - Python/JavaScript 语法检查：通过。
 - 浏览器脚本与既有 1440px/390px 证据已保存在 `qiqi/artifacts/safety-fixes-2026-10-16/`；本次环境未安装 Playwright，因此未重新执行浏览器脚本，不能把本轮写成浏览器复验通过。
+
+## 统一后端接入（2026-10-20）
+
+- 后端：`https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev`（团队 Cloudflare Worker）。
+- 只读探活 `GET /api/core-agent/status`；真实复核 `POST /api/core-agent/review`。
+- 实测：`/health`、`/api/review/capabilities` 返回 200；`POST /api/review` 返回 `PENDING_RISK`，模型真实返回 `HOLD_FOR_REVIEW`，`execution_allowed=false`、审批 `BLOCKED`。
+- 失败不回退：后端非 2xx、网络不可达或返回非法 JSON 时，路由原样返回错误状态，不切换到规则引擎。
+- 配置：`CORE_AGENT_BASE_URL`、`CORE_AGENT_API_KEY`、`CORE_AGENT_TIMEOUT`、`CORE_AGENT_PROXY`（仅本机调试）。不提交任何密钥。
+- 边界：本侧 `/api/review` 保持原有本地链路；统一后端是并列路由，未替换演示主线；正式 Risk Owner、审批与执行网关仍未接通。
 
 ## 已知边界
 
