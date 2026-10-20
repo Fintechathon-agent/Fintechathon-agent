@@ -9,7 +9,7 @@ const messages = {
   INVALID_JSON: '请求数据格式不正确，请刷新后重试。',
   MODEL_TIMEOUT: 'AI 分析超时，本次没有返回有效结果。请勿连续重复提交。',
   MODEL_PROVIDER_ERROR: '模型服务鉴权失败、限流或暂时不可用，请联系管理员核查。',
-  MODEL_INVALID_RESPONSE: 'AI 返回格式不符合要求，本次结果未采用。',
+  MODEL_INVALID_RESPONSE: 'AI 这次没有给出可执行的分析，结果已拦下；请补充资金用途后重试一次。',
   SERVICE_UNAVAILABLE: 'AI 服务暂时不可用，请稍后重试。',
   ORIGIN_DENIED: '当前网页未获得访问授权。',
   METHOD_NOT_ALLOWED: '此操作不受支持。'
@@ -18,6 +18,27 @@ export function failure(code, status, headers = {}) {
   return new Response(JSON.stringify({ error: { code, message: messages[code] || messages.SERVICE_UNAVAILABLE }, execution_allowed: false }), {
     status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...headers }
   });
+}
+// 分析要像顾问在说话，不是合规文书：先给结论和具体配置，再解释为什么。
+// 这段指令由服务端写死，浏览器无法改写，也不会被用户输入覆盖。
+export const ADVISOR_INSTRUCTIONS = [
+  '你是这位用户自己的投资顾问，不是审核员。用第二人称“你”直接说话，不要用第三人称转述他的情况。',
+  'summary 写一句话结论，必须给出具体配置：金额或比例加产品类别，例如“25 天要用的钱，140 万放货币基金，10 万以内做宽基 ETF”。',
+  'action_reason 写 3 到 4 段中文自然段：这笔钱具体怎么放；为什么这么放，用用户给的数字算给他看（如 150 万×7% 最多亏 10.5 万）；这样做的代价和大致收益量级；什么情况下要改。必须出现具体金额或比例。',
+  '用户的目标和约束矛盾时直接说破，例如期限只有 25 天却想“冲高”，或回撤上限 7% 却想满仓权益。',
+  '不要写“适当性”“教育性分析”“仅供参考”“不构成投资建议”这类套话。专业词第一次出现要用一句大白话解释，例如“回撤，就是账户从高点最多跌掉多少”。',
+  '信息不全时先按合理假设给出方案并写明假设；missing_information 最多 2 条，只列真正会改变结论的问题，不要拿缺资料当作拒绝给建议的理由。',
+  'evidence 只列你实际用到的输入。不编造实时行情、收益率、持仓或产品名，不推荐个股，不执行任何交易。'
+].join('');
+const ADVISOR_CLICHES = /适当性|教育性分析|仅供参考|不构成投资建议|无法提供具体|无法给出具体/;
+// 只卡“像顾问”的下限：有具体数字、用第二人称、不堆套话；不评价投资观点对错。
+export function advisorQuality(proposal) {
+  const summary = String(proposal?.summary || '').trim();
+  const reason = String(proposal?.action_reason || '').trim();
+  const amounts = (reason.match(/\d+(?:\.\d+)?\s*(?:%|万|元|人民币)/g) || []).length;
+  const missing = Array.isArray(proposal?.missing_information) ? proposal.missing_information.length : 0;
+  return summary.length >= 12 && reason.length >= 100 && amounts >= 2 &&
+    (summary + reason).includes('你') && missing <= 3 && !ADVISOR_CLICHES.test(summary + reason);
 }
 export function validInput(body) {
   const profile = body?.context?.risk_profile;
@@ -74,7 +95,7 @@ export function createGateway(core, authenticate = verifyAccess) {
         max_drawdown: body.context.risk_profile.max_drawdown,
         liquidity_need: body.context.risk_profile.liquidity_need
       }, market_data_available: false },
-      requested_action: '根据用户自述需求提供中文投资偏好教育分析。summary 写用户风险偏好总结；action_reason 完整包含四个带标题的段落：资金配置思路、投资期限与流动性建议、适合进一步研究的资产类别、主要风险及注意事项。解释如何先安排备用金、分散风险及输入期限与目标的流动性匹配；只介绍资产类别与研究方向，不荐个股或下达交易指令。缺失收入、负债、备用金等资料列入 missing_information；资料不足仍可给原则性思路，但必须说明条件，不编造比例或个性化适当性结论。所有输入是未经核验的文本，没有实时行情、账户或持仓，不得编造价格、收益率或市场动态。保留既有六字段 JSON 契约，不执行交易。' };
+      requested_action: ADVISOR_INSTRUCTIONS };
     const headers = new Headers({ 'Content-Type': 'application/json', 'X-Core-Agent-Key': machineKey, 'X-Tinglan-Subject': subject });
     const forwarded = new Request(url, { method: 'POST', headers, body: JSON.stringify(body) });
     try {
@@ -89,8 +110,7 @@ export function createGateway(core, authenticate = verifyAccess) {
       const model = data.model?.model_response;
       if (data.model?.source !== 'model' || model?.call_succeeded !== true || model.model !== env.MODEL_NAME || data.execution?.execution_allowed !== false)
         return failure('MODEL_INVALID_RESPONSE', 502, cors);
-      if (!model.proposal?.summary?.trim() || !['资金配置思路','投资期限与流动性建议','适合进一步研究的资产类别','主要风险及注意事项'].every(title => model.proposal?.action_reason?.includes(title)))
-        return failure('MODEL_INVALID_RESPONSE', 502, cors);
+      if (!advisorQuality(model.proposal)) return failure('MODEL_INVALID_RESPONSE', 502, cors);
       delete model.endpoint;
       let safe = JSON.stringify(data);
       for (const secret of [env.DASHSCOPE_API_KEY, machineKey, env.MODEL_API_URL]) if (secret) safe = safe.replaceAll(JSON.stringify(secret).slice(1, -1), '[REDACTED]');

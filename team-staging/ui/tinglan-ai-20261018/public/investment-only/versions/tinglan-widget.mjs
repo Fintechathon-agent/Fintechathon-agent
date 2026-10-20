@@ -41,10 +41,14 @@ form.addEventListener('submit', async event => {
   const started = performance.now();
   try {
     const result = await analyze(config, body, window.tinglanFetch);
-    for (const key of ['summary','reason','evidence','missing','raw']) output.querySelector('[data-result=' + key + ']').textContent = result[key];
-    output.querySelector('[data-result=meta]').textContent = 'Live AI 模型返回 · ' + result.model + ' · ' + ((performance.now() - started) / 1000).toFixed(2) + ' 秒 · ' + (result.tokens === null ? '用量未返回' : result.tokens + ' tokens');
+    // 模型用换行分段；用 <p> 渲染，避免整段挤成一块看不清。
+    const reasonBox = output.querySelector('[data-result=reason]');
+    reasonBox.replaceChildren(...String(result.reason).split(/\n+/).map(line => line.trim()).filter(Boolean)
+      .map(line => { const p = document.createElement('p'); p.textContent = line; return p; }));
+    for (const key of ['summary','evidence','missing','raw']) output.querySelector('[data-result=' + key + ']').textContent = result[key];
+    output.querySelector('[data-result=meta]').textContent = result.model + ' · ' + ((performance.now() - started) / 1000).toFixed(2) + ' 秒 · ' + (result.tokens === null ? '用量未返回' : result.tokens + ' tokens');
     output.querySelector('[data-result=trace]').textContent = '运行编号：' + result.runId + '\n审计编号：' + result.auditId;
-    output.hidden = false; show('AI 分析已返回，等待风险复核；未执行交易。');
+    output.hidden = false; show('分析已返回。这只是建议，系统没有也不会替你下单。');
   } catch (error) { show(messages[error.message] || messages.SERVICE_UNAVAILABLE, true); }
   finally { button.disabled = false; form.removeAttribute('aria-busy'); form.querySelectorAll('input,select,textarea').forEach(node => { node.disabled = false; }); }
 });

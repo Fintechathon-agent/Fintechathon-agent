@@ -141,7 +141,11 @@ const { pathToFileURL } = require('node:url');
     assert.equal(raw.summary, report.browser.summary);
     assert.deepEqual(raw, JSON.parse(report.steps[student ? 0 : 1].content));
     assert.equal(report.browser.analysis, raw.action_reason);
-    if (student) for (const title of ['资金配置思路','投资期限与流动性建议','适合进一步研究的资产类别','主要风险及注意事项']) assert(raw.action_reason.includes(title), 'Required analysis section missing');
+    if (student) {
+      assert(/\d+(?:\.\d+)?\s*(?:%|万|元|人民币)/.test(raw.action_reason), 'Analysis has no concrete amount or ratio');
+      assert(raw.action_reason.includes('你'), 'Analysis is not addressed to the user');
+      assert(!/适当性|教育性分析|仅供参考|不构成投资建议|无法提供具体/.test(raw.summary + raw.action_reason), 'Analysis is disclaimer boilerplate');
+    }
     report.browser.matchesProvider = true; report.result = 'LOCAL_REAL_CHAIN_PASSED'; save();
     await page.locator('#ai-assistant').screenshot({ path: path.join(moduleRoot, student ? 'evidence/live-student-panel.png' : 'evidence/live-local-panel.png') });
     console.log(JSON.stringify(report));

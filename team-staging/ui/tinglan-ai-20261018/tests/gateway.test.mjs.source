@@ -19,7 +19,8 @@ function setup(overrides = {}) {
   env.REVIEW_SERVICE={idFromName:x=>x,get:()=>service};
   return {env,storage,entries,restart:()=>{service=new ReviewService({storage},env);},gateway:createGateway(core,async()=> 'a'.repeat(64))};
 }
-function provider(model='qwen3.8-flash',reason='MOCK：资金配置思路：先了解备用金。\n投资期限与流动性建议：核实资金用途。\n适合进一步研究的资产类别：先了解风险。\n主要风险及注意事项：没有可信行情，不计算收益。') {return Response.json({model,id:'synthetic-response',usage:{prompt_tokens:80,completion_tokens:30,total_tokens:110},choices:[{message:{content:JSON.stringify({summary:'MOCK：需补充持仓与资金安排。',risk_level:'unknown',proposed_action:'REQUEST_MORE_INFO',action_reason:reason,missing_information:['持仓'],evidence:['虚构输入']})}}]});}
+const MOCK_REASON='你手上这 1 万元三年内不用，可以这样放：7000 元放中短债基金做底仓，2000 元定投宽基指数，剩下 1000 元留在货币基金当备用金。\n这么放的理由是，你自述中低风险、又没填能接受多少回撤，按最差一年跌 5% 算，1 万元最多亏 500 元，还在你可承受范围里。\n代价是收益不会高，一年大概率在 3% 到 6% 之间，想靠这 1 万元赚大钱不现实。\n如果你这三年里随时可能动用这笔钱，那 2000 元的定投部分要先停掉。';
+function provider(model='qwen3.8-flash',reason=MOCK_REASON,summary='你这是一笔三年不用的闲钱，建议七成中短债、两成宽基指数、一成货币基金。') {return Response.json({model,id:'synthetic-response',usage:{prompt_tokens:80,completion_tokens:30,total_tokens:110},choices:[{message:{content:JSON.stringify({summary,risk_level:'medium',proposed_action:'HOLD_FOR_REVIEW',action_reason:reason,missing_information:['这笔钱三年内是否会动用'],evidence:['投资金额：10000 元','自述风险偏好：中低']})}}]});}
 
 test('Mock full existing workflow, preference context, audit, replay and durable budget', async t=>{
   const app=setup();let calls=0;
@@ -90,10 +91,10 @@ test('Preference inputs preserve amount, risk, goal and truthful source without 
     assert.throws(()=>buildInput({...preferences,...change},crypto.randomUUID()),/INVALID_REVIEW_INPUT/);
 });
 
-test('Self-reported preference uses existing LIVE mode and server-authored five-part instructions',async t=>{
+test('Self-reported preference uses existing LIVE mode and server-authored advisor voice',async t=>{
   const app=setup();let calls=0;t.mock.method(console,'log',()=>{});
   t.mock.method(globalThis,'fetch',async(_url,options)=>{calls++;const sent=JSON.parse(options.body);
-    assert.match(options.body,/10000/);assert.match(options.body,/资金配置思路/);assert.match(options.body,/主要风险及注意事项/);
+    assert.match(options.body,/10000/);assert.match(options.body,/第二人称/);assert.match(options.body,/具体配置/);
     const content=JSON.parse(sent.messages[1].content.split('\n').at(-1));assert.equal(content.context.synthetic,false);return provider(sent.model);});
   const body=buildInput({...preferences,inputMode:'self_reported'},crypto.randomUUID());
   assert.equal((await app.gateway.fetch(request(body),app.env)).status,200);assert.equal(calls,1);
@@ -114,4 +115,16 @@ test('Explicit Max has its own conservative reservation and never falls back to 
 test('Incomplete model analysis fails visibly rather than becoming a successful fixed answer',async t=>{
   const app=setup();let calls=0;t.mock.method(console,'log',()=>{});t.mock.method(globalThis,'fetch',async()=>{calls++;return provider('qwen3.8-flash','MOCK：只有一句话，没有完整分析。');});
   const response=await app.gateway.fetch(request(),app.env);assert.equal(response.status,502);assert.equal((await response.json()).error.code,'MODEL_INVALID_RESPONSE');assert.equal(calls,1);
+});
+
+test('Advisor voice gate rejects disclaimers and third-person restatement',async t=>{
+  const cliche='用户自述风险偏好为中等，鉴于缺乏实时行情、账户核验及详细财务状况，无法提供具体投资建议或适当性结论。\n资金配置思路：建议先确保 3-6 个月生活支出，直接进行大额投资存在流动性风险，需进一步确认。';
+  const thirdPerson='该用户为中等风险偏好，建议将 150 万元中的 100 万元配置货币基金，50 万元配置宽基指数。\n此人期限仅 25 天，回撤上限 7%，当前配置存在期限错配，需调整。';
+  const terse='你把这 150 万都放货币基金就行。';
+  for (const [name,reason] of [['disclaimer',cliche],['third-person',thirdPerson],['no-numbers',terse]]) {
+    const app=setup();let calls=0;t.mock.method(console,'log',()=>{});
+    t.mock.method(globalThis,'fetch',async()=>{calls++;return provider('qwen3.8-flash',reason,reason.split('\n')[0]);});
+    const response=await app.gateway.fetch(request(),app.env);
+    assert.equal(response.status,502,name);assert.equal((await response.json()).error.code,'MODEL_INVALID_RESPONSE',name);assert.equal(calls,1);
+  }
 });

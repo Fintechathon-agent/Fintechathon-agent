@@ -25,8 +25,8 @@
 <details class="panel" id="evidence-panel"><summary>任务状态与工具证据</summary><p class="small">任务已停在风控交接点；未接团队审批网关，不提供成交操作。</p><div id="task-status" class="tag"></div><pre id="evidence"></pre><button class="secondary" id="export">下载分析 JSON</button></details>
 </div>
 <section class="panel" id="ai-assistant" aria-labelledby="tinglan-title">
-<p class="section-kicker">AI / 偏好分析</p><h2 id="tinglan-title">听澜 AI 助手</h2>
-<p class="small muted">填写投资需求，获取模型生成的偏好分析与资金安排思路。用户自述未经账户核验；没有实时行情，不生成实时价格、收益预测或交易指令。</p>
+<p class="section-kicker">AI / 投资顾问</p><h2 id="tinglan-title">听澜 AI 助手</h2>
+<p class="small muted">把你手上这笔钱的金额、期限、能接受亏多少说清楚，它会像顾问一样告诉你具体怎么放、为什么这么放。</p>
 <form id="share-login" method="post" action="/api/session" hidden><label>分享访问口令<input name="code" type="password" minlength="16" maxlength="128" autocomplete="current-password" required></label><button type="submit" disabled>进入真实 AI 分析</button><p class="small">向分享者获取访问口令。口令用于保护试验额度，不能填写百炼 API Key。</p><p id="share-login-status" role="status"></p></form>
 <button id="share-logout" type="button" class="secondary" hidden>退出分享会话</button>
 <form id="tinglan-form" hidden><div class="fields">
@@ -41,7 +41,7 @@
 <label class="small"><input name="consent" type="checkbox" required> 我确认不包含账户、身份、密码或密钥，并同意将本次需求发送至百炼进行分析。</label>
 <button type="submit" disabled>开始 AI 分析</button></form>
 <p id="tinglan-status" role="status" aria-live="polite">正在检查安全入口配置…</p>
-<div id="tinglan-result" hidden aria-live="polite"><p data-result="meta" class="small muted"></p><h3>用户风险偏好总结</h3><p data-result="summary"></p><h3>资金配置、期限、资产类别与主要风险</h3><p data-result="reason"></p><h3>输入依据</h3><p data-result="evidence"></p><h3>待补充信息</h3><p data-result="missing"></p><details><summary>完整模型原文</summary><pre data-result="raw"></pre></details><details><summary>运行与审计记录</summary><pre data-result="trace"></pre></details><p class="small">未执行交易。AI 内容需本人核实，不能代替风险评估与完整计划确认。</p></div>
+<div id="tinglan-result" hidden aria-live="polite"><p data-result="meta" class="small muted"></p><h3>结论</h3><p data-result="summary" class="advisor-summary"></p><h3>具体怎么放</h3><div data-result="reason" class="advisor-reason"></div><h3>我依据的是什么</h3><p data-result="evidence"></p><h3>还需要你确认</h3><p data-result="missing"></p><details><summary>完整模型原文</summary><pre data-result="raw"></pre></details><details><summary>运行与审计记录</summary><pre data-result="trace"></pre></details><p class="small">模型只看到你上面填的几项，看不到你的账户、真实持仓和实时行情；它不替你下单。最后按不按这个方案来，由你决定。</p></div>
 </section>
 
 

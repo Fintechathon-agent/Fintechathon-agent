@@ -34,9 +34,12 @@ export function readResult(data, modelName) {
   let raw;
   try { raw = JSON.parse(model.raw_text); } catch { throw new Error('MODEL_INVALID_RESPONSE'); }
   if (raw.summary !== p.summary || raw.action_reason !== p.action_reason) throw new Error('MODEL_INVALID_RESPONSE');
-  if (!['资金配置思路','投资期限与流动性建议','适合进一步研究的资产类别','主要风险及注意事项'].every(title => p.action_reason.includes(title))) throw new Error('MODEL_INVALID_RESPONSE');
+  // 与 gateway.mjs 的 advisorQuality 同一标准：没有具体数字、只有套话的回答不展示。
+  if ((p.action_reason.match(/\d+(?:\.\d+)?\s*(?:%|万|元|人民币)/g) || []).length < 1 || p.action_reason.length < 100 ||
+      !(p.summary + p.action_reason).includes('你') || /适当性|教育性分析|仅供参考|不构成投资建议|无法提供具体/.test(p.summary + p.action_reason))
+    throw new Error('MODEL_INVALID_RESPONSE');
   return { summary: p.summary, reason: p.action_reason, evidence: p.evidence.join('；') || '未返回证据，请核实来源。', raw: model.raw_text,
-    missing: p.missing_information.join('；') || '请继续核实输入资料与适用条件。', model: model.model,
+    missing: p.missing_information.join('；') || '暂无；如果你愿意补充收入、负债和这笔钱的具体用途，我可以把方案再收紧一档。', model: model.model,
     tokens: Number.isSafeInteger(model.usage?.total_tokens) ? model.usage.total_tokens : null, runId: data.run_id, auditId: data.audit.audit_id };
 }
 export async function analyze(config, body, fetchImpl, base = location.href) {
