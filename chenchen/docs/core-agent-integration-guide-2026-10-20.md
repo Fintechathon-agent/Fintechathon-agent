@@ -101,7 +101,7 @@ WorkflowRecord.session_id 可选；HandoffPackage.session_id 必填可 null。�
 
 ## UI 只读消费边界
 
-已实现 buildInvestmentReport 本地投影与 TXT 下载，无独立公共协议版本。task_state 必须为 RISK_CHECK/HANDOFF_REQUIRED，artifacts 中快照、数据日期与方案必须匹配；缺失则提示补资料。UI 不能填零、跨任务拼接或从 approval 推导真实执行授权。团队独有投资总览恢复提交 6ead62e，个人 main 尚无该提交。
+已实现 buildInvestmentReport 本地投影与 TXT 下载，无独立公共协议版本。task_state 必须为 RISK_CHECK/HANDOFF_REQUIRED，artifacts 中快照、数据日期与方案必须匹配；缺失则提示补资料。UI 不能填零、跨任务拼接或从 approval 推导真实执行授权。团队投资总览提交 6ead62e，个人在本轮期间同步同项提交 3a611dd；两 main 均已包含，正式交付仍待确认。
 
 ## 本轮验证与待确认
 
@@ -120,7 +120,7 @@ WorkflowRecord.session_id 可选；HandoffPackage.session_id 必填可 null。�
 - Risk：正式接收服务身份、签名回调和联合验收仍缺；需提供同任务批准/拒绝/补资料/重复/冲突/过期回写样例，并确认 provider_response_id 缺失时的拒绝与恢复协议，不能造假编号。
 - Backend：健康 task_state/artifacts/tool_results/audit_evidence 与模型记录尚无版本化映射，健康 Session/Checkpoint 为进程内；需提供字段对照、跨实例幂等与持久化方案。模型存储恢复不能证明健康链路跨重启恢复。
 - Backend 与 Risk：可信审批身份及 Safety Action Gateway 未验收；需受保护入口和执行前再检查 Contract，真实执行继续关闭。
-- UI：两 main 的投资总览基线不同；需确认正式交付版本，并给出同任务等待/拒绝/缺资料/过期/409/503 的恢复与手机真机验收回执。本地页面及报告测试不等于正式部署。
+- UI：两个 main 已含投资总览，本地展示通过仍不代表正式部署；需确认正式交付版本，并给出同任务等待/拒绝/缺资料/过期/409/503 的恢复与手机真机验收回执。本地页面及报告测试不等于正式部署。
 - Memory：需提供既有 consent 下 memory_id、来源版本及撤回证据；调用方账户候选不能当作可信记忆，不扩展范围。
 - Quant 与 Data：需确认现有结果版本/日期、真实持仓快照及资金来源、时效与冲突协议；预期提供可审计样例，不能用现金占比证明生活费或可投资额度已确认。
 

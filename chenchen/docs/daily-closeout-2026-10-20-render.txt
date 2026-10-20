@@ -1,4 +1,4 @@
-core-agent-daily-update-2026-10-20 exit=1
+core-agent-daily-update-2026-10-20 final render exit=1
 Traceback (most recent call last):
   File "C:\Users\33183\.codex\plugins\cache\openai-primary-runtime\documents\26.1015.12040\skills\documents\render_docx.py", line 546, in <module>
     main()
@@ -14,7 +14,7 @@ Traceback (most recent call last):
     raise FileNotFoundError(f"LibreOffice {executable_name} was not found on PATH")
 FileNotFoundError: LibreOffice soffice.exe was not found on PATH
 
-core-agent-integration-guide-2026-10-20 exit=1
+core-agent-integration-guide-2026-10-20 final render exit=1
 Traceback (most recent call last):
   File "C:\Users\33183\.codex\plugins\cache\openai-primary-runtime\documents\26.1015.12040\skills\documents\render_docx.py", line 546, in <module>
     main()
