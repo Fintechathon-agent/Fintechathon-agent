@@ -17,12 +17,21 @@
 <button id="run" type="submit" disabled>开始健康检查 →</button><p class="small danger" id="load-error" role="alert" hidden></p>
 </form></details>
 <div id="results" hidden>
+<section class="dashboard-shell" id="dashboard-overview" aria-labelledby="dashboard-overview-title">
+<div class="dashboard-nav" aria-label="投资分析导航"><span class="dashboard-nav-label">本次分析</span><a href="#dashboard-overview">总览</a><a href="#next-steps-panel">先做什么</a><a href="#plans-panel">看方案</a><a href="#concentration-panel">看集中度</a><a href="#technical-details">运行记录</a></div>
+<div class="decision-banner"><div><p class="section-kicker">先看这一句</p><h2 id="dashboard-overview-title">本次组合状态</h2><p class="decision-number" id="dashboard-decision">正在整理结论…</p><p class="decision-copy" id="dashboard-decision-copy">结果会显示在这里。</p></div><div class="dashboard-status"><span class="tag" id="dashboard-status">分析中</span><a class="secondary dashboard-jump" href="#next-steps-panel">看下一步 ↓</a></div></div>
+<div class="focus-grid" id="dashboard-focus-grid">
+<article class="focus-card"><span class="focus-icon" aria-hidden="true">01</span><h3>组合表现</h3><strong class="focus-value" id="focus-return-value">—</strong><p id="focus-return-copy">固定样例区间的变化。</p><details class="compact-detail"><summary>小提示</summary><p class="small">这是演示数据的历史比较，不是实际账户盈亏。</p></details></article>
+<article class="focus-card"><span class="focus-icon" aria-hidden="true">02</span><h3>现金缓冲</h3><strong class="focus-value" id="focus-cash-value">—</strong><p id="focus-cash-copy">组合中暂时留在现金里的比例。</p><details class="compact-detail"><summary>小提示</summary><p class="small">现金比例不能证明房租、学费等生活用钱已经留够。</p></details></article>
+<article class="focus-card"><span class="focus-icon" aria-hidden="true">03</span><h3>先关注什么</h3><strong class="focus-value focus-value-text" id="focus-risk-value">—</strong><p id="focus-risk-copy">分析后给出的第一项核对顺序。</p><details class="compact-detail"><summary>小提示</summary><p class="small">这里只给核对顺序，不会自动改变组合，也不会代替风控审批。</p></details></article>
+</div>
+</section>
 <section class="snapshot-card" id="result-summary"><div id="report-overview"></div><button class="secondary" id="export-readable" type="button">下载易读报告 TXT</button><p class="small muted">分析完成后仍需风控复核和必要的人工确认；没有执行交易。</p></section>
 <section class="panel next-steps-panel" id="next-steps-panel"><div class="row"><div><p class="section-kicker">看懂之后 / 下一步</p><h2>现在先检查什么？</h2></div><span class="tag">只给核对顺序</span></div><p class="small muted" id="next-steps-intro">根据刚才的偏好与持仓，先做这三件小事；它们不会自动改变你的组合。</p><div class="next-step-grid" id="next-steps-list"></div><details class="compact-detail"><summary>什么时候需要重新检查？</summary><p class="small muted">投资期限、近期用钱计划、能承受的下跌幅度或组合中的最大仓位发生明显变化时，再重新运行一次。数据日期变旧时，也要先核对数据来源。</p></details></section>
 <section class="result-verdict"><div><p class="section-kicker">方案差异</p><h2 id="verdict-title"></h2><p id="verdict-copy"></p><details class="why-details"><summary>为什么这样判断</summary><ul id="verdict-evidence" class="evidence-list"></ul></details></div><span class="verdict-tag" id="verdict-tag"></span></section>
 <details class="panel" id="plans-panel"><summary>展开比较三种方案</summary><p class="small muted">同一段虚构数据、相同费用。尚未做适配或审批，不代表未来收益或个人推荐。</p><div id="comparison"></div>
 <details class="compact-detail"><summary>查看收益曲线与全部权重</summary><div id="investment-chart"></div><div id="weights"></div><p class="small muted" id="assumptions"></p></details></details>
-<details class="panel"><summary>组合集中在哪里？</summary><div id="findings"></div><p class="small muted">相关系数 ≥ 0.8 仅提示短窗口同向波动，不证明长期关系。</p></details>
+<details class="panel" id="concentration-panel"><summary>组合集中在哪里？</summary><div id="findings"></div><p class="small muted">相关系数 ≥ 0.8 仅提示短窗口同向波动，不证明长期关系。</p></details>
 <details class="panel"><summary>查看详细记录</summary><p class="small">保留原始计算和任务编号，供团队核查。尚未接通审批网关，不提供成交操作。</p><div id="task-status" class="tag"></div><pre id="evidence"></pre><button class="secondary" id="export">下载原始记录 JSON</button></details>
 </div></main>
 <footer class="footer">个人投资顾问 · 固定演示，非实时行情 · 不接真实账户 · 不构成投资建议</footer><div id="status" role="status" aria-live="polite"></div><script type="module" src="/versions/investment.js"></script>

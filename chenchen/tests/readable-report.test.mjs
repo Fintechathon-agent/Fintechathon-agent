@@ -69,4 +69,7 @@ test("investment page serves the real report module and exports readable text", 
   const page = await fetch(base + "/investment").then(r => r.text());
   assert.match(page, /下载易读报告 TXT/);
   assert.match(page, /<details class="panel" id="plans-panel">/);
+  assert.match(page, /id="dashboard-overview"/);
+  assert.match(page, /href="#concentration-panel"/);
+  assert.match(page, /id="focus-risk-value"/);
 });

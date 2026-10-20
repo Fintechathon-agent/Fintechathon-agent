@@ -35,6 +35,17 @@ body.home-product{--green:#2358a6}
 .decision-banner{display:flex;justify-content:space-between;align-items:center;gap:22px;background:linear-gradient(115deg,var(--pale),#fff 68%)}
 .decision-number{font:800 30px/1.15 system-ui;color:var(--green);letter-spacing:-1px}
 .decision-copy{max-width:600px;color:var(--muted);font-size:13px;margin:4px 0 0}
+.dashboard-shell{margin:18px 0 20px}
+.dashboard-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 10px;padding:4px 0;color:var(--muted);font-size:12px}
+.dashboard-nav-label{font-weight:800;color:var(--ink);margin-right:5px}
+.dashboard-nav a{color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:99px;padding:6px 10px;background:#fff}
+.dashboard-nav a:hover,.dashboard-nav a:focus-visible{color:var(--green);border-color:var(--green);background:var(--pale)}
+.dashboard-status{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.dashboard-jump{display:inline-flex;align-items:center;text-decoration:none;padding:8px 11px;border-radius:10px}
+.focus-card .focus-value{display:block;margin:8px 0 4px;color:var(--green);font:800 clamp(22px,3vw,30px)/1.15 system-ui;letter-spacing:-.7px;overflow-wrap:anywhere}
+.focus-card .focus-value-text{font-size:18px;line-height:1.35;letter-spacing:-.1px}
+.focus-card .compact-detail{margin-top:10px}
+.focus-card .compact-detail p{margin:5px 0 0}
 .snapshot-card .metrics,.metrics.compact-metrics{margin:0;gap:10px}
 .compact-metrics .metric{padding:14px 16px;border-radius:12px}
 .compact-metrics .metric strong{font-size:24px;margin-top:3px}

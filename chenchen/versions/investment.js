@@ -27,6 +27,19 @@ function renderNextSteps(report) {
   $("#next-steps-list").innerHTML = report.priorities.map((step, index) => '<article class="next-step"><span class="next-step-number">0' + (index + 1) + '</span><h3>' + esc(step.title) + '</h3><details class="compact-detail"><summary>原因与处理办法</summary><p>' + esc(step.reason) + '</p><p>' + esc(step.next) + '</p></details></article>').join("");
   $("#next-steps-intro").textContent = "先看这三件事。点开后看原因和处理办法。";
 }
+function renderDashboard(report) {
+  const [change, drawdown, cash] = report.metrics;
+  const first = report.priorities[0];
+  $("#dashboard-decision").textContent = report.headline;
+  $("#dashboard-decision-copy").textContent = report.context;
+  $("#dashboard-status").textContent = "已完成分析 · 等待风控复核";
+  $("#focus-return-value").textContent = change?.value || "待核对";
+  $("#focus-return-copy").textContent = "期间最大跌幅 " + (drawdown?.value || "待核对");
+  $("#focus-cash-value").textContent = cash?.value || "待核对";
+  $("#focus-cash-copy").textContent = cash?.help || "现金比例待核对。";
+  $("#focus-risk-value").textContent = first?.title || "先补齐资料";
+  $("#focus-risk-copy").textContent = first?.reason || "当前还没有可用的核对结论。";
+}
 $("#check-form").addEventListener("input",invalidate);
 $("#demo-profile").onclick=()=>{ invalidate(); $("#horizon").value=365;$("#drawdown").value=10;$("#liquidity").value="medium";toast("已填入虚构偏好，可修改。"); };
 $("#check-form").onsubmit=async event=>{
@@ -44,6 +57,7 @@ $("#check-form").onsubmit=async event=>{
     if(!view.best||!view.baseline)throw new Error("模拟缺少有效结果，暂不展示结论。");
     renderHoldings(a.portfolio_snapshot);
     renderNextSteps(readableReport);
+    renderDashboard(readableReport);
     $("#report-overview").innerHTML=investmentReportHtml(readableReport);
     $("#findings").innerHTML='<p>最大证券仓位 <b>'+esc(a.health_report.concentration.largest_instrument)+'</b>，占 <b>'+pct(a.health_report.concentration.top_1)+'</b>。</p><p class="small">短样本年化波动率 '+pct(m.annualized_volatility)+'。</p>'+
       a.health_report.hidden_clusters.map(c=>'<p class="small">'+esc(c.instruments.join(" / "))+' · 相关系数 '+c.correlation.toFixed(3)+'</p>').join("");
