@@ -53,6 +53,11 @@ test('Input, missing authentication, CORS, blocked model mode and unavailable st
   app.storage.get=async()=>{throw new Error('storage failed');};assert.equal((await app.gateway.fetch(request(),app.env)).status,503);assert.equal(calls,0);
 });
 test('Daily identity quota persists independently of the minute window',async()=>{const app=setup({TINGLAN_DAILY_REQUESTS:'1'});await reserveUser(app.storage,'a'.repeat(64),app.env,60000);await assert.rejects(reserveUser(app.storage,'a'.repeat(64),app.env,180000),/RATE_LIMITED/);});
+test('Workerd-compatible manual redirects reject 302 before reading or forwarding credentials',async t=>{
+ const app=setup();let calls=0;t.mock.method(console,'log',()=>{});
+ t.mock.method(globalThis,'fetch',async (_url,options)=>{calls++;assert.equal(options.redirect,'manual');return new Response('redirect',{status:302,headers:{Location:'https://invalid.example'}});});
+ const response=await app.gateway.fetch(request(),app.env);assert.equal(response.status,502);assert.equal((await response.json()).error.code,'MODEL_PROVIDER_ERROR');assert.equal(calls,1);
+});
 
 test('Access signature, issuer, audience, expiry and email allowlist are verified',async()=>{
   const pair=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);

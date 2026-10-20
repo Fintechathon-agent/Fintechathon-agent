@@ -1,3 +1,5 @@
+2026-10-20 最新：独立分享 Worker 的真实 Flash 后端及网页链路均已通过；大陆直连仍未通过。详见 [CLOUD-VERIFICATION-2026-10-20.md](CLOUD-VERIFICATION-2026-10-20.md)。以下均为历史交付快照。
+
 # 听澜真实 AI 接入候选 · 2026-10-18
 
 2026-10-19 第二轮：投资金额/目标/风险偏好及完整分析已补齐；指定大学生场景一次真实调用 HTTP 200、1148 tokens，完整结果与网页一致。新增报告 [PREFERENCE-ACCEPTANCE-2026-10-19.md](PREFERENCE-ACCEPTANCE-2026-10-19.md)。云端部署仍被 Owner 登录/Access 配置阻塞，下文和上一轮报告为历史快照。

@@ -1,7 +1,9 @@
 <section class="panel" id="ai-assistant" aria-labelledby="tinglan-title">
 <p class="section-kicker">AI / 偏好分析</p><h2 id="tinglan-title">听澜 AI 助手</h2>
 <p class="small muted">填写投资需求，获取模型生成的偏好分析与资金安排思路。用户自述未经账户核验；没有实时行情，不生成实时价格、收益预测或交易指令。</p>
-<form id="tinglan-form"><div class="fields">
+<form id="share-login" method="post" action="/api/session" hidden><label>分享访问口令<input name="code" type="password" minlength="16" maxlength="128" autocomplete="current-password" required></label><button type="submit" disabled>进入真实 AI 分析</button><p class="small">向分享者获取访问口令。口令用于保护试验额度，不能填写百炼 API Key。</p><p id="share-login-status" role="status"></p></form>
+<button id="share-logout" type="button" class="secondary" hidden>退出分享会话</button>
+<form id="tinglan-form" hidden><div class="fields">
 <label>投资金额（元）<input name="amount" type="number" min="0.01" max="100000000" step="0.01" required></label>
 <label>投资期限（天）<input name="horizon" type="number" min="1" max="36500" required></label>
 <label>风险偏好<select name="risk" required><option value="">请选择</option><option value="low">低</option><option value="medium_low">中低</option><option value="medium">中</option><option value="high">高</option></select></label>

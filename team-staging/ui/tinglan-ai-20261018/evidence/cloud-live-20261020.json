@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-10-20T02:02:43.524Z",
+  "base": "https://xinlan-qwen38-share.lixjanus526.workers.dev",
+  "model": "qwen3.8-flash",
+  "scope": "REAL_CLOUDFLARE_CHAIN",
+  "attempts": 1,
+  "steps": [
+    {
+      "phase": "authenticated-cloud-server-to-bailian",
+      "http": 502,
+      "durationMs": 798,
+      "body": {
+        "error": {
+          "code": "SERVICE_UNAVAILABLE",
+          "message": "AI 服务暂时不可用，请稍后重试。"
+        },
+        "execution_allowed": false
+      }
+    }
+  ],
+  "mainlandNetworkVerified": false,
+  "health": {
+    "status": "ok",
+    "service": "xinlan-qwen38-share",
+    "model": "qwen3.8-flash",
+    "configured": true,
+    "paidEnabled": true
+  },
+  "security": {
+    "anonymous": 401,
+    "forgedMachineBypassBlocked": true,
+    "crossOrigin": 403,
+    "login": 200,
+    "httpOnly": true,
+    "secure": true,
+    "sameSiteStrict": true
+  },
+  "result": "FAILED",
+  "error": {
+    "name": "AssertionError",
+    "code": "ERR_ASSERTION"
+  }
+}

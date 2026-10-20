@@ -40,7 +40,7 @@ export function readResult(data, modelName) {
     tokens: Number.isSafeInteger(model.usage?.total_tokens) ? model.usage.total_tokens : null, runId: data.run_id, auditId: data.audit.audit_id };
 }
 export async function analyze(config, body, fetchImpl, base = location.href) {
-  if (!config?.endpoint || config.mode !== 'CLOUDFLARE_ACCESS' || !['qwen3.8-flash','qwen3.8-max'].includes(config.model)) throw new Error('UNCONFIGURED');
+  if (!config?.endpoint || !['CLOUDFLARE_ACCESS','SESSION'].includes(config.mode) || !['qwen3.8-flash','qwen3.8-max'].includes(config.model)) throw new Error('UNCONFIGURED');
   const endpoint = new URL(config.endpoint, base);
   if (endpoint.protocol !== 'https:' && !['localhost','127.0.0.1'].includes(endpoint.hostname)) throw new Error('UNCONFIGURED');
   if (endpoint.username || endpoint.password || endpoint.search || endpoint.hash || endpoint.pathname !== '/api/review') throw new Error('UNCONFIGURED');

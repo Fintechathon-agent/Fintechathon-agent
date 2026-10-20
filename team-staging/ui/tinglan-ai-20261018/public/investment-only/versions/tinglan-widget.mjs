@@ -9,6 +9,22 @@ try {
 } catch { /* An unavailable configuration must not trigger model traffic. */ }
 if (!config?.endpoint) show('Demo 预览 · ' + messages.UNCONFIGURED);
 else show('Live AI 待验证 · 提交后核验登录并调用 ' + config.model + '，当前尚未请求模型。');
+if (config?.mode === 'SESSION') {
+  const login = document.querySelector('#share-login'), logout = document.querySelector('#share-logout'), hint = document.querySelector('#share-login-status');
+  const setAuthenticated = value => { login.hidden = value; logout.hidden = !value; form.hidden = !value; output.hidden = true; };
+  setAuthenticated(false);
+  try { const response = await window.tinglanFetch('/api/session', { cache:'no-store', credentials:'same-origin' }); const session = await response.json();setAuthenticated(response.ok && session.authenticated === true); } catch { show('无法核验分享会话，请检查网络。',true); }
+  login.addEventListener('submit',async event => {
+    event.preventDefault(); const submit = login.querySelector('button'); submit.disabled = true; hint.textContent = '正在验证访问口令…';
+    try { const response = await window.tinglanFetch('/api/session', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'},body:JSON.stringify({code:login.elements.code.value}),signal:AbortSignal.timeout(10000) });
+      if (!response.ok) { hint.textContent = response.status === 429 ? '登录尝试过多，请十分钟后再试。' : '访问口令无效或服务尚未配置。';return; }
+      login.reset();setAuthenticated(true);show('已进入受保护的真实 AI 工作台。提交后调用 Qwen3.8，当前尚未请求模型。');
+    } catch { hint.textContent = '登录网络失败，请重试。'; } finally { submit.disabled=false; }
+  });
+  logout.addEventListener('click',async()=>{try { const response=await window.tinglanFetch('/api/session',{method:'DELETE',credentials:'same-origin'});if(!response.ok)throw new Error();setAuthenticated(false);show('已退出分享会话。'); }catch{show('退出失败，请重试。',true);}});
+  login.querySelector('button').disabled=false;
+}
+else form.hidden=false;
 button.disabled = false;
 form.addEventListener('input', () => { output.hidden = true; pending = null; show('输入已改变，请重新提交分析。'); });
 form.addEventListener('submit', async event => {

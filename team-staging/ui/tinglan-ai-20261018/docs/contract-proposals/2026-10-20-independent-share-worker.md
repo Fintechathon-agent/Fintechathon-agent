@@ -1,0 +1,15 @@
+# Independent share Worker and transport compatibility
+
+User authorization: independent deployment in account 323563bd429155d1e603e8493138ada3, preserving the existing UI and core review protections. The user approved 20 requests with CNY 0.20 conservative application reservations, including acceptance. No automatic retries or model fallback. Team main/release remain unchanged; PR 23 remains a draft.
+
+The independent `xinlan-qwen38-share` Worker serves the existing frontend assets and the same-origin `/api/review` route. No duplicate Pages project is created. The shared model-review.v1 request and response contracts are retained. The original core sources are extracted from baseline 922d8a34d54c862d0353b14bb3a01ceba67b2476 into a temporary candidate; only that copy receives the documented model allowlist, response identity, reservation and Worker transport patches.
+
+Authentication uses a high-entropy shared access code verified by a serialized SQLite Durable Object and an HMAC-signed eight-hour HttpOnly/Secure/SameSite=Strict cookie. No frontend model key or machine credential is used. This is controlled shared access, not personal email identity or RBAC. All holders share the same subject quota. Anonymous requests and external machine-key bypasses are blocked; workflow approval/execution routes remain unavailable. Access-based gateway support is retained separately.
+
+Login limits: five attempts per IP per ten-minute fixed window, and 100 global per minute. Review limits: two per shared subject per minute, 20 per day, plus the original global model guard and durable CNY 0.20 total reservation. Each Flash attempt consumes CNY 0.01 reservation before HTTP, including ambiguous failures. This reservation is not an Alibaba billing hard cap. Automatic model retry is disabled. The independent share deployment only permits qwen3.8-flash; explicit qwen3.8-max support remains available in the isolated gateway candidate with its larger reservation, requiring separate deployment and budget authorization.
+
+Runtime finding: workerd rejects Request redirect="error". The Worker transport injects fetchImpl using redirect="manual", rejects all 3xx before parsing, and never forwards credentials to a redirect location. The shared Node adapter contract and Owner tests remain unchanged. Reference: https://github.com/cloudflare/workerd/blob/main/src/workerd/api/http.c%2B%2B (Request redirect validation).
+
+Authenticated `/api/tinglan/status` returns only bounded attempt accounting, model, error code, duration, usage and provider response ID. Its internal DO handler requires the server machine credential and cannot be reached as a public workflow route. No prompts, sessions or secrets are returned. Credentials stay in local ignored server configuration and Cloudflare Secrets; the source configuration defaults to paid=false to prevent accidental activation.
+
+Review remains with PR 23; this proposal documents the user-authorized isolated deployment and does not authorize integration into team main/release.
