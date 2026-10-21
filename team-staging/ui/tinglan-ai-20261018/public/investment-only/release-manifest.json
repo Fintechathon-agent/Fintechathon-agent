@@ -18,7 +18,7 @@
     },
     {
       "file": "versions/investment.js",
-      "sha256": "d6b5a3bb04042d7c19b2ba5858cf302d935b0344b9600645e0c01eb8ebda0183"
+      "sha256": "61e8f7ae746e6c965f5ed0abe5ca45f69ee98307fafb7accf453c05d8fa10129"
     },
     {
       "file": "versions/presentation.mjs",
@@ -74,11 +74,11 @@
     },
     {
       "file": "versions/tinglan-client.mjs",
-      "sha256": "93d1a24350b63b2235ac329b74817eaed73b6b4b34b6709265ce771eda769179"
+      "sha256": "d49a303dc6160c7b258a1d8c383971a5084a98e3400cf65e109b5d75957f90c4"
     },
     {
       "file": "versions/tinglan-widget.mjs",
-      "sha256": "c93a32c5bec0259f7f81790bfd3554c91130d0c188e2f3f96e8a2f91d8aafa83"
+      "sha256": "89880ed50b56915b741a007fa07706610fe5857831684577a6fda875d43d232d"
     },
     {
       "file": "versions/tinglan-transport.js",
@@ -94,7 +94,7 @@
     },
     {
       "file": "investment.html",
-      "sha256": "c53f67a2789ed49e8651920403493b236352ea43911adf81f63300ed6dffe648"
+      "sha256": "ba8f310b0a4c7d32605bd7161ca90a3aa5f5a5b75445a466ab4179caf09ddb63"
     },
     {
       "file": "catalog.html",
@@ -127,6 +127,16 @@
     {
       "file": "tinglan-config.json",
       "sha256": "5dbc74f88519539a1370a9b8e4dc42f05a6d0334fcac9b3fdcc971205e38a43c"
+    },
+    {
+      "file": "versions/investment-theme.css",
+      "sha256": "b770dfb0fa957c0e88611a721688b284c4b29ed018e704498795b63a92eeb78f"
     }
-  ]
+  ],
+  "screenshotFollowup": {
+    "date": "2026-10-21",
+    "scope": "THREE_TARGETED_UI_REPAIRS",
+    "backendChanged": false,
+    "modelCalls": 0
+  }
 }

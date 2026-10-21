@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-21",
+  "worker": "xinlan-qwen38-share",
+  "previousVersion": "68891f8b-752d-4c90-8442-9eb41773d44b",
+  "version": "8d7bb50a-a3ef-4b0b-8610-16d0bcd203f0",
+  "changedStaticAssets": [
+    "/investment-only/versions/investment-theme.css",
+    "/investment-only/investment.html",
+    "/investment-only/release-manifest.json",
+    "/investment-only/versions/investment.js"
+  ],
+  "workerCodeUploadKiB": 313.46,
+  "workerGzipKiB": 68.81,
+  "remoteVariablesRetained": true,
+  "localVariablesBlockOmitted": true,
+  "secretsUploaded": false,
+  "backendSourceChanged": false,
+  "paidModelCalls": 0,
+  "result": "DEPLOYED"
+}

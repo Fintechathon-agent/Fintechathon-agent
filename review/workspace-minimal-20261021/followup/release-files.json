@@ -1,0 +1,29 @@
+{
+  "basePreviewCommit": "c529294bf0fe78c205d9ef372ef75d6b5ead152e",
+  "files": [
+    {
+      "file": "landing.html",
+      "sha256": "56adb645536b85fab82e49f7165b34733b99c18d68c3cc75f3215ca98c4e46d1"
+    },
+    {
+      "file": "investment-only/investment.html",
+      "sha256": "f671b7f35feddb3b6ef2ea987ac913023fe3eebe5f2b3eb69438e19cc225e5b2"
+    },
+    {
+      "file": "investment-only/versions/investment.js",
+      "sha256": "61e8f7ae746e6c965f5ed0abe5ca45f69ee98307fafb7accf453c05d8fa10129"
+    },
+    {
+      "file": "investment-only/versions/investment-theme.css",
+      "sha256": "b770dfb0fa957c0e88611a721688b284c4b29ed018e704498795b63a92eeb78f"
+    },
+    {
+      "file": "preview-manifest.json",
+      "sha256": "4979880b7e3da79a570a0d6c87406dc80d98b85741f963db938d9ae421ddd7a8"
+    },
+    {
+      "file": "investment-only/release-manifest.json",
+      "sha256": "54ab15f477c24bf739579de67115fce93f4d4fb36e834e4c5cd56cd95532ca70"
+    }
+  ]
+}
