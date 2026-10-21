@@ -1,0 +1,389 @@
+{
+  "timestamp": "2026-10-21T09:03:16.379Z",
+  "mode": "local",
+  "measurements": [
+    {
+      "width": 375,
+      "cards": [
+        {
+          "h3": {
+            "y": 1714.859375,
+            "height": 19,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1741.859375,
+            "height": 82.5,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1824.359375,
+            "height": 29,
+            "unclipped": true
+          }
+        },
+        {
+          "h3": {
+            "y": 1714.859375,
+            "height": 19,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1741.859375,
+            "height": 82.5,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1824.359375,
+            "height": 29,
+            "unclipped": true
+          }
+        }
+      ],
+      "aligned": true,
+      "noOverflow": true
+    },
+    {
+      "width": 700,
+      "cards": [
+        {
+          "h3": {
+            "y": 1728.453125,
+            "height": 22,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1758.453125,
+            "height": 41.25,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1799.703125,
+            "height": 32,
+            "unclipped": true
+          }
+        },
+        {
+          "h3": {
+            "y": 1728.453125,
+            "height": 22,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1758.453125,
+            "height": 41.25,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1799.703125,
+            "height": 32,
+            "unclipped": true
+          }
+        }
+      ],
+      "aligned": true,
+      "noOverflow": true
+    },
+    {
+      "width": 701,
+      "cards": [
+        {
+          "h3": {
+            "y": 1747.578125,
+            "height": 32,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1797.578125,
+            "height": 108.75,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1922.328125,
+            "height": 44,
+            "unclipped": true
+          }
+        },
+        {
+          "h3": {
+            "y": 1747.578125,
+            "height": 32,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1797.578125,
+            "height": 108.75,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1922.328125,
+            "height": 44,
+            "unclipped": true
+          }
+        }
+      ],
+      "aligned": true,
+      "noOverflow": true
+    },
+    {
+      "width": 720,
+      "cards": [
+        {
+          "h3": {
+            "y": 1747.578125,
+            "height": 32,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1797.578125,
+            "height": 108.75,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1922.328125,
+            "height": 44,
+            "unclipped": true
+          }
+        },
+        {
+          "h3": {
+            "y": 1747.578125,
+            "height": 32,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1797.578125,
+            "height": 108.75,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1922.328125,
+            "height": 44,
+            "unclipped": true
+          }
+        }
+      ],
+      "aligned": true,
+      "noOverflow": true
+    },
+    {
+      "width": 800,
+      "cards": [
+        {
+          "h3": {
+            "y": 1763.578125,
+            "height": 32,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1813.578125,
+            "height": 81.5625,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1911.140625,
+            "height": 44,
+            "unclipped": true
+          }
+        },
+        {
+          "h3": {
+            "y": 1763.578125,
+            "height": 32,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1813.578125,
+            "height": 81.5625,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1911.140625,
+            "height": 44,
+            "unclipped": true
+          }
+        }
+      ],
+      "aligned": true,
+      "noOverflow": true
+    },
+    {
+      "width": 840,
+      "cards": [
+        {
+          "h3": {
+            "y": 1744.078125,
+            "height": 32,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1794.078125,
+            "height": 81.5625,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1891.640625,
+            "height": 44,
+            "unclipped": true
+          }
+        },
+        {
+          "h3": {
+            "y": 1744.078125,
+            "height": 32,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1794.078125,
+            "height": 81.5625,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1891.640625,
+            "height": 44,
+            "unclipped": true
+          }
+        }
+      ],
+      "aligned": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1024,
+      "cards": [
+        {
+          "h3": {
+            "y": 1745.703125,
+            "height": 33,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1796.703125,
+            "height": 54.375,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1867.078125,
+            "height": 44,
+            "unclipped": true
+          }
+        },
+        {
+          "h3": {
+            "y": 1745.703125,
+            "height": 33,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1796.703125,
+            "height": 54.375,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1867.078125,
+            "height": 44,
+            "unclipped": true
+          }
+        }
+      ],
+      "aligned": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1259,
+      "cards": [
+        {
+          "h3": {
+            "y": 1761.484375,
+            "height": 41,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1820.484375,
+            "height": 54.375,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1890.859375,
+            "height": 44,
+            "unclipped": true
+          }
+        },
+        {
+          "h3": {
+            "y": 1761.484375,
+            "height": 41,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1820.484375,
+            "height": 54.375,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1890.859375,
+            "height": 44,
+            "unclipped": true
+          }
+        }
+      ],
+      "aligned": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "cards": [
+        {
+          "h3": {
+            "y": 1772.078125,
+            "height": 46,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1836.078125,
+            "height": 54.375,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1906.453125,
+            "height": 44,
+            "unclipped": true
+          }
+        },
+        {
+          "h3": {
+            "y": 1772.078125,
+            "height": 46,
+            "unclipped": true
+          },
+          "p": {
+            "y": 1836.078125,
+            "height": 54.375,
+            "unclipped": true
+          },
+          ".feature-link": {
+            "y": 1906.453125,
+            "height": 44,
+            "unclipped": true
+          }
+        }
+      ],
+      "aligned": true,
+      "noOverflow": true
+    }
+  ],
+  "navigation": [
+    {
+      "card": 0,
+      "panel": "banking",
+      "passed": true
+    },
+    {
+      "card": 1,
+      "panel": "tasks",
+      "passed": true
+    }
+  ],
+  "pageErrors": [],
+  "result": "PASSED"
+}
