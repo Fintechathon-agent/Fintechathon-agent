@@ -867,3 +867,73 @@ Word 日报与手册已生成，架构和时序以可读图像嵌入，完成 OO
 ## Word 版式验收
 
 日报和联调手册均嵌入架构、时序图；ZIP、文本、图片数量和宽度结构检查通过。已尝试 canonical render_docx.py，bundled 环境缺少 LibreOffice soffice.exe，未生成页面 PNG，逐页版式验收未完成。不能标记版式通过；日志 daily-closeout-2026-10-20-render.txt。
+Core Agent Daily Update 2026 10 21
+
+今日真实产出：Core 与 Risk 的独立 Cloudflare 联调后端已部署，14 项公网检查通过；这是独立后端联调版，不是完整产品联合验收。模型入口仍为 423 MODEL_CALLS_DISABLED，真实模型调用、人工审批和交易执行均为 0，execution_allowed=false。
+
+A 已完成的核心接口
+
+- investment-agent.v1：Backend/Core Agent -> Harness/UI/Risk；request_id、task_id、session_id、task_state、artifacts、tool_results、audit_evidence、risk_handoff 可追踪，运行时 Schema 未改。
+- risk-handoff.v1 / risk-callback.v1：Core -> Risk；Risk -> Backend。机器身份、固定 reviewer、签名、任务和方案指纹门禁已部署；正式业务回调仍未联合验收。
+- core-agent-error.v1：401、403、404、409、423 边界已公网验证。
+- Cloud bridge 2026-10-21：/api/status 200；/api/assess 仅程序资金核对；/api/review 423，不生成正式任务、不执行。
+- Durable Object Audit Evidence：检查编号、事件编号、哈希链和状态可查询，联调环境独立。
+
+B 可验证的集成进度
+
+- 团队 Core 分支 npm run check 通过；npm test -- --test-reporter=tap 304/304。个人 Core 工作区 check 通过；测试 294/294。日志见 daily-closeout-2026-10-21-check.txt 与 tests.txt。
+- git diff --check 两仓库通过。
+- Cloudflare 公网检查 14/14：health 200；无凭据 401；Risk -> Core 200；资金案例 BLOCK 缺口 2000；重复复用；改内容 409；记录查询 200；模型入口 423；Origin 403；错签名 401；错 reviewer 403；不存在任务 404。
+- 本地云适配专项 9/9；原 Core 全量 304/304；PR27 Python 16/16、Node 258/258、静态样例 4/4、金额向量 12/12。模型均为测试替身，真实模型调用 0。
+
+金融数据与职责边界
+
+Core 只消费既有 Quant diagnosePortfolio.metrics、generateCandidates.target_weights、runSimulation.comparisons，未重算或修改 Quant。Memory consent、范围、生命周期、清理规则未改。价格与新闻冲突只记录 REVIEW_REQUIRED。request/task/session/Contract version/audit_evidence 在样例中可追踪；前端 approval 不是交易授权，execution_allowed=false。
+
+C 需要其他 Owner 配合的阻塞项
+
+- Risk/Backend：正式接收地址、可信身份、回调回写、provider_response_id 缺失、幂等/重试和冲突协议。
+- 模型/费用 Owner：预算与提供方确认后才能打开模型入口，当前 423。
+- UI/Backend：服务端代理、本人隔离及 PENDING_RISK/FAILED/EXPIRED/REVIEW_REQUIRED 与 401/403/409/423 恢复展示。
+- Memory、Quant、Data：可信引用、结果版本、时效和冲突样例。
+- 安全/执行 Owner：人工审批身份、Safety Action Gateway、执行前检查和真实用户隔离。
+
+下一步：先冻结 Risk/Backend 回调和模型预算，再以同一 request/task/session/audit 做真实模型到 Risk Handoff 联合验收；继续保持 PAPER 与真实执行阻断。
+
+Word 版式：已生成 dated DOCX 并嵌入架构、时序图；OOXML 结构检查通过。render_docx.py 因缺少 LibreOffice soffice.exe 未生成页面 PNG，逐页验收未完成。
+
+Core Agent Daily Update 2026 10 21
+
+今日真实产出：Core 与 Risk 的独立 Cloudflare 联调后端已部署，14 项公网检查通过；这是独立后端联调版，不是完整产品联合验收。模型入口仍为 423 MODEL_CALLS_DISABLED，真实模型调用、人工审批和交易执行均为 0，execution_allowed=false。
+
+A 已完成的核心接口
+
+- investment-agent.v1：Backend/Core Agent -> Harness/UI/Risk；request_id、task_id、session_id、task_state、artifacts、tool_results、audit_evidence、risk_handoff 可追踪，运行时 Schema 未改。
+- risk-handoff.v1 / risk-callback.v1：Core -> Risk；Risk -> Backend。机器身份、固定 reviewer、签名、任务和方案指纹门禁已部署；正式业务回调仍未联合验收。
+- core-agent-error.v1：401、403、404、409、423 边界已公网验证。
+- Cloud bridge 2026-10-21：/api/status 200；/api/assess 仅程序资金核对；/api/review 423，不生成正式任务、不执行。
+- Durable Object Audit Evidence：检查编号、事件编号、哈希链和状态可查询，联调环境独立。
+
+B 可验证的集成进度
+
+- 团队 Core 分支 npm run check 通过；npm test -- --test-reporter=tap 304/304。个人 Core 工作区 check 通过；测试 294/294。日志见 daily-closeout-2026-10-21-check.txt 与 tests.txt。
+- git diff --check 两仓库通过。
+- Cloudflare 公网检查 14/14：health 200；无凭据 401；Risk -> Core 200；资金案例 BLOCK 缺口 2000；重复复用；改内容 409；记录查询 200；模型入口 423；Origin 403；错签名 401；错 reviewer 403；不存在任务 404。
+- 本地云适配专项 9/9；原 Core 全量 304/304；PR27 Python 16/16、Node 258/258、静态样例 4/4、金额向量 12/12。模型均为测试替身，真实模型调用 0。
+
+金融数据与职责边界
+
+Core 只消费既有 Quant diagnosePortfolio.metrics、generateCandidates.target_weights、runSimulation.comparisons，未重算或修改 Quant。Memory consent、范围、生命周期、清理规则未改。价格与新闻冲突只记录 REVIEW_REQUIRED。request/task/session/Contract version/audit_evidence 在样例中可追踪；前端 approval 不是交易授权，execution_allowed=false。
+
+C 需要其他 Owner 配合的阻塞项
+
+- Risk/Backend：正式接收地址、可信身份、回调回写、provider_response_id 缺失、幂等/重试和冲突协议。
+- 模型/费用 Owner：预算与提供方确认后才能打开模型入口，当前 423。
+- UI/Backend：服务端代理、本人隔离及 PENDING_RISK/FAILED/EXPIRED/REVIEW_REQUIRED 与 401/403/409/423 恢复展示。
+- Memory、Quant、Data：可信引用、结果版本、时效和冲突样例。
+- 安全/执行 Owner：人工审批身份、Safety Action Gateway、执行前检查和真实用户隔离。
+
+下一步：先冻结 Risk/Backend 回调和模型预算，再以同一 request/task/session/audit 做真实模型到 Risk Handoff 联合验收；继续保持 PAPER 与真实执行阻断。
+
+Word 版式：已生成 dated DOCX 并嵌入架构、时序图；OOXML 结构检查通过。render_docx.py 因缺少 LibreOffice soffice.exe 未生成页面 PNG，逐页验收未完成。
+

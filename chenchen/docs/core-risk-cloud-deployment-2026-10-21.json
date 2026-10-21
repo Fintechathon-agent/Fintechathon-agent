@@ -1,0 +1,362 @@
+{
+  "report": "core-risk-cloud-deployment.v1",
+  "recorded_for_date": "2026-10-21",
+  "checked_at": "2026-10-21T07:37:00.067Z",
+  "core": "https://finance-lab-core-risk-validation.realchenchenluo.workers.dev",
+  "risk": "https://finance-lab-risk-bridge.realchenchenluo.workers.dev",
+  "checks": [
+    {
+      "name": "risk_health",
+      "status": 200,
+      "elapsed_ms": 916,
+      "response_sha256": "71b33eabd12eb2860616a5a6535ce4e056f9d0b23c7d8e4286c0d5a052f4fffa",
+      "summary": {
+        "status": "ok",
+        "service": "risk-conversation",
+        "deployment": "CLOUD_VALIDATION",
+        "owner_source": "PR27-27bdefb",
+        "model_calls_enabled": false,
+        "joint_acceptance": false,
+        "execution_allowed": false
+      }
+    },
+    {
+      "name": "core_health",
+      "status": 200,
+      "elapsed_ms": 1344,
+      "response_sha256": "b36e0ff40d97d7af2a1c8bab346b83fcf6a23c3955b6114e938d41c5a561a90f",
+      "summary": {
+        "status": "ok",
+        "service": "core-agent",
+        "contract_version": "investment-agent.v1",
+        "review_endpoint": "/api/review",
+        "docs": "/docs",
+        "model": {
+          "provider": "cloudflare_workers_ai",
+          "name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "configured": false
+        },
+        "audit_storage": "durable_object"
+      }
+    },
+    {
+      "name": "risk_unauthenticated_denied",
+      "status": 401,
+      "elapsed_ms": 228,
+      "response_sha256": "5f2826d840b6f5bba7587e862df68db801fcdc77f155df53f905279c906012f1",
+      "summary": {
+        "error": {
+          "code": "SERVICE_AUTH_REQUIRED",
+          "message": "缺少有效的服务端身份。"
+        },
+        "execution_allowed": false
+      }
+    },
+    {
+      "name": "core_unauthenticated_denied",
+      "status": 401,
+      "elapsed_ms": 217,
+      "response_sha256": "673853a1ac06dcaa1fc0742c5c950bd6677578443991dbb24adf3b052875edfc",
+      "summary": {
+        "contract_version": "investment-agent.v1",
+        "request_id": null,
+        "operation": "PORTFOLIO_HEALTH_CHECK",
+        "trace": {
+          "contract_version": "investment-agent.v1",
+          "error_contract_version": "core-agent-error.v1",
+          "source_contract_version": "investment-agent.v1",
+          "request_id": null,
+          "task_id": null,
+          "session_id": null,
+          "run_id": null,
+          "audit_id": null,
+          "handoff_id": null
+        },
+        "error": {
+          "code": "AUTHENTICATION_REQUIRED",
+          "message": "API authentication is required",
+          "retryable": false,
+          "stage": "AUTHENTICATION",
+          "recovery": "Use the server-side X-Core-Agent-Key through your backend proxy.",
+          "details": null
+        },
+        "error_contract_version": "core-agent-error.v1",
+        "source_contract_version": "investment-agent.v1"
+      }
+    },
+    {
+      "name": "risk_to_core_authenticated_connection",
+      "status": 200,
+      "elapsed_ms": 249,
+      "response_sha256": "70e1ae3fa09c0f0c5b9f0336af3fdbbf95288255e9d67a7031f069f7f760f2f4",
+      "summary": {
+        "service": "risk-conversation",
+        "mode": "CLOUD_VALIDATION_SYNTHETIC_ONLY",
+        "core_connection_verified": true,
+        "core_callback_configured": true,
+        "model_configured": false,
+        "model_calls_enabled": false,
+        "model_probe": "NOT_RUN",
+        "joint_acceptance": false,
+        "execution_allowed": false
+      }
+    },
+    {
+      "name": "cloud_program_shortfall",
+      "status": 200,
+      "elapsed_ms": 245,
+      "response_sha256": "22c45dfcf768af55d9bac2464d45af8cf66ea8202c89bab0eda1d9b5696c4e8d",
+      "summary": {
+        "risk_check_id": "cloud-risk-83814448-9f47-4715-ab12-7eb4e6677b0a",
+        "decision": "BLOCK",
+        "shortfall_yuan": "2000.00",
+        "protected_yuan": "4000.00",
+        "replayed": true,
+        "model_status": "NOT_CALLED",
+        "formal_risk_callback": "NOT_SENT",
+        "audit_event_id": "conversation-audit-3f12bc4d-b86c-491f-aaea-0b999e630b31",
+        "execution_allowed": false
+      }
+    },
+    {
+      "name": "cloud_replay",
+      "status": 200,
+      "elapsed_ms": 229,
+      "response_sha256": "22c45dfcf768af55d9bac2464d45af8cf66ea8202c89bab0eda1d9b5696c4e8d",
+      "summary": {
+        "risk_check_id": "cloud-risk-83814448-9f47-4715-ab12-7eb4e6677b0a",
+        "decision": "BLOCK",
+        "shortfall_yuan": "2000.00",
+        "protected_yuan": "4000.00",
+        "replayed": true,
+        "model_status": "NOT_CALLED",
+        "formal_risk_callback": "NOT_SENT",
+        "audit_event_id": "conversation-audit-3f12bc4d-b86c-491f-aaea-0b999e630b31",
+        "execution_allowed": false
+      }
+    },
+    {
+      "name": "cloud_content_conflict",
+      "status": 409,
+      "elapsed_ms": 258,
+      "response_sha256": "05dbc9d3b91e506b6272b3d2b222af0937f486dfbe205d84ac0cb0684ac76eb5",
+      "summary": {
+        "error": {
+          "code": "IDEMPOTENCY_CONTENT_CONFLICT",
+          "message": "同一请求编号对应的资料不能改变。"
+        },
+        "executed": false,
+        "execution_allowed": false
+      }
+    },
+    {
+      "name": "cloud_persisted_record",
+      "status": 200,
+      "elapsed_ms": 830,
+      "response_sha256": "a5e91b92dd4b65084a648e8b55223635d1c9d550f6d175c66c146cb3f172c527",
+      "summary": {
+        "record_status": "COMPLETE",
+        "audit_count": 1,
+        "audit_event_ids": [
+          "conversation-audit-3f12bc4d-b86c-491f-aaea-0b999e630b31"
+        ],
+        "event_hashes": [
+          "98b0f4dfbcf8a823284111892a40b4dceb1fabfac0139b21c995d0a55c50b6b0"
+        ],
+        "execution_allowed": false
+      }
+    },
+    {
+      "name": "cloud_model_budget_guard",
+      "status": 423,
+      "elapsed_ms": 228,
+      "response_sha256": "5c8eb178a5dcbc011f9b38fd2b4ba88982bc2636c6da3f9e8af20b2e63e38db8",
+      "summary": {
+        "error": {
+          "code": "MODEL_CALLS_DISABLED",
+          "message": "按零付费测试要求，模型调用尚未开放；可使用/api/assess核对虚构资金。没有生成模型响应或正式回调。"
+        },
+        "executed": false,
+        "execution_allowed": false
+      }
+    },
+    {
+      "name": "browser_machine_key_rejected",
+      "status": 403,
+      "elapsed_ms": 222,
+      "response_sha256": "3ee31ea8e01ec4488fae36cc58f4fa0edf2e1a40459fe647bd7bd047a437fe42",
+      "summary": {
+        "error": {
+          "code": "BROWSER_ACCESS_DENIED",
+          "message": "该接口只供受信任服务端调用，不接收浏览器机器凭据。"
+        },
+        "execution_allowed": false
+      }
+    },
+    {
+      "name": "wrong_callback_signature_rejected",
+      "status": 401,
+      "elapsed_ms": 222,
+      "response_sha256": "c3543f331a0dad1af0af0fbbc6926a166a8af63e447888e87374cc828f41b21e",
+      "summary": {
+        "review_version": "model-review.v1",
+        "contract_version": "model-review.v1",
+        "error": {
+          "code": "OWNER_AUTH_INVALID",
+          "message": "risk 回写签名无效。",
+          "retryable": false,
+          "stage": "AUTHENTICATION",
+          "recovery": "重新读取当前 Handoff，使用相同请求正文生成签名。",
+          "details": null
+        },
+        "workflow": null,
+        "error_contract_version": "core-agent-error.v1",
+        "source_contract_version": "model-review.v1",
+        "operation": "MODEL_REVIEW",
+        "request_id": null,
+        "trace": {
+          "contract_version": "model-review.v1",
+          "error_contract_version": "core-agent-error.v1",
+          "source_contract_version": "model-review.v1",
+          "request_id": null,
+          "task_id": null,
+          "session_id": null,
+          "run_id": null,
+          "audit_id": null,
+          "handoff_id": null
+        }
+      }
+    },
+    {
+      "name": "correct_signature_wrong_reviewer_rejected",
+      "status": 403,
+      "elapsed_ms": 235,
+      "response_sha256": "b9ef10c92b14e1076d50da6f9f286908cfa7a3813c6a95ed409441cf2db067cb",
+      "summary": {
+        "review_version": "model-review.v1",
+        "contract_version": "model-review.v1",
+        "error": {
+          "code": "OWNER_ACTOR_MISMATCH",
+          "message": "Risk 审核身份与服务端配置不一致。",
+          "retryable": false,
+          "stage": "AUTHENTICATION",
+          "recovery": "使用服务端配置的 Risk 身份重新签署；不要修改原任务。",
+          "details": null
+        },
+        "workflow": null,
+        "error_contract_version": "core-agent-error.v1",
+        "source_contract_version": "model-review.v1",
+        "operation": "MODEL_REVIEW",
+        "request_id": null,
+        "trace": {
+          "contract_version": "model-review.v1",
+          "error_contract_version": "core-agent-error.v1",
+          "source_contract_version": "model-review.v1",
+          "request_id": null,
+          "task_id": null,
+          "session_id": null,
+          "run_id": null,
+          "audit_id": null,
+          "handoff_id": null
+        }
+      }
+    },
+    {
+      "name": "valid_signature_missing_task_rejected",
+      "status": 404,
+      "elapsed_ms": 210,
+      "response_sha256": "e6dc76e94ec307b674ec67d628b6f88ad432c77d7065164b4c21724f73c96111",
+      "summary": {
+        "review_version": "model-review.v1",
+        "contract_version": "model-review.v1",
+        "error": {
+          "code": "WORKFLOW_NOT_FOUND",
+          "message": "review task not found",
+          "retryable": false,
+          "stage": "LOOKUP",
+          "recovery": "Use the task_id returned by POST /api/review.",
+          "details": null
+        },
+        "workflow": null,
+        "error_contract_version": "core-agent-error.v1",
+        "source_contract_version": "model-review.v1",
+        "operation": "MODEL_REVIEW",
+        "request_id": null,
+        "trace": {
+          "contract_version": "model-review.v1",
+          "error_contract_version": "core-agent-error.v1",
+          "source_contract_version": "model-review.v1",
+          "request_id": null,
+          "task_id": null,
+          "session_id": null,
+          "run_id": null,
+          "audit_id": null,
+          "handoff_id": null
+        }
+      }
+    }
+  ],
+  "real_model_calls": 0,
+  "signature_authentication_probed": true,
+  "formal_risk_callback_tested": false,
+  "human_approval_tested": false,
+  "execution_gateway_connected": false,
+  "joint_acceptance": false,
+  "encrypted_credentials_outside_git": true,
+  "deployments": {
+    "core": {
+      "version": "cfdd0359-3341-4fd0-8f4d-9bee3d746d40",
+      "deployment": "0e419436-0f19-4bd2-9bb5-cf78763c49ff"
+    },
+    "risk": {
+      "version": "8f10004d-761b-43c3-9e08-543ef52746f8",
+      "deployment": "c2204555-5461-4885-993d-a6b0910fa42d"
+    },
+    "old_core_unchanged": {
+      "version": "209a21a4-7245-4a96-bb3a-56a064e61d85",
+      "deployment": "6d8b50e9-aabc-444f-9e95-e8c7d4ac2ac0"
+    }
+  },
+  "build": {
+    "risk_pr": 27,
+    "risk_source_commit": "27bdefbbb38c7d4e7b7dc1f975217862832d1d6f",
+    "pinned_source_files_verified": 10,
+    "source_comparison": "Git text matches with CRLF normalized; raw file hashes retained",
+    "bundle_sha256": "ba4156676886629466b8d41cc9042074bc9c006477b724a0bd398ab4adef9301",
+    "transformations": [
+      "Build-time Ajv standalone validator only; request/callback logic unchanged",
+      "SQLite Durable Object store replaces local filesystem store"
+    ],
+    "owner_source_sha256": {
+      "modules/safety-risk-eval/interface-adapters/conversation-review.cjs": "c621f9cef50d3776f5eabd96727d9124d44af72ede7af8486fef959c773e6239",
+      "modules/safety-risk-eval/interface-adapters/conversation-risk.cjs": "2a5764ea190e1b7c6ec843df533af05051d3127a0fb0f8fe26ab0eb9a0f84777",
+      "modules/safety-risk-eval/interface-adapters/conversation-input.cjs": "24fc91ff4b2bb01817d3cccd1e9d8b3e209f0b9ae42f2d69265f04c41666991d",
+      "modules/safety-risk-eval/daily-engine.cjs": "f588c9d2299fce5a94248744a359eb0ceccfc9c958d6f66688f5849d235ab556",
+      "modules/safety-risk-eval/interface-adapters/money.cjs": "7548c9a1f65e59fe43663cfda68c34c91e5358ad3324dd578cd0575467271dd1",
+      "modules/safety-risk-eval/interface-adapters/conversation-store.cjs": "5d3c32dc7e1c4a0e974a891788a568137f1a25fea4f603d124a090d865b3427e",
+      "modules/safety-risk-eval/interface-adapters/core-client.cjs": "61171c2d99bc293d9b20707ea8dd2174262f53ded2316ea54d396b3382827381",
+      "modules/safety-risk-eval/interface-adapters/risk-callback-sender.cjs": "f76c1dd0a848671c631631ef785920c61e1e6548047e35ff02b71f71efaa208c",
+      "modules/safety-risk-eval/interface-adapters/risk-callback.cjs": "eac98b03e6f593290a9aeb79fb22cc892fd6c9d4d5523def7e715ac7fb8b56b5",
+      "docs/safety-risk-eval/daily-policy-v1/policy-config.v1.json": "e01da713b2e1021bdadd6918be3ee54238df9884602d5e5774597867a537d9a1"
+    }
+  },
+  "local": {
+    "core_tests": 304,
+    "cloud_adapter_cases": 9,
+    "real_workerd_checked": true,
+    "models": "TEST_DOUBLE_ONLY"
+  },
+  "intermediate_failures": [
+    "CJS dynamic node:crypto require failed workerd startup; ESM built-in wrappers fixed and runtime retested",
+    "First Windows credential recovery copy empty because PS7 module path contaminated Windows PowerShell; error handling and child module path fixed; encrypted vault now verified through reuse",
+    "First post-upload Risk authentication returned 503, not counted as pass; configuration replaced with recoverable independently generated secrets and final public checks passed"
+  ],
+  "preservation": {
+    "old_production_worker_changed": false,
+    "old_ui_changed": false,
+    "owner_original_files_changed": false,
+    "pr27_merged": false,
+    "pr28_merged": false,
+    "storage_deleted": false
+  }
+}
