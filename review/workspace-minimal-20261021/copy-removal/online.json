@@ -1,0 +1,44 @@
+{
+  "mode": "online",
+  "result": "PASSED",
+  "pagesRun": 39579434600,
+  "commit": "26410016d64884c86fea178943b0f922fef484f9",
+  "checks": [
+    {
+      "width": 375,
+      "paragraphsRemoved": true,
+      "aligned": true,
+      "noEmptyCopyArea": true,
+      "noOverflow": true,
+      "cardHeight": 288
+    },
+    {
+      "width": 840,
+      "paragraphsRemoved": true,
+      "aligned": true,
+      "noEmptyCopyArea": true,
+      "noOverflow": true,
+      "cardHeight": 400
+    },
+    {
+      "width": 1440,
+      "paragraphsRemoved": true,
+      "aligned": true,
+      "noEmptyCopyArea": true,
+      "noOverflow": true,
+      "cardHeight": 414
+    }
+  ],
+  "wholeCardNavigation": 2,
+  "pageErrors": [],
+  "publishedFiles": [
+    {
+      "file": "landing.html",
+      "sha256": "0faf1997537e80de4a518665f07dfd39eaecb216461a2ddd57ce74f4c509c407"
+    },
+    {
+      "file": "preview-manifest.json",
+      "sha256": "972cf0a08aab8f03af68833ab62ef0d38092878a46a8ae046fee259d86903d9a"
+    }
+  ]
+}
