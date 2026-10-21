@@ -94,7 +94,7 @@
     },
     {
       "file": "investment.html",
-      "sha256": "ba8f310b0a4c7d32605bd7161ca90a3aa5f5a5b75445a466ab4179caf09ddb63"
+      "sha256": "d8ef35b8f04e341c4a5458130da538af68976481034e90ff4868db6177cfb2bc"
     },
     {
       "file": "catalog.html",
@@ -130,7 +130,11 @@
     },
     {
       "file": "versions/investment-theme.css",
-      "sha256": "b770dfb0fa957c0e88611a721688b284c4b29ed018e704498795b63a92eeb78f"
+      "sha256": "3fafdcb2664368889771f863c7181d75bae7ea2ca9710d33001476ebfe6c3535"
+    },
+    {
+      "file": "versions/team-logo-transparent.png",
+      "sha256": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6"
     }
   ],
   "screenshotFollowup": {

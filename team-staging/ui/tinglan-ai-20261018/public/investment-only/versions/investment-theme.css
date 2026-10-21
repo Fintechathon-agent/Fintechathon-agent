@@ -1,4 +1,4 @@
-/* Match the shared black, gray and orange palette without changing layout or logos. */
+/* Shared black, gray and orange palette. */
 body.archive-workbench {
   --canvas:#0b0a09;
   --archive-surface:#191715;
@@ -48,3 +48,11 @@ body.archive-workbench input[type=checkbox] { accent-color:var(--signal-orange);
 body.archive-workbench .plan-card.highlighted { border-color:var(--signal-orange); }
 body.archive-workbench :is(.notice,.inline-feedback,.review) { border-color:#80502e; }
 body.archive-workbench :focus-visible { outline-color:var(--signal-orange); }
+/* Use the same transparent artwork as the homepage. */
+body.archive-workbench .lab-brand .team-logo-cutout {
+  display:block; width:80px; height:80px; object-fit:contain;
+  flex:none; background:transparent; filter:none; border:0;
+}
+@media(max-width:900px) {
+  body.archive-workbench .lab-brand .team-logo-cutout { width:56px; height:56px; }
+}
