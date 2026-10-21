@@ -6,6 +6,28 @@
 <title>Finance Lab · 金融 AI 安全任务台</title>
 <link rel="stylesheet" href="/static/style.css">
 <link rel="icon" href="data:,">
+<style>
+.funds-check { margin: 12px 0; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.funds-check summary { cursor: pointer; color: var(--ink); font-weight: 600; padding: 8px 0; }
+.funds-check p { margin: 8px 0; color: var(--text); font-size: 14px; }
+.funds-check fieldset { border: 0; margin: 12px 0 0; padding: 0; min-width: 0; }
+.funds-check legend { font-size: 14px; margin-bottom: 8px; }
+.funds-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.funds-fields label { display: grid; gap: 4px; font-size: 14px; }
+.funds-fields input { width: 100%; min-width: 0; min-height: 44px; padding: 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); font: inherit; font-size: 16px; background: var(--card); color: var(--text); }
+.funds-check input:focus-visible, .funds-check summary:focus-visible { outline: 2px solid var(--brand-mid); outline-offset: 3px; }
+.funds-check input:disabled { opacity: .6; }
+.funds-confirm { display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; font-size: 14px; padding: 5px 0; }
+.funds-confirm input { width: 18px; height: 18px; flex: 0 0 auto; margin: 2px 0 0; accent-color: var(--brand); }
+.conversation-result { overflow-wrap: anywhere; }
+.conversation-result h4 { margin: 14px 0 6px; }
+.conversation-result dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 12px; margin: 8px 0; }
+.conversation-result dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.conversation-result details { margin-top: 12px; }
+.conversation-result summary { cursor: pointer; padding: 8px 0; }
+.conversation-result pre { white-space: pre-wrap; overflow-wrap: anywhere; font-family: inherit; }
+@media (max-width: 420px) { .funds-fields { grid-template-columns: minmax(0, 1fr); } }
+</style>
 </head>
 <body>
 
@@ -201,9 +223,32 @@
         完整链路：行情读取 → 资讯检索 → 组合诊断 → 风险检查 → 决策生成 → 风控闸门 → 情景推演 → 权限判定 → 用户确认 → 执行回执。
       </p>
       <div class="nl-box">
-        <input id="nl-question" type="text" maxlength="80"
-               placeholder="试试：把平安银行减仓30%（留空 = 全身体检；说不清会自动追问）" />
+        <input id="nl-question" type="text" maxlength="20000" aria-label="本次理财问题"
+               placeholder="例如：想投入8000元，但下个月要交房租，会影响生活吗？" />
       </div>
+      <details class="funds-check" id="daily-finance-form">
+        <summary>核对本次资金安排（虚构）</summary>
+        <p>金额以元填写。留空表示未知；没有费用、占用或保底时，请明确填 0。以下为用户自述的虚构数据，不代表银行余额核验。</p>
+        <p id="risk-conversation-status" role="status">正在检查资金核对服务配置…</p>
+        <label class="funds-confirm"><input type="checkbox" id="daily-finance-enable">本轮加入以下虚构资金数据</label>
+        <fieldset id="daily-finance-fields" disabled>
+          <legend>本次核对金额与日期</legend>
+          <button type="button" class="btn btn-outline btn-sm" id="daily-finance-example">填入房租虚构示例</button>
+          <div class="funds-fields">
+            <label for="daily-cash">现金总额（含其他占用）<input id="daily-cash" inputmode="decimal" maxlength="20" autocomplete="off" placeholder="不知道请留空"></label>
+            <label for="daily-amount">本次拟投入金额<input id="daily-amount" inputmode="decimal" maxlength="20" autocomplete="off" placeholder="不知道请留空"></label>
+            <label for="daily-fees">本次费用<input id="daily-fees" inputmode="decimal" maxlength="20" autocomplete="off" placeholder="确认无费用请填 0"></label>
+            <label for="daily-holds">已知其他任务占用<input id="daily-holds" inputmode="decimal" maxlength="20" autocomplete="off" placeholder="确认无占用请填 0"></label>
+            <label for="daily-floor">另外保留的备用现金<input id="daily-floor" inputmode="decimal" maxlength="20" autocomplete="off" placeholder="不含下方用途预留"></label>
+            <label for="daily-purpose-label">需要保护的用途<input id="daily-purpose-label" maxlength="60" autocomplete="off" placeholder="例如房租、学费"></label>
+            <label for="daily-purpose">当前为该用途预留<input id="daily-purpose" inputmode="decimal" maxlength="20" autocomplete="off" placeholder="不知道请留空"></label>
+            <label for="daily-due">该用途仍待支付金额<input id="daily-due" inputmode="decimal" maxlength="20" autocomplete="off" placeholder="已全额支付请填 0"></label>
+            <label for="daily-due-date">该用途到期日<input id="daily-due-date" type="date"></label>
+          </div>
+          <label class="funds-confirm"><input type="checkbox" id="daily-facts-confirmed">我已核对这些虚构金额、费用、其他占用与日期；未填项目仍为未知。</label>
+          <label class="funds-confirm"><input type="checkbox" id="daily-purpose-confirmed">我确认上面的用途预留和备用现金需要保留；此勾选只确认约束，不授权投资或付款。</label>
+        </fieldset>
+      </details>
       <button class="btn btn-primary btn-block" id="btn-review">发起体检（支持自然语言）</button>
       <div id="intent-area"></div>
       <ol class="steps" id="agent-steps" aria-label="本轮任务计划">
