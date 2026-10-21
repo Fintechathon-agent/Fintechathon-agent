@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-10-21T05:02:49.681Z",
+  "scope": "ONE_REAL_PROVIDER_CALL",
+  "model": "qwen3.8-flash",
+  "maxAttempts": 1,
+  "maxOutputTokens": 16,
+  "attempts": 1,
+  "cloudBrowserVerified": false,
+  "http": 200,
+  "durationMs": 853,
+  "returnedModel": "qwen3.8-flash",
+  "responseId": "chatcmpl-77ab64b2-5aa0-9321-94da-f48b4df4daa0",
+  "usage": {
+    "prompt_tokens": 31,
+    "total_tokens": 33,
+    "completion_tokens": 2,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 31
+    }
+  },
+  "text": "API_OK",
+  "errorCode": null,
+  "result": "REAL_PROVIDER_PASSED"
+}

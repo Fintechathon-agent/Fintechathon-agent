@@ -1,0 +1,88 @@
+{
+  "timestamp": "2026-10-21T05:17:36.303Z",
+  "base": "https://lixjanus526-art.github.io/finance-lab-ui-preview",
+  "previewCommit": "c529294bf0fe78c205d9ef372ef75d6b5ead152e",
+  "pagesBuild": {
+    "runId": 39548507452,
+    "conclusion": "success"
+  },
+  "modelCalls": 0,
+  "routes": [
+    {
+      "route": "workspace",
+      "width": 375,
+      "http": 200,
+      "visible": true,
+      "noOverflow": true
+    },
+    {
+      "route": "banking",
+      "width": 375,
+      "http": 200,
+      "visible": true,
+      "noOverflow": true
+    },
+    {
+      "route": "tasks",
+      "width": 375,
+      "http": 200,
+      "visible": true,
+      "noOverflow": true
+    },
+    {
+      "route": "safety",
+      "width": 375,
+      "http": 200,
+      "visible": true,
+      "noOverflow": true
+    },
+    {
+      "route": "workspace",
+      "width": 1440,
+      "http": 200,
+      "visible": true,
+      "noOverflow": true
+    },
+    {
+      "route": "banking",
+      "width": 1440,
+      "http": 200,
+      "visible": true,
+      "noOverflow": true
+    },
+    {
+      "route": "tasks",
+      "width": 1440,
+      "http": 200,
+      "visible": true,
+      "noOverflow": true
+    },
+    {
+      "route": "safety",
+      "width": 1440,
+      "http": 200,
+      "visible": true,
+      "noOverflow": true
+    }
+  ],
+  "assets": [
+    {
+      "file": "versions/workspace-refinement.css",
+      "http": 200,
+      "matchesReviewedSha256": true
+    },
+    {
+      "file": "versions/workspace.js",
+      "http": 200,
+      "matchesReviewedSha256": true
+    },
+    {
+      "file": "workspace.html",
+      "http": 200,
+      "matchesReviewedSha256": true
+    }
+  ],
+  "pageErrors": [],
+  "cardBackgroundClick": true,
+  "result": "PUBLISHED_UI_VERIFIED"
+}
