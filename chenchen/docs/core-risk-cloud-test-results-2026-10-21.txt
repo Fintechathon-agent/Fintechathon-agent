@@ -1,0 +1,29 @@
+Core + Risk Cloudflare 部署检查
+日期：2026-10-21（中国时间）
+
+结论：独立后端联调版已部署，14项公网检查通过。不是完整产品联合验收。
+Risk说明页：https://finance-lab-risk-bridge.realchenchenluo.workers.dev/
+Core源站：https://finance-lab-core-risk-validation.realchenchenluo.workers.dev
+
+1. Risk在线：200。
+2. Core在线：200，模型未绑定。
+3. Risk没有访问凭据：401，拒绝。
+4. Core没有访问凭据：401，拒绝。
+5. Risk服务端实际访问Core能力接口：200，机器身份有效。
+6. 虚构案例现金10000、保护房租4000、拟投入8000：BLOCK，缺口2000。
+7. 原请求重试：复用同一审计事件，不重复建立记录。
+8. 同请求编号改内容：409，拒绝。
+9. 查询云端持久记录：200，状态COMPLETE，审计事件1条。
+10. 完整模型入口：423 MODEL_CALLS_DISABLED，没有调用模型或发送正式回调。
+11. 浏览器Origin请求携带机器凭据：403，拒绝。
+12. 错误回调签名：401，拒绝。
+13. 正确签名、错误审核身份：403，拒绝。
+14. 正确签名和身份、但任务不存在：404 WORKFLOW_NOT_FOUND，拒绝；没有业务回调被采纳。
+
+本地：原Core 304/304，云适配专项9/9。完整回调本地路径只使用测试替身模型。
+真实模型调用0次；未进行模型付费测试；未进行人工审批和执行网关联合验收。
+没有修改旧生产Worker、旧网页、其他Owner源文件或正式交付区，没有删除历史版本或存储。
+凭据在Cloudflare Secrets；本机恢复副本为Windows DPAPI密文，不进入GitHub或浏览器。
+
+每项响应哈希、事件编号和部署版本详见：core-risk-cloud-deployment-2026-10-21.json。
+调用样例与仍需完成事项详见：core-risk-cloud-deployment-2026-10-21.md。
