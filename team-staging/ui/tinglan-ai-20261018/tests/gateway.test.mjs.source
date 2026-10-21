@@ -1,0 +1,117 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import core from '../../../../chenchen/deployment/worker.js';
+import { ReviewService } from '../worker-entry.mjs';
+import { createGateway, reserveUser } from '../gateway.mjs';
+import { verifyAccess } from '../access.mjs';
+import { buildInput, analyze, readResult } from '../frontend/client.mjs';
+
+const preferences = { amount:10000,horizon:1095,risk:'medium_low',goal:'未来三年稳健积累并保留备用金',drawdown:10,liquidity:'medium',text:'虚构示例：希望保留备用金，尚未提供持仓。',inputMode:'sample',consent:true };
+const input = () => buildInput(preferences,crypto.randomUUID());
+const request = (body = input(), origin = 'https://preview.example') => new Request('https://api.example/api/review', {method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:typeof body === 'string'?body:JSON.stringify(body)});
+function setup(overrides = {}) {
+  const entries = new Map();
+  const storage = {get:async key=>structuredClone(entries.get(key)),put:async (key,value)=>{for(const [k,v] of Object.entries(typeof key==='string'?{[key]:value}:key))entries.set(k,structuredClone(v));}};
+  const env = {MODEL_PROVIDER:'aliyun_bailian',MODEL_NAME:'qwen3.8-flash',MODEL_MAX_ATTEMPTS:'1',MODEL_TIMEOUT_MS:'50',BAILIAN_WORKSPACE_ID:'synthetic-workspace',
+    DASHSCOPE_API_KEY:'synthetic-model-secret',CORE_AGENT_API_KEY:'synthetic-machine-secret',BAILIAN_ALLOW_PAID_CALLS:'true',BAILIAN_TEST_BUDGET_CNY:'0.02',
+    BAILIAN_MAX_OUTPUT_TOKENS:'800',CORS_ORIGINS:'https://preview.example',TINGLAN_DAILY_REQUESTS:'5',...overrides};
+  let service = new ReviewService({storage},env);
+  env.REVIEW_SERVICE={idFromName:x=>x,get:()=>service};
+  return {env,storage,entries,restart:()=>{service=new ReviewService({storage},env);},gateway:createGateway(core,async()=> 'a'.repeat(64))};
+}
+function provider(model='qwen3.8-flash',reason='MOCK：资金配置思路：先了解备用金。\n投资期限与流动性建议：核实资金用途。\n适合进一步研究的资产类别：先了解风险。\n主要风险及注意事项：没有可信行情，不计算收益。') {return Response.json({model,id:'synthetic-response',usage:{prompt_tokens:80,completion_tokens:30,total_tokens:110},choices:[{message:{content:JSON.stringify({summary:'MOCK：需补充持仓与资金安排。',risk_level:'unknown',proposed_action:'REQUEST_MORE_INFO',action_reason:reason,missing_information:['持仓'],evidence:['虚构输入']})}}]});}
+
+test('Mock full existing workflow, preference context, audit, replay and durable budget', async t=>{
+  const app=setup();let calls=0;
+  t.mock.method(console,'log',()=>{});
+  t.mock.method(globalThis,'fetch',async(url,options)=>{calls++;assert.match(url,/maas\.aliyuncs\.com/);const body=JSON.parse(options.body);assert.equal(body.model,'qwen3.8-flash');assert.equal(body.max_tokens,800);assert.match(options.body,/investment_horizon_days/);assert.match(options.body,/JSON/);return provider();});
+  const body=input(),r=await app.gateway.fetch(request(body),app.env);assert.equal(r.status,200);const result=await r.json();
+  assert.equal(readResult(result,'qwen3.8-flash').tokens,110);assert.equal(result.execution.execution_allowed,false);
+  assert(!JSON.stringify(result).includes(app.env.DASHSCOPE_API_KEY));assert.equal(calls,1);
+  app.restart();const replay=await app.gateway.fetch(request(body),app.env);assert.equal(replay.status,200);assert.equal(calls,1);
+  const overRate=await app.gateway.fetch(request(),app.env);assert.equal(overRate.status,429);assert.equal(calls,1);
+  assert.equal(app.entries.get('bailian-budget:v1').reserved_cents,1);
+});
+
+for (const [name,make,status] of [
+  ['provider auth',()=>new Response('{}',{status:401}),502],['provider rate',()=>new Response('{}',{status:429}),502],
+  ['invalid JSON',()=>new Response('{'),502],['wrong model',()=>provider('wrong-model'),502],['network unavailable',()=>{throw new TypeError('synthetic network');},502],
+  ['timeout',(_u,o)=>new Promise((_r,reject)=>o.signal.addEventListener('abort',()=>reject(new DOMException('timeout','AbortError')))),504]
+]) test('Mock safe failure: '+name,async t=>{const app=setup();let calls=0;t.mock.method(console,'log',()=>{});t.mock.method(globalThis,'fetch',(...args)=>{calls++;return make(...args);});
+  const response=await app.gateway.fetch(request(),app.env);assert.equal(response.status,status);const body=await response.json();assert(body.error.code);assert.equal(body.execution_allowed,false);assert.equal(calls,1);assert.equal(app.entries.get('bailian-budget:v1').reserved_cents,1);
+});
+
+test('Input, missing authentication, CORS, blocked model mode and unavailable storage never call provider',async t=>{
+  let calls=0;t.mock.method(globalThis,'fetch',()=>{calls++;throw new Error('must not call');});const app=setup();
+  assert.equal((await app.gateway.fetch(request('{'),app.env)).status,400);
+  assert.equal((await app.gateway.fetch(request({...input(),context:{}}),app.env)).status,422);
+  assert.equal((await app.gateway.fetch(request(input(),'https://evil.example'),app.env)).status,403);
+  assert.equal((await createGateway(core,async()=>{throw new Error('AUTHENTICATION_REQUIRED');}).fetch(request(),app.env)).status,401);
+  assert.equal((await app.gateway.fetch(request(),{...app.env,MODEL_PROVIDER:'http'})).status,503);
+  const preflight=await app.gateway.fetch(new Request('https://api.example/api/review',{method:'OPTIONS',headers:{Origin:'https://preview.example'}}),app.env);
+  assert.equal(preflight.status,204);assert.equal(preflight.headers.get('Access-Control-Allow-Credentials'),'true');
+  app.storage.get=async()=>{throw new Error('storage failed');};assert.equal((await app.gateway.fetch(request(),app.env)).status,503);assert.equal(calls,0);
+});
+test('Daily identity quota persists independently of the minute window',async()=>{const app=setup({TINGLAN_DAILY_REQUESTS:'1'});await reserveUser(app.storage,'a'.repeat(64),app.env,60000);await assert.rejects(reserveUser(app.storage,'a'.repeat(64),app.env,180000),/RATE_LIMITED/);});
+test('Workerd-compatible manual redirects reject 302 before reading or forwarding credentials',async t=>{
+ const app=setup();let calls=0;t.mock.method(console,'log',()=>{});
+ t.mock.method(globalThis,'fetch',async (_url,options)=>{calls++;assert.equal(options.redirect,'manual');return new Response('redirect',{status:302,headers:{Location:'https://invalid.example'}});});
+ const response=await app.gateway.fetch(request(),app.env);assert.equal(response.status,502);assert.equal((await response.json()).error.code,'MODEL_PROVIDER_ERROR');assert.equal(calls,1);
+});
+
+test('Access signature, issuer, audience, expiry and email allowlist are verified',async()=>{
+  const pair=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
+  const key=await crypto.subtle.exportKey('jwk',pair.publicKey);key.kid='test-key';
+  const env={ACCESS_ISSUER:'https://synthetic-test.cloudflareaccess.com',ACCESS_AUD:'test-aud',ACCESS_ALLOWED_EMAILS:'member@example.invalid'};
+  const now=Date.now(), claims={iss:env.ACCESS_ISSUER,aud:[env.ACCESS_AUD],sub:'test-user',email:'member@example.invalid',type:'app',iat:Math.floor(now/1000),exp:Math.floor(now/1000)+300};
+  const encode=x=>Buffer.from(JSON.stringify(x)).toString('base64url');
+  const token=async changes=>{const text=encode({alg:'RS256',kid:'test-key'})+'.'+encode({...claims,...changes});return text+'.'+Buffer.from(await crypto.subtle.sign('RSASSA-PKCS1-v1_5',pair.privateKey,new TextEncoder().encode(text))).toString('base64url');};
+  const verify=async value=>verifyAccess(new Request('https://api.example',{headers:{'Cf-Access-Jwt-Assertion':value}}),env,async()=>Response.json({keys:[key]}),now);
+  const good=await token({});assert.match(await verify(good),/^[a-f0-9]{64}$/);
+  for(const change of [{iss:'https://evil.invalid'},{aud:['wrong']},{exp:0},{email:'other@example.invalid'},{type:'org'}])await assert.rejects(verify(await token(change)),/AUTHENTICATION_REQUIRED/);
+  await assert.rejects(verify(good.slice(0,-8)+'invalidx'),/AUTHENTICATION_REQUIRED/);
+});
+
+test('Browser client rejects fallback, invalid model, missing config and maps HTTP errors',async()=>{
+  const config={endpoint:'https://api.example/api/review',model:'qwen3.8-flash',mode:'CLOUDFLARE_ACCESS'};
+  for(const [status,code] of [[401,'AUTHENTICATION_REQUIRED'],[403,'AUTHENTICATION_REQUIRED'],[429,'RATE_LIMITED'],[504,'MODEL_TIMEOUT'],[503,'SERVICE_UNAVAILABLE']])
+    await assert.rejects(analyze(config,input(),async()=>Response.json({}, {status}),'https://preview.example'),new RegExp(code));
+  await assert.rejects(analyze({endpoint:null},input(),async()=>{throw new Error('must not call');},'https://preview.example'),/UNCONFIGURED/);
+  assert.throws(()=>readResult({source:'rule_fallback'},'qwen3.8-flash'),/MODEL_INVALID_RESPONSE/);
+});
+
+test('Preference inputs preserve amount, risk, goal and truthful source without changing the shared envelope',()=>{
+  const sample=input(),live=buildInput({...preferences,inputMode:'self_reported'},crypto.randomUUID());
+  assert.equal(sample.data_mode,'SYNTHETIC_REPLAY');assert.equal(sample.context.synthetic,true);
+  assert.equal(live.data_mode,'LIVE');assert.equal(live.context.synthetic,false);
+  const unspecified=buildInput({...preferences,drawdown:''},crypto.randomUUID());assert.equal(unspecified.context.risk_profile.max_drawdown,undefined);assert.match(unspecified.text,/未提供，不能由风险偏好推算/);
+  for(const text of ['10000','中低','未来三年','1095'])assert(live.text.includes(text));
+  for(const change of [{amount:0},{amount:NaN},{amount:1.001},{amount:100000001},{goal:''},{risk:'unknown'},{inputMode:'fake'},{consent:false}])
+    assert.throws(()=>buildInput({...preferences,...change},crypto.randomUUID()),/INVALID_REVIEW_INPUT/);
+});
+
+test('Self-reported preference uses existing LIVE mode and server-authored five-part instructions',async t=>{
+  const app=setup();let calls=0;t.mock.method(console,'log',()=>{});
+  t.mock.method(globalThis,'fetch',async(_url,options)=>{calls++;const sent=JSON.parse(options.body);
+    assert.match(options.body,/10000/);assert.match(options.body,/资金配置思路/);assert.match(options.body,/主要风险及注意事项/);
+    const content=JSON.parse(sent.messages[1].content.split('\n').at(-1));assert.equal(content.context.synthetic,false);return provider(sent.model);});
+  const body=buildInput({...preferences,inputMode:'self_reported'},crypto.randomUUID());
+  assert.equal((await app.gateway.fetch(request(body),app.env)).status,200);assert.equal(calls,1);
+  assert.equal((await app.gateway.fetch(request({...body,context:{...body.context,synthetic:true}}),app.env)).status,422);
+});
+
+test('Explicit Max has its own conservative reservation and never falls back to another model',async t=>{
+  let calls=0;t.mock.method(console,'log',()=>{});t.mock.method(globalThis,'fetch',async(_url,options)=>{calls++;assert.equal(JSON.parse(options.body).model,'qwen3.8-max');return provider('qwen3.8-max');});
+  const small=setup({MODEL_NAME:'qwen3.8-max',BAILIAN_TEST_BUDGET_CNY:'0.02'});
+  assert.equal((await small.gateway.fetch(request(),small.env)).status,429);assert.equal(calls,0);
+  const allowed=setup({MODEL_NAME:'qwen3.8-max',BAILIAN_TEST_BUDGET_CNY:'0.50'});
+  const response=await allowed.gateway.fetch(request(),allowed.env);assert.equal(response.status,200);assert.equal(calls,1);
+  assert.equal(readResult(await response.json(),'qwen3.8-max').model,'qwen3.8-max');
+  assert.equal(allowed.entries.get('bailian-budget:v1').reserved_cents,50);
+  const other=setup({MODEL_NAME:'qwen3.7-flash'});assert.equal((await other.gateway.fetch(request(),other.env)).status,503);assert.equal(calls,1);
+});
+
+test('Incomplete model analysis fails visibly rather than becoming a successful fixed answer',async t=>{
+  const app=setup();let calls=0;t.mock.method(console,'log',()=>{});t.mock.method(globalThis,'fetch',async()=>{calls++;return provider('qwen3.8-flash','MOCK：只有一句话，没有完整分析。');});
+  const response=await app.gateway.fetch(request(),app.env);assert.equal(response.status,502);assert.equal((await response.json()).error.code,'MODEL_INVALID_RESPONSE');assert.equal(calls,1);
+});
