@@ -1,6 +1,7 @@
 "use strict";
 
 const { ReviewError } = require("./model-review");
+const { riskReviewerRequired } = require("./service-security");
 
 const OWNER_FIELDS = Object.freeze({
   risk: { actor: "reviewer", url: "RISK_SERVICE_URL", secret: ["RISK_SERVICE_HMAC_SECRET", "RISK_HMAC_SECRET"], signature: "X-Risk-Signature" },
@@ -70,7 +71,7 @@ async function verifyOwnerRequest({ owner, body, headers, env }) {
   const secret = ownerSecret(owner, env);
   const actor = typeof body?.[definition.actor] === "string" ? body[definition.actor].trim() : null;
   if (!secret) {
-    if (envValue(env, "REQUIRE_TRUSTED_ACTORS").toLowerCase() === "true") {
+    if (envValue(env, "REQUIRE_TRUSTED_ACTORS").toLowerCase() === "true" || owner === "risk" && riskReviewerRequired(env)) {
       throw bridgeError("OWNER_AUTH_NOT_CONFIGURED", `${owner} 的可信身份验证尚未配置。`, { recovery: "配置对应 HMAC secret 后再启用 REQUIRE_TRUSTED_ACTORS。" });
     }
     return { owner, actor, mode: "DEMO_UNVERIFIED", verified: false, signature_header: definition.signature };
@@ -80,6 +81,19 @@ async function verifyOwnerRequest({ owner, body, headers, env }) {
   const expected = await signatureFor(body, secret);
   if (supplied.trim().toLowerCase() !== expected) {
     throw bridgeError("OWNER_AUTH_INVALID", `${owner} 回写签名无效。`, { statusCode: 401, stage: "AUTHENTICATION", recovery: "重新读取当前 Handoff，使用相同请求正文生成签名。" });
+  }
+  if (owner === "risk") {
+    const reviewer = envValue(env, "RISK_REVIEWER_ID");
+    if ((riskReviewerRequired(env) || reviewer) && (!reviewer || reviewer.length > 500)) {
+      throw bridgeError("OWNER_IDENTITY_NOT_CONFIGURED", "Risk 的固定审核身份尚未正确配置。", {
+        recovery: "在双方服务端配置相同的 RISK_REVIEWER_ID；不能从用户表单读取。"
+      });
+    }
+    if (reviewer && actor !== reviewer) {
+      throw bridgeError("OWNER_ACTOR_MISMATCH", "Risk 审核身份与服务端配置不一致。", {
+        statusCode: 403, stage: "AUTHENTICATION", recovery: "使用服务端配置的 Risk 身份重新签署；不要修改原任务。"
+      });
+    }
   }
   return { owner, actor, mode: "HMAC_SHA256", verified: true, signature_header: definition.signature };
 }
