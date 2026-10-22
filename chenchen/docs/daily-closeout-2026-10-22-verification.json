@@ -1,0 +1,54 @@
+{
+  "checked_at": "2026-10-22T14:02:28.020703+00:00",
+  "baseline": {
+    "exit": 0,
+    "stdout": "3ef17909c8c0652605dc2406fd54064956ff8aa6",
+    "stderr": ""
+  },
+  "same_day_main_commits": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "trusted_cloud_commit_is_main_ancestor": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "main_key_file_presence": {
+    "deployment/risk-worker.js": false,
+    "integrations/service-security.js": false,
+    "scripts/check-risk-callback-config.js": false,
+    "integrations/owner-bridge.js": true
+  },
+  "tests": {
+    "check_exit": 0,
+    "tests": 284,
+    "pass": 284,
+    "fail": 0,
+    "skip": 0,
+    "trace_pass": 32,
+    "trace_fail": 0,
+    "positive_schema_cases": 7
+  },
+  "business_changes_by_automation": false,
+  "external_calls": 0,
+  "real_model_calls": 0,
+  "real_execution": 0,
+  "formal_risk_joint_acceptance": false,
+  "docx_structure": "PASS two embedded diagrams each",
+  "page_layout_acceptance": "INCOMPLETE renderer unavailable",
+  "commands": [
+    "npm run check",
+    "npm test -- --test-reporter=tap",
+    "python docs/daily-closeout-check-2026-10-22.py",
+    "git merge-base --is-ancestor 9e6bed1 HEAD",
+    "git diff --check",
+    "git diff --cached --check"
+  ],
+  "environment": {
+    "python": "C:\\Users\\33183\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "CORE_AGENT_NODE": "C:\\Users\\33183\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "PYTHONPATH": "C:\\Users\\33183\\.codex\\automations\\core-agent-daily-update\\python-deps"
+  }
+}

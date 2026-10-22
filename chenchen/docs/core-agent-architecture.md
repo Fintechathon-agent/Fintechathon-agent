@@ -79,3 +79,7 @@ flowchart LR
 ## 2026-10-20 晚间收尾
 
 双链路与停止点维持不变。本次独立 284/284 回归、32/32 Schema/语义追踪；UI 只读投影消费健康结果，缺数据停止，不产生交易授权。个人 main 在本轮期间同步投资总览提交 3a611dd，最终两 main 均已包含该 UI。字段归属、可选 session、进程内 checkpoint 与正式 Risk 待验收限制见 core-agent-integration-guide-2026-10-20.md 与同名 Word，含可读架构及模块时序图。
+
+## 2026-10-22 main 基线复核
+
+两份 main 独立 284/284 回归、32/32 Schema 与语义检查通过。10 月 21 日可信 reviewer/云适配开发提交 9e6bed1 尚未合入任一 main；不将留存云部署证据称作 main 已完成正式审核。更新图像、字段归属与停止点见 core-agent-integration-guide-2026-10-22.md 及同名 DOCX。
