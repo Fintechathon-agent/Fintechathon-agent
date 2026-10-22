@@ -1,0 +1,45 @@
+{
+  "mode": "CLOUD_UI_ONLY",
+  "checks": [
+    {
+      "width": 320,
+      "sidebarProductRemoved": true,
+      "centralProductAvailable": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 375,
+      "sidebarProductRemoved": true,
+      "centralProductAvailable": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 840,
+      "sidebarProductRemoved": true,
+      "centralProductAvailable": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "sidebarProductRemoved": true,
+      "centralProductAvailable": true,
+      "roundTrip": true,
+      "noOverflow": true
+    }
+  ],
+  "pageErrors": [],
+  "modelRequests": 0,
+  "publishedAssets": [
+    {
+      "file": "catalog.html",
+      "sha256": "fb606c4901bd7b987240f147decb28feaecb601cab3b08fbd27d11ffd2e59396"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "55ec591b55cb7767451f6f2d39c5858b564bdb3af09e0a0ffaba75941bca3af4"
+    }
+  ]
+}

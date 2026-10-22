@@ -1,0 +1,35 @@
+{
+  "mode": "LOCAL_UI_ONLY",
+  "checks": [
+    {
+      "width": 320,
+      "sidebarProductRemoved": true,
+      "centralProductAvailable": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 375,
+      "sidebarProductRemoved": true,
+      "centralProductAvailable": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 840,
+      "sidebarProductRemoved": true,
+      "centralProductAvailable": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "sidebarProductRemoved": true,
+      "centralProductAvailable": true,
+      "roundTrip": true,
+      "noOverflow": true
+    }
+  ],
+  "pageErrors": [],
+  "modelRequests": 0
+}
