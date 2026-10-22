@@ -7,7 +7,10 @@
     "test": "node --test test/*.test.cjs",
     "examples:check": "node write-examples.cjs --check",
     "start:conversation": "node conversation-server.cjs",
-    "test:python-bridge": "node verify-python-bridge.cjs"
+    "test:python-bridge": "node verify-python-bridge.cjs",
+    "test:joint": "node ../joint-acceptance/run.cjs",
+    "test:joint-preflight": "node --test ../joint-acceptance/test/preflight.test.cjs",
+    "preflight:joint": "node ../joint-acceptance/preflight.cjs"
   },
   "engines": {
     "node": ">=22"
