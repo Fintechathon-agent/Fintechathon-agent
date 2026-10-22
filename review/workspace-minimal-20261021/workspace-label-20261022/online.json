@@ -1,0 +1,85 @@
+{
+  "mode": "CLOUD_UI_ONLY",
+  "checks": [
+    {
+      "width": 320,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": "hiddenOnMobile",
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 375,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": "hiddenOnMobile",
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 840,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": "hiddenOnMobile",
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 901,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1024,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1180,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1181,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    }
+  ],
+  "pageErrors": [],
+  "modelRequests": 0,
+  "publishedAssets": [
+    {
+      "file": "investment.html",
+      "sha256": "c9109546705d65fc69b1f0572d46c5edf80cbdd3a204184500d7c37d2bfc45b1"
+    },
+    {
+      "file": "versions/product-overrides.css",
+      "sha256": "8857c83eca44e0076f167bb021e3f8feaa8ce5c088973614df41a92c5eed0cda"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "b4088eba533cfe047be81d9046d19e6cb14515572dbc97af708254eaa477171f"
+    }
+  ]
+}

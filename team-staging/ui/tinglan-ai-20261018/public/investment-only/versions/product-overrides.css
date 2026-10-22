@@ -226,3 +226,7 @@ dialog dl{font-size:13px}
 .sidebar .global-nav{margin-bottom:7px}
 body .sidebar .global-nav a[aria-current="page"]{color:var(--accent,#ff9148);background:#251a13;border-color:#55311a;font-weight:600}
 @media(max-width:900px){.sidebar .global-nav{margin-bottom:0;flex:none}.sidebar .workspace-switch{min-width:0}.sidebar .workspace-switch a{white-space:nowrap}}
+
+/* Fit the product name on one line within both desktop sidebar widths. */
+body.archive-workbench .sidebar .section-label{font-size:12px;letter-spacing:0;white-space:nowrap}
+@media(min-width:901px) and (max-width:1180px){body.archive-workbench .sidebar .section-label{font-size:11px}}

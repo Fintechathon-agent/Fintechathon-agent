@@ -1,0 +1,71 @@
+{
+  "mode": "LOCAL_UI_ONLY",
+  "checks": [
+    {
+      "width": 320,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": "hiddenOnMobile",
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 375,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": "hiddenOnMobile",
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 840,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": "hiddenOnMobile",
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 901,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1024,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1180,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1181,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    }
+  ],
+  "pageErrors": [],
+  "modelRequests": 0
+}
