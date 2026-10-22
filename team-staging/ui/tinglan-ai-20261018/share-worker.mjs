@@ -1,16 +1,26 @@
 import core from '../../../chenchen/deployment/worker.js';
 import { ReviewService } from './worker-entry.mjs';
 import { createGateway, failure } from './gateway.mjs';
-import { ShareAuth, verifySession, digest } from './share-auth.mjs';
+import { ShareAuth, verifySession, issueSession, sessionCookie, digest } from './share-auth.mjs';
 export { ReviewService, ShareAuth };
 const gateway = createGateway(core, verifySession);
 const json = (body, status = 200, headers = {}) => Response.json(body, { status, headers: { 'Cache-Control': 'no-store', ...headers } });
 export default { async fetch(request, env, ctx) {
   const url = new URL(request.url);
+  const publicAccess = env.SHARE_ACCESS_MODE === 'PUBLIC';
   if (url.pathname === '/') return Response.redirect(url.origin + '/investment-only/investment.html#ai-assistant', 302);
-  if (url.pathname === '/health') return json({ status: 'ok', service: 'xinlan-qwen38-share', model: env.MODEL_NAME, configured: Boolean(env.DASHSCOPE_API_KEY && env.CORE_AGENT_API_KEY && env.SHARE_ACCESS_CODE && env.SESSION_SIGNING_KEY), paidEnabled: env.BAILIAN_ALLOW_PAID_CALLS === 'true' });
+  if (url.pathname === '/health') return json({ status: 'ok', service: 'xinlan-qwen38-share', model: env.MODEL_NAME, configured: Boolean(env.DASHSCOPE_API_KEY && env.CORE_AGENT_API_KEY && env.SHARE_ACCESS_CODE && env.SESSION_SIGNING_KEY), paidEnabled: env.BAILIAN_ALLOW_PAID_CALLS === 'true', accessMode: publicAccess ? 'PUBLIC' : 'CODE' });
   if (url.pathname === '/api/session') {
     if (request.method === 'GET') {
+      if (publicAccess) {
+        const origin = request.headers.get('Origin'), site = request.headers.get('Sec-Fetch-Site');
+        if ((origin && origin !== url.origin) || site === 'cross-site') return failure('ORIGIN_DENIED', 403);
+        try {
+          try { await verifySession(request, env); return json({ authenticated: true, model: env.MODEL_NAME }); }
+          catch { /* Create a signed session without exposing any server secret. */ }
+          return json({ authenticated: true, model: env.MODEL_NAME }, 200, { 'Set-Cookie': sessionCookie(await issueSession(env)) });
+        } catch { return failure('ACCESS_NOT_CONFIGURED', 503); }
+      }
       try { await verifySession(request, env); return json({ authenticated: true, model: env.MODEL_NAME }); }
       catch { return json({ authenticated: false }, 401); }
     }
@@ -33,7 +43,7 @@ export default { async fetch(request, env, ctx) {
       return await auth.fetch(new Request('https://internal/login', { method: 'POST', body: JSON.stringify({ code: body.code, ipHash }) }));
     } catch { return failure('SERVICE_UNAVAILABLE', 503); }
   }
-  if (url.pathname === '/investment-only/tinglan-config.json') return json({ endpoint: '/api/review', model: env.MODEL_NAME, mode: 'SESSION' });
+  if (url.pathname === '/investment-only/tinglan-config.json') return json({ endpoint: '/api/review', model: env.MODEL_NAME, mode: 'SESSION', accessMode: publicAccess ? 'PUBLIC' : 'CODE' });
   if (url.pathname === '/api/tinglan/status' && request.method === 'GET') {
     try { await verifySession(request,env); } catch { return failure('AUTHENTICATION_REQUIRED',401); }
     try {

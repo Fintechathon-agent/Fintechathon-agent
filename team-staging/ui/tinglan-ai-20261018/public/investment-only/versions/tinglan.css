@@ -1,1 +1,4 @@
 #ai-assistant textarea{display:block;width:100%;min-height:120px;margin:10px 0;resize:vertical}#ai-assistant form>label{display:block;margin:14px 0}#ai-assistant input[type=checkbox]{width:auto}#tinglan-status{margin:16px 0}#tinglan-status[role=alert]{color:#efad83}#tinglan-result p,#tinglan-result pre{white-space:pre-wrap;overflow-wrap:anywhere}#ai-assistant [hidden]{display:none!important}
+
+/* Keep the conversation input visible above the supporting profile fields. */
+#ai-assistant{scroll-margin-top:calc(var(--step-offset,0px) + 100px)}#ai-assistant .chat-composer{font-size:16px}#ai-assistant .chat-composer textarea{min-height:150px}#ai-assistant .chat-profile{margin:18px 0}#ai-assistant .chat-profile>summary{font-size:14px}#ai-assistant .chat-profile>label{display:block;margin:14px 0}#ai-assistant #tinglan-result{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}

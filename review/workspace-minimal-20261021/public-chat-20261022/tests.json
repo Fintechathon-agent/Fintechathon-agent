@@ -1,0 +1,36 @@
+{
+  "unit": {
+    "passed": 24,
+    "failed": 0
+  },
+  "publicBrowserMock": {
+    "widths": [
+      375,
+      840,
+      1440
+    ],
+    "passed": true,
+    "realPaidCalls": 0
+  },
+  "legacySessionInitialization": {
+    "passed": true
+  },
+  "legacyBrowserMock": {
+    "widths": [
+      1440,
+      1024,
+      375
+    ],
+    "failureScenarios": 7,
+    "staticPlans": 3,
+    "passed": true,
+    "realPaidCalls": 0
+  },
+  "compile": {
+    "passed": true
+  },
+  "releaseManifests": {
+    "verified": true
+  },
+  "sharedCoreChanged": false
+}

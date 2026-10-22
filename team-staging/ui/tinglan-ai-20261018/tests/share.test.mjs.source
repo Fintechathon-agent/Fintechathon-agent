@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { ShareAuth, issueSession, verifySession, sessionCookie, digest } from '../share-auth.mjs';
 import worker from '../share-worker.mjs';
 import { ReviewService } from '../worker-entry.mjs';
+import { reserveUser } from '../gateway.mjs';
 const env = () => ({SHARE_ACCESS_CODE:'synthetic-code-for-tests-only-12345',SESSION_SIGNING_KEY:'synthetic-signing-key-for-tests-12345',CORE_AGENT_API_KEY:'synthetic-core-key',MODEL_PROVIDER:'aliyun_bailian',MODEL_NAME:'qwen3.8-flash'});
 const memory = () => {const entries=new Map();return {get:async key=>structuredClone(entries.get(key)),put:async(key,value)=>{for(const [k,v]of Object.entries(typeof key==='string'?{[key]:value}:key))entries.set(k,structuredClone(v));}};};
 test('Usage diagnostics require internal authority and omit stored prompts and session fields',async()=>{
@@ -44,4 +45,46 @@ test('Same-origin login, logout and dynamic config retain session boundaries',as
  const session=await worker.fetch(new Request('https://site.example/api/session',{headers:{Cookie:cookie}}),e);assert.equal(session.status,200);
  const config=await worker.fetch(new Request('https://site.example/investment-only/tinglan-config.json'),e);assert.equal((await config.json()).mode,'SESSION');
  const logout=await worker.fetch(new Request('https://site.example/api/session',{method:'DELETE',headers:{Origin:'https://site.example'}}),e);assert.match(logout.headers.get('Set-Cookie'),/Max-Age=0/);
+});
+
+test('Public mode creates a signed session without a password or login-attempt writes',async()=>{
+ const e={...env(),SHARE_ACCESS_MODE:'PUBLIC',SHARE_AUTH:{idFromName(){throw new Error('Password login must not run');}}};
+ const response=await worker.fetch(new Request('https://site.example/api/session'),e);
+ assert.equal(response.status,200);assert.equal(response.headers.get('Cache-Control'),'no-store');
+ const cookie=response.headers.get('Set-Cookie');assert.match(cookie,/HttpOnly; Secure; SameSite=Strict/);
+ const text=await response.text();assert.equal(JSON.parse(text).authenticated,true);
+ for(const secret of [e.SHARE_ACCESS_CODE,e.SESSION_SIGNING_KEY,e.CORE_AGENT_API_KEY])assert(!text.includes(secret));
+ const request=new Request('https://site.example/api/session',{headers:{Cookie:cookie.split(';')[0]}});
+ assert.equal(await verifySession(request,e),await digest(e.SHARE_ACCESS_CODE));
+ const reused=await worker.fetch(request,e);assert.equal(reused.status,200);assert.equal(reused.headers.get('Set-Cookie'),null);
+ const config=await worker.fetch(new Request('https://site.example/investment-only/tinglan-config.json'),e);
+ assert.equal((await config.json()).accessMode,'PUBLIC');
+});
+
+test('Public session rejects cross-site bootstrap and fails closed without signing configuration',async()=>{
+ const e={...env(),SHARE_ACCESS_MODE:'PUBLIC'};
+ for(const headers of [{Origin:'https://evil.example'},{'Sec-Fetch-Site':'cross-site'}]){
+  assert.equal((await worker.fetch(new Request('https://site.example/api/session',{headers}),e)).status,403);
+ }
+ assert.equal((await worker.fetch(new Request('https://site.example/api/session'),{...e,SESSION_SIGNING_KEY:''})).status,503);
+ const config=await worker.fetch(new Request('https://site.example/investment-only/tinglan-config.json'),env());
+ assert.equal((await config.json()).accessMode,'CODE');
+});
+
+test('Public sessions share the existing quota and cannot authorize workflow operations',async()=>{
+ const e={...env(),SHARE_ACCESS_MODE:'PUBLIC',TINGLAN_DAILY_REQUESTS:'20'};
+ const subjects=[];
+ for(let i=0;i<2;i++){
+  const session=await worker.fetch(new Request('https://site.example/api/session'),e);
+  const cookie=session.headers.get('Set-Cookie').split(';')[0];
+  const request=new Request('https://site.example/api/review',{method:'POST',headers:{Cookie:cookie,Origin:'https://site.example','Content-Type':'application/json'},body:'{}'});
+  subjects.push(await verifySession(request,e));
+  assert.equal((await worker.fetch(request,e)).status,422);
+ }
+ assert.equal(subjects[0],subjects[1]);const storage=memory(),now=Date.now();
+ await reserveUser(storage,subjects[0],e,now);await reserveUser(storage,subjects[1],e,now);
+ await assert.rejects(reserveUser(storage,subjects[0],e,now),/RATE_LIMITED/);
+ const noSession=new Request('https://site.example/api/review',{method:'POST',headers:{Origin:'https://site.example','Content-Type':'application/json','X-Core-Agent-Key':e.CORE_AGENT_API_KEY},body:'{}'});
+ assert.equal((await worker.fetch(noSession,e)).status,401);
+ assert.equal((await worker.fetch(new Request('https://site.example/api/review/approval',{method:'POST'}),e)).status,404);
 });

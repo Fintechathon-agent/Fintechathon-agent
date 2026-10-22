@@ -8,8 +8,19 @@ try {
   if (response.ok) config = await response.json();
 } catch { /* An unavailable configuration must not trigger model traffic. */ }
 if (!config?.endpoint) show('Demo 预览 · ' + messages.UNCONFIGURED);
-else show('Live AI 待验证 · 提交后核验登录并调用 ' + config.model + '，当前尚未请求模型。');
-if (config?.mode === 'SESSION') {
+else show('正在准备对话…');
+const publicAccess = config?.accessMode === 'PUBLIC';
+async function ensurePublicSession() {
+  const response = await window.tinglanFetch('/api/session', { cache: 'no-store', credentials: 'same-origin', signal: AbortSignal.timeout(10000) });
+  if (!response.ok || (await response.json()).authenticated !== true) throw new Error('AUTHENTICATION_REQUIRED');
+}
+if (config?.mode === 'SESSION' && publicAccess) {
+  document.querySelector('#share-login').hidden = true;
+  document.querySelector('#share-logout').hidden = true;
+  form.hidden = false;
+  try { await ensurePublicSession(); show('直接输入问题，填写分析所需信息后即可发送。'); }
+  catch { show('对话连接暂未就绪，发送时将重新连接。', true); }
+} else if (config?.mode === 'SESSION') {
   const login = document.querySelector('#share-login'), logout = document.querySelector('#share-logout'), hint = document.querySelector('#share-login-status');
   const setAuthenticated = value => { login.hidden = value; logout.hidden = !value; form.hidden = !value; output.hidden = true; };
   setAuthenticated(false);
@@ -37,14 +48,15 @@ form.addEventListener('submit', async event => {
   } catch (error) { show(messages[error.message] || messages.INVALID_REVIEW_INPUT, true); return; }
   button.disabled = true; form.setAttribute('aria-busy', 'true');
   form.querySelectorAll('input,select,textarea').forEach(node => { node.disabled = true; });
-  show('正在核验权限并请求 AI 分析，请稍候…');
+  show('听澜正在思考，请稍候…');
   const started = performance.now();
   try {
+    if (publicAccess) await ensurePublicSession();
     const result = await analyze(config, body, window.tinglanFetch);
     for (const key of ['summary','reason','evidence','missing','raw']) output.querySelector('[data-result=' + key + ']').textContent = result[key];
     output.querySelector('[data-result=meta]').textContent = 'Live AI 模型返回 · ' + result.model + ' · ' + ((performance.now() - started) / 1000).toFixed(2) + ' 秒 · ' + (result.tokens === null ? '用量未返回' : result.tokens + ' tokens');
     output.querySelector('[data-result=trace]').textContent = '运行编号：' + result.runId + '\n审计编号：' + result.auditId;
     output.hidden = false; show('AI 分析已返回，等待风险复核；未执行交易。');
-  } catch (error) { show(messages[error.message] || messages.SERVICE_UNAVAILABLE, true); }
+  } catch (error) { show(publicAccess && error.message === 'AUTHENTICATION_REQUIRED' ? '对话连接暂未就绪，请再次发送以重新连接。' : messages[error.message] || messages.SERVICE_UNAVAILABLE, true); }
   finally { button.disabled = false; form.removeAttribute('aria-busy'); form.querySelectorAll('input,select,textarea').forEach(node => { node.disabled = false; }); }
 });

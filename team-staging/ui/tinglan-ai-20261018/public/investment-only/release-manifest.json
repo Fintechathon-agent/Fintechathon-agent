@@ -78,7 +78,7 @@
     },
     {
       "file": "versions/tinglan-widget.mjs",
-      "sha256": "89880ed50b56915b741a007fa07706610fe5857831684577a6fda875d43d232d"
+      "sha256": "b9086f1ecdc5b90b5f458bf424453503c4862bc3c948872f27f25aa43956315a"
     },
     {
       "file": "versions/tinglan-transport.js",
@@ -86,7 +86,7 @@
     },
     {
       "file": "versions/tinglan.css",
-      "sha256": "fb9907f8860eaecba2f217cc2af236d20fc5e3dfd4ef642bca3cdd467f4bf7d1"
+      "sha256": "587bf9fc3289bf187e377001635c77e72c64e29b1864c4381c1b4ab046f3f46b"
     },
     {
       "file": "landing.html",
@@ -94,7 +94,7 @@
     },
     {
       "file": "investment.html",
-      "sha256": "87229aa95a366d59aa4ba08eee6234799c540124591ce4c5b0201a100ae997ea"
+      "sha256": "790060bd279b6fc6441b7a957e5ff4c5695d619e3817527e33e26e4874e7f92a"
     },
     {
       "file": "catalog.html",
