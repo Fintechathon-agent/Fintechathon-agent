@@ -18,13 +18,13 @@ const env = { DB: { prepare(sql) { assert.equal(sql, "SELECT 1 AS ok"); queries+
 const rows = [];
 try {
   candidate = (await import(pathToFileURL(path.join(root, "dist/server/index.js")).href)).default;
-  for (const route of ["/risk", "/risk/app.js", "/risk/daily.js", "/risk/network.js", "/risk/connection.js", "/risk/connection.css"]) {
+  for (const route of ["/risk", "/risk/app.js", "/risk/daily.js", "/risk/network.js", "/risk/feedback.js", "/risk/connection.js", "/risk/connection.css"]) {
     const response = await candidate.fetch(new Request("https://synthetic.invalid" + route), env);
     assert.equal(response.status, 200); const text = await response.text();
     if (route.endsWith(".js")) new vm.Script(text);
-    if (route === "/risk") assert.ok(text.indexOf("/risk/network.js") < text.indexOf("/risk/connection.js") && text.indexOf("/risk/connection.js") < text.indexOf("/risk/app.js"));
+    if (route === "/risk") assert.ok(text.indexOf("/risk/network.js") < text.indexOf("/risk/feedback.js") && text.indexOf("/risk/feedback.js") < text.indexOf("/risk/connection.js") && text.indexOf("/risk/connection.js") < text.indexOf("/risk/app.js"));
     if (route.endsWith("daily.js")) { assert.ok(text.includes("function confirmedInputs()")); assert.ok(text.includes("function acceptableReasons()")); }
-    if (["/risk/app.js", "/risk/daily.js"].includes(route)) { assert.ok(text.includes("RiskConnection.request")); assert.ok(text.includes("RiskConnection.enforceButtons")); assert.ok(!text.includes("await fetch(route")); }
+    if (["/risk/app.js", "/risk/daily.js"].includes(route)) { assert.ok(text.includes("RiskConnection.request")); assert.ok(text.includes("RiskConnection.enforceButtons")); assert.ok(text.includes("RiskConnection.reportUiError")); assert.ok(!text.includes("await fetch(route")); }
     rows.push({ route, result: "PASS" });
   }
   const response = await candidate.fetch(new Request("https://synthetic.invalid/api/safety/health"), env);

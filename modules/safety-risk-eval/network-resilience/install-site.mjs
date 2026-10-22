@@ -14,10 +14,12 @@ function replaceOnce(source, before, after) {
 export function patchAsset(route, source) {
   source = source.replace(/\r\n?/g, "\n");
   if (route === "/risk") {
-    source = replaceOnce(source, '<script src="/risk/app.js" defer>', '<link rel="stylesheet" href="/risk/connection.css"><script src="/risk/network.js" defer></script><script src="/risk/connection.js" defer></script><script src="/risk/app.js" defer>');
+    source = replaceOnce(source, '<script src="/risk/app.js" defer>', '<link rel="stylesheet" href="/risk/connection.css"><script src="/risk/network.js" defer></script><script src="/risk/feedback.js" defer></script><script src="/risk/connection.js" defer></script><script src="/risk/app.js" defer>');
     return source;
   }
   const daily = route.endsWith("daily.js");
+  const failureHandler = daily ? 'catch (error) { tell(`${error.message}${error.code ? `（${error.code}）` : ""}`, true); }' : 'catch (error) { notice(error.message, true); }';
+  source = replaceOnce(source, failureHandler, `catch (error) { ${daily ? "tell" : "notice"}(window.RiskConnection.reportUiError(), true); }`);
   const start = source.indexOf("async function api(route, data) {");
   const end = source.indexOf(daily ? "\n  function confirmedInputs()" : "\nasync function action(", start);
   if (start < 0 || end < start || !source.slice(start, end).includes("await fetch(")) throw new Error("The original request helper changed; stop rather than overwrite it.");
@@ -43,7 +45,7 @@ export async function installSite(directory) {
     if (!response.ok) throw new Error("The Site baseline asset could not be read.");
     assets[route] = { body: patchAsset(route, await response.text()), type: route === "/risk" ? "text/html; charset=utf-8" : "text/javascript; charset=utf-8" };
   }
-  for (const file of ["network.js", "connection.js", "connection.css"]) assets["/risk/" + file] = { body: fs.readFileSync(path.join(moduleDirectory, file), "utf8"), type: file.endsWith("css") ? "text/css; charset=utf-8" : "text/javascript; charset=utf-8" };
+  for (const file of ["network.js", "feedback.js", "connection.js", "connection.css"]) assets["/risk/" + file] = { body: fs.readFileSync(path.join(moduleDirectory, file), "utf8"), type: file.endsWith("css") ? "text/css; charset=utf-8" : "text/javascript; charset=utf-8" };
   const wrapper = `import base from "./index-base.js";
 import assets from "./network-assets.mjs";
 import { createHealthMonitor } from "./network-health.mjs";
@@ -71,7 +73,7 @@ export default { async fetch(request, env, ctx) {
   fs.writeFileSync(entry, wrapper);
   const provenance = { project_id: projectId, baseline_site_version: 10, baseline_sha256: baselineHash, mutation_handlers_changed: false,
     entry_sha256: digest(wrapper),
-    files: Object.fromEntries(["network.js", "connection.js", "connection.css", "health.mjs", "install-site.mjs"].map(file => [file, digest(fs.readFileSync(path.join(moduleDirectory, file)))])) };
+    files: Object.fromEntries(["network.js", "feedback.js", "connection.js", "connection.css", "health.mjs", "install-site.mjs"].map(file => [file, digest(fs.readFileSync(path.join(moduleDirectory, file)))])) };
   fs.writeFileSync(path.join(root, "network-resilience-provenance.json"), JSON.stringify(provenance, null, 2) + "\n");
   return provenance;
 }
