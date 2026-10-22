@@ -1,0 +1,14 @@
+[
+  {
+    "file": "investment.html",
+    "sha256": "7bf34be7fb2c3aae4241ec4c0026878a6b4fca598558a8928bb5ac003b5da9f5"
+  },
+  {
+    "file": "versions/tinglan-widget.mjs",
+    "sha256": "e99739114b496d8d53e43a505cb49e61547160c44ee8d9d6391872d582dc951e"
+  },
+  {
+    "file": "release-manifest.json",
+    "sha256": "ccbd98021753e20bfe7bcd2f291e9a06284b14e8ab23c62463cf6fbfb3287fe8"
+  }
+]

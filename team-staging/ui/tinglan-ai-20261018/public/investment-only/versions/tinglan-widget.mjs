@@ -53,9 +53,8 @@ form.addEventListener('submit', async event => {
   try {
     if (publicAccess) await ensurePublicSession();
     const result = await analyze(config, body, window.tinglanFetch);
-    for (const key of ['summary','reason','evidence','missing','raw']) output.querySelector('[data-result=' + key + ']').textContent = result[key];
+    for (const key of ['summary','reason','evidence','missing']) output.querySelector('[data-result=' + key + ']').textContent = result[key];
     output.querySelector('[data-result=meta]').textContent = 'Live AI 模型返回 · ' + result.model + ' · ' + ((performance.now() - started) / 1000).toFixed(2) + ' 秒 · ' + (result.tokens === null ? '用量未返回' : result.tokens + ' tokens');
-    output.querySelector('[data-result=trace]').textContent = '运行编号：' + result.runId + '\n审计编号：' + result.auditId;
     output.hidden = false; show('AI 分析已返回，等待风险复核；未执行交易。');
   } catch (error) { show(publicAccess && error.message === 'AUTHENTICATION_REQUIRED' ? '对话连接暂未就绪，请再次发送以重新连接。' : messages[error.message] || messages.SERVICE_UNAVAILABLE, true); }
   finally { button.disabled = false; form.removeAttribute('aria-busy'); form.querySelectorAll('input,select,textarea').forEach(node => { node.disabled = false; }); }
