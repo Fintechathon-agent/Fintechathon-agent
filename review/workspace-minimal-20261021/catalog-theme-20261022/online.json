@@ -1,0 +1,157 @@
+{
+  "mode": "CLOUD_UI_ONLY",
+  "checks": [
+    {
+      "width": 320,
+      "paletteAndMaterialsMatch": true,
+      "noOverflow": true,
+      "catalogEntryPreserved": true,
+      "opensInvestment": true,
+      "styles": {
+        "body": {
+          "backgroundColor": "rgb(11, 10, 9)",
+          "color": "rgb(243, 238, 232)"
+        },
+        "sidebar": {
+          "backgroundColor": "rgb(21, 19, 16)",
+          "borderRightColor": "rgb(81, 72, 63)"
+        },
+        "card": {
+          "backgroundImage": "linear-gradient(135deg, rgba(255, 242, 213, 0.035), rgba(0, 0, 0, 0)), none",
+          "backgroundColor": "rgba(25, 23, 21, 0.76)",
+          "borderTopColor": "rgba(232, 216, 195, 0.18)",
+          "borderRadius": "18px",
+          "boxShadow": "rgba(234, 216, 195, 0.15) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 12px 32px 0px",
+          "backdropFilter": "blur(18px)"
+        },
+        "button": {
+          "backgroundColor": "rgb(255, 145, 74)",
+          "color": "rgb(23, 16, 10)",
+          "borderRadius": "8px"
+        },
+        "accent": {
+          "color": "rgb(255, 145, 74)"
+        }
+      }
+    },
+    {
+      "width": 375,
+      "paletteAndMaterialsMatch": true,
+      "noOverflow": true,
+      "catalogEntryPreserved": true,
+      "opensInvestment": true,
+      "styles": {
+        "body": {
+          "backgroundColor": "rgb(11, 10, 9)",
+          "color": "rgb(243, 238, 232)"
+        },
+        "sidebar": {
+          "backgroundColor": "rgb(21, 19, 16)",
+          "borderRightColor": "rgb(81, 72, 63)"
+        },
+        "card": {
+          "backgroundImage": "linear-gradient(135deg, rgba(255, 242, 213, 0.035), rgba(0, 0, 0, 0)), none",
+          "backgroundColor": "rgba(25, 23, 21, 0.76)",
+          "borderTopColor": "rgba(232, 216, 195, 0.18)",
+          "borderRadius": "18px",
+          "boxShadow": "rgba(234, 216, 195, 0.15) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 12px 32px 0px",
+          "backdropFilter": "blur(18px)"
+        },
+        "button": {
+          "backgroundColor": "rgb(255, 145, 74)",
+          "color": "rgb(23, 16, 10)",
+          "borderRadius": "8px"
+        },
+        "accent": {
+          "color": "rgb(255, 145, 74)"
+        }
+      }
+    },
+    {
+      "width": 1024,
+      "paletteAndMaterialsMatch": true,
+      "noOverflow": true,
+      "catalogEntryPreserved": true,
+      "opensInvestment": true,
+      "styles": {
+        "body": {
+          "backgroundColor": "rgb(11, 10, 9)",
+          "color": "rgb(243, 238, 232)"
+        },
+        "sidebar": {
+          "backgroundColor": "rgb(21, 19, 16)",
+          "borderRightColor": "rgb(81, 72, 63)"
+        },
+        "card": {
+          "backgroundImage": "linear-gradient(135deg, rgba(255, 242, 213, 0.035), rgba(0, 0, 0, 0)), none",
+          "backgroundColor": "rgba(25, 23, 21, 0.76)",
+          "borderTopColor": "rgba(232, 216, 195, 0.18)",
+          "borderRadius": "18px",
+          "boxShadow": "rgba(234, 216, 195, 0.15) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 12px 32px 0px",
+          "backdropFilter": "blur(18px)"
+        },
+        "button": {
+          "backgroundColor": "rgb(255, 145, 74)",
+          "color": "rgb(23, 16, 10)",
+          "borderRadius": "8px"
+        },
+        "accent": {
+          "color": "rgb(255, 145, 74)"
+        }
+      }
+    },
+    {
+      "width": 1440,
+      "paletteAndMaterialsMatch": true,
+      "noOverflow": true,
+      "catalogEntryPreserved": true,
+      "opensInvestment": true,
+      "styles": {
+        "body": {
+          "backgroundColor": "rgb(11, 10, 9)",
+          "color": "rgb(243, 238, 232)"
+        },
+        "sidebar": {
+          "backgroundColor": "rgb(21, 19, 16)",
+          "borderRightColor": "rgb(81, 72, 63)"
+        },
+        "card": {
+          "backgroundImage": "linear-gradient(135deg, rgba(255, 242, 213, 0.035), rgba(0, 0, 0, 0)), none",
+          "backgroundColor": "rgba(25, 23, 21, 0.76)",
+          "borderTopColor": "rgba(232, 216, 195, 0.18)",
+          "borderRadius": "18px",
+          "boxShadow": "rgba(234, 216, 195, 0.15) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 12px 32px 0px",
+          "backdropFilter": "blur(18px)"
+        },
+        "button": {
+          "backgroundColor": "rgb(255, 145, 74)",
+          "color": "rgb(23, 16, 10)",
+          "borderRadius": "8px"
+        },
+        "accent": {
+          "color": "rgb(255, 145, 74)"
+        }
+      }
+    }
+  ],
+  "pageErrors": [],
+  "modelRequests": 0,
+  "publishedAssets": [
+    {
+      "file": "catalog.html",
+      "sha256": "994ef06ee76cbaebd834b6b0161844870f16b29c755d3e743ab3c56e0c73dfe0"
+    },
+    {
+      "file": "versions/catalog-theme.css",
+      "sha256": "b219353445e6181d51ffa654183c3e879712b806fd278b65cb6f0614153e27c1"
+    },
+    {
+      "file": "versions/catalog-theme.mjs",
+      "sha256": "8589ed3d4ce958f92ffd75e582cab2f98e18affa74d01a98dd4c71fb36a93612"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "7ab83abe79b8b7f6c05a78cbb5edba817beb94c8ffe5a690c3a3d3cf1be80a26"
+    }
+  ]
+}

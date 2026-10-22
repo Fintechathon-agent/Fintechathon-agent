@@ -98,7 +98,7 @@
     },
     {
       "file": "catalog.html",
-      "sha256": "fcccc4ad7a7cdc1530eab72b64fce3cb7b4379f51c3b1863ba04a181b3558ae9"
+      "sha256": "875af90df648b89059e3280b58643d36ef2d6417757f28c2afae05fb5e8f971d"
     },
     {
       "file": "not-found.html",
@@ -139,6 +139,14 @@
     {
       "file": "versions/landing-logo-transparent.png",
       "sha256": "0a1365d99bb229a99c488413e099d7bc31b6932fc33709b2dcbd689bb180eef2"
+    },
+    {
+      "file": "versions/catalog-theme.css",
+      "sha256": "b219353445e6181d51ffa654183c3e879712b806fd278b65cb6f0614153e27c1"
+    },
+    {
+      "file": "versions/catalog-theme.mjs",
+      "sha256": "8589ed3d4ce958f92ffd75e582cab2f98e18affa74d01a98dd4c71fb36a93612"
     }
   ],
   "screenshotFollowup": {
