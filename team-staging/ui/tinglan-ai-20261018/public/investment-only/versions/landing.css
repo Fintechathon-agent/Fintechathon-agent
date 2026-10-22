@@ -140,7 +140,7 @@ footer p { text-align:center; }
  .feature-card .liquid-vessel { left:46%; width:54%; top:14px; bottom:auto; height:52px; }
  .feature-card .balance-caption { font-size:10px; padding-bottom:5px; }
  .feature-card .balance-caption b { display:none; }
- .feature-card h3 { font-size:17px; margin:12px 0 8px; }
+ .feature-card h3 { font-size:clamp(14px,4.5vw,17px); white-space:nowrap; margin:12px 0 8px; }
  .feature-card>p { font-size:12.5px; line-height:1.65; margin:0; }
  .feature-card ul { gap:6px; margin:14px 0; }
  .feature-card li { font-size:11px; padding:4px 7px; }

@@ -1,0 +1,78 @@
+{
+  "mode": "online",
+  "layout": [
+    {
+      "width": 320,
+      "captionRewritten": true,
+      "removedLabels": 6,
+      "removedSecondSentences": 2,
+      "entriesAligned": true,
+      "noOverflow": true,
+      "poolClicks": 2
+    },
+    {
+      "width": 375,
+      "captionRewritten": true,
+      "removedLabels": 6,
+      "removedSecondSentences": 2,
+      "entriesAligned": true,
+      "noOverflow": true,
+      "poolClicks": 2
+    },
+    {
+      "width": 840,
+      "captionRewritten": true,
+      "removedLabels": 6,
+      "removedSecondSentences": 2,
+      "entriesAligned": true,
+      "noOverflow": true,
+      "poolClicks": 2
+    },
+    {
+      "width": 1440,
+      "captionRewritten": true,
+      "removedLabels": 6,
+      "removedSecondSentences": 2,
+      "entriesAligned": true,
+      "noOverflow": true,
+      "poolClicks": 2
+    }
+  ],
+  "interactions": [
+    {
+      "side": 0,
+      "input": "pointer",
+      "animatedPour": true
+    },
+    {
+      "side": 1,
+      "input": "keyboard",
+      "animatedPour": true
+    }
+  ],
+  "pageErrors": [],
+  "modelRequests": 0,
+  "workspaceNavigation": true,
+  "assets": [
+    {
+      "file": "landing.html",
+      "sha256": "f00fdf527a8829c160221f6f52c71db4f40fb16c24a063f523256755acd771ab"
+    },
+    {
+      "file": "versions/landing.css",
+      "sha256": "411647ea4fb05311c5e023d5ebc767f55c34df0c70464b56251626b81b96db79"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "39ba6c762607d5f0062a0ff544b27505defd8b17daa5f30c49e6f1bf7343c5eb"
+    }
+  ],
+  "health": {
+    "status": "ok",
+    "service": "xinlan-qwen38-share",
+    "model": "qwen3.8-flash",
+    "configured": true,
+    "paidEnabled": true
+  },
+  "result": "PASSED"
+}

@@ -62,7 +62,7 @@
     },
     {
       "file": "versions/landing.css",
-      "sha256": "b141ae3f830c048f5dd2513996868799b4df39a9e640fa758c8359a946b8ba7c"
+      "sha256": "411647ea4fb05311c5e023d5ebc767f55c34df0c70464b56251626b81b96db79"
     },
     {
       "file": "versions/static-preview.css",
@@ -90,7 +90,7 @@
     },
     {
       "file": "landing.html",
-      "sha256": "8328f3e1582e55099da071938dca434514224283399c302bf4e87585b2d18693"
+      "sha256": "58eab16a62338acf8e82e8543f592c0332c30213725b20c37e32a96911fb89e8"
     },
     {
       "file": "investment.html",

@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-21",
+  "worker": "xinlan-qwen38-share",
+  "previousVersion": "77b78740-e5ba-441d-bbed-116918d6d4e8",
+  "version": "2748f2d5-4e3e-4320-9216-658c23f8b635",
+  "changedStaticAssets": [
+    "investment-only/landing.html",
+    "investment-only/versions/landing.css",
+    "investment-only/release-manifest.json"
+  ],
+  "backendSourceChanged": false,
+  "remoteVariablesRetained": true,
+  "localVariablesBlockOmitted": true,
+  "secretsUploaded": false,
+  "modelCalls": 0,
+  "uploadConnection": "Direct connection for deployment process only",
+  "previousAttempts": "Two proxy transport failures before deployment; remote baseline verified before retry",
+  "result": "DEPLOYED"
+}
