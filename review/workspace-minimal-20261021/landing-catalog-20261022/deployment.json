@@ -1,0 +1,16 @@
+{
+  "version": "9dcf5ea5-8806-4926-8797-6c9b4649923f",
+  "previousVersion": "1abc5b46-d50e-49a0-99f5-fc1b11e33329",
+  "variablesPreserved": true,
+  "modelRequests": 0,
+  "assets": [
+    {
+      "file": "landing.html",
+      "sha256": "d120bd1fcd38ee513a369aee40270007c9f4c4409d71fb64d7e8fd0b454c1121"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "7b4eff9d3eb4cb91f7184f5e3e4907bf5adac82ba66ee7e9b2209e6cb2b44eba"
+    }
+  ]
+}
