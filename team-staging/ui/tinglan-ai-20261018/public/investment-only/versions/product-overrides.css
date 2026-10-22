@@ -218,3 +218,6 @@ dialog dl{font-size:13px}
   .result-verdict{display:block}
   .verdict-tag{margin-top:13px}
 }
+/* Reuse the transparent team artwork across product pages. */
+.lab-brand .team-logo-cutout{display:block;width:80px;height:80px;object-fit:contain;flex:none;background:transparent;filter:none;border:0}
+@media(max-width:900px){.lab-brand .team-logo-cutout{width:56px;height:56px}}

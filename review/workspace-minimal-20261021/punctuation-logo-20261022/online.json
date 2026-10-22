@@ -1,0 +1,79 @@
+{
+  "mode": "online",
+  "checks": [
+    {
+      "screen": "catalog",
+      "width": 375,
+      "logoLoaded": true,
+      "logoSize": 56,
+      "noOverflow": true,
+      "punctuationChecked": false
+    },
+    {
+      "screen": "investment",
+      "width": 375,
+      "logoLoaded": true,
+      "logoSize": 56,
+      "noOverflow": true,
+      "punctuationChecked": true
+    },
+    {
+      "screen": "catalog",
+      "width": 840,
+      "logoLoaded": true,
+      "logoSize": 56,
+      "noOverflow": true,
+      "punctuationChecked": false
+    },
+    {
+      "screen": "investment",
+      "width": 840,
+      "logoLoaded": true,
+      "logoSize": 56,
+      "noOverflow": true,
+      "punctuationChecked": true
+    },
+    {
+      "screen": "catalog",
+      "width": 1440,
+      "logoLoaded": true,
+      "logoSize": 80,
+      "noOverflow": true,
+      "punctuationChecked": false
+    },
+    {
+      "screen": "investment",
+      "width": 1440,
+      "logoLoaded": true,
+      "logoSize": 80,
+      "noOverflow": true,
+      "punctuationChecked": true
+    }
+  ],
+  "errors": [],
+  "modelRequests": 0,
+  "catalogNavigation": true,
+  "assets": [
+    {
+      "file": "investment.html",
+      "sha256": "cf586c04aadb83c60e4a22a452e2c1cc39b95942aa8baca1d9fa1b8fb473144a"
+    },
+    {
+      "file": "catalog.html",
+      "sha256": "6b9c464eabf63784ba833dc2da881d68baa9b5ac542ec4f23187907a573ea7ef"
+    },
+    {
+      "file": "versions/product-overrides.css",
+      "sha256": "ce1196696a2d1ab54da452be24b950862f4778da0fddb483638e3f496254664e"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "648693220f8903731e5c9bc5d22ad0813ae4a3c2698bb01514f7f723c8de8f3e"
+    },
+    {
+      "file": "versions/team-logo-transparent.png",
+      "sha256": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6"
+    }
+  ],
+  "result": "PASSED"
+}

@@ -1,6 +1,6 @@
 # 工作窗口统一与精简交付 · 2026-10-21
 
-后续修订见 [配色与首页入口](followup/README.md)、[双卡对齐](alignment/README.md)；首页最新状态为[删除两段卡片说明](copy-removal/README.md)，其补丁基于对齐版本应用；独立千问页修改见[文字精简与彩色Logo](share-brand/README.md)，独立首页最新修改见[文案精简与水池互动提示](landing-pools/README.md)。
+后续修订见 [配色与首页入口](followup/README.md)、[双卡对齐](alignment/README.md)；首页最新状态为[删除两段卡片说明](copy-removal/README.md)，其补丁基于对齐版本应用；独立千问页修改见[文字精简与彩色Logo](share-brand/README.md)，独立首页修改见[文案精简与水池互动提示](landing-pools/README.md)，最新局部修订见[投资页标点与产品导航Logo](punctuation-logo-20261022/README.md)。
 
 本轮修改用户指定的个人预览页面，保留现有 Logo、首页图形及已有金融演示逻辑。工作窗口使用首页的暖黑 `#0b0a09`、暖白 `#f3eee8` 与橙色 `#ff914a`。删除欢迎口号、重点说明卡、未开放服务卡、重复标题与普通说明的外框；仅真实输入、按钮、导航与可展开内容保留操作提示。
 
