@@ -1,0 +1,24 @@
+{
+  "workerVersion": "e0968e37-d682-40d8-9177-1e7ef0481885",
+  "previousVersion": "0807ac09-1038-4b85-9b3c-1752ced1faef",
+  "preservedVariables": true,
+  "modelRequests": 0,
+  "assets": [
+    {
+      "file": "investment.html",
+      "sha256": "1e3e98b487be0896fe014a60715ef4be36fbe1dd0618d73b6af7eb0c9d6a7b61"
+    },
+    {
+      "file": "catalog.html",
+      "sha256": "88e923d17d3ca40802c6addc6eacd2314e701285abbe49e84b6b9fb3f1df1de7"
+    },
+    {
+      "file": "versions/product-overrides.css",
+      "sha256": "014d9ae7a95675b022d1bbf58f4f44e48153c8d01fa725398e2c2e0412e3b1cd"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "d4acc39256656a41cfe1f131644296c1c055088d5ac9e6b506df47a1f662e64e"
+    }
+  ]
+}

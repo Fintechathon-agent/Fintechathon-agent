@@ -26,7 +26,7 @@
     },
     {
       "file": "versions/product-overrides.css",
-      "sha256": "ce1196696a2d1ab54da452be24b950862f4778da0fddb483638e3f496254664e"
+      "sha256": "014d9ae7a95675b022d1bbf58f4f44e48153c8d01fa725398e2c2e0412e3b1cd"
     },
     {
       "file": "versions/style.css",
@@ -94,11 +94,11 @@
     },
     {
       "file": "investment.html",
-      "sha256": "790060bd279b6fc6441b7a957e5ff4c5695d619e3817527e33e26e4874e7f92a"
+      "sha256": "d0de8e2dd06f74667f25623b69eb50cd954136eea5015065b781f03c2075a596"
     },
     {
       "file": "catalog.html",
-      "sha256": "2e033c92f231b4385aa230879ac2e3016ff0a5456fdc349bfbb607bbb5126464"
+      "sha256": "d534ebb1ebcea41810a3f619fb6090e380c1b6d5a085b4c6ea4138b3697c3877"
     },
     {
       "file": "not-found.html",

@@ -221,3 +221,8 @@ dialog dl{font-size:13px}
 /* Reuse the transparent team artwork across product pages. */
 .lab-brand .team-logo-cutout{display:block;width:80px;height:80px;object-fit:contain;flex:none;background:transparent;filter:none;border:0}
 @media(max-width:900px){.lab-brand .team-logo-cutout{width:56px;height:56px}}
+
+/* Keep global product navigation separate from in-product sections. */
+.sidebar .global-nav{margin-bottom:7px}
+body .sidebar .global-nav a[aria-current="page"]{color:var(--accent,#ff9148);background:#251a13;border-color:#55311a;font-weight:600}
+@media(max-width:900px){.sidebar .global-nav{margin-bottom:0;flex:none}.sidebar .workspace-switch{min-width:0}.sidebar .workspace-switch a{white-space:nowrap}}
