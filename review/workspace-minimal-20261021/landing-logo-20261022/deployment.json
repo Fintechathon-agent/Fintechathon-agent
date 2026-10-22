@@ -1,0 +1,28 @@
+{
+  "version": "1abc5b46-d50e-49a0-99f5-fc1b11e33329",
+  "previousVersion": "e0968e37-d682-40d8-9177-1e7ef0481885",
+  "variablesPreserved": true,
+  "modelRequests": 0,
+  "assets": [
+    {
+      "file": "landing.html",
+      "sha256": "a0eb66e3b6498bc7442a97bce37c3018a3867ee06d40ab668fd09b2ad7d1e578"
+    },
+    {
+      "file": "versions/landing.css",
+      "sha256": "0f01dad7285835f34e8f971263a8155d2be7c5780bd8c48c3ee8fa96d20e0da3"
+    },
+    {
+      "file": "versions/landing.js",
+      "sha256": "56ed2b21d673657a82b481ff6f9391e51c8668af782ea42e065d11216440ac63"
+    },
+    {
+      "file": "versions/landing-logo-transparent.png",
+      "sha256": "0a1365d99bb229a99c488413e099d7bc31b6932fc33709b2dcbd689bb180eef2"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "7eac71670031a616c4f7d1adf18241f67a230cd51f449243e0ca32fe4a9f4279"
+    }
+  ]
+}

@@ -46,7 +46,7 @@
     },
     {
       "file": "versions/landing.js",
-      "sha256": "a7e191b6b73467f75daad729c37582570c39f6228dd37e7fc66afbf6d1f4c95a"
+      "sha256": "56ed2b21d673657a82b481ff6f9391e51c8668af782ea42e065d11216440ac63"
     },
     {
       "file": "versions/glass.css",
@@ -62,7 +62,7 @@
     },
     {
       "file": "versions/landing.css",
-      "sha256": "411647ea4fb05311c5e023d5ebc767f55c34df0c70464b56251626b81b96db79"
+      "sha256": "0f01dad7285835f34e8f971263a8155d2be7c5780bd8c48c3ee8fa96d20e0da3"
     },
     {
       "file": "versions/static-preview.css",
@@ -90,7 +90,7 @@
     },
     {
       "file": "landing.html",
-      "sha256": "58eab16a62338acf8e82e8543f592c0332c30213725b20c37e32a96911fb89e8"
+      "sha256": "e0489aa176aac6473e9d8fc59efa2fcf8c19269ee4d3324397c9545ab80d365d"
     },
     {
       "file": "investment.html",
@@ -135,6 +135,10 @@
     {
       "file": "versions/team-logo-transparent.png",
       "sha256": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6"
+    },
+    {
+      "file": "versions/landing-logo-transparent.png",
+      "sha256": "0a1365d99bb229a99c488413e099d7bc31b6932fc33709b2dcbd689bb180eef2"
     }
   ],
   "screenshotFollowup": {

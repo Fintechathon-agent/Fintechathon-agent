@@ -2,6 +2,7 @@ import { createArchiveScene, initLiquidBalance } from './archive.js';
 'use strict';
 // Native scrolling remains available with or without JavaScript.
 for (const host of document.querySelectorAll('[data-archive-scene]')) host.append(createArchiveScene({density:host.dataset.archiveScene}));
+const notice = document.querySelector('.static-preview-notice');
 const copy = document.querySelector('.story-copy');
 const next = document.querySelector('.story-next');
 const flip = document.querySelector('.coin-flip');
@@ -28,6 +29,8 @@ function morphPath(start, end, progress) {
 let pending = false;
 function render() {
   pending = false;
+  // Account for wrapped notice text without leaving a gap after scrolling.
+  document.documentElement.style.setProperty('--landing-notice-offset', `${Math.max(0, notice?.getBoundingClientRect().bottom || 0)}px`);
   const rect = story.getBoundingClientRect();
   const stageHeight = story.firstElementChild.offsetHeight;
   const progress = motion.matches ? 0 : clamp(-rect.top / Math.max(1, rect.height - stageHeight));
