@@ -162,3 +162,7 @@ footer p { text-align:center; }
 /* Keep the header below the notice while the notice is on screen. */
 .landing-product .landing-nav{top:calc(20px + var(--landing-notice-offset,40px))}
 @media(max-width:700px){.landing-product .landing-nav{top:calc(12px + var(--landing-notice-offset,60px))}}
+
+/* Keep the product name together when the direct-entry label wraps. */
+.direct-adviser-label{min-width:0}
+.direct-adviser-label>span{white-space:nowrap}

@@ -230,3 +230,7 @@ body .sidebar .global-nav a[aria-current="page"]{color:var(--accent,#ff9148);bac
 /* Fit the product name on one line within both desktop sidebar widths. */
 body.archive-workbench .sidebar .section-label{font-size:12px;letter-spacing:0;white-space:nowrap}
 @media(min-width:901px) and (max-width:1180px){body.archive-workbench .sidebar .section-label{font-size:11px}}
+
+/* Keep the AI assistant note compact within the existing navigation row. */
+.health-nav-label{white-space:nowrap}
+.health-nav-label small{font-size:11px}

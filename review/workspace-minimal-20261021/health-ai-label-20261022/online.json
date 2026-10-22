@@ -1,0 +1,121 @@
+{
+  "mode": "CLOUD_UI_ONLY",
+  "checks": [
+    {
+      "width": 320,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": "hiddenOnMobile",
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 375,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": "hiddenOnMobile",
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 840,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": "hiddenOnMobile",
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 901,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1024,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1180,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1181,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "landing-direct-entry",
+      "width": 320,
+      "textCorrect": true,
+      "opensInvestmentOverview": true,
+      "noLinkOverflow": true
+    },
+    {
+      "screen": "landing-direct-entry",
+      "width": 375,
+      "textCorrect": true,
+      "opensInvestmentOverview": true,
+      "noLinkOverflow": true
+    },
+    {
+      "screen": "landing-direct-entry",
+      "width": 840,
+      "textCorrect": true,
+      "opensInvestmentOverview": true,
+      "noLinkOverflow": true
+    },
+    {
+      "screen": "landing-direct-entry",
+      "width": 1440,
+      "textCorrect": true,
+      "opensInvestmentOverview": true,
+      "noLinkOverflow": true
+    }
+  ],
+  "pageErrors": [],
+  "modelRequests": 0,
+  "publishedAssets": [
+    {
+      "file": "investment.html",
+      "sha256": "91a8133a0bfb3d2a371b140d4b4be441ec62d89354640c847aa2ce12a09400af"
+    },
+    {
+      "file": "landing.html",
+      "sha256": "3f1872c279688b9a22d6fb87ab7cbc93e32866101a68caeff977fa2c07403a7c"
+    },
+    {
+      "file": "versions/product-overrides.css",
+      "sha256": "35e8787ab7b8902c1dea65baa36c43bb0a86123a8d3cd142c6b48ed4e161ab8b"
+    },
+    {
+      "file": "versions/landing.css",
+      "sha256": "b56ecee5d3a042dc55c2e08270b1e46b3f4f158d3f240525edd42d9467ecf6ce"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "52264442547fd727800c6c59f13303758d11431da575ab0dd70f06640952bfc5"
+    }
+  ]
+}
