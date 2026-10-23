@@ -1,0 +1,2 @@
+vendor/** -text whitespace=cr-at-eol
+frontend/** -text whitespace=cr-at-eol

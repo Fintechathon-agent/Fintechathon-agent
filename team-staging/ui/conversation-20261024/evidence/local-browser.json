@@ -1,0 +1,82 @@
+{
+  "base": "http://127.0.0.1:8887",
+  "realProviderRequested": false,
+  "widths": [
+    320,
+    375,
+    430,
+    700,
+    701,
+    840,
+    1024,
+    1440,
+    1920
+  ],
+  "requests": [
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/message",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/message",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "diagnosticsHidden": true,
+  "offlineDraftPreserved": true,
+  "persistenceAndIsolation": true,
+  "result": "PASSED"
+}

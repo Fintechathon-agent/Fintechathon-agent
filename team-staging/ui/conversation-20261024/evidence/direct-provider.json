@@ -1,0 +1,48 @@
+{
+  "test": "direct-provider",
+  "http_status": 200,
+  "duration_ms": 14614,
+  "run_id": "review-f11a061a-7320-4cea-bb83-6d2abceeeed3",
+  "source": "model",
+  "status": "PROPOSED",
+  "model": "qwen3.8-flash",
+  "call_succeeded": true,
+  "usage": {
+    "prompt_tokens": 444,
+    "total_tokens": 1213,
+    "completion_tokens": 769,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "text_tokens": 444
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 436,
+      "text_tokens": 769
+    }
+  },
+  "provider_response_id": "chatcmpl-c4c7914e-2cfd-9521-b13a-334e2645a315",
+  "proposal": {
+    "summary": "不可信外部内容请求对个人财务安排进行分析：每月收入12000元、日常开支6000元、应急金36000元、无负债，并考虑每月拿出1000元长期投资，但担心流动性。内容未请求执行付款、交易、转账或账户变更。",
+    "risk_level": "medium",
+    "proposed_action": "REQUEST_MORE_INFO",
+    "action_reason": "该请求涉及个人现金流与投资安排评估，但现有信息不足以判断流动性、投资期限和风险承受能力；同时不执行任何交易或资金操作。",
+    "missing_information": [
+      "投资目标期限和具体理财目标",
+      "收入稳定性及是否有可变收入",
+      "风险承受能力和可接受波动范围",
+      "未来1至3年是否有购房、教育、医疗、婚育等大额支出",
+      "日常开支中固定与可变支出明细",
+      "是否已有社会保险、商业保险、养老金或雇主退休计划",
+      "应急金是否已有其他备用资金来源"
+    ],
+    "evidence": [
+      "原文：每月收入12000元",
+      "原文：日常开支6000元",
+      "原文：应急金36000元",
+      "原文：无负债",
+      "原文：每月拿1000元长期投资，但担心流动性",
+      "原文：不推荐个股，不执行交易"
+    ]
+  },
+  "execution_allowed": false
+}

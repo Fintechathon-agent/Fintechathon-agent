@@ -1,0 +1,7 @@
+{
+  "tests": 59,
+  "failures": 0,
+  "errors": 0,
+  "result": "PASSED",
+  "scope": "upstream deterministic regression; not evidence of real AI calls"
+}
