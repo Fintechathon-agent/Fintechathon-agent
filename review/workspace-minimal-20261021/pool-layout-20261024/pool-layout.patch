@@ -2,68 +2,32 @@ diff --git a/landing.html b/landing.html
 index d3e2ffd..ba60ed4 100644
 --- a/landing.html
 +++ b/landing.html
-@@ -4,7 +4,7 @@
-   <meta name="description" content="从一笔想法，到每一笔有据可循的决策。探索 Finance Lab 投资组合诊断与任务记录。">
-   <meta name="theme-color" content="#0a0a0a">
-   <link rel="icon" href="versions/favicon.svg" type="image/svg+xml">
+@@ -7 +7 @@
 -  <link rel="stylesheet" href="versions/landing.css?v=20261016-type">
 +  <link rel="stylesheet" href="versions/landing.css?v=20261024-pool-layout">
-   <script type="module" src="versions/landing.js?v=20261021-minimal"></script>
- <link rel="stylesheet" href="versions/tokens.css"><script type="module" src="versions/archive.js?v=20261021-minimal"></script><link rel="stylesheet" href="versions/preview.css"><link rel="stylesheet" href="versions/workspace-refinement.css?v=20261021-align"></head>
- <body class="landing-product refined-home"><aside class="preview-notice" aria-label="演示状态">静态演示 · 组合服务未连接 · 不执行交易</aside>
 diff --git a/preview-manifest.json b/preview-manifest.json
 index be9df5f..ec8157e 100644
 --- a/preview-manifest.json
 +++ b/preview-manifest.json
-@@ -32,7 +32,7 @@
-     },
-     {
-       "file": "landing.html",
+@@ -35 +35 @@
 -      "sha256": "0faf1997537e80de4a518665f07dfd39eaecb216461a2ddd57ce74f4c509c407"
 +      "sha256": "186420dd762c6bcc1d56e309b47078c180891057303d44bd5fe241b21629a031"
-     },
-     {
-       "file": "merchant.html",
-@@ -72,7 +72,7 @@
-     },
-     {
-       "file": "versions/landing.css",
+@@ -75 +75 @@
 -      "sha256": "cbf35390e76db3698330a254e519ebbed2aa556f872175cc8d5500cc012cfd7c"
 +      "sha256": "1bee38147f7bd093ad86eef8262229cc6616d2eedd916ab9384ac16ca11bd88d"
-     },
-     {
-       "file": "versions/landing.js",
 diff --git a/versions/landing.css b/versions/landing.css
 index e3ab689..9e2bd3e 100644
 --- a/versions/landing.css
 +++ b/versions/landing.css
-@@ -55,9 +55,9 @@ h2 { font-size:var(--text-title); font-weight:600; line-height:1.4; margin:15px
- .card-top { height:40px; border-bottom:1px solid #b8ada036; padding-bottom:12px; display:flex; align-items:center; justify-content:space-between; color:var(--text-secondary); font:var(--text-meta) Consolas,monospace; letter-spacing:1px; }
- .feature-icon { width:28px; height:28px; display:grid; place-content:center; flex:none; font:24px 'Segoe UI',sans-serif; }
- .archive-diagram { position:relative; container-type:inline-size; height:160px; display:flex; align-items:center; margin:20px 0; color:#d0c2ad70; border-bottom:1px solid #b8ada036; }
+@@ -58 +58 @@ h2 { font-size:var(--text-title); font-weight:600; line-height:1.4; margin:15px
 -.archive-diagram>span { font:100px/1 Consolas,monospace; letter-spacing:-.1em; }
 +.archive-diagram>span:not(.liquid-vessel) { font:100px/1 Consolas,monospace; letter-spacing:-.1em; }
- /* The number scales with its card so wide fallback fonts never run under the pan. */
+@@ -60 +60 @@ h2 { font-size:var(--text-title); font-weight:600; line-height:1.4; margin:15px
 -.archive-diagram>span { font-size:min(100px,27cqi); }
 +.archive-diagram>span:not(.liquid-vessel) { font-size:min(100px,27cqi); }
- 
- 
- .feature-card h3 { font-size:var(--text-title); font-weight:600; margin:18px 0; }
-@@ -121,7 +121,7 @@ footer p { text-align:center; }
- .feature-card[data-liquid-active=true] .liquid-water { opacity:1; transition-duration:0s; }
- .liquid-drops { position:absolute; left:0; top:-20px; width:100%; height:calc(100% + 20px); pointer-events:none; }
- .balance-caption { align-self:flex-end; display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; padding-bottom:7px; color:var(--text-secondary); font:12px/1.4 Consolas,monospace; }
+@@ -124 +124 @@ footer p { text-align:center; }
 -.archive-diagram>span { position:absolute; left:0; top:28px; pointer-events:none; }
 +.archive-diagram>span:not(.liquid-vessel) { position:absolute; left:0; top:28px; pointer-events:none; }
- .balance-caption b { font:inherit; text-align:right; margin-left:auto; }
- .pour-hint { opacity:0; white-space:nowrap; transition:opacity var(--motion-duration); }
- .feature-card[data-ready=true]:hover .pour-hint,.feature-card[data-ready=true]:focus-within .pour-hint,.feature-card[data-hint=true] .pour-hint,.feature-card[data-full=true] .pour-hint { opacity:1; }
-@@ -141,7 +141,7 @@ footer p { text-align:center; }
-  .feature-card .card-top>span:first-child { max-width:54%; line-height:1.35; }
-  .feature-card .feature-icon { display:none; }
-  .feature-card .archive-diagram { height:120px; margin:12px 0; }
+@@ -144 +144 @@ footer p { text-align:center; }
 - .feature-card .archive-diagram>span { top:14px; }
 + .feature-card .archive-diagram>span:not(.liquid-vessel) { top:14px; }
-  .feature-card .liquid-vessel { left:46%; width:54%; top:14px; bottom:auto; height:52px; }
-  .feature-card .balance-caption { font-size:10px; padding-bottom:5px; }
-  .feature-card .balance-caption b { display:none; }

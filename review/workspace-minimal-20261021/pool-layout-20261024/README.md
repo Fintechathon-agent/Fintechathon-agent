@@ -7,7 +7,7 @@
 - 修改基线：个人预览 `preview` 分支 `26410016d64884c86fea178943b0f922fef484f9`。
 - 布局提交：`5e77529c7a4b84b89ad87dad1cd71c4720cf33ce`；最终发布提交：`a3587d43d194eff650da01d5a89bbddc4d615b3d`，推送后与远端 `preview` 一致。最后一笔提交修正 Windows 工作副本换行与 Git 发布字节不同导致的清单哈希偏差，页面代码无追加改动。
 - 验收入口：[预览首页](https://lixjanus526-art.github.io/finance-lab-ui-preview/landing.html?v=20261024-pool-layout#explore)。
-- `site/` 为三个发布文件的精确副本；`release-files.json` 记录 SHA256；`pool-layout.patch` 可在基线上复现修改。
+- `site/` 为三个发布文件的精确副本；`release-files.json` 记录 SHA256；`pool-layout.patch` 为零上下文补丁，可在对应基线上使用 `git apply --unidiff-zero pool-layout.patch` 复现修改。
 - 团队仓库仅新增本目录，沿用 `codex/workspace-minimal-20261021` 与草稿 PR #26。
 
 ## 检查
