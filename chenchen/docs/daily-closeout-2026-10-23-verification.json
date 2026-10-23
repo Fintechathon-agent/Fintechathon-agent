@@ -1,0 +1,37 @@
+{
+  "checked_at": "2026-10-23T14:09:15.476562+00:00",
+  "main_baseline": "704c7ffcf70ee623b3a24634e02d4e9e48ff3701",
+  "business_commits_today": [],
+  "check_exit": 0,
+  "tests": {
+    "pass": 284,
+    "fail": 0,
+    "skip": 0
+  },
+  "trace": {
+    "pass": 32,
+    "fail": 0,
+    "positive_schema_cases": 7
+  },
+  "docx_structure": [
+    {
+      "file": "core-agent-daily-update-2026-10-23.docx",
+      "paragraphs": 39,
+      "images": 2,
+      "zip_valid": true,
+      "image_widths_valid": true,
+      "page_layout_accepted": false
+    },
+    {
+      "file": "core-agent-integration-guide-2026-10-23.docx",
+      "paragraphs": 86,
+      "images": 2,
+      "zip_valid": true,
+      "image_widths_valid": true,
+      "page_layout_accepted": false
+    }
+  ],
+  "runtime_note": "Initial Python 3.14 dependency import failed; rerun with bundled Python succeeded. No project dependencies changed.",
+  "business_code_changed": false,
+  "new_public_model_risk_trade_calls": 0
+}

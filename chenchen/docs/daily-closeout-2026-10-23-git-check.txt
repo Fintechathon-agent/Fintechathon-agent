@@ -1,0 +1,3 @@
+git diff --check: exit 0
+git diff --cached --check: exit 0 (rechecked after staging)
+Only dated daily/integration docs and read-only validation evidence staged.
