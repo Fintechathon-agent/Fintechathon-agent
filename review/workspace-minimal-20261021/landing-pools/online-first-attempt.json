@@ -1,0 +1,19 @@
+{
+  "mode": "online",
+  "layout": [
+    {
+      "width": 320,
+      "captionRewritten": true,
+      "removedLabels": 6,
+      "removedSecondSentences": 2,
+      "entriesAligned": true,
+      "noOverflow": true,
+      "poolClicks": 2
+    }
+  ],
+  "interactions": [],
+  "pageErrors": [],
+  "modelRequests": 0,
+  "result": "FAILED",
+  "error": "Entry alignment at 375"
+}

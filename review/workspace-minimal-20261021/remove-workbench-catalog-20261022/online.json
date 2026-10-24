@@ -1,0 +1,69 @@
+{
+  "mode": "CLOUD_UI_ONLY",
+  "checks": [
+    {
+      "width": 375,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": "hiddenOnMobile",
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1024,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "productEntryRemoved": true,
+      "labelFitsOneLine": true,
+      "sectionLinksPreserved": true,
+      "roundTrip": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "landing-direct-entry",
+      "width": 320,
+      "textCorrect": true,
+      "opensInvestmentOverview": true,
+      "noLinkOverflow": true
+    },
+    {
+      "screen": "landing-direct-entry",
+      "width": 375,
+      "textCorrect": true,
+      "opensInvestmentOverview": true,
+      "noLinkOverflow": true
+    },
+    {
+      "screen": "landing-direct-entry",
+      "width": 840,
+      "textCorrect": true,
+      "opensInvestmentOverview": true,
+      "noLinkOverflow": true
+    },
+    {
+      "screen": "landing-direct-entry",
+      "width": 1440,
+      "textCorrect": true,
+      "opensInvestmentOverview": true,
+      "noLinkOverflow": true
+    }
+  ],
+  "pageErrors": [],
+  "modelRequests": 0,
+  "publishedAssets": [
+    {
+      "file": "investment.html",
+      "sha256": "baba4b0ea427eb209ead537dcb940bb561d873cea92c64aa846998c12df21ade"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "0de5cdcf760b83649912fdc2b6dfa0ab58b286032da06737f66d2fe180542672"
+    }
+  ]
+}

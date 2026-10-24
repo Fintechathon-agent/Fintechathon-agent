@@ -1,0 +1,12 @@
+{
+  "candidateService": {
+    "tests": 7,
+    "result": "PASSED",
+    "modelCalls": 0
+  },
+  "existingConversation": {
+    "tests": 59,
+    "result": "PASSED"
+  },
+  "scope": "unit regression is separate from real model evidence"
+}

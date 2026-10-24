@@ -1,0 +1,99 @@
+{
+  "timestamp": "2026-10-21T05:11:06.400Z",
+  "base": "http://127.0.0.1:4187",
+  "modelCalls": 0,
+  "widths": [
+    {
+      "width": 320,
+      "routes": 4,
+      "noOverflow": true,
+      "landingPalette": "rgb(11, 10, 9)",
+      "navigationTouchTarget": true
+    },
+    {
+      "width": 375,
+      "routes": 4,
+      "noOverflow": true,
+      "landingPalette": "rgb(11, 10, 9)",
+      "navigationTouchTarget": true
+    },
+    {
+      "width": 390,
+      "routes": 4,
+      "noOverflow": true,
+      "landingPalette": "rgb(11, 10, 9)",
+      "navigationTouchTarget": true
+    },
+    {
+      "width": 430,
+      "routes": 4,
+      "noOverflow": true,
+      "landingPalette": "rgb(11, 10, 9)",
+      "navigationTouchTarget": true
+    },
+    {
+      "width": 850,
+      "routes": 4,
+      "noOverflow": true,
+      "landingPalette": "rgb(11, 10, 9)",
+      "navigationTouchTarget": true
+    },
+    {
+      "width": 1024,
+      "routes": 4,
+      "noOverflow": true,
+      "landingPalette": "rgb(11, 10, 9)",
+      "navigationTouchTarget": true
+    },
+    {
+      "width": 1440,
+      "routes": 4,
+      "noOverflow": true,
+      "landingPalette": "rgb(11, 10, 9)",
+      "navigationTouchTarget": true
+    }
+  ],
+  "routes": [
+    {
+      "card": ".investment-feature",
+      "route": "banking",
+      "backgroundClick": true
+    },
+    {
+      "card": ".merchant-feature",
+      "route": "tasks",
+      "backgroundClick": true
+    },
+    {
+      "file": "investment.html",
+      "palette": true
+    },
+    {
+      "file": "catalog.html",
+      "palette": true
+    },
+    {
+      "file": "risk-workbench.html",
+      "palette": true
+    },
+    {
+      "file": "investment-only/investment.html",
+      "palette": true
+    }
+  ],
+  "checks": [
+    "Keyboard card activation",
+    "Draft preserved across windows",
+    "Back and forward",
+    "Deep-link reload",
+    "Invalid route fallback",
+    "Task validation",
+    "Service failure does not show success",
+    "Existing explicitly labelled static portfolio simulation retains all three plans",
+    "No-script safety content accessible",
+    "Logo asset byte-identical"
+  ],
+  "pageErrors": [],
+  "logoSha256": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6",
+  "result": "PASSED"
+}

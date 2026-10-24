@@ -1,0 +1,9 @@
+{
+  "tests": 2,
+  "result": "PASSED",
+  "checks": [
+    "real subprocess with absent provider configuration returns unavailable and preserves records",
+    "retention read-only hash remains unchanged"
+  ],
+  "paidProviderCalls": 0
+}

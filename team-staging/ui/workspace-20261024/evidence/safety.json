@@ -1,0 +1,10 @@
+{
+  "secretScanPassed": true,
+  "filesScanned": 18,
+  "formalRisk": "OWNER_NOT_CONNECTED",
+  "productionSchemaChanged": false,
+  "execution_enabled": false,
+  "automaticCleanup": false,
+  "coreSnapshot": "46041e5526f97c0956798315d5caceb653615208",
+  "coreRuntimeFiles": 31
+}

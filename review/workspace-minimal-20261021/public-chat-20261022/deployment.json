@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-22",
+  "worker": "xinlan-qwen38-share",
+  "previousVersion": "54ae8bfa-a973-42b5-a35b-ab6e95c998d1",
+  "version": "0807ac09-1038-4b85-9b3c-1752ced1faef",
+  "accessMode": "PUBLIC",
+  "automaticSignedSession": true,
+  "sharedCoreChanged": false,
+  "existingQuotaAndBudgetRetained": true,
+  "productionVariablesPreserved": true,
+  "secretsUploaded": false,
+  "sourceModeDefault": "CODE",
+  "teamMainMerged": false
+}

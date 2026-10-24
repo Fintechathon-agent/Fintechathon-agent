@@ -1,0 +1,136 @@
+{
+  "core": {
+    "repository": "Fintechathon-agent/Fintechathon-agent",
+    "commit": "46041e5526f97c0956798315d5caceb653615208",
+    "mode": "READ_ONLY_LOCAL_FIXTURE_RUNTIME",
+    "files": [
+      {
+        "file": "chenchen/contracts/agent-output.v1.schema.json",
+        "sha256": "cf6a3c18ce1c5b356cebd03201d6a42e1c0aabb8013b438e0e9b7235e17faf4c"
+      },
+      {
+        "file": "chenchen/contracts/core-agent-error.js",
+        "sha256": "2ed113d3152fb8af0a1aeb7c192d488e5c1f67d80bb9beadc90366ae494222a4"
+      },
+      {
+        "file": "chenchen/contracts/core-agent-error.v1.schema.json",
+        "sha256": "81e090c8c5aeb0787eb30701369678ec256b19d36f3ab092927d639402555742"
+      },
+      {
+        "file": "chenchen/contracts/funding-plan-demo.v1.schema.json",
+        "sha256": "ee9696eff492e1142ce63f85f301b9df33fff2f2730904a3d4a3e76f4ac77755"
+      },
+      {
+        "file": "chenchen/contracts/investment-agent.v1.schema.json",
+        "sha256": "30554f12a41fcd80ed7ff714dad86ff53e673e2e1c81e030c2cdc88dcf7e2eec"
+      },
+      {
+        "file": "chenchen/contracts/investment-contract.js",
+        "sha256": "90e053a9da796d22c77b03561552c42140dc18e0c7b2eae2dc6df028b1776333"
+      },
+      {
+        "file": "chenchen/contracts/model-review.v1.schema.json",
+        "sha256": "9f01bb767b9b0e79889b2166f6f25426ffeeeedec10570658bfc1ea371c61be5"
+      },
+      {
+        "file": "chenchen/contracts/owner-bridge.v1.schema.json",
+        "sha256": "215da23de3c6108c2d0e47b4f72ef2ef1737475648f6aedb0ee51727c50a5d56"
+      },
+      {
+        "file": "chenchen/contracts/risk-handoff.v1.schema.json",
+        "sha256": "c19c116260d88fcc0ee5859bb01e094dc5064c49e84cf79d53d1c3bd4fbcc0fa"
+      },
+      {
+        "file": "chenchen/core/harness.js",
+        "sha256": "25ced420958fcfe1f1a8201c4a1f1ffbee933edc2a11a8f66f5b5dcb51debc61"
+      },
+      {
+        "file": "chenchen/core/memory.js",
+        "sha256": "8352e74f1beeb16161e0d8be3c7c31a73b049fae57b9ca200cc868cc82441331"
+      },
+      {
+        "file": "chenchen/data/demo-portfolio.json",
+        "sha256": "ef767b212b63737d10e08fee18c71099dfc8ddd4d9d89e3b906e4ad4a470677a"
+      },
+      {
+        "file": "chenchen/data/market-brief-2026-10-08.json",
+        "sha256": "146f1896acf90d0dcd2456d30503886c1f614bec5574390ca988901d461029c5"
+      },
+      {
+        "file": "chenchen/data/market-brief-2026-10-09.json",
+        "sha256": "6fd2a3e5a0f1e386d7f03bfa900d031410f7116081eef43faef1122d3d380b4f"
+      },
+      {
+        "file": "chenchen/data/risk-workbench-demo.json",
+        "sha256": "4008bc8cb0b419bb668e7cd2a482af6e5487e19254618daff3c26318c114a72f"
+      },
+      {
+        "file": "chenchen/integrations/bailian-budget.js",
+        "sha256": "5dbd9e6b8b0a396180f9a3e9c4c56fac8aead06820a3358be28f658bd07e35f8"
+      },
+      {
+        "file": "chenchen/integrations/bailian-provider.js",
+        "sha256": "a682dd6f13e4ee5f3931bb644ea244709d03beb599fcc4a15b08702daa1b785d"
+      },
+      {
+        "file": "chenchen/integrations/funding-plan.js",
+        "sha256": "c81862592273804a06a25845d855c54ad14a967c0748bf50bd6e945a5828bbb5"
+      },
+      {
+        "file": "chenchen/integrations/legacy-review-adapter.js",
+        "sha256": "554f497c2d288c56452cc282ee73a8a77a1de4882ebd5722fd6bb69db0dd122b"
+      },
+      {
+        "file": "chenchen/integrations/model-review.js",
+        "sha256": "8d5a7d8347a42d28ef7257f7407fe2c41e9ba360529cf6ecde14095770f27512"
+      },
+      {
+        "file": "chenchen/integrations/owner-bridge.js",
+        "sha256": "46c4f8fdb3b63c25d42e1620e93761f5b02e0a69b7cd255111ffd3e5b80635e8"
+      },
+      {
+        "file": "chenchen/integrations/review-evidence.js",
+        "sha256": "1f82320ab1b4b205a0a82511a76b8efe69d8f4546d41aa560ac7d5b3600a1647"
+      },
+      {
+        "file": "chenchen/integrations/review-reservation.js",
+        "sha256": "d15ea2b0428dce4cf11fe2b33b72d13b9827d7e177951aaf026e175da2e90141"
+      },
+      {
+        "file": "chenchen/integrations/review-transition.js",
+        "sha256": "cdfe2e51fe6439b5ca6e2b84bf90984ee009724d8967f0198b031b7849fe6da2"
+      },
+      {
+        "file": "chenchen/integrations/review-workflow.js",
+        "sha256": "d2d93550b200d89457eef4006841e1c53457d1688307505e1194543ca667036f"
+      },
+      {
+        "file": "chenchen/integrations/risk-handoff.js",
+        "sha256": "f87b8b4c6d06c8508999f4fca3c9c5ad8ab8fb10c481d69de4c8eb2384925bf0"
+      },
+      {
+        "file": "chenchen/integrations/risk-workbench-adapter.js",
+        "sha256": "d9d54b4b2bbb34930a48af97de0b27b8313febef40f6d7261c35b5e928d62d92"
+      },
+      {
+        "file": "chenchen/merchant/ledger.js",
+        "sha256": "f97e96648b6c93392cf34424b4e612ecf820d8b96f8ebaaf43abe316b590f374"
+      },
+      {
+        "file": "chenchen/server.js",
+        "sha256": "e4dc7d7caad7100422365019f50b12f8c4b3ecd2c8dd139e56667307a2654bd6"
+      },
+      {
+        "file": "chenchen/tools/financial-tools.js",
+        "sha256": "d9aff4ccf7b3a0a895796a1139f6541b14f2df672c54034c302693e139e49b32"
+      },
+      {
+        "file": "chenchen/tools/market-brief.js",
+        "sha256": "5ff991b8216b23b3c453f1323b7169cbc68b08df754f443774b8b8157c2dd18b"
+      }
+    ]
+  },
+  "reusedConversationCandidate": "../conversation-20261024",
+  "formalCoreApiChanged": false,
+  "formalRiskApiChanged": false
+}

@@ -1,0 +1,57 @@
+{
+  "baseline": "a3587d43d194eff650da01d5a89bbddc4d615b3d",
+  "files": [
+    {
+      "file": ".gitattributes",
+      "sha256": "8c44368e27c58ecdf71e84ec6f5b2d77c9bfbcb43ba459b44fd71d4c91b26fbc"
+    },
+    {
+      "file": "CONVERSATION.md",
+      "sha256": "d3371d613ba3b4db89bfbd54e3637ad9ad2f07105dbb533caffecf3fa99c82d7"
+    },
+    {
+      "file": "conversation-config.json",
+      "sha256": "05fb4cc76435e3713cf9562101ffaefde68800d8a2535b4a934886274e4b6232"
+    },
+    {
+      "file": "conversation.html",
+      "sha256": "422561e83eaad4343bac02962b1196de037d2702cdf156a1f12c3795ccd9e69f"
+    },
+    {
+      "file": "landing.html",
+      "sha256": "6f0750029ae06806a8bd3da9582fcc7c020491aae059a9b4ed3d7505c3baf3d1"
+    },
+    {
+      "file": "preview-manifest.json",
+      "sha256": "1c5b8d3dd9a1f6a972294cb20370d704de4bcfeab361141481ea6f0c48358653"
+    },
+    {
+      "file": "versions/conversation-brand.css",
+      "sha256": "e027f660ce13a6ba1ab9242b432088cf3e0be997a4328dc48bf65bb5f8b06cc7"
+    },
+    {
+      "file": "versions/conversation-brand.mjs",
+      "sha256": "8755ded6fcfd4edd8cc182755652d1b63e034b19e9ee23e7bc9d8e4f38ce2b81"
+    },
+    {
+      "file": "versions/conversation.css",
+      "sha256": "415ecc79ee4a372df43ade81c08de911a198bf9c947136b6cfd36a6dcb128eb0"
+    },
+    {
+      "file": "versions/conversation.js",
+      "sha256": "ad2146194baec0efb6b7d70227aa40f417ce47e63115becfa5505de4ff95bf46"
+    },
+    {
+      "file": "versions/workspace-investment.js",
+      "sha256": "efaa1880f1d314681782f7992f41a3438a1ac101bb2057d7dcce2227eed7c47d"
+    },
+    {
+      "file": "versions/workspace-refinement.css",
+      "sha256": "bf9becca6d8274281741551df17a04fdee413ae532149264e9eb6eb4b171e726"
+    },
+    {
+      "file": "workspace.html",
+      "sha256": "bd04ff89ae5f83ee5ddb765e761b7bc7375a57db93a302fdc2c98e910c54793f"
+    }
+  ]
+}

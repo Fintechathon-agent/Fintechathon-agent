@@ -1,0 +1,70 @@
+{
+  "baseline": "abcd197d370174ec475699d82eb5f27ffff8a820",
+  "previewCommit": "ebd3a190f727d8060f12a9224b3e157084f7b43e",
+  "files": [
+    {
+      "file": ".gitattributes",
+      "sha256": "f6c7b5f0019a4f3f1dea12a0806eb279149d9d4a95fb56c6bdfe49d19244f548"
+    },
+    {
+      "file": "CONVERSATION.md",
+      "sha256": "5ed2033835506e9df17a16a99c5c4e44b2868d4931b21ccdf0f7d341d2814ac5"
+    },
+    {
+      "file": "conversation.html",
+      "sha256": "205a4befd4541b6a146877ec10a50ec15a5a7424b08be2e8eaaac6b4e240c8c4"
+    },
+    {
+      "file": "docs/WORKSPACE-AUDIT-20261024.md",
+      "sha256": "60864a823e3a90b3ab8224af9a7291b27a7b97eb1cd46241e43fd7c2f29b47ec"
+    },
+    {
+      "file": "landing.html",
+      "sha256": "54c31c99be6ab9dfff282c93aa98bad2ab53b09352a3552392af20e13d894cc5"
+    },
+    {
+      "file": "preview-manifest.json",
+      "sha256": "0829de6ab8c5cca3de95e3b8020341f8c4ef6186023cbf6b5ff9a64ab6328a81"
+    },
+    {
+      "file": "versions/archive-scene.css",
+      "sha256": "9d98b5eca59370725e93dbf3b57a9af6bc34154a36f40d506ab381cc41d027fc"
+    },
+    {
+      "file": "versions/conversation-brand.css",
+      "sha256": "9712edb13f36108947011ac7692495a557546adf1c55b6b21493e8327a59e353"
+    },
+    {
+      "file": "versions/conversation.js",
+      "sha256": "3ca76874fa63827817ace3a532067f5b4be35eb86921b30f84dbf22a08710a7d"
+    },
+    {
+      "file": "versions/workspace-investment.js",
+      "sha256": "3096cb64d1fb342c086ae42d66cdacc20312760905edb5a6161ffba8d0a6f99b"
+    },
+    {
+      "file": "versions/workspace-model.mjs",
+      "sha256": "5bb1b4e656351fb32420500ab78b342e7ed23cbdd2278d8af22e20c83b38f637"
+    },
+    {
+      "file": "versions/workspace-store.mjs",
+      "sha256": "8e7b277faea53b35b5383d6600b144526dd99e6923006aa25aa05431a0ef2194"
+    },
+    {
+      "file": "versions/workspace-unified.css",
+      "sha256": "0e81a0a9fd6fdaf4ee5257ba8805036b2e309d1a4626f2f28e56364175a252bd"
+    },
+    {
+      "file": "versions/workspace-unified.mjs",
+      "sha256": "00f60610a35f3c5cfa3592553ea6a6c4f20a187b62441dcc492198f05ba18311"
+    },
+    {
+      "file": "versions/workspace.js",
+      "sha256": "6e02fad356a28ca46e009e5ef76b668372e1091a080583eb6bb8f172da573e4f"
+    },
+    {
+      "file": "workspace.html",
+      "sha256": "feafb5807a3de24be47861b71fb02c6508dce82bfa04e60e5c01da9f28d5dadb"
+    }
+  ]
+}

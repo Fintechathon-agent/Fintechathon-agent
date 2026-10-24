@@ -1,9 +1,9 @@
 <section class="panel" id="ai-assistant" aria-labelledby="tinglan-title">
 <p class="section-kicker">AI / 偏好分析</p><h2 id="tinglan-title">听澜 AI 助手</h2>
-<p class="small muted">填写投资需求，获取模型生成的偏好分析与资金安排思路。用户自述未经账户核验；没有实时行情，不生成实时价格、收益预测或交易指令。</p>
+
 <form id="share-login" method="post" action="/api/session" hidden><label>分享访问口令<input name="code" type="password" minlength="16" maxlength="128" autocomplete="current-password" required></label><button type="submit" disabled>进入真实 AI 分析</button><p class="small">向分享者获取访问口令。口令用于保护试验额度，不能填写百炼 API Key。</p><p id="share-login-status" role="status"></p></form>
 <button id="share-logout" type="button" class="secondary" hidden>退出分享会话</button>
-<form id="tinglan-form" hidden><div class="fields">
+<form id="tinglan-form"><label class="chat-composer">和听澜聊聊<textarea name="text" maxlength="1500" required placeholder="描述你的投资目标、资金用途和希望了解的问题"></textarea></label><details class="chat-profile" open><summary>分析所需信息</summary><div class="fields">
 <label>投资金额（元）<input name="amount" type="number" min="0.01" max="100000000" step="0.01" required></label>
 <label>投资期限（天）<input name="horizon" type="number" min="1" max="36500" required></label>
 <label>风险偏好<select name="risk" required><option value="">请选择</option><option value="low">低</option><option value="medium_low">中低</option><option value="medium">中</option><option value="high">高</option></select></label>
@@ -11,9 +11,9 @@
 <label>资金需求<select name="liquidity" required><option value="">请选择</option><option value="low">近期无需动用</option><option value="medium">需要预留备用金</option><option value="high">近期需要资金</option></select></label>
 <label>资料来源<select name="inputMode" required><option value="self_reported">用户自述需求（未核验）</option><option value="sample">虚构测试示例</option></select></label></div>
 <label>投资目标<input name="goal" maxlength="200" required placeholder="例如：三年内稳健积累，并保留学习生活备用金"></label>
-<label>希望分析的问题<textarea name="text" maxlength="1500" required placeholder="描述资金用途和限制，不要填写账户、身份证、密码或密钥。"></textarea></label>
+</details>
 <label class="small"><input name="consent" type="checkbox" required> 我确认不包含账户、身份、密码或密钥，并同意将本次需求发送至百炼进行分析。</label>
-<button type="submit" disabled>开始 AI 分析</button></form>
-<p id="tinglan-status" role="status" aria-live="polite">正在检查安全入口配置…</p>
+<button type="submit" disabled>发送</button></form>
+<p id="tinglan-status" role="status" aria-live="polite">正在准备对话…</p>
 <div id="tinglan-result" hidden aria-live="polite"><p data-result="meta" class="small muted"></p><h3>用户风险偏好总结</h3><p data-result="summary"></p><h3>资金配置、期限、资产类别与主要风险</h3><p data-result="reason"></p><h3>输入依据</h3><p data-result="evidence"></p><h3>待补充信息</h3><p data-result="missing"></p><details><summary>完整模型原文</summary><pre data-result="raw"></pre></details><details><summary>运行与审计记录</summary><pre data-result="trace"></pre></details><p class="small">未执行交易。AI 内容需本人核实，不能代替风险评估与完整计划确认。</p></div>
 </section>

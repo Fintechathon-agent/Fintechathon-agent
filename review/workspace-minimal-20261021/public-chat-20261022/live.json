@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-10-22T04:49:17.068Z",
+  "mode": "ONE_REAL_MODEL_CALL",
+  "attempts": 1,
+  "passwordPosts": 0,
+  "checks": [
+    {
+      "width": 375,
+      "automaticSession": true,
+      "chatVisible": true,
+      "noPassword": true,
+      "noOverflow": true
+    },
+    {
+      "width": 840,
+      "automaticSession": true,
+      "chatVisible": true,
+      "noPassword": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "automaticSession": true,
+      "chatVisible": true,
+      "noPassword": true,
+      "noOverflow": true
+    }
+  ],
+  "pageErrors": [],
+  "health": {
+    "status": "ok",
+    "service": "xinlan-qwen38-share",
+    "model": "qwen3.8-flash",
+    "configured": true,
+    "paidEnabled": true,
+    "accessMode": "PUBLIC"
+  },
+  "reservedCentsBefore": 4,
+  "attemptsBefore": 4,
+  "http": 200,
+  "durationMs": 8368,
+  "model": "qwen3.8-flash",
+  "tokens": 1171,
+  "runId": "review-09185c96-4918-47d5-8084-cee58d005da4",
+  "auditId": "audit-0d5ec2cd-d348-4f5c-a130-dd8e60612281",
+  "resultMatchesProvider": true,
+  "executionAllowed": false,
+  "reservedCentsAfter": 5,
+  "assets": [
+    {
+      "file": "investment.html",
+      "sha256": "794a4de6ded8af86662f7d76a910b1a385129c2a92552bd928fba7b52f478269"
+    },
+    {
+      "file": "versions/tinglan-widget.mjs",
+      "sha256": "b9086f1ecdc5b90b5f458bf424453503c4862bc3c948872f27f25aa43956315a"
+    },
+    {
+      "file": "versions/tinglan.css",
+      "sha256": "587bf9fc3289bf187e377001635c77e72c64e29b1864c4381c1b4ab046f3f46b"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "63823f4bd7a665d920b170cab33ae1c8db2db10cc91729420045fcfdac46edc3"
+    }
+  ],
+  "result": "PASSED"
+}

@@ -1,0 +1,134 @@
+{
+  "base": "http://127.0.0.1:8887",
+  "realProviderRequested": true,
+  "widths": [
+    320,
+    375,
+    430,
+    700,
+    701,
+    840,
+    1024,
+    1440,
+    1920
+  ],
+  "requests": [
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/message",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/message",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/state",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/message",
+      "status": 200
+    },
+    {
+      "path": "/api/assistant/message",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "diagnosticsHidden": true,
+  "offlineDraftPreserved": true,
+  "live": {
+    "timestamp": "2026-10-23T17:06:09.899Z",
+    "http_status": 200,
+    "duration_ms": 28294,
+    "run_id": "review-f0fcf22e-153c-45a3-82d7-738fee3286ef",
+    "source": "model",
+    "model": "qwen3.8-flash",
+    "call_succeeded": true,
+    "provider_response_id": "chatcmpl-25aef5d8-6cb0-932e-a4f5-9fbf8a437233",
+    "usage": {
+      "prompt_tokens": 854,
+      "total_tokens": 2443,
+      "completion_tokens": 1589,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "text_tokens": 854
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1157,
+        "text_tokens": 1589
+      }
+    },
+    "raw_text": "{\n  \"summary\": \"初步判断：按自述，若月收入约12000元、每月必要开支6000元、应急金36000元、计划每月投资1000元且持有五年以上，日常现金流仍可能有约5000元空间；但记录未对账，预算缺少期初余额、必需支出和缓冲数据，且“投资计划”状态为 review，不能视为已执行持仓。主要风险是临时用钱导致现金流紧张。必要追问：请确认未来12个月是否有明确大额支出，以及是否先保留足够应急金再按1000元/月投资。\",\n  \"risk_level\": \"medium\",\n  \"proposed_action\": \"REQUEST_MORE_INFO\",\n  \"action_reason\": \"当前自述收支与记录口径不一致，且存在 review 状态的投资计划，需补充一条关键现金流信息后再做教育性分析；不执行交易，不推荐个股，不把投资计划当作持仓。\",\n  \"missing_information\": [\n    \"未来12个月是否有明确大额支出，以及是否先保留足够应急金再按1000元/月投资。\"\n  ],\n  \"evidence\": [\n    \"用户自述：每月必要开支6000元，有36000元应急金，打算每月1000元投资，持有五年以上，担心临时用钱。\",\n    \"记录显示：工资到账 amount_cents=1200000（约12000元），餐饮支出 amount_cents=2800（约28元），投资计划 amount_cents=100000（约1000元），状态为 review。\",\n    \"预算信息显示：missing 包含 opening、essentials、buffer，available_cents 为 null，review_count=1。\",\n    \"用户明确要求不推荐个股、不执行交易，且投资计划未确认执行。\"\n  ]\n}",
+    "proposal": {
+      "summary": "初步判断：按自述，若月收入约12000元、每月必要开支6000元、应急金36000元、计划每月投资1000元且持有五年以上，日常现金流仍可能有约5000元空间；但记录未对账，预算缺少期初余额、必需支出和缓冲数据，且“投资计划”状态为 review，不能视为已执行持仓。主要风险是临时用钱导致现金流紧张。必要追问：请确认未来12个月是否有明确大额支出，以及是否先保留足够应急金再按1000元/月投资。",
+      "risk_level": "medium",
+      "proposed_action": "REQUEST_MORE_INFO",
+      "action_reason": "当前自述收支与记录口径不一致，且存在 review 状态的投资计划，需补充一条关键现金流信息后再做教育性分析；不执行交易，不推荐个股，不把投资计划当作持仓。",
+      "missing_information": [
+        "未来12个月是否有明确大额支出，以及是否先保留足够应急金再按1000元/月投资。"
+      ],
+      "evidence": [
+        "用户自述：每月必要开支6000元，有36000元应急金，打算每月1000元投资，持有五年以上，担心临时用钱。",
+        "记录显示：工资到账 amount_cents=1200000（约12000元），餐饮支出 amount_cents=2800（约28元），投资计划 amount_cents=100000（约1000元），状态为 review。",
+        "预算信息显示：missing 包含 opening、essentials、buffer，available_cents 为 null，review_count=1。",
+        "用户明确要求不推荐个股、不执行交易，且投资计划未确认执行。"
+      ]
+    },
+    "execution_allowed": false,
+    "attempts": 1,
+    "browser_message_http_status": 200,
+    "answer": "1 项需要核对，暂不计入金额。\n有一部分金额或事项还没有识别清楚，可以再单独说一句，我会继续整理。\n\n初步判断：按自述，若月收入约12000元、每月必要开支6000元、应急金36000元、计划每月投资1000元且持有五年以上，日常现金流仍可能有约5000元空间；但记录未对账，预算缺少期初余额、必需支出和缓冲数据，且“投资计划”状态为 review，不能视为已执行持仓。主要风险是临时用钱导致现金流紧张。必要追问：请确认未来12个月是否有明确大额支出，以及是否先保留足够应急金再按1000元/月投资。\n当前自述收支与记录口径不一致，且存在 review 状态的投资计划，需补充一条关键现金流信息后再做教育性分析；不执行交易，不推荐个股，不把投资计划当作持仓。\n\n这是分析结果，资金未变动；正式风控与执行尚未完成。",
+    "duplicateDidNotRecallProvider": true
+  },
+  "persistenceAndIsolation": true,
+  "result": "PASSED"
+}

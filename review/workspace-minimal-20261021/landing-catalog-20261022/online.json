@@ -1,0 +1,39 @@
+{
+  "mode": "CLOUD_UI_ONLY",
+  "alpha": true,
+  "transparentPixels": 1021412,
+  "width": 1254,
+  "height": 1254,
+  "checks": [
+    {
+      "width": 320,
+      "logoLoaded": true,
+      "logoSize": 56,
+      "noOverflow": true,
+      "catalogLink": true
+    },
+    {
+      "width": 375,
+      "logoLoaded": true,
+      "logoSize": 56,
+      "noOverflow": true,
+      "catalogLink": true
+    },
+    {
+      "width": 840,
+      "logoLoaded": true,
+      "logoSize": 68,
+      "noOverflow": true,
+      "catalogLink": true
+    },
+    {
+      "width": 1440,
+      "logoLoaded": true,
+      "logoSize": 68,
+      "noOverflow": true,
+      "catalogLink": true
+    }
+  ],
+  "errors": [],
+  "modelRequests": 0
+}

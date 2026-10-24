@@ -1,0 +1,229 @@
+{
+  "sourceRepository": "Fintechathon-agent/Fintechathon-agent",
+  "sourceBranch": "codex/ui-site-integration-v1",
+  "sourceCommit": "a007143ae5fd22750442e3ce79880aceec3baf56",
+  "reviewedMain": "e51ce9bb4e30cd409414ef55f8f9a5eddd065dda",
+  "mode": "PREVIEW_STATIC_UI_ONLY",
+  "backend": "NOT_CONNECTED",
+  "files": [
+    {
+      "file": ".nojekyll",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "build-info.json",
+      "sha256": "569988676928615a81a0a5c0adc497b25a85e823f03cbb2f0af5e6f05cad650c"
+    },
+    {
+      "file": "catalog.html",
+      "sha256": "a1ad688ba4584319d1b2fba86734e34a5bf9dd28d198cb4a1b093d9e64bdb5ee"
+    },
+    {
+      "file": "index.html",
+      "sha256": "2e417fc4a5b1dd5abf65945adc8b1e15b476328a4a7f1c00415b68df8e2701a3"
+    },
+    {
+      "file": "investment-v0.10.html",
+      "sha256": "ad10751b843074c43dac1ef1bba03e23a0d6bf28aacd8bd7c2629487d9cde486"
+    },
+    {
+      "file": "investment.html",
+      "sha256": "20ca5df947169b3abed696e1bd34538a099eae73f8340c9324716bd954126287"
+    },
+    {
+      "file": "landing.html",
+      "sha256": "6f0750029ae06806a8bd3da9582fcc7c020491aae059a9b4ed3d7505c3baf3d1"
+    },
+    {
+      "file": "merchant.html",
+      "sha256": "1d274ac911d8f7463946e23acf0d37fd62edbf62b2f2483db3220704ac9b165a"
+    },
+    {
+      "file": "README.md",
+      "sha256": "63917c0c2bb236c03f7219fcf36db49dfbf471d8ecf49949b598e33fd0329bef"
+    },
+    {
+      "file": "risk-workbench.html",
+      "sha256": "5e02edf855a95480035f728e591fa9a3dcc0df13ce3852fc6e5c0c176a3f4dba"
+    },
+    {
+      "file": "versions/archive.js",
+      "sha256": "4f41e8d85acbf0b74c2f9fc49089d41961e34cebf3d9616c7f963bbf5527eac5"
+    },
+    {
+      "file": "versions/common.js",
+      "sha256": "11356ddb8a4e1aea51e62ca7a29513bd0be27f305374ea3000aa3f78f2145915"
+    },
+    {
+      "file": "versions/favicon.svg",
+      "sha256": "867f5f46d3301e8f4c74ec27c397408dd9ed7a9bc0e56f6454e9a8baa95fa204"
+    },
+    {
+      "file": "versions/glass.css",
+      "sha256": "ef937b275e7de90b742306e4155d3c0df169d4405c38cff47e7d746f7f74f40c"
+    },
+    {
+      "file": "versions/investment-legacy.js",
+      "sha256": "93f39fd39062e891cf088a7e655a7f9f9eb4e12e6408f71d0af0fc2f2a1d0292"
+    },
+    {
+      "file": "versions/investment.js",
+      "sha256": "8e76de47d4c307c0fb9b45502ff3094ed2de897bca7ff69a1acf3e8374f16bb2"
+    },
+    {
+      "file": "versions/landing.css",
+      "sha256": "1bee38147f7bd093ad86eef8262229cc6616d2eedd916ab9384ac16ca11bd88d"
+    },
+    {
+      "file": "versions/landing.js",
+      "sha256": "64eda8f9ac3eef57e158f64740debe641c3f3987af9171eb182242afc08579b1"
+    },
+    {
+      "file": "versions/presentation.mjs",
+      "sha256": "3c101315ff25b886969f5a88dee77d39ecdf0d3ba6a35c86c64a47ff4f4404d8"
+    },
+    {
+      "file": "versions/preview.css",
+      "sha256": "87b4107cdf62a4060752fa70013fa86180d185f96e5ea7dfcf45cde6f31eea7a"
+    },
+    {
+      "file": "versions/product-overrides.css",
+      "sha256": "2312064f7fd803535212fdaffc445d2ab355f618d4b3dac21274507e764a0e5b"
+    },
+    {
+      "file": "versions/site-context.mjs",
+      "sha256": "65e13b673fb67e8991caee1740dfdf0574a1a0ba2c3d1d9eab56f9ec2892ad00"
+    },
+    {
+      "file": "versions/site-shell.css",
+      "sha256": "8ad1046395e9b195700bdc430d9572273c86b64cb40388cbe422d2ffc1a631b9"
+    },
+    {
+      "file": "versions/style.css",
+      "sha256": "8d875cac265f673e2408a48fc0238050b68553ab7ccd082ac89e5a8b7eb5f519"
+    },
+    {
+      "file": "versions/team-logo-transparent.png",
+      "sha256": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6"
+    },
+    {
+      "file": "versions/tokens.css",
+      "sha256": "83aebf27a001e1bd8cceb871c73e69891cb9f0134d62907af1a243441e81db35"
+    },
+    {
+      "file": "versions/workspace-investment.js",
+      "sha256": "efaa1880f1d314681782f7992f41a3438a1ac101bb2057d7dcce2227eed7c47d"
+    },
+    {
+      "file": "versions/workspace-model.mjs",
+      "sha256": "6cd6dab59970da850e8b4d04dae3dd9f955d1026245fa1d1b1e257b3f1580890"
+    },
+    {
+      "file": "versions/workspace.css",
+      "sha256": "7cd5efcbf48e381caca4ac2668fe8dfc5ce63c44bf17ea486fa890b494178b02"
+    },
+    {
+      "file": "versions/workspace.js",
+      "sha256": "e3b4d0876f3b159f3371d2ecd999eca8b921c6f8d3ab41c0809c6c11d7c3a328"
+    },
+    {
+      "file": "workspace.html",
+      "sha256": "bd04ff89ae5f83ee5ddb765e761b7bc7375a57db93a302fdc2c98e910c54793f"
+    },
+    {
+      "file": ".gitignore",
+      "sha256": "74915c29af71239177f006327120d0c757edd618353228c4af5f0ee23ce8d78a"
+    },
+    {
+      "file": "merchant/index.html",
+      "sha256": "586a4c73292ba0dbb42803d7a7144db37638f96631012772f2340a04a6fc843d"
+    },
+    {
+      "file": "versions/merchant.html",
+      "sha256": "032c9f33404070f919513543b565a14a9216787f48757553184d474aff768b02"
+    },
+    {
+      "file": ".gitattributes",
+      "sha256": "8c44368e27c58ecdf71e84ec6f5b2d77c9bfbcb43ba459b44fd71d4c91b26fbc"
+    },
+    {
+      "file": "versions/workspace-refinement.css",
+      "sha256": "bf9becca6d8274281741551df17a04fdee413ae532149264e9eb6eb4b171e726"
+    },
+    {
+      "file": "CONVERSATION.md",
+      "sha256": "d3371d613ba3b4db89bfbd54e3637ad9ad2f07105dbb533caffecf3fa99c82d7"
+    },
+    {
+      "file": "conversation-config.json",
+      "sha256": "05fb4cc76435e3713cf9562101ffaefde68800d8a2535b4a934886274e4b6232"
+    },
+    {
+      "file": "conversation.html",
+      "sha256": "422561e83eaad4343bac02962b1196de037d2702cdf156a1f12c3795ccd9e69f"
+    },
+    {
+      "file": "versions/conversation-brand.css",
+      "sha256": "e027f660ce13a6ba1ab9242b432088cf3e0be997a4328dc48bf65bb5f8b06cc7"
+    },
+    {
+      "file": "versions/conversation-brand.mjs",
+      "sha256": "8755ded6fcfd4edd8cc182755652d1b63e034b19e9ee23e7bc9d8e4f38ce2b81"
+    },
+    {
+      "file": "versions/conversation.css",
+      "sha256": "415ecc79ee4a372df43ade81c08de911a198bf9c947136b6cfd36a6dcb128eb0"
+    },
+    {
+      "file": "versions/conversation.js",
+      "sha256": "ad2146194baec0efb6b7d70227aa40f417ce47e63115becfa5505de4ff95bf46"
+    }
+  ],
+  "scan": {
+    "rules": [
+      "privateKey",
+      "githubToken",
+      "providerKey",
+      "credentialLiteral"
+    ],
+    "hits": []
+  },
+  "packaging": [
+    "Preview notice",
+    "Legacy independent Risk tool unavailable; no cross-service calls",
+    "Static-only source disclosure"
+  ],
+  "publicationUpdate": {
+    "date": "2026-10-18",
+    "candidate": "investment-only/investment.html",
+    "backend": "NOT_CONNECTED",
+    "preservedWorkspace": true,
+    "merchantRetired": true,
+    "assistant": "TINGLAN_UI_READY_OWNER_CONFIGURATION_REQUIRED"
+  },
+  "refinement": {
+    "date": "2026-10-21",
+    "basePreviewCommit": "57e0a6bccd890b00c8599d8bd64b62569fe3d196",
+    "teamBranch": "codex/workspace-minimal-20261021",
+    "scope": "UI_ONLY",
+    "backendChanged": false,
+    "logoChanged": false
+  },
+  "screenshotFollowup": {
+    "date": "2026-10-21",
+    "scope": "THREE_TARGETED_UI_REPAIRS",
+    "backendChanged": false,
+    "modelCalls": 0
+  },
+  "conversation": {
+    "date": "2026-10-24",
+    "sourceRepository": "jinyihan77-create/finance-lab-demo",
+    "sourceBranch": "codex/conversation-backend",
+    "sourceCommit": "60f763831c238cbacdd0580de362743b7327c93c",
+    "page": "conversation.html",
+    "onlineBackend": "NOT_DEPLOYED",
+    "endpoint": null,
+    "localLiveAcceptance": "REAL_BAILIAN_BROWSER_HTTP_200",
+    "execution_allowed": false
+  }
+}

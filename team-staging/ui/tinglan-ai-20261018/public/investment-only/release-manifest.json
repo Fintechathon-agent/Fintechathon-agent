@@ -18,7 +18,7 @@
     },
     {
       "file": "versions/investment.js",
-      "sha256": "d6b5a3bb04042d7c19b2ba5858cf302d935b0344b9600645e0c01eb8ebda0183"
+      "sha256": "61e8f7ae746e6c965f5ed0abe5ca45f69ee98307fafb7accf453c05d8fa10129"
     },
     {
       "file": "versions/presentation.mjs",
@@ -26,7 +26,7 @@
     },
     {
       "file": "versions/product-overrides.css",
-      "sha256": "dda507e6f78a6ea2d04f475acc9a36be6eb13343a7c66bf9c2709cd139b30d99"
+      "sha256": "35e8787ab7b8902c1dea65baa36c43bb0a86123a8d3cd142c6b48ed4e161ab8b"
     },
     {
       "file": "versions/style.css",
@@ -46,7 +46,7 @@
     },
     {
       "file": "versions/landing.js",
-      "sha256": "a7e191b6b73467f75daad729c37582570c39f6228dd37e7fc66afbf6d1f4c95a"
+      "sha256": "56ed2b21d673657a82b481ff6f9391e51c8668af782ea42e065d11216440ac63"
     },
     {
       "file": "versions/glass.css",
@@ -62,7 +62,7 @@
     },
     {
       "file": "versions/landing.css",
-      "sha256": "b141ae3f830c048f5dd2513996868799b4df39a9e640fa758c8359a946b8ba7c"
+      "sha256": "b56ecee5d3a042dc55c2e08270b1e46b3f4f158d3f240525edd42d9467ecf6ce"
     },
     {
       "file": "versions/static-preview.css",
@@ -74,11 +74,11 @@
     },
     {
       "file": "versions/tinglan-client.mjs",
-      "sha256": "93d1a24350b63b2235ac329b74817eaed73b6b4b34b6709265ce771eda769179"
+      "sha256": "d49a303dc6160c7b258a1d8c383971a5084a98e3400cf65e109b5d75957f90c4"
     },
     {
       "file": "versions/tinglan-widget.mjs",
-      "sha256": "c93a32c5bec0259f7f81790bfd3554c91130d0c188e2f3f96e8a2f91d8aafa83"
+      "sha256": "e99739114b496d8d53e43a505cb49e61547160c44ee8d9d6391872d582dc951e"
     },
     {
       "file": "versions/tinglan-transport.js",
@@ -86,19 +86,19 @@
     },
     {
       "file": "versions/tinglan.css",
-      "sha256": "fb9907f8860eaecba2f217cc2af236d20fc5e3dfd4ef642bca3cdd467f4bf7d1"
+      "sha256": "587bf9fc3289bf187e377001635c77e72c64e29b1864c4381c1b4ab046f3f46b"
     },
     {
       "file": "landing.html",
-      "sha256": "8328f3e1582e55099da071938dca434514224283399c302bf4e87585b2d18693"
+      "sha256": "dbecb3b4abbc656314fe265757c914c5b3d1230de2f658ae2f75bde5c44e392d"
     },
     {
       "file": "investment.html",
-      "sha256": "c53f67a2789ed49e8651920403493b236352ea43911adf81f63300ed6dffe648"
+      "sha256": "9969203340dcbf4ac2726f89a770c3333ae7bef59b86e37d18c1c8ffbf582302"
     },
     {
       "file": "catalog.html",
-      "sha256": "287cfa246d652c930efc0302d9a633416acb6a7e7e0640f26aab5a7ba91f3b40"
+      "sha256": "875af90df648b89059e3280b58643d36ef2d6417757f28c2afae05fb5e8f971d"
     },
     {
       "file": "not-found.html",
@@ -127,6 +127,32 @@
     {
       "file": "tinglan-config.json",
       "sha256": "5dbc74f88519539a1370a9b8e4dc42f05a6d0334fcac9b3fdcc971205e38a43c"
+    },
+    {
+      "file": "versions/investment-theme.css",
+      "sha256": "3fafdcb2664368889771f863c7181d75bae7ea2ca9710d33001476ebfe6c3535"
+    },
+    {
+      "file": "versions/team-logo-transparent.png",
+      "sha256": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6"
+    },
+    {
+      "file": "versions/landing-logo-transparent.png",
+      "sha256": "0a1365d99bb229a99c488413e099d7bc31b6932fc33709b2dcbd689bb180eef2"
+    },
+    {
+      "file": "versions/catalog-theme.css",
+      "sha256": "b219353445e6181d51ffa654183c3e879712b806fd278b65cb6f0614153e27c1"
+    },
+    {
+      "file": "versions/catalog-theme.mjs",
+      "sha256": "8589ed3d4ce958f92ffd75e582cab2f98e18affa74d01a98dd4c71fb36a93612"
     }
-  ]
+  ],
+  "screenshotFollowup": {
+    "date": "2026-10-21",
+    "scope": "THREE_TARGETED_UI_REPAIRS",
+    "backendChanged": false,
+    "modelCalls": 0
+  }
 }

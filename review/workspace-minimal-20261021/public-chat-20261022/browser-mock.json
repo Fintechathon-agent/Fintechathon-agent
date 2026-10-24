@@ -1,0 +1,34 @@
+{
+  "mode": "MOCK_UI_ONLY",
+  "checks": [
+    {
+      "width": 375,
+      "noCodeNeeded": true,
+      "requiredInputsPreserved": true,
+      "singleSend": true,
+      "replyVisible": true,
+      "noOverflow": true
+    },
+    {
+      "width": 840,
+      "noCodeNeeded": true,
+      "requiredInputsPreserved": true,
+      "singleSend": true,
+      "replyVisible": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "noCodeNeeded": true,
+      "requiredInputsPreserved": true,
+      "singleSend": true,
+      "replyVisible": true,
+      "noOverflow": true
+    }
+  ],
+  "modelRequests": 6,
+  "passwordPosts": 0,
+  "pageErrors": [],
+  "result": "PASSED",
+  "realPaidCalls": 0
+}

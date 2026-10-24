@@ -1,0 +1,69 @@
+{
+  "mode": "online",
+  "checks": [
+    {
+      "width": 320,
+      "removedBlocks": 3,
+      "logoLoaded": true,
+      "logoSize": 56,
+      "noOverflow": true,
+      "loginReady": true,
+      "staticPlans": 3
+    },
+    {
+      "width": 375,
+      "removedBlocks": 3,
+      "logoLoaded": true,
+      "logoSize": 56,
+      "noOverflow": true,
+      "loginReady": true,
+      "staticPlans": 3
+    },
+    {
+      "width": 840,
+      "removedBlocks": 3,
+      "logoLoaded": true,
+      "logoSize": 56,
+      "noOverflow": true,
+      "loginReady": true,
+      "staticPlans": 3
+    },
+    {
+      "width": 1440,
+      "removedBlocks": 3,
+      "logoLoaded": true,
+      "logoSize": 80,
+      "noOverflow": true,
+      "loginReady": true,
+      "staticPlans": 3
+    }
+  ],
+  "modelRequests": 0,
+  "pageErrors": [],
+  "assets": [
+    {
+      "file": "investment.html",
+      "sha256": "3d444968f9efb41fa479da11ab44ec9f1ae02b0ba191f07e1f02c971872d590e"
+    },
+    {
+      "file": "versions/investment-theme.css",
+      "sha256": "3fafdcb2664368889771f863c7181d75bae7ea2ca9710d33001476ebfe6c3535"
+    },
+    {
+      "file": "versions/team-logo-transparent.png",
+      "sha256": "fba7a4e1b36b9f8f40057cf655f446009c5943bd6bbfbd1d0f3d6d0b14b246d6"
+    },
+    {
+      "file": "release-manifest.json",
+      "sha256": "15c3a28fad51ee2b71b281e20328949652004cea43c274d97b3f13bd743ec118"
+    }
+  ],
+  "health": {
+    "status": "ok",
+    "service": "xinlan-qwen38-share",
+    "model": "qwen3.8-flash",
+    "configured": true,
+    "paidEnabled": true
+  },
+  "result": "PASSED"
+}

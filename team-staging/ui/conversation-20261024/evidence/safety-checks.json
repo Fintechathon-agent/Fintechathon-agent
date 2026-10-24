@@ -1,0 +1,12 @@
+{
+  "secretScanPassed": true,
+  "filesScanned": 37,
+  "checks": [
+    "exact credential value absent",
+    "private provider endpoint absent",
+    "no runtime database or environment file in public bundle"
+  ],
+  "deletedExistingData": 0,
+  "automaticCleanup": false,
+  "formalDeployment": false
+}

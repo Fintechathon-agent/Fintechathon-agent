@@ -1,0 +1,33 @@
+diff --git a/landing.html b/landing.html
+index 4fc1e8af0093f605c5adff4dcbbba3b13ba2d494..d3e2ffdf2b751911123c322aead4d8c31c0176b8 100644
+--- a/landing.html
++++ b/landing.html
+@@ -61,13 +61,13 @@
+         <article class="feature-card glass investment-feature">
+           <div class="card-top"><span>01 / PERSONAL FINANCE</span><span class="feature-icon"><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"></path></svg></span></div>
+           <div class="feature-visual archive-diagram"><span aria-hidden="true">01</span><span class="liquid-vessel" aria-hidden="true"><canvas class="liquid-water" aria-hidden="true"></canvas></span><canvas class="liquid-drops" aria-hidden="true"></canvas><div class="balance-caption"><b>PORTFOLIO / RECORD 0026</b></div></div>
+-          <h3>个人投资顾问</h3><p>读懂持仓结构，检查组合健康。<br>对照不同方案，追溯每一项分析依据。</p>
++          <h3>个人投资顾问</h3>
+           <a class="feature-link" href="workspace.html#banking" aria-label="进入投资组合工作窗口">探索投资工作台 <span><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"></path></svg></span></a>
+         </article>
+         <article class="feature-card glass merchant-feature">
+           <div class="card-top"><span>02 / TASK EVIDENCE</span><span class="feature-icon">⌘</span></div>
+           <div class="feature-visual archive-diagram"><span aria-hidden="true">02</span><span class="liquid-vessel" aria-hidden="true"><canvas class="liquid-water" aria-hidden="true"></canvas></span><canvas class="liquid-drops" aria-hidden="true"></canvas><div class="balance-caption"><b>TASK / RECORD 0062</b></div></div>
+-          <h3>我的任务与记录</h3><p>查看原任务，核对风险交接与分析依据。<br>审批与执行待正式接口接入。</p>
++          <h3>我的任务与记录</h3>
+           <a class="feature-link" href="workspace.html#tasks" aria-label="进入我的任务与记录">查看任务与记录 <span><svg class="arrow-ne" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 9 9 3M4.5 3H9v4.5"></path></svg></span></a>
+         </article>
+       </div>
+diff --git a/preview-manifest.json b/preview-manifest.json
+index f2e52cc70178d5af411ede44a3c7d8a9dd26727c..be9df5f506bb5d0ac9c839144d50b23945b752c5 100644
+--- a/preview-manifest.json
++++ b/preview-manifest.json
+@@ -32,7 +32,7 @@
+     },
+     {
+       "file": "landing.html",
+-      "sha256": "29336b3e30a842174939b4ccce7c83dad984be6df80835013607c8da45bb6846"
++      "sha256": "0faf1997537e80de4a518665f07dfd39eaecb216461a2ddd57ce74f4c509c407"
+     },
+     {
+       "file": "merchant.html",

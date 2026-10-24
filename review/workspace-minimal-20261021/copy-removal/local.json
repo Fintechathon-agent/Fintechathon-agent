@@ -1,0 +1,32 @@
+{
+  "mode": "local",
+  "result": "PASSED",
+  "checks": [
+    {
+      "width": 375,
+      "paragraphsRemoved": true,
+      "aligned": true,
+      "noEmptyCopyArea": true,
+      "noOverflow": true,
+      "cardHeight": 288
+    },
+    {
+      "width": 840,
+      "paragraphsRemoved": true,
+      "aligned": true,
+      "noEmptyCopyArea": true,
+      "noOverflow": true,
+      "cardHeight": 400
+    },
+    {
+      "width": 1440,
+      "paragraphsRemoved": true,
+      "aligned": true,
+      "noEmptyCopyArea": true,
+      "noOverflow": true,
+      "cardHeight": 414
+    }
+  ],
+  "wholeCardNavigation": 2,
+  "pageErrors": []
+}

@@ -1,0 +1,43 @@
+{
+  "conversation": {
+    "repository": "https://github.com/jinyihan77-create/finance-lab-demo",
+    "ref": "codex/conversation-backend",
+    "commit": "60f763831c238cbacdd0580de362743b7327c93c"
+  },
+  "previewBaseline": "a3587d43d194eff650da01d5a89bbddc4d615b3d",
+  "teamBranch": "codex/workspace-minimal-20261021",
+  "dependencies": [
+    {
+      "file": "vendor/conversation/assistant/core_client.py",
+      "sha256": "91967614bdf68e8e3611b0bfaf1718a70f1c81fe43cd7a76a87fbf5cd5f6a2c9"
+    },
+    {
+      "file": "vendor/conversation/assistant/journal_parser.py",
+      "sha256": "fc91f1f2a7efffc010df567b659a565808b98f3236e10c5fbddfd697e5e8add6"
+    },
+    {
+      "file": "vendor/conversation/assistant/service.py",
+      "sha256": "ba28a44ad1e57ae4ec779e1b9ed0dd8887eaf320f56a98b175113f4002c78c09"
+    },
+    {
+      "file": "vendor/conversation/assistant/storage.py",
+      "sha256": "0d273e2a1dffb0c3e458c470d498bef3d0a1f472bfd779358db122d88e148012"
+    },
+    {
+      "file": "vendor/conversation/assistant/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "vendor/conversation/serve.py",
+      "sha256": "638d529a7ff63fcbbfef06eb970f87216d34f28a76582b12f4d38bb8b9c920db"
+    },
+    {
+      "file": "vendor/provider/local-review.js",
+      "sha256": "da28c7177f4399f38f6f4927f69fa0093a5c51e70cbd0aaa66214de0d6aed512"
+    },
+    {
+      "file": "vendor/provider/model-review.js",
+      "sha256": "334c8681da11f0cbbe2ef8c59bccae998bf019fd664204f885e3fe98e5db9248"
+    }
+  ]
+}

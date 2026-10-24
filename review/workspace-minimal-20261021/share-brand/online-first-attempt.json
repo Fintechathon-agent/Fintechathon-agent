@@ -1,0 +1,8 @@
+{
+  "mode": "online",
+  "checks": [],
+  "modelRequests": 0,
+  "pageErrors": [],
+  "result": "FAILED",
+  "error": "page.goto: Timeout 40000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://xinlan-qwen38-share.lixjanus526.workers.dev/investment-only/investment?v=20261021-brand\", waiting until \"networkidle\"\u001b[22m\n"
+}

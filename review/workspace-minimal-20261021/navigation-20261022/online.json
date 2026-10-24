@@ -1,0 +1,77 @@
+{
+  "mode": "CLOUD_UI_ONLY",
+  "checks": [
+    {
+      "screen": "investment",
+      "width": 320,
+      "navigationRoundTrip": true,
+      "logoLoaded": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "catalog",
+      "width": 320,
+      "navigationRoundTrip": true,
+      "logoLoaded": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "investment",
+      "width": 375,
+      "navigationRoundTrip": true,
+      "logoLoaded": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "catalog",
+      "width": 375,
+      "navigationRoundTrip": true,
+      "logoLoaded": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "investment",
+      "width": 840,
+      "navigationRoundTrip": true,
+      "logoLoaded": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "catalog",
+      "width": 840,
+      "navigationRoundTrip": true,
+      "logoLoaded": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "investment",
+      "width": 1024,
+      "navigationRoundTrip": true,
+      "logoLoaded": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "catalog",
+      "width": 1024,
+      "navigationRoundTrip": true,
+      "logoLoaded": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "investment",
+      "width": 1440,
+      "navigationRoundTrip": true,
+      "logoLoaded": true,
+      "noOverflow": true
+    },
+    {
+      "screen": "catalog",
+      "width": 1440,
+      "navigationRoundTrip": true,
+      "logoLoaded": true,
+      "noOverflow": true
+    }
+  ],
+  "pageErrors": [],
+  "modelRequests": 0
+}

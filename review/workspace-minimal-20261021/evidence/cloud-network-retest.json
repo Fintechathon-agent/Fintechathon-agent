@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-21",
+  "endpoint": "https://xinlan-qwen38-share.lixjanus526.workers.dev/health",
+  "direct": {
+    "http": null,
+    "durationMs": 10762,
+    "error": "TypeError",
+    "causeCode": "UND_ERR_CONNECT_TIMEOUT"
+  },
+  "existingLocalProxy": {
+    "http": null,
+    "causeCode": "ECONNRESET"
+  },
+  "providerCalls": 0,
+  "cloudBrowserChainVerifiedThisRun": false,
+  "mainlandReachabilityVerified": false,
+  "result": "WORKER_NETWORK_UNVERIFIED"
+}

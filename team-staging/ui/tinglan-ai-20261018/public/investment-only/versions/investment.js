@@ -24,7 +24,7 @@ async function init() {
 }
 function renderHoldings(p) {
   const dated=dateStatus(p.as_of,today());
-  const palette=['#eee5d8','#b9ac9a','#8b8074','#655f58','#dad4cc'];
+  const palette=['#ff914a','#e9e4dd','#afa79f','#716a63','#c86e38'];
   const allocation = allocationView(p).map((item,index)=>({...item,color:palette[index%palette.length]}));
   $('#portfolio-total').classList.remove('archive-skeleton'); $('#portfolio-total').removeAttribute('aria-busy');
   $('#portfolio-total').textContent = money(p.total_value * 100);

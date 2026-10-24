@@ -1,0 +1,18 @@
+{
+  "baseline": "69c8b75ad76d130252272d5061286d9e593cee9e",
+  "scope": "Homepage card alignment only",
+  "files": [
+    {
+      "file": "landing.html",
+      "sha256": "29336b3e30a842174939b4ccce7c83dad984be6df80835013607c8da45bb6846"
+    },
+    {
+      "file": "versions/workspace-refinement.css",
+      "sha256": "ac913103b6aaa1af6681d0ad9e2247e774351e8de5156792e1641c962cf6d819"
+    },
+    {
+      "file": "preview-manifest.json",
+      "sha256": "0ec7fea0e9aabed3e348b18519838d513e7a87cfd00d99bce9e220d62f87d5e8"
+    }
+  ]
+}

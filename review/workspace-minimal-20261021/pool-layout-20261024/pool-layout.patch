@@ -1,0 +1,33 @@
+diff --git a/landing.html b/landing.html
+index d3e2ffd..ba60ed4 100644
+--- a/landing.html
++++ b/landing.html
+@@ -7 +7 @@
+-  <link rel="stylesheet" href="versions/landing.css?v=20261016-type">
++  <link rel="stylesheet" href="versions/landing.css?v=20261024-pool-layout">
+diff --git a/preview-manifest.json b/preview-manifest.json
+index be9df5f..ec8157e 100644
+--- a/preview-manifest.json
++++ b/preview-manifest.json
+@@ -35 +35 @@
+-      "sha256": "0faf1997537e80de4a518665f07dfd39eaecb216461a2ddd57ce74f4c509c407"
++      "sha256": "186420dd762c6bcc1d56e309b47078c180891057303d44bd5fe241b21629a031"
+@@ -75 +75 @@
+-      "sha256": "cbf35390e76db3698330a254e519ebbed2aa556f872175cc8d5500cc012cfd7c"
++      "sha256": "1bee38147f7bd093ad86eef8262229cc6616d2eedd916ab9384ac16ca11bd88d"
+diff --git a/versions/landing.css b/versions/landing.css
+index e3ab689..9e2bd3e 100644
+--- a/versions/landing.css
++++ b/versions/landing.css
+@@ -58 +58 @@ h2 { font-size:var(--text-title); font-weight:600; line-height:1.4; margin:15px
+-.archive-diagram>span { font:100px/1 Consolas,monospace; letter-spacing:-.1em; }
++.archive-diagram>span:not(.liquid-vessel) { font:100px/1 Consolas,monospace; letter-spacing:-.1em; }
+@@ -60 +60 @@ h2 { font-size:var(--text-title); font-weight:600; line-height:1.4; margin:15px
+-.archive-diagram>span { font-size:min(100px,27cqi); }
++.archive-diagram>span:not(.liquid-vessel) { font-size:min(100px,27cqi); }
+@@ -124 +124 @@ footer p { text-align:center; }
+-.archive-diagram>span { position:absolute; left:0; top:28px; pointer-events:none; }
++.archive-diagram>span:not(.liquid-vessel) { position:absolute; left:0; top:28px; pointer-events:none; }
+@@ -144 +144 @@ footer p { text-align:center; }
+- .feature-card .archive-diagram>span { top:14px; }
++ .feature-card .archive-diagram>span:not(.liquid-vessel) { top:14px; }

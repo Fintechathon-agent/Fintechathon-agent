@@ -1,0 +1,237 @@
+{
+  "base": "http://127.0.0.1:8897",
+  "liveRequested": true,
+  "widths": [
+    320,
+    375,
+    430,
+    700,
+    840,
+    1024,
+    1440
+  ],
+  "errors": [],
+  "steps": [
+    "six routes, defaults, draft persistence, back",
+    "real assistant ledger and shared budget, stable iframe draft",
+    "unchanged Core fixture health-check and restored result",
+    "combined authorized source selection",
+    "real combined AI -> local REVIEW -> explicit task confirmation -> persistent task/audit",
+    "sensitive operation blocked, no executor, origin denial, session isolation"
+  ],
+  "liveHttp": 200,
+  "live": {
+    "analysis": {
+      "id": "review-34540b5b-867a-4c80-b19f-fd7bf6807827",
+      "sessionId": "local-session-20ccf7bf0e994d0fa78a879351a0d3ec",
+      "requestId": "workspace-4645610c-df34-42d4-88d4-03a7e0644a0b",
+      "title": "请结合已选中的持仓、生活预算与备用金目标，简短说明应先核对哪些风险和缺失资料。最多三条，只分析，不执行任何操作。",
+      "mode": "REAL_MODEL",
+      "model": "qwen3.8-flash",
+      "createdAt": "2026-10-24T04:22:48.588249+00:00",
+      "sources": {
+        "portfolio": {
+          "id": "golden-demo-portfolio",
+          "mode": "FIXTURE",
+          "asOf": "2026-09-23T08:00:00Z",
+          "revision": "47afdede0c23b3a53f4cb1c74408060a1e2bb437342456ecf5b6b3fd1c407b19",
+          "snapshot": {
+            "snapshot_id": "snapshot-de37f3dab3586cd6",
+            "portfolio_id": "golden-demo-portfolio",
+            "as_of": "2026-09-23T08:00:00Z",
+            "positions": [
+              {
+                "instrument_id": "EQUITY_ALPHA",
+                "name": "Alpha Holdings",
+                "type": "A_SHARE",
+                "sector": "Technology",
+                "quantity": 100,
+                "price": 47.2,
+                "market_value": 4720,
+                "weight": 0.15186615
+              },
+              {
+                "instrument_id": "ETF_GROWTH",
+                "name": "Growth ETF",
+                "type": "ETF",
+                "sector": "Technology",
+                "quantity": 100,
+                "price": 75.5,
+                "market_value": 7550,
+                "weight": 0.24292149
+              },
+              {
+                "instrument_id": "ETF_CONSUMER",
+                "name": "Consumer ETF",
+                "type": "ETF",
+                "sector": "Consumer",
+                "quantity": 100,
+                "price": 47.6,
+                "market_value": 4760,
+                "weight": 0.15315315
+              },
+              {
+                "instrument_id": "ETF_BOND",
+                "name": "Bond ETF",
+                "type": "ETF",
+                "sector": "Fixed Income",
+                "quantity": 100,
+                "price": 40.5,
+                "market_value": 4050,
+                "weight": 0.13030888
+              }
+            ],
+            "cash": 10000,
+            "cash_weight": 0.32175032,
+            "total_value": 31080,
+            "data_quality": {
+              "status": "VALID",
+              "errors": [],
+              "warnings": []
+            }
+          }
+        },
+        "budget": {
+          "id": "budget-2026-10",
+          "mode": "USER_REPORTED",
+          "asOf": "2026-10-24T04:22:21.846451+00:00",
+          "revision": "42c70e26df0b7ca5021f82aa3addfb6877abde0142553141fe9875171b986407",
+          "summary": {
+            "month": "2026-10",
+            "totals": {
+              "CNY": {
+                "income": 1200000,
+                "expense": 1800,
+                "investment": 0,
+                "proceeds": 0,
+                "planned": 0
+              }
+            },
+            "budget": {
+              "opening": 2000000,
+              "essentials": 600000,
+              "buffer": 1000000
+            },
+            "missing": [],
+            "available_cents": 1598200,
+            "foreign_currency_unconverted": false,
+            "review_count": 0
+          }
+        },
+        "goal": {
+          "mode": "USER_DRAFT",
+          "name": "生活备用金",
+          "amountCents": 3000000,
+          "deadline": ""
+        }
+      },
+      "sourceHash": "96debb6e6172e3b93ef337b8fdff7c24fca3b4de3abe6e4c303d172b4f6ce50c",
+      "text": "这是一次只读、教育性核对，不构成投资或财务执行建议。资料包含虚构持仓、用户自述预算与未核验备用金目标。优先核对三类问题：一是收入、支出与预算字段单位口径是否一致；二是备用金目标金额和期限是否明确并与当前现金/预算缺口匹配；三是持仓、预算、目标数据是否经账户验证且归属同一用户。未执行任何操作。\n\n证据不足且存在数值/单位疑点：月度收入与支出金额差异极大，available_cents 与 totals 的单位口径可能不一致，备用金目标缺少截止日期；同时 USER_REPORTED 与 USER_DRAFT 数据未经账户核验，需由用户补充确认后才能继续判断。",
+      "proposal": {
+        "summary": "这是一次只读、教育性核对，不构成投资或财务执行建议。资料包含虚构持仓、用户自述预算与未核验备用金目标。优先核对三类问题：一是收入、支出与预算字段单位口径是否一致；二是备用金目标金额和期限是否明确并与当前现金/预算缺口匹配；三是持仓、预算、目标数据是否经账户验证且归属同一用户。未执行任何操作。",
+        "risk_level": "medium",
+        "proposed_action": "REQUEST_MORE_INFO",
+        "action_reason": "证据不足且存在数值/单位疑点：月度收入与支出金额差异极大，available_cents 与 totals 的单位口径可能不一致，备用金目标缺少截止日期；同时 USER_REPORTED 与 USER_DRAFT 数据未经账户核验，需由用户补充确认后才能继续判断。",
+        "missing_information": [
+          "budget 中 income 1200000、expense 1800 是否以 CNY 元、分或其他单位记录",
+          "available_cents 1598200 与 totals、budget 字段之间的换算关系和是否包含全部资金",
+          "goal 中 amountCents 3000000 的目标期限、达成方式、是否计入当前 cash 或预算余额",
+          "持仓、预算和备用金目标是否均经账户来源验证并属于同一用户或同一资金视图"
+        ],
+        "evidence": [
+          "untrusted_content: portfolio.mode 为 FIXTURE，snapshot.total_value 为 31080，cash 为 10000",
+          "untrusted_content: budget.mode 为 USER_REPORTED，totals.CNY.income 为 1200000，expense 为 1800，available_cents 为 1598200",
+          "untrusted_content: goal.mode 为 USER_DRAFT，name 为“生活备用金”，amountCents 为 3000000，deadline 为空",
+          "untrusted_content: 用户要求只进行教育性分析，不修改账本、不推断缺失财务数据、不执行资金操作"
+        ]
+      },
+      "provider": {
+        "http_status": 200,
+        "duration_ms": 26453,
+        "provider_response_id": "chatcmpl-c6bc5fdd-1ad3-9439-857f-31a400eb9a82",
+        "usage": {
+          "prompt_tokens": 1352,
+          "total_tokens": 2750,
+          "completion_tokens": 1398,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "text_tokens": 1352
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 904,
+            "text_tokens": 1398
+          }
+        },
+        "attempts": 1
+      },
+      "risk": {
+        "decision": null,
+        "status": "PENDING_OWNER",
+        "authority": "NOT_CONNECTED"
+      },
+      "localGuard": {
+        "decision": "REVIEW",
+        "authority": "LOCAL_ADVISORY"
+      },
+      "execution_allowed": false
+    },
+    "providerEvidence": {
+      "timestamp": "2026-10-24T04:22:48.517Z",
+      "http_status": 200,
+      "duration_ms": 26453,
+      "run_id": "review-34540b5b-867a-4c80-b19f-fd7bf6807827",
+      "source": "model",
+      "model": "qwen3.8-flash",
+      "call_succeeded": true,
+      "provider_response_id": "chatcmpl-c6bc5fdd-1ad3-9439-857f-31a400eb9a82",
+      "usage": {
+        "prompt_tokens": 1352,
+        "total_tokens": 2750,
+        "completion_tokens": 1398,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "text_tokens": 1352
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 904,
+          "text_tokens": 1398
+        }
+      },
+      "raw_text": "{\n  \"summary\": \"这是一次只读、教育性核对，不构成投资或财务执行建议。资料包含虚构持仓、用户自述预算与未核验备用金目标。优先核对三类问题：一是收入、支出与预算字段单位口径是否一致；二是备用金目标金额和期限是否明确并与当前现金/预算缺口匹配；三是持仓、预算、目标数据是否经账户验证且归属同一用户。未执行任何操作。\",\n  \"risk_level\": \"medium\",\n  \"proposed_action\": \"REQUEST_MORE_INFO\",\n  \"action_reason\": \"证据不足且存在数值/单位疑点：月度收入与支出金额差异极大，available_cents 与 totals 的单位口径可能不一致，备用金目标缺少截止日期；同时 USER_REPORTED 与 USER_DRAFT 数据未经账户核验，需由用户补充确认后才能继续判断。\",\n  \"missing_information\": [\n    \"budget 中 income 1200000、expense 1800 是否以 CNY 元、分或其他单位记录\",\n    \"available_cents 1598200 与 totals、budget 字段之间的换算关系和是否包含全部资金\",\n    \"goal 中 amountCents 3000000 的目标期限、达成方式、是否计入当前 cash 或预算余额\",\n    \"持仓、预算和备用金目标是否均经账户来源验证并属于同一用户或同一资金视图\"\n  ],\n  \"evidence\": [\n    \"untrusted_content: portfolio.mode 为 FIXTURE，snapshot.total_value 为 31080，cash 为 10000\",\n    \"untrusted_content: budget.mode 为 USER_REPORTED，totals.CNY.income 为 1200000，expense 为 1800，available_cents 为 1598200\",\n    \"untrusted_content: goal.mode 为 USER_DRAFT，name 为“生活备用金”，amountCents 为 3000000，deadline 为空\",\n    \"untrusted_content: 用户要求只进行教育性分析，不修改账本、不推断缺失财务数据、不执行资金操作\"\n  ]\n}",
+      "proposal": {
+        "summary": "这是一次只读、教育性核对，不构成投资或财务执行建议。资料包含虚构持仓、用户自述预算与未核验备用金目标。优先核对三类问题：一是收入、支出与预算字段单位口径是否一致；二是备用金目标金额和期限是否明确并与当前现金/预算缺口匹配；三是持仓、预算、目标数据是否经账户验证且归属同一用户。未执行任何操作。",
+        "risk_level": "medium",
+        "proposed_action": "REQUEST_MORE_INFO",
+        "action_reason": "证据不足且存在数值/单位疑点：月度收入与支出金额差异极大，available_cents 与 totals 的单位口径可能不一致，备用金目标缺少截止日期；同时 USER_REPORTED 与 USER_DRAFT 数据未经账户核验，需由用户补充确认后才能继续判断。",
+        "missing_information": [
+          "budget 中 income 1200000、expense 1800 是否以 CNY 元、分或其他单位记录",
+          "available_cents 1598200 与 totals、budget 字段之间的换算关系和是否包含全部资金",
+          "goal 中 amountCents 3000000 的目标期限、达成方式、是否计入当前 cash 或预算余额",
+          "持仓、预算和备用金目标是否均经账户来源验证并属于同一用户或同一资金视图"
+        ],
+        "evidence": [
+          "untrusted_content: portfolio.mode 为 FIXTURE，snapshot.total_value 为 31080，cash 为 10000",
+          "untrusted_content: budget.mode 为 USER_REPORTED，totals.CNY.income 为 1200000，expense 为 1800，available_cents 为 1598200",
+          "untrusted_content: goal.mode 为 USER_DRAFT，name 为“生活备用金”，amountCents 为 3000000，deadline 为空",
+          "untrusted_content: 用户要求只进行教育性分析，不修改账本、不推断缺失财务数据、不执行资金操作"
+        ]
+      },
+      "execution_allowed": false,
+      "attempts": 1
+    }
+  },
+  "task": {
+    "id": "local-task-073d412d5ff9420a9efedf94f496b304",
+    "analysisId": "review-34540b5b-867a-4c80-b19f-fd7bf6807827",
+    "sessionId": "local-session-20ccf7bf0e994d0fa78a879351a0d3ec",
+    "title": "核对资料：请结合已选中的持仓、生活预算与备用金目标，简短说明应先核对哪些风险和缺失资料。最多三条，只分析，不执行任何操作。",
+    "mode": "LOCAL_CANDIDATE",
+    "createdAt": "2026-10-24T04:22:48.802692+00:00",
+    "sourceHash": "96debb6e6172e3b93ef337b8fdff7c24fca3b4de3abe6e4c303d172b4f6ce50c",
+    "status": "WAITING_OWNER_RISK",
+    "risk": "PENDING_OWNER",
+    "userConfirmed": true,
+    "execution_allowed": false
+  },
+  "result": "PASSED"
+}

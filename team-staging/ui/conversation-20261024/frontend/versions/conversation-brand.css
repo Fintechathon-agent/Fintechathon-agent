@@ -1,0 +1,41 @@
+/* Match the established homepage palette, artwork and construction background. */
+body.conversation-product { --surface:#151310; --surface-hover:#211c17; --line:#44362b; --muted:var(--text-secondary); --positive:var(--text-primary); --warning:var(--signal-orange); background:var(--canvas); isolation:isolate; }
+.conversation-scene { position:fixed; z-index:-1; opacity:.42; }
+.app-shell { position:relative; background:transparent; }
+.sidebar { background:rgb(21 19 16 / 94%); backdrop-filter:blur(18px); }
+.workspace { background:rgb(11 10 9 / 70%); }
+.brand { min-height:80px; gap:10px; }
+.brand>span { min-width:0; white-space:nowrap; }
+.conversation-logo { display:block; width:64px; height:64px; object-fit:contain; flex-shrink:0; }
+.brand-caption { color:var(--text-secondary); }
+.welcome-mark { display:inline-flex; }
+.welcome-mark .conversation-logo { width:80px; height:80px; }
+.mini-logo { display:block; object-fit:contain; }
+.topbar { border-bottom:1px solid var(--line); background:rgb(21 19 16 / 70%); }
+.topbar-divider { opacity:.35; }
+.home-return { color:var(--text-secondary); font-size:13px; white-space:nowrap; }
+.home-return:hover { color:var(--signal-orange); }
+.arrow-ne,.nav-svg { width:16px; height:16px; flex-shrink:0; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; vertical-align:middle; }
+.message-actions svg,.suggestions svg { width:12px; height:12px; }
+.library-nav button { gap:12px; }
+.message.user { background:#282019; border:1px solid #5c3c2744; }
+.welcome h1 { color:var(--text-primary); }
+#composer { background:rgb(25 23 21 / 94%); border-color:#68513e; }
+.artifact-panel,dialog { background:rgb(21 19 16 / 98%); }
+.status-label.recorded { color:var(--text-secondary); border-color:var(--line); }
+.balance { color:var(--text-primary); }
+.service-notice { padding:10px 24px; border-bottom:1px solid #765137; color:var(--text-secondary); background:#251b13; font-size:12px; flex-shrink:0; }
+.sidebar-bottom { margin-top:16px; }
+@media(min-width:701px) and (max-width:1150px) {
+  .brand { font-size:14px; }
+  .brand .conversation-logo { width:52px; height:52px; }
+  .workspace-account { padding:6px 0; gap:6px; font-size:12px; }
+}
+@media(max-width:700px) {
+  .conversation-logo { width:52px; height:52px; }
+  .welcome-mark .conversation-logo { width:64px; height:64px; }
+  .topbar .title-group { gap:6px; flex:1; overflow:hidden; }
+  .title-group #chat-title { max-width:100px; }
+  #open-results { padding-inline:8px; }
+  .service-notice { padding:10px 16px; }
+}

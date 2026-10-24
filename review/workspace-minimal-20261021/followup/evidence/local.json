@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-10-21T08:41:31.866Z",
+  "mode": "LOCAL",
+  "checks": [
+    {
+      "width": 375,
+      "heroDirectNavigation": true,
+      "decorativeLabelsRemoved": 6
+    },
+    {
+      "label": "preview",
+      "width": 375,
+      "orangeControls": true,
+      "orangeAllocation": true,
+      "noOverflow": true,
+      "logoUnchanged": true,
+      "staticPlans": 3
+    },
+    {
+      "label": "share",
+      "width": 375,
+      "orangeControls": true,
+      "orangeAllocation": true,
+      "noOverflow": true,
+      "logoUnchanged": true,
+      "staticPlans": 3
+    },
+    {
+      "width": 1440,
+      "heroDirectNavigation": true,
+      "decorativeLabelsRemoved": 6
+    },
+    {
+      "label": "preview",
+      "width": 1440,
+      "orangeControls": true,
+      "orangeAllocation": true,
+      "noOverflow": true,
+      "logoUnchanged": true,
+      "staticPlans": 3
+    },
+    {
+      "label": "share",
+      "width": 1440,
+      "orangeControls": true,
+      "orangeAllocation": true,
+      "noOverflow": true,
+      "logoUnchanged": true,
+      "staticPlans": 3
+    }
+  ],
+  "modelRequests": 0,
+  "pageErrors": [],
+  "result": "PASSED"
+}

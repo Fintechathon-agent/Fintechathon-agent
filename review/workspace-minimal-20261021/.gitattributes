@@ -1,0 +1,2 @@
+# Preserve the reviewed release files and evidence byte for byte.
+* -text whitespace=cr-at-eol

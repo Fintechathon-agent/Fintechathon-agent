@@ -1,0 +1,20 @@
+{
+  "base": "https://lixjanus526-art.github.io/finance-lab-ui-preview",
+  "realProviderRequested": false,
+  "widths": [
+    320,
+    375,
+    430,
+    700,
+    701,
+    840,
+    1024,
+    1440,
+    1920
+  ],
+  "requests": [],
+  "errors": [],
+  "diagnosticsHidden": true,
+  "publishedHashesVerified": 12,
+  "result": "PASSED"
+}

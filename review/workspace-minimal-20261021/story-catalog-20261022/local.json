@@ -1,0 +1,19 @@
+{
+  "mode": "LOCAL_UI_ONLY",
+  "checks": [
+    {
+      "width": 375,
+      "labelCorrect": true,
+      "opensCatalog": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "labelCorrect": true,
+      "opensCatalog": true,
+      "noOverflow": true
+    }
+  ],
+  "pageErrors": [],
+  "modelRequests": 0
+}

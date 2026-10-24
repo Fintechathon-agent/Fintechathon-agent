@@ -1,0 +1,18 @@
+[
+  {
+    "route": "workspace",
+    "violations": []
+  },
+  {
+    "route": "banking",
+    "violations": []
+  },
+  {
+    "route": "tasks",
+    "violations": []
+  },
+  {
+    "route": "safety",
+    "violations": []
+  }
+]
