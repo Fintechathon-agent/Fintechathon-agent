@@ -11,6 +11,11 @@ const S = {
   tab: 'audit',
   auditLimit: 12,    // 审计时间线默认展示条数
   stepTimer: null,
+  reviewRevision: 0,
+  readOnlyConversation: false,
+  riskConversationConfigured: false,
+  conversationRequestKey: null,
+  conversationFingerprint: null,
 };
 
 const SECTOR_COLORS = ['#0d3b2e', '#2f7d63', '#5fa88c', '#9dc0b3', '#c9a24d', '#8c6b4f', '#7c9bb5'];
@@ -40,7 +45,12 @@ async function api(path, opts = {}) {
     body: opts.body ? JSON.stringify(opts.body) : undefined,
   });
   const data = await res.json().catch(() => ({ error: '响应解析失败' }));
-  if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
+  if (!res.ok || data.error) {
+    const detail = typeof data.error === 'string' ? data.error : data.error?.message;
+    const error = new Error(detail || `HTTP ${res.status}`);
+    error.payload = data;
+    throw error;
+  }
   return data;
 }
 
@@ -313,6 +323,11 @@ function renderTierMatrix(rows) {
 
 function renderApprovals(list) {
   const card = $('#card-approvals');
+  if (S.readOnlyConversation) {
+    card.classList.add('hidden');
+    $('#approvals-list').replaceChildren();
+    return;
+  }
   $('#approvals-count').textContent = `${list.length} 项`;
   if (!list.length) { card.classList.add('hidden'); return; }
   card.classList.remove('hidden');
@@ -365,8 +380,12 @@ function animateSteps() {
 }
 
 async function runReview() {
+  if ($('#btn-review').disabled) return;
+  const revision = ++S.reviewRevision;
   const btn = $('#btn-review');
   btn.disabled = true;
+  S.readOnlyConversation = $('#daily-finance-enable').checked || S.riskConversationConfigured;
+  if (S.readOnlyConversation) renderApprovals([]);
   $('#agent-status').textContent = '体检中…';
   $('#rec-area').innerHTML = '<div class="muted" style="margin-top:14px">Agent 正在分析，请稍候…</div>';
   resetSteps();
@@ -374,16 +393,36 @@ async function runReview() {
 
   try {
     const q = ($('#nl-question').value || '').trim();
-    const data = await api('/api/review', { method: 'POST', body: { question: q || '请检查我的持仓健康状况' } });
+    const body = { question: q || '请检查我的持仓健康状况' };
+    if ($('#daily-finance-enable').checked) {
+      body.daily_finance_yuan = dailyFinanceInput();
+    }
+    // Keep a request key for an unchanged draft, including transport retries.
+    // Only in-memory state is used; no financial data is persisted in storage.
+    const fingerprint = JSON.stringify(body);
+    if (S.conversationFingerprint !== fingerprint || !S.conversationRequestKey) {
+      S.conversationFingerprint = fingerprint;
+      S.conversationRequestKey = 'conversation-' + crypto.randomUUID();
+    }
+    body.idempotency_key = S.conversationRequestKey;
+    const data = await api('/api/review', { method: 'POST', body });
+    if (revision !== S.reviewRevision) return;
     clearInterval(S.stepTimer);
     S.stepTimer = null;
     S.review = data;
     S.decision = null;
+    S.readOnlyConversation = data.conversation_mode === 'READ_ONLY_CONVERSATION' || Boolean(data.risk_advice);
 
     renderIntent(data.intent, data.assistant_message);
     renderPlan(data.plan);
     if (data.breaker) renderBreaker(data.breaker);
     renderRecommendation(data);
+
+    if (S.readOnlyConversation) {
+      renderApprovals([]);
+      $('#agent-status').textContent = conversationStatus(data);
+      return;
+    }
 
     if (data.circuit_locked) {
       $('#agent-status').textContent = '熔断锁定';
@@ -408,18 +447,122 @@ async function runReview() {
         ? `已完成${sourceNote} · ${(data.elapsed_ms / 1000).toFixed(1)}s`
         : '等待补充';
   } catch (err) {
+    if (revision !== S.reviewRevision) return;
     clearInterval(S.stepTimer);
     S.stepTimer = null;
     markStep(6, 'skip');
     $('#agent-status').textContent = '失败';
     $('#rec-area').innerHTML = `<div class="alert bad">体检失败：${esc(err.message)}</div>`;
+    if (err.payload?.risk_advice) {
+      S.readOnlyConversation = true;
+      renderRiskAdvice(err.payload);
+      renderApprovals([]);
+      $('#agent-status').textContent = err.payload.risk_callback?.status === 'UNKNOWN'
+        ? conversationStatus(err.payload) : '模型或交接失败 · 未执行';
+    }
   } finally {
     btn.disabled = false;
     if ($('#agent-status').textContent === '体检中…') $('#agent-status').textContent = '待发起';
   }
 }
 
+function dailyFinanceInput() {
+  const read = (id) => $(id).value.trim() || null;
+  return {
+    cash_yuan: read('#daily-cash'), amount_yuan: read('#daily-amount'),
+    fees_yuan: read('#daily-fees'), holds_yuan: read('#daily-holds'),
+    floor_yuan: read('#daily-floor'), purpose_yuan: read('#daily-purpose'),
+    due_yuan: read('#daily-due'), due_date: read('#daily-due-date'),
+    purpose_label: read('#daily-purpose-label'),
+    facts_confirmed: $('#daily-facts-confirmed').checked,
+    purpose_confirmed: $('#daily-purpose-confirmed').checked,
+  };
+}
+
+function invalidateConversation() {
+  S.reviewRevision += 1;
+  S.conversationRequestKey = null;
+  S.conversationFingerprint = null;
+  if (S.review?.risk_advice || S.readOnlyConversation) {
+    S.review = null;
+    $('#rec-area').innerHTML = '<p class="alert">输入已修改，旧结论不再适用，请重新发起核对。</p>';
+    $('#agent-status').textContent = '输入已修改 · 待重新核对';
+    renderApprovals([]);
+  }
+}
+
+function minorMoney(value) {
+  if (!Number.isSafeInteger(value)) return '尚未知';
+  const amount = BigInt(value), absolute = amount < 0n ? -amount : amount;
+  return `${amount < 0n ? '-' : ''}¥${absolute / 100n}.${String(absolute % 100n).padStart(2, '0')}`;
+}
+
+function readableAction(value) {
+  if (typeof value === 'string') return value;
+  return value?.message_zh || value?.message || value?.title || value?.action || '';
+}
+
+function conversationStatus(data) {
+  if (data.risk_callback?.status === 'UNKNOWN') return '回写结果待核查 · 未执行';
+  if (data.risk_advice?.decision === 'ERROR') return '检查异常 · 未执行';
+  if (data.risk_advice?.decision === 'BLOCK') return '已阻止 · 未执行';
+  if (data.risk_advice?.decision === 'REVIEW') return '需要补充或复核 · 未执行';
+  if (data.execution_state === 'awaiting_approval') return '等待审批 · 未执行';
+  if (data.execution_state === 'awaiting_risk') return '等待风险交接 · 未执行';
+  return data.model_status === 'live' ? '仅完成分析 · 未执行' : '模型说明未返回 · 未执行';
+}
+
+function renderRiskAdvice(data) {
+  const advice = data.risk_advice || {}, metrics = advice.metrics || {};
+  const failureMessage = typeof data.error === 'string' ? data.error : data.error?.message;
+  const failureCode = typeof data.error === 'object' ? data.error?.code : data.error_code;
+  const failure = data.error
+    ? `<div class="alert bad" role="alert">模型或交接失败，未执行：${esc(failureMessage || '服务返回异常，请核查本次任务。')}${failureCode ? `（${esc(failureCode)}）` : ''}</div>`
+    : '';
+  const labels = { ALLOW: '通过资金检查', REVIEW: '需要补充或复核', BLOCK: '当前安排不可继续', ERROR: '检查异常，保持暂停' };
+  const states = { awaiting_approval: '等待审批，未执行', awaiting_risk: '等待风险处理，未执行', blocked: '已阻止，未执行', not_executed: '未执行' };
+  const callback = { RECORDED: 'Core 已记录', DUPLICATE: '原记录已存在', NOT_SENT: '尚未发送', UNKNOWN: '接收结果待核查' };
+  const fields = [
+    ['free_before_minor', '本次安排前可分配资金'], ['action_total_minor', '本次金额与费用合计'],
+    ['projected_free_after_minor', '安排后预计可分配资金'], ['shortfall_minor', '预计资金缺口'],
+    ['holds_before_minor', '其他任务已占用'], ['protected_before_minor', '已确认用途预留'],
+  ];
+  const reasons = Array.isArray(advice.reasons) ? advice.reasons : [];
+  const actions = Array.isArray(advice.next_actions) ? advice.next_actions : [];
+  const purposes = Array.isArray(advice.protected_purposes) ? advice.protected_purposes : [];
+  const purposeConfirmed = advice.input_confirmation?.purposes_confirmed === true;
+  const executionNote = data.risk_callback?.status === 'UNKNOWN'
+    ? 'Core 风险回写结果未知，请先核查原任务；暂不重发或执行。'
+    : (states[data.execution_state] || '本次仅作核对，未执行');
+  const raw = data.model_raw ?? data.model?.model_response?.raw_text ?? data.model?.model_response?.raw_response ?? null;
+  $('#card-gate').classList.add('hidden');
+  $('#card-whatif').classList.add('hidden');
+  $('#rec-area').innerHTML = `<section class="conversation-result" aria-label="本次资金安排核对结果">
+    ${failure}
+    <h3>${esc(labels[advice.decision] || '检查结果待核实')}</h3>
+    <p>${esc(advice.summary || data.assistant_message || '请查看具体原因并补充资料。')}</p>
+    <p class="sim-note">${esc(advice.notice_zh || '虚构数据核对。程序结论与模型说明分开；未授权或执行任何投资、付款。')}</p>
+    <h4>程序核对的金额</h4><dl>${fields.filter(([key]) => key in metrics).map(([key, label]) => `<dt>${esc(label)}</dt><dd>${esc(minorMoney(metrics[key]))}</dd>`).join('')}</dl>
+    ${purposes.length ? `<h4>${purposeConfirmed ? '这笔钱为什么需要保留' : '待确认的资金用途'}</h4><ul>${purposes.map(purpose => `<li>${esc(purpose.label || purpose.name || purpose.purpose_label || '用途')}（${purposeConfirmed ? '用户已确认' : '尚待用户确认'}）：预留 ${esc(minorMoney(purpose.reserved_now_minor))}，待付 ${esc(minorMoney(purpose.remaining_due_minor))}${purpose.due_at || purpose.due_date ? `，到期 ${esc(purpose.due_at || purpose.due_date)}` : ''}</li>`).join('')}</ul>` : ''}
+    ${reasons.length ? `<h4>判断原因</h4><ul>${reasons.map(reason => `<li>${esc(readableAction(reason))}${reason.recovery?.message_zh ? `；${esc(reason.recovery.message_zh)}` : ''}</li>`).join('')}</ul>` : ''}
+    ${actions.length ? `<h4>接下来可以做什么</h4><ul>${actions.map(action => `<li>${esc(readableAction(action))}</li>`).join('')}</ul>` : ''}
+    <p class="alert">${esc(executionNote)}。资金检查通过也不代表用户已授权。</p>
+    <details><summary>模型说明（${data.model_status === 'live' && data.decision_source === 'model' ? '真实返回' : '未取得有效返回'}）</summary>
+      <p>模型只解释程序结论，不能更改保护用途、审批或执行权限。</p>
+      <pre>${esc(raw === null ? '本次没有可展示的模型原文，未切换为模拟成功。' : typeof raw === 'string' ? raw : JSON.stringify(raw, null, 2))}</pre>
+    </details>
+    <details><summary>查看本次任务与审计关联</summary><dl>
+      <dt>运行编号</dt><dd>${esc(data.run_id || '尚未取得')}</dd>
+      <dt>任务编号</dt><dd>${esc(data.task_id || '尚未取得')}</dd>
+      <dt>审计编号</dt><dd>${esc(data.audit_id || '尚未取得')}</dd>
+      <dt>风险回写</dt><dd>${esc(callback[data.risk_callback?.status] || '尚未完成')}</dd>
+      <dt>风险原因代码</dt><dd>${esc(reasons.map(reason => reason.code).filter(Boolean).join('、') || '无')}</dd>
+    </dl></details>
+  </section>`;
+}
+
 function renderRecommendation(data) {
+  if (data.risk_advice || data.engine === 'risk-conversation') { renderRiskAdvice(data); return; }
   const r = data.recommendation;
   const area = $('#rec-area');
   renderRiskWorkbench(data);
@@ -754,6 +897,7 @@ async function reloadData() {
 function closeModal() { $('#modal-root').innerHTML = ''; }
 
 function openConfirm(a) {
+  if (S.readOnlyConversation) return toast('本次仅核对资金安排，尚未接入可信执行授权。');
   const isRed = a.tier === 'red';
   $('#modal-root').innerHTML = `
     <div class="modal-mask" id="mask">
@@ -913,6 +1057,39 @@ async function init() {
 
 document.addEventListener('DOMContentLoaded', () => {
   init();
+  api('/api/risk-conversation/status').then(status => {
+    S.riskConversationConfigured = status.configured === true;
+    if (S.riskConversationConfigured) {
+      S.readOnlyConversation = true;
+      renderApprovals([]);
+    }
+    $('#risk-conversation-status').textContent = status.configured
+      ? '资金核对服务已配置；提交后按程序规则检查，模型调用失败会如实显示。'
+      : '资金核对服务尚未配置；加入资金数据后会明确暂停，不会切回旧服务。';
+  }).catch(() => { $('#risk-conversation-status').textContent = '暂时无法读取接入状态；提交失败时不会自动切换为离线成功。'; });
+  $('#daily-finance-enable').addEventListener('change', () => {
+    $('#daily-finance-fields').disabled = !$('#daily-finance-enable').checked;
+    $('#daily-facts-confirmed').checked = false;
+    $('#daily-purpose-confirmed').checked = false;
+    invalidateConversation();
+  });
+  $('#daily-finance-form').addEventListener('input', event => {
+    if (!['daily-facts-confirmed', 'daily-purpose-confirmed', 'daily-finance-enable'].includes(event.target.id)) {
+      $('#daily-facts-confirmed').checked = false;
+      $('#daily-purpose-confirmed').checked = false;
+    }
+    invalidateConversation();
+  });
+  $('#nl-question').addEventListener('input', invalidateConversation);
+  $('#daily-finance-example').onclick = () => {
+    const values = { cash: '10000', amount: '8000', fees: '0', holds: '0', floor: '1000', purpose: '3000', due: '3000', 'purpose-label': '房租' };
+    Object.entries(values).forEach(([key, value]) => { $('#daily-' + key).value = value; });
+    const due = new Date(); due.setDate(due.getDate() + 30);
+    $('#daily-due-date').value = `${due.getFullYear()}-${String(due.getMonth() + 1).padStart(2, '0')}-${String(due.getDate()).padStart(2, '0')}`;
+    $('#daily-facts-confirmed').checked = false;
+    $('#daily-purpose-confirmed').checked = false;
+    invalidateConversation();
+  };
   $('#btn-review').onclick = runReview;
   $('#nl-question').addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && !event.isComposing) runReview();
