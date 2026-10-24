@@ -1,0 +1,5 @@
+investment-only/** -text whitespace=cr-at-eol
+workspace.html -text whitespace=cr-at-eol
+versions/workspace-investment.js -text whitespace=cr-at-eol
+versions/workspace.js -text whitespace=cr-at-eol
+versions/workspace-model.mjs -text whitespace=cr-at-eol

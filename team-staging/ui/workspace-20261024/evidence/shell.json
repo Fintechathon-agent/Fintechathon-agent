@@ -1,0 +1,22 @@
+{
+  "base": "http://127.0.0.1:8897",
+  "liveRequested": false,
+  "widths": [
+    320,
+    375,
+    430,
+    700,
+    840,
+    1024,
+    1440
+  ],
+  "errors": [],
+  "steps": [
+    "six routes, defaults, draft persistence, back",
+    "real assistant ledger and shared budget, stable iframe draft",
+    "unchanged Core fixture health-check and restored result",
+    "combined authorized source selection",
+    "sensitive operation blocked, no executor, origin denial, session isolation"
+  ],
+  "result": "PASSED"
+}

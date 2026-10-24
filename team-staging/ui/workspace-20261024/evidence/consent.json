@@ -1,0 +1,8 @@
+{
+  "result": "PASSED",
+  "sourceChangeRevokesConsent": true,
+  "questionChangeRevokesConsent": true,
+  "analysisDraftSurvivesReload": true,
+  "postRequests": 0,
+  "pageErrors": []
+}

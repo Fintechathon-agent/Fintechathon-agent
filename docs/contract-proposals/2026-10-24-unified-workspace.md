@@ -2,6 +2,8 @@
 
 状态：待用户确认，并由Core、Risk、Approval、Audit对应Owner记录确认后再合入。当前不修改共享后端、数据库或正式权限逻辑；不更新team-release。
 
+2026-10-24 后续确认：用户已明确批准隔离 team-staging 的 UI/业务集成候选、只读上下文分析与本地草案/事件存储。这不代表正式 Core/Risk API、数据库 Schema 或策略已获 Owner 批准。实际候选使用本机 `/api/assistant/workspace/state|analysis|task`，复用现有 HttpOnly Cookie 路径；仅监听127.0.0.1，任务保持 WAITING_OWNER_RISK，拒绝所有资金执行与正式风险写入。下述正式集成提案继续待对应 Owner 确认。
+
 ## 需要确认的最小服务变更
 
 现有生活服务 `/api/assistant/message` 同时解析记账和分析，直接拼接持仓/预算JSON可能生成不应出现的账本条目。需独立只读分析动作，不能由前端假定它已经存在。
