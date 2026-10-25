@@ -1,0 +1,16 @@
+test_live_mode_cannot_reuse_demo_cookie_or_client_verification (tests.test_guest_accounts.GuestHttpTests.test_live_mode_cannot_reuse_demo_cookie_or_client_verification) ... ok
+test_real_investment_http_flow_updates_the_same_transfer_balance_once (tests.test_guest_accounts.GuestHttpTests.test_real_investment_http_flow_updates_the_same_transfer_balance_once) ... ok
+test_reset_is_guest_scoped_and_retains_explicit_preferences (tests.test_guest_accounts.GuestHttpTests.test_reset_is_guest_scoped_and_retains_explicit_preferences) ... ok
+test_signed_cookie_mode_csrf_identity_and_private_worker_boundaries (tests.test_guest_accounts.GuestHttpTests.test_signed_cookie_mode_csrf_identity_and_private_worker_boundaries) ... ok
+test_two_guests_cannot_read_or_approve_each_others_tasks_or_preferences (tests.test_guest_accounts.GuestHttpTests.test_two_guests_cannot_read_or_approve_each_others_tasks_or_preferences) ... ok
+test_updated_preference_blocks_previously_queued_transfer (tests.test_guest_accounts.GuestHttpTests.test_updated_preference_blocks_previously_queued_transfer) ... ok
+test_atomic_write_failure_leaves_no_cash_position_or_receipt_change (tests.test_guest_accounts.UnifiedLedgerTests.test_atomic_write_failure_leaves_no_cash_position_or_receipt_change) ... ok
+test_legacy_or_mismatched_owner_is_not_loaded_and_root_is_exclusive (tests.test_guest_accounts.UnifiedLedgerTests.test_legacy_or_mismatched_owner_is_not_loaded_and_root_is_exclusive) ... ok
+test_missing_cash_in_existing_ledger_does_not_restore_fixture_balance (tests.test_guest_accounts.UnifiedLedgerTests.test_missing_cash_in_existing_ledger_does_not_restore_fixture_balance) ... ok
+test_replay_changed_parameters_and_floor_are_checked (tests.test_guest_accounts.UnifiedLedgerTests.test_replay_changed_parameters_and_floor_are_checked) ... ok
+test_transfer_and_investment_concurrency_cannot_spend_the_same_cash (tests.test_guest_accounts.UnifiedLedgerTests.test_transfer_and_investment_concurrency_cannot_spend_the_same_cash) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 7.176s
+
+OK

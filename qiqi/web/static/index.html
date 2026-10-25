@@ -50,6 +50,19 @@
 </header>
 
 <section class="banking" id="banking-section">
+  <div class="card hidden" id="guest-account-panel">
+    <h2>本浏览器的模拟账户</h2>
+    <p>转账与投资共用现金余额。访客会话最长 24 小时，仅限本浏览器和当前模式，不跨设备同步；会话过期或清除 Cookie 后无法自动找回。</p>
+    <p id="guest-account-summary" aria-live="polite"></p>
+    <details class="funds-check">
+      <summary>修改最低现金保留</summary>
+      <label for="guest-cash-floor">至少保留多少元</label>
+      <input id="guest-cash-floor" type="number" min="0" max="1000000000" step="0.01" inputmode="decimal">
+      <button class="btn btn-outline" type="button" id="guest-save-preference">确认保存</button>
+      <button class="btn btn-outline" type="button" id="guest-delete-preference">删除此约束</button>
+      <p id="guest-preference-status" aria-live="polite">只保存你在这里确认的值，账单备注不会修改此约束。</p>
+    </details>
+  </div>
   <div class="card">
     <div class="card-head">
       <h2>金融 AI 安全任务台 · 六场景统一入口</h2>
@@ -326,5 +339,6 @@
 
 <script src="/static/app.js"></script>
 <script src="/static/banking.js"></script>
+<script src="/static/guest-account.js"></script>
 </body>
 </html>

@@ -51,6 +51,7 @@ async function api(path, opts = {}) {
     error.payload = data;
     throw error;
   }
+  if (opts.method === 'POST') window.dispatchEvent(new Event('guest-account-changed'));
   return data;
 }
 

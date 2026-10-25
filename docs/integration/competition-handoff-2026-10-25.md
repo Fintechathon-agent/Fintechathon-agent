@@ -1,5 +1,7 @@
 # Personal AI Fund Manager 参赛交接单（2026-10-25 更新）
 
+> 最新续办入口为 `qiqi/web/guest_gateway.py --port 8877`：本机访客隔离、Finance 统一账本及 262 项回归已完成；每日 20 元测试预算已获用户批准。权限申请文本、当前限制和真实模型/设备验收步骤见 [续办记录](staging-access-and-guests-2026-10-25.md)。下文保留上一轮证据与统计，不能将旧的 0 元授权当作最新授权。
+
 交付分支 `codex/competition-integration-20261025`，[Draft PR #31](https://github.com/Fintechathon-agent/Fintechathon-agent/pull/31)。当前是本地集成候选版，**未完成线上 staging 验收，未生产发布**。模块与唯一 Owner、版本来源、实际架构和阻塞见 [审计](audit-2026-10-25.md)。
 
 ## 可运行与可展示内容

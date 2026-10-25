@@ -270,10 +270,16 @@ def _run_and_queue(state, question: str, *, seeded: bool = False, bills_data=Non
     """
     res = banking_route(
         question, bills_data=bills_data if bills_data is not None else demo_bills(), cards_data=state.cards,
-        contacts=demo_contacts(), balance=state.balance,
+        contacts=demo_contacts(), balance=getattr(state, "spendable_balance", state.balance),
         daily_cumulative=state.daily_cumulative, user_id=USER_ID,
         cancelled_subs=state.cancelled_subs,
     )
+    if hasattr(state, "spendable_balance") and state.spendable_balance != state.balance:
+        res.message = res.message.replace("账户余额", "扣除已确认保留后的可安排现金")
+        for check in res.data.get("gate_checks", []):
+            check["detail"] = check.get("detail", "").replace("账户余额", "扣除已确认保留后的可安排现金")
+        res.data["account_cash"] = state.balance
+        res.data["spendable_cash"] = state.spendable_balance
     deduplicated = False
     if res.status not in ("pending_confirmation", "scheduled"):
         return res, deduplicated
@@ -410,7 +416,10 @@ def confirm_action(payload: dict) -> dict:
     if scenario == "transfer" and operation == "transfer":
         req = TransferRequest(request_id=pending_id, payee=request.get("payee", ""),
                               amount=float(request.get("amount", 0)))
-        passed, checks = check_transfer(req, demo_contacts(), state.balance, state.daily_cumulative)
+        passed, checks = check_transfer(req, demo_contacts(), getattr(state, "spendable_balance", state.balance), state.daily_cumulative)
+        if hasattr(state, "spendable_balance") and state.spendable_balance != state.balance:
+            for check in checks:
+                check["detail"] = check.get("detail", "").replace("账户余额", "扣除已确认保留后的可安排现金")
         tier = tier_of_operation("transfer", "transfer_now", req.amount, state.daily_cumulative)
     elif scenario == "transfer" and operation == "aa_collect":
         passed = bool(request.get("payee")) and float(request.get("amount", 0)) > 0

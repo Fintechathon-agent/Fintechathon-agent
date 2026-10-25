@@ -8,7 +8,7 @@
 
 1. 在北京业务空间确认实际 Workspace ID、模型授权与新 Key。配置示例为 `chenchen/wrangler.bailian.example.toml`，其中 Workspace ID 留空、付费开关为 `false`、预算均为 `0`。
 2. 专属兼容端点由服务端按 Workspace ID 组成：`https://<workspace-id>.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/chat/completions`。不得把截图里的旧 Key 或完整专属地址硬编码。
-3. 在账户持有人明确批准收费测试后，才分别配置 `BAILIAN_TEST_BUDGET_CNY` 与 `BAILIAN_DAILY_BUDGET_CNY`，然后开启 `BAILIAN_ALLOW_PAID_CALLS`。每日额度必须大于 0 且不超过总额度；当前批准金额仍为 0。
+3. 用户在后续本轮明确批准每日测试上限 20 元；执行方另限制本轮总额 20 元，包含重试，不自动充值。账户/密钥/余额核实后才把 `BAILIAN_TEST_BUDGET_CNY` 与 `BAILIAN_DAILY_BUDGET_CNY` 配置为 20，再开启 `BAILIAN_ALLOW_PAID_CALLS`。当前尚未实施云端配置，参考模板仍保持关闭和 0 元；不得删除或清零旧账本。
 4. 在服务端交互式设置 `DASHSCOPE_API_KEY` Secret。运行 `node chenchen/scripts/bailian-preflight.js` 只检查本地配置，不联网、不开启推理。
 
 ## 预算与记录
