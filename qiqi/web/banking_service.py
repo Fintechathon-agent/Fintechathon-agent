@@ -332,6 +332,9 @@ def run_scenario(text: str, bill_file: dict | None = None) -> dict:
         return {"delegated": True, "result": None, "message": res.message}
     trace_id = "bill_" + uuid4().hex if source_record else None
     provenance = _provenance()
+    if res.intent.get("name") == "fund_knowledge":
+        provenance = {"source": "curated_definition", "source_label": "程序内置的基金定义",
+                      "simulation_notice": "仅作知识解释；未调用账户工具、未提出或执行买卖动作。"}
     if source_record and res.scenario == "bill" and res.status == "done":
         res.data["source_record"] = source_record
         res.data["trace_id"] = trace_id
@@ -344,7 +347,7 @@ def run_scenario(text: str, bill_file: dict | None = None) -> dict:
         "scenario": res.scenario, "scenario_label": res.scenario_label,
         "intent": res.intent, "plan": res.plan, "tier": res.tier,
         "tier_label": tier_label(res.tier), "status": res.status,
-        "message": res.message, "data": res.data,
+        "message": res.message, "data": res.data, "provenance": provenance,
     }, "pending": state.pending, "scheduled": state.scheduled,
         "breaker": get_breaker().state(), "provenance": provenance, "deduplicated": deduplicated}
 

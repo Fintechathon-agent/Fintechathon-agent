@@ -41,6 +41,7 @@ _PRIVILEGE_BYPASS_RE = re.compile(
 _OUT_OF_SCOPE_RE = re.compile(
     r"(机票|酒店|外卖|天气|打车|游戏|考试|写代码|写\s*.{0,6}\s*(作文|文章|论文))"
 )
+_FUND_DEFINITION_RE = re.compile(r"^\s*(基金是什么|什么是基金)[？?。！!\s]*$")
 
 
 def detect_scenario(text: str) -> str:
@@ -109,6 +110,16 @@ def route(
             plan={"intent": "out_of_scope", "nodes": []},
             tier="green", status="done",
             message="银行 AI 智能体只办理银行业务：转账、账单、理财、卡片、订阅与跨场景联动。",
+        )
+
+    if _FUND_DEFINITION_RE.fullmatch(question):
+        return ScenarioResult(
+            scenario="wealth", scenario_label="基金知识解释",
+            intent={"name": "fund_knowledge", "label": "基金知识问题", "question": question},
+            plan={"intent": "fund_knowledge", "nodes": []}, tier="green", status="done",
+            data={"answer_source": "curated_definition", "execution_required": False},
+            message="基金是把多位投资者的资金汇集起来，按基金合同约定投资和管理的产品。不同基金的资产、费用和风险不同；仅凭这个问题不能判断你是否该买入或卖出。",
+            audit_actions=[("banking_fund_knowledge_query", {"source": "curated_definition"})],
         )
 
     scenario = detect_scenario(question)
