@@ -10,6 +10,8 @@ const dailyEngine = require("./daily-engine.cjs");
 const dailyModel = require("./daily-model.cjs");
 const { LongTextBridge } = require("./long-text.cjs");
 const planningModel = require("./planning-model.cjs");
+const requestRouter = require("./request-router.cjs");
+const requestCorpus = require("./data/request-corpus.v1.json");
 const adapter = require("./core-adapter.cjs");
 const { runAttackDemo } = require("./security.cjs");
 const policy = require("./policy.cjs");
@@ -57,6 +59,7 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
     if (!upstream.risk_handoff) return { upstream, risk: null };
     const input = adapter.fromHandoff(upstream, actor, settings);
     const risk = gateway.register(input, { memoryConsent: settings.memoryConsent === true });
+    store.transaction((data) => { data.tasks[input.binding.task_id].core_audit = harness.getAudit(input.binding.task_id); return null; });
     return { upstream, risk };
   }
   const server = http.createServer(async (req, res) => {
@@ -66,6 +69,7 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
       if (!["127.0.0.1", "localhost", "[::1]"].includes(url.hostname) || Number(url.port || 80) !== server.address().port) throw new GatewayError("LOCAL_ONLY", "仅在本机演示。", "BLOCK", 403);
       if (req.headers.origin && req.headers.origin !== url.origin) throw new GatewayError("ORIGIN_MISMATCH", "拒绝跨来源请求。", "BLOCK", 403);
       if (url.pathname.startsWith("/api/") && req.headers["sec-fetch-site"] === "cross-site") throw new GatewayError("CROSS_SITE_REQUEST", "拒绝跨站请求。", "BLOCK", 403);
+      if (req.method === "GET" && url.pathname === "/api/safety/health") { send(res, 200, { service: "risk-workbench", status: "ok", access: "LOOPBACK_ONLY", port: server.address().port }); return; }
       if (req.method === "GET" && ["/risk/long-text", "/risk/long-text/", "/risk/long-text/app.js", "/risk/long-text/style.css"].includes(url.pathname)) {
         const file = url.pathname.endsWith(".js") ? "app.js" : url.pathname.endsWith(".css") ? "style.css" : "index.html";
         let content = fs.readFileSync(path.join(__dirname, "../../team-staging/risk/long-text/public", file), "utf8");
@@ -76,7 +80,7 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
         const html = fs.readFileSync(path.join(__dirname, "../../chenchen/versions/investment.html"), "utf8").replace("</head>", '<script src="/risk/team-bootstrap.js"></script></head>');
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" }); res.end(html); return;
       }
-      if (url.pathname === "/risk" || url.pathname === "/risk/" || ["/risk/app.js", "/risk/style.css", "/risk/team-bootstrap.js", "/risk/daily.js", "/risk/daily.css"].includes(url.pathname)) {
+      if (url.pathname === "/risk" || url.pathname === "/risk/" || ["/risk/app.js", "/risk/style.css", "/risk/team-bootstrap.js", "/risk/daily.js", "/risk/daily.css", "/risk/intents.js", "/risk/intents.css"].includes(url.pathname)) {
         const file = url.pathname === "/risk" || url.pathname === "/risk/" ? "index.html" : url.pathname.slice("/risk/".length);
         res.writeHead(200, { "Content-Type": file.endsWith("js") ? "text/javascript; charset=utf-8" : file.endsWith("css") ? "text/css; charset=utf-8" : "text/html; charset=utf-8", "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'", "X-Content-Type-Options": "nosniff", "Cache-Control": "no-store" });
         res.end(fs.readFileSync(path.join(__dirname, "public", file))); return;
@@ -84,6 +88,7 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
       if (!url.pathname.startsWith("/api/")) { originalHandler(req, res); return; }
       s = session(req, res);
       if (req.method === "GET" && url.pathname === "/api/safety/session") { send(res, 200, { csrf: s.csrf, user_id: s.user_id, mode: "LOCAL_SYNTHETIC_DEMO" }); return; }
+      if (req.method === "GET" && url.pathname === "/api/safety/intents/catalog") { send(res, 200, { categories: requestRouter.CATEGORIES, cases: requestCorpus.cases, coverage: requestRouter.coverage(requestCorpus) }); return; }
       if (req.method === "GET" && url.pathname === "/api/safety/long-text/health") { send(res, 200, { ok: true, network_model_enabled: true, integrated: true, execution_allowed: false }); return; }
       if (req.method === "GET" && url.pathname === "/api/safety/policy") { send(res, 200, policy.describe()); return; }
       if (req.method === "GET" && url.pathname === "/api/safety/daily/policy") { send(res, 200, dailyEngine.describePolicy()); return; }
@@ -104,13 +109,16 @@ function createApplication({ directory = path.join(__dirname, ".runtime"), store
       }
       if (req.method === "GET" && url.pathname.startsWith("/api/audit/")) {
         const taskId = decodeURIComponent(url.pathname.slice("/api/audit/".length)); const task = gatewayFor(taskId).inspect(taskId, s.user_id);
-        if (task.kind === "DAILY_CASHFLOW") { send(res, 200, { core: task.model_review?.core_audit || null, core_provenance: "SESSION_SYNTHETIC_READ_ONLY", safety: store.events.filter(e => e.task_id === taskId) }); return; }
-        if (task.handoff_import) { send(res, 200, { core: task.handoff_import.original_response.audit_evidence, core_provenance: task.handoff_import.provenance, safety: store.events.filter((e) => (e.task_id || e.binding?.task_id) === taskId) }); return; }
-        send(res, 200, harness.getAudit(taskId)); return;
+        send(res, 200, {
+          core: task.handoff_import?.original_response.audit_evidence || task.core_audit || task.model_review?.core_audit || (task.kind === "DAILY_CASHFLOW" ? null : harness.getAudit(taskId)),
+          core_provenance: task.handoff_import?.provenance || (task.kind === "DAILY_CASHFLOW" ? "SESSION_SYNTHETIC_READ_ONLY" : "LOCAL_CORE"),
+          safety: store.events.filter((e) => (e.task_id || e.binding?.task_id) === taskId)
+        }); return;
       }
       if (req.method !== "POST") throw new GatewayError("NOT_FOUND", "接口不存在。", "ERROR", 404);
       if (req.headers["x-risk-csrf"] !== s.csrf) throw new GatewayError("CSRF_REQUIRED", "缺少当前会话的确认来源标识。", "BLOCK", 403);
       payload = await body(req);
+      if (url.pathname === "/api/safety/intents/classify") { send(res, 200, requestRouter.classify(payload)); return; }
       if (url.pathname.startsWith("/api/safety/long-text/")) {
         const bridge = new LongTextBridge({ store, gateway: dailyGateway });
         if (url.pathname === "/api/safety/long-text/plan-review") {

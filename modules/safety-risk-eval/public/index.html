@@ -1,9 +1,18 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>日常资金与风险工作台 · Personal AI Fund Manager</title><link rel="stylesheet" href="/risk/style.css"><link rel="stylesheet" href="/risk/daily.css"><script src="/risk/app.js" defer></script><script src="/risk/daily.js" defer></script></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>日常资金与风险工作台 · Personal AI Fund Manager</title><link rel="stylesheet" href="/risk/style.css"><link rel="stylesheet" href="/risk/daily.css"><link rel="stylesheet" href="/risk/intents.css"><script src="/risk/app.js" defer></script><script src="/risk/daily.js" defer></script><script src="/risk/intents.js" defer></script></head>
 <body>
 <header><a class="brand" href="/risk">Personal AI Fund Manager<span>风险检查与模拟执行</span></a><nav aria-label="页面导航"><a href="/investment">投资组合页面</a><a href="/risk" aria-current="page">风控工作台</a></nav><span class="mode">本机 · 虚构数据</span></header>
 <main>
+  <section id="intent-entry" aria-labelledby="intent-title">
+    <div class="section-title"><h1 id="intent-title">先分清需求，再安排下一步。</h1><span class="mode">需求分类入口</span></div>
+    <p>预算、还款、投资、比价或账户问题可以一起说。先看每件事归哪一类、能走到哪一步，再决定是否进入资金核对。</p>
+    <p id="intent-access" class="fine"></p>
+    <label for="intent-text">这次想处理什么？</label><textarea id="intent-text" maxlength="20000" rows="4" placeholder="例如：下月要还信用卡，想比价一台电脑，也想知道还可以拿多少钱投资。"></textarea>
+    <div class="actions"><button id="intent-classify" type="button" disabled>拆分需求并查看处理路径</button><span id="intent-status" role="status" aria-live="polite">正在连接分类服务…</span></div>
+    <div id="intent-result" hidden></div>
+    <details id="intent-samples"><summary>场景样本与分类覆盖</summary><p id="intent-coverage"></p><p class="fine">以下为开发编写的合成样本，不是已训练模型或真实用户准确率。可以按分类浏览并试用；错误分类应进入后续回归样本。</p><label for="intent-filter">选择需求类别</label><select id="intent-filter"></select><label for="intent-sample">选择场景</label><select id="intent-sample"></select><button id="intent-use-sample" type="button" class="secondary">将样本放入输入框</button><div id="intent-coverage-table"></div></details>
+  </section>
   <div class="workbench-modes" role="tablist" aria-label="工作台模式"><button type="button" id="mode-daily" role="tab" aria-controls="daily-workspace" aria-selected="true">日常资金</button><button type="button" id="mode-investment" role="tab" aria-controls="investment-workspace" aria-selected="false">投资与安全攻防</button></div>
   <div id="daily-workspace" role="tabpanel" aria-labelledby="mode-daily">
     <div class="daily-intro"><div><h1>先安排好生活，再安排投资。</h1><p>这笔钱投出去，会不会影响下次交学费、付房租？<br>把用途和日期确认清楚，再看程序给出的判断。</p></div><p class="daily-scope">虚构资料 · 不连接银行<br>规则由服务端计算；模拟只影响当前会话的沙箱账本。</p></div>

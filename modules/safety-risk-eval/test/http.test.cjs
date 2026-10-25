@@ -35,6 +35,29 @@ test("HTTP: original health handoff -> explicit profile -> approval -> protected
   const approved = await f.post("/api/safety/confirm", { task_id, risk_check_id: review.data.risk_check_id, binding: review.data.binding, accepted_reason_ids: [], confirmed: true });
   assert.equal(approved.data.status, "CONFIRMED");
   const result = await f.post("/api/paper-trade/execute", { task_id, idempotency_key: "approved-001" }); assert.equal(result.data.status, "SUCCEEDED");
+  assert.equal(result.data.result.mode, "SYNTHETIC_PAPER_ONLY");
+  const audit = await fetch(f.base + `/api/audit/${task_id}`, { headers: { cookie: f.cookie } }).then(r => r.json());
+  assert.equal(audit.core.task_id, task_id);
+  assert.equal(audit.core_provenance, "LOCAL_CORE");
+  assert.ok(audit.safety.some(e => e.event_type === "RISK_CHECK_COMPLETED"));
+  assert.ok(audit.safety.some(e => e.event_type === "PLAN_CONFIRMED"));
+  assert.ok(audit.safety.some(e => e.event_type === "EXECUTION_SUCCEEDED"));
+});
+test("HTTP: intent route and UI assets are live, disconnected operations remain unavailable", async t => {
+  const f = await start(t);
+  const catalog = await fetch(f.base + "/api/safety/intents/catalog", { headers: { cookie: f.cookie } }).then(r => r.json());
+  assert.equal(catalog.coverage.passed, catalog.coverage.total);
+  const page = await fetch(f.base + "/risk").then(r => r.text());
+  assert.match(page, /\/risk\/intents\.js/);
+  assert.equal((await fetch(f.base + "/risk/intents.js")).status, 200);
+  const classified = await f.post("/api/safety/intents/classify", { text: "检查我的持仓，也想转账" });
+  assert.equal(classified.status, 200);
+  assert.equal(classified.data.execution_allowed, false);
+  assert.ok(classified.data.groups.some(g => g.code === "TRANSFER" && g.capability === "NOT_CONNECTED"));
+  assert.ok(classified.data.next_actions.every(a => a.code !== "TRANSFER"));
+  const invalid = await f.post("/api/safety/intents/classify", { text: "转账", approved: true });
+  assert.equal(invalid.status, 422);
+  assert.equal(invalid.data.error.code, "INVALID_FIELDS");
 });
 test("HTTP: client-supplied approval and cross-origin requests never authorize execution", async (t) => {
   const f = await start(t), created = await f.post("/api/safety/tasks", profile), task_id = created.data.upstream.task_state.task_id;

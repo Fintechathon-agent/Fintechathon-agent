@@ -39,7 +39,7 @@ const prefix = `"use strict";\nconst crypto = require("node:crypto");\nconst { i
 fs.writeFileSync(path.join(generated, "contract.cjs"), prefix + original.slice(original.indexOf("const canonical =")));
 const mime = { ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8" };
 const assets = {};
-for (const file of ["index.html", "style.css", "app.js", "team-bootstrap.js", "daily.js", "daily.css"]) {
+for (const file of ["index.html", "style.css", "app.js", "team-bootstrap.js", "daily.js", "daily.css", "intents.js", "intents.css"]) {
   let body = fs.readFileSync(path.join(root, "../public", file), "utf8");
   if (file === "index.html") body = body.replaceAll("本机", "在线").replace("日志存于在线，未接团队正式认证与集中审计。", "演示日志保存于云端D1，未接团队正式账号；请只输入虚构资料。");
   assets[file === "index.html" ? "/risk" : "/risk/" + file] = { body, type: mime[path.extname(file)] };

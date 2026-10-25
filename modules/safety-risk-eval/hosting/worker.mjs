@@ -5,6 +5,8 @@ import dailyEngine from "../daily-engine.cjs";
 import dailyModel from "../daily-model.cjs";
 import longText from "../long-text.cjs";
 import planningModel from "../planning-model.cjs";
+import requestRouter from "../request-router.cjs";
+import requestCorpus from "../data/request-corpus.v1.json" with { type: "json" };
 import adapter from "../core-adapter.cjs";
 import security from "../security.cjs";
 import policy from "../policy.cjs";
@@ -49,8 +51,10 @@ export default {
     try {
       if (request.headers.get("origin") && request.headers.get("origin") !== url.origin) throw new GatewayError("ORIGIN_MISMATCH", "拒绝跨来源请求。", "BLOCK", 403);
       if (request.headers.get("sec-fetch-site") === "cross-site") throw new GatewayError("CROSS_SITE_REQUEST", "拒绝跨站请求。", "BLOCK", 403);
+      if (request.method === "GET" && url.pathname === "/api/safety/health") return json({ service: "risk-workbench", status: "ok", access: "HOSTED_HTTPS" });
       session = await getSession(env.DB, request);
       if (request.method === "GET" && url.pathname === "/api/safety/session") return json({ csrf: session.csrf, user_id: session.user_id, mode: "ONLINE_SYNTHETIC_DEMO" }, 200, session);
+      if (request.method === "GET" && url.pathname === "/api/safety/intents/catalog") return json({ categories: requestRouter.CATEGORIES, cases: requestCorpus.cases, coverage: requestRouter.coverage(requestCorpus) }, 200, session);
       if (request.method === "GET" && url.pathname === "/api/safety/long-text/health") return json({ ok: true, integrated: true, network_model_enabled: true, execution_allowed: false }, 200, session);
       if (request.method === "GET" && url.pathname === "/api/safety/policy") return json(policy.describe(), 200, session);
       if (request.method === "GET" && url.pathname === "/api/safety/daily/policy") return json(dailyEngine.describePolicy(), 200, session);
@@ -63,6 +67,7 @@ export default {
         const text = await request.text();
         if (new TextEncoder().encode(text).length > 65536) throw new GatewayError("BODY_TOO_LARGE", "演示请求过大。", "ERROR", 413);
         try { payload = JSON.parse(text); } catch { throw new GatewayError("INVALID_JSON", "请求必须是有效 JSON。", "ERROR", 400); }
+        if (url.pathname === "/api/safety/intents/classify") return json(requestRouter.classify(payload), 200, session);
       } else if (request.method !== "GET") throw new GatewayError("METHOD_NOT_ALLOWED", "不支持该操作。", "BLOCK", 405);
       store = await CloudStore.open(env.DB, session);
       const harness = new core.Harness();
