@@ -32,7 +32,7 @@ const DETAIL_LABELS = {
   portfolio_value: '组合市值', position_count: '持仓数', action: '动作', symbol: '标的',
   quantity: '数量', result: '结果', reason: '原因', method: '验证方式', channel: '通道',
   sms_code_ok: '短信验证', face_ok: '人脸识别', note: '说明', tier: '权限', removed_files: '清理文件',
-  price: '参考价', message: '回执',
+  price: '参考价', message: '回执', receipt: '模拟回执',
   intent: '意图', failure_count: '连续失败', breaker_locked: '熔断状态',
 };
 
@@ -742,7 +742,8 @@ function detailChips(entry) {
   const chips = [];
   Object.entries(entry).forEach(([k, v]) => {
     if (skip.has(k) || v === '' || v === null || v === undefined) return;
-    let text = Array.isArray(v) ? v.join(', ') : String(v);
+    let text = k === 'receipt' && v.message ? v.message
+      : typeof v === 'object' ? JSON.stringify(v) : String(v);
     if (k === 'portfolio_value' || k === 'price') text = `¥${money(text)}`;
     if (k === 'quantity') text = `${num(text)} 股`;
     if (k === 'result' && typeof v === 'boolean') text = v ? '通过' : '未通过';

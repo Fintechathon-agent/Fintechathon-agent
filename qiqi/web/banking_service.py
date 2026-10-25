@@ -40,6 +40,8 @@ SEED_PENDING_TTL_SECONDS = 2 * 60 * 60
 DEMO_AS_OF = "2026-10-11"
 DEMO_PROVENANCE = {
     "source": "demo_fixture",
+    "verification_mode": "DEMO_MOCK",
+    "identity_verified": False,
     "source_label": "演示固定数据",
     "simulation_notice": "演示模拟：不会发生真实资金转移、短信/人脸验证或外部下单。",
 }

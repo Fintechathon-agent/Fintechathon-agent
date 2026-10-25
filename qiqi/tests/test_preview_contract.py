@@ -32,6 +32,30 @@ def _request():
 
 
 class PreviewContractTests(unittest.TestCase):
+    def test_competition_holdings_are_100000_with_60_20_20_weights(self):
+        payload = _request()
+        payload["input"]["portfolio"] = {
+            "portfolio_id": "competition-fixture-60-20-20", "as_of": "2026-10-25", "cash": 0,
+            "positions": [{"instrument_id": f"SYNTHETIC-{index}", "quantity": 1, "price": amount}
+                          for index, amount in enumerate((60000, 20000, 20000))],
+        }
+        response = health_check_response(payload)
+        snapshot = response["artifacts"]["portfolio_snapshot"]
+        self.assertEqual(snapshot["total_assets"], 100000)
+        self.assertEqual([p["market_value"] for p in snapshot["positions"]], [60000, 20000, 20000])
+        self.assertEqual([p["weight"] for p in snapshot["positions"]], [0.6, 0.2, 0.2])
+        self.assertFalse(response["task_state"]["execution_allowed"])
+
+    def test_unknown_or_invalid_cash_cannot_be_assumed_zero(self):
+        for amount in (None, True, "unknown", float("nan"), float("inf")):
+            with self.subTest(cash=amount):
+                payload = _request()
+                payload["input"]["portfolio"]["cash"] = amount
+                response = health_check_response(payload)
+                self.assertEqual(response["task_state"]["status"], "WAITING_INPUT")
+                self.assertIn("input.portfolio.cash", response["task_state"]["missing_fields"])
+                self.assertNotIn("artifacts", response)
+
     def test_valid_request_returns_read_only_handoff_with_traceable_artifacts(self):
         response = health_check_response(_request())
         task = response["task_state"]

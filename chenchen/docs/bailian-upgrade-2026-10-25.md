@@ -1,6 +1,6 @@
 # 百炼 qwen3.8-flash 接入准备（2026-10-25）
 
-状态：**仅源码和替身测试通过；未设置新密钥，未发起百炼请求，未部署此分支。** 截图中的旧密钥已经暴露，必须在百炼控制台撤销；新密钥只写 Cloudflare Worker Secret，不进入仓库、聊天或命令参数。账户余额、业务空间权限、实际账单和收费测试预算仍待账户持有人核实。
+状态：**本分支仅源码和替身测试通过；本轮未设置新密钥、未发起收费推理、未部署此分支。** 10 月 25 日个人 `xinlan-qwen38-share` 健康接口已报告模型配置存在，其历史分支有 10 月 20 日调用记录；这些不等于本分支或团队 staging 接通。截图旧密钥不使用；新密钥只写服务端 Secret，不进入仓库、聊天或命令参数。账户余额、密钥轮换、业务空间权限、实际账单和收费测试预算仍待核实。
 
 阿里云[模型说明](https://help.aliyun.com/zh/model-studio/qwen3-8-flash)明确模型调用 ID 为 `qwen3.8-flash`，北京支持结构化输出与工具调用。本适配只使用 Chat Completions 的非流式 JSON 输出；这些能力的真实账户可用性尚未验证。北京[官方目录价](https://help.aliyun.com/zh/model-studio/model-pricing)为每百万输入 Token 0.8 元、输出 Token 2.7 元；优惠、免费额度与最终账单必须以账户为准。保留 `qwen3.7-flash` 及已核实日期快照作为代码回退选项，其北京短输入目录价更低，预算预估仍采用 3.8 的较高价格。
 
@@ -21,6 +21,6 @@
 
 - `node --test chenchen/tests/bailian.test.mjs chenchen/tests/bailian-worker.test.mjs`：17/17 通过，供应商 HTTP 全部替身；含 40.0203 分已记账、10 分占用、50 分上限的边界夹具。
 - `npm.cmd run check --prefix chenchen`：通过。
-- `npm.cmd test --prefix chenchen`：288/288 通过。
+- `npm.cmd test --prefix chenchen`：合入机器鉴权与联合验收分支后，317/317 通过。
 
-真实账户、非流式回答、流式回答、工具调用、Risk 联调和 staging 扣费对账均未在本轮完成；本分支不得据此切换生产模型。
+本机 Risk/Core HTTP 与 Finance/Risk/Core 三服务 HTTP 已使用模型替身通过，见 `docs/integration/competition-handoff-2026-10-25.md`。真实账户、非流式回答、流式回答、工具调用和 staging 扣费对账均未在本轮完成；本分支不得据此切换生产模型。

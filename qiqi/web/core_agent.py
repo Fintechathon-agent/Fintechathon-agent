@@ -9,19 +9,22 @@
 
 明确不做：
 - 不在失败时退回规则引擎（真实模型联调模式必须显示失败）；
-- 不生成审批或执行授权，``execution_allowed`` 永远是后端给的值；
+- 不生成审批或执行授权，本只读适配的 ``execution_allowed`` 永远为 False；
 - 不缓存、不重试到成功。
 
 环境变量：
     CORE_AGENT_BASE_URL   默认 https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev
-    CORE_AGENT_API_KEY    可选；后端未配置密钥时可不填
+    CORE_AGENT_API_KEY    受保护的团队后端必须配置机器身份密钥
     CORE_AGENT_TIMEOUT    默认 60 秒（后端建议客户端最多等 60 秒）
 """
 from __future__ import annotations
 
 import json
 import os
+import re
+import ipaddress
 import urllib.error
+import urllib.parse
 import urllib.request
 import uuid
 from typing import Any
@@ -33,6 +36,7 @@ REVIEW_VERSION = "model-review.v1"
 PROXY_ENV_HINT = "CORE_AGENT_PROXY"
 # Cloudflare 会拦截空 UA 的自动化请求（403），显式声明客户端身份。
 USER_AGENT = "finance-lab-core-agent-client/1.0 (+local demo)"
+MAX_RESPONSE_BYTES = 512 * 1024
 
 
 class CoreAgentError(RuntimeError):
@@ -45,7 +49,45 @@ class CoreAgentError(RuntimeError):
 
 
 def base_url() -> str:
-    return (os.environ.get("CORE_AGENT_BASE_URL") or DEFAULT_BASE_URL).rstrip("/")
+    raw = (os.environ.get("CORE_AGENT_BASE_URL") or DEFAULT_BASE_URL).strip()
+    try:
+        url = urllib.parse.urlsplit(raw)
+        host, port = url.hostname, url.port
+        loopback = host == "localhost"
+        if not loopback:
+            try:
+                loopback = ipaddress.ip_address(host or "").is_loopback
+            except ValueError:
+                pass
+        if (not host or url.username is not None or url.password is not None or port == 0
+                or url.query or url.fragment or url.path not in ("", "/")
+                or url.scheme not in ("https", "http") or url.scheme == "http" and not loopback):
+            raise ValueError("invalid origin")
+    except ValueError:
+        raise CoreAgentError("CORE_CONFIGURATION_INVALID：请配置 HTTPS 来源或本机回环地址。", 503) from None
+    return raw.rstrip("/")
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def _headers() -> dict[str, str]:
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+    key = (os.environ.get("CORE_AGENT_API_KEY") or "").strip()
+    if key:
+        headers["X-Core-Agent-Key"] = key
+    return headers
+
+
+def _read_response(response) -> bytes:
+    if 300 <= response.status < 400:
+        raise CoreAgentError("CORE_REDIRECT_REJECTED：服务地址发生跳转，未转发服务凭据。", 502)
+    raw = response.read(MAX_RESPONSE_BYTES + 1)
+    if len(raw) > MAX_RESPONSE_BYTES:
+        raise CoreAgentError("CORE_RESPONSE_TOO_LARGE：服务响应超过大小限制。", 502)
+    return raw
 
 
 def _timeout() -> float:
@@ -64,9 +106,9 @@ def _transport() -> urllib.request.OpenerDirector:
     proxy = (os.environ.get(PROXY_ENV_HINT) or "").strip()
     if proxy:
         return urllib.request.build_opener(
-            urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+            urllib.request.ProxyHandler({"http": proxy, "https": proxy}), _NoRedirect()
         )
-    return urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    return urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect())
 
 
 def build_request(question: str, *, kind: str = "combined",
@@ -75,11 +117,16 @@ def build_request(question: str, *, kind: str = "combined",
     text = (question or "").strip()
     if not text:
         raise ValueError("问题不能为空")
+    if len(text) > 6000:
+        raise ValueError("问题超过 6000 字；未截断或提交模型")
+    if idempotency_key is not None and (not isinstance(idempotency_key, str)
+            or not re.fullmatch(r"[A-Za-z0-9_-]{8,80}", idempotency_key)):
+        raise ValueError("请求编号应为 8—80 位字母、数字、下划线或连字符")
     return {
         "schema_version": REVIEW_VERSION,
         "kind": kind,
         "scenario": scenario,
-        "text": text[:6000],
+        "text": text,
         "data_mode": "SYNTHETIC_REPLAY",
         "execution_mode": "PAPER",
         "capability": "REVIEW_ONLY",
@@ -92,22 +139,16 @@ def post_review(payload: dict[str, Any]) -> tuple[int, dict[str, Any]]:
     """POST /api/review，原样返回 (HTTP 状态, JSON 体)。"""
     url = base_url() + "/api/review"
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    headers = {
-        "Content-Type": "application/json; charset=utf-8",
-        "User-Agent": USER_AGENT,
-        "Accept": "application/json",
-    }
-    api_key = (os.environ.get("CORE_AGENT_API_KEY") or "").strip()
-    if api_key:
-        headers["X-Core-Agent-Key"] = api_key
+    headers = {**_headers(), "Content-Type": "application/json; charset=utf-8"}
     request = urllib.request.Request(url, data=body, headers=headers, method="POST")
     try:
         with _transport().open(request, timeout=_timeout()) as response:
             status = response.status
-            raw = response.read()
+            raw = _read_response(response)
     except urllib.error.HTTPError as exc:
         status = exc.code
-        raw = exc.read()
+        with exc:
+            raw = _read_response(exc)
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         raise CoreAgentError(f"统一后端不可达：{exc}", 0) from exc
 
@@ -192,7 +233,7 @@ def to_ui_response(status: int, record: dict[str, Any]) -> dict[str, Any]:
         "audit_id": (record.get("audit") or {}).get("audit_id") if isinstance(record.get("audit"), dict) else None,
         "workflow_status": workflow_status,
         "execution_state": execution_state,
-        "execution_allowed": bool(handoff.get("execution_allowed", False)),
+        "execution_allowed": False,
         "decision_source": "model" if model["call_succeeded"] else "none",
         "model_status": "live" if model["call_succeeded"] else "unavailable",
         "model": model,
@@ -229,16 +270,17 @@ def review(question: str, **kwargs: Any) -> dict[str, Any]:
 def _get(path: str) -> tuple[int, dict[str, Any]]:
     request = urllib.request.Request(
         base_url() + path,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+        headers=_headers(),
         method="GET",
     )
     try:
         with _transport().open(request, timeout=min(_timeout(), 15.0)) as response:
             status = response.status
-            raw = response.read()
+            raw = _read_response(response)
     except urllib.error.HTTPError as exc:
         status = exc.code
-        raw = exc.read()
+        with exc:
+            raw = _read_response(exc)
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         raise CoreAgentError(f"统一后端不可达：{exc}", 0) from exc
     try:

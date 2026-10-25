@@ -561,6 +561,10 @@ class DemoApp:
         approved = payload.get("approved") is True
         comment = str(payload.get("comment", "")).strip()
 
+        if approved and self.mode != "demo":
+            return {"success": False, "executed": False, "error_code": "TRUSTED_APPROVAL_REQUIRED",
+                    "message": "真实模型联调未接可信审批身份；演示验证码和人脸标记不能授权执行。"}
+
         # 熔断锁定期间拒绝一切裁决（fail-closed，需先人工恢复）
         if approved and get_breaker().is_locked():
             return {
@@ -1084,6 +1088,7 @@ class Handler(BaseHTTPRequestHandler):
                         str(body.get("question", "")),
                         kind=str(body.get("kind") or "combined"),
                         scenario=str(body.get("scenario") or "GENERAL_REVIEW"),
+                        idempotency_key=body.get("idempotency_key"),
                     )
                 except ValueError as exc:
                     return self._json({"error": str(exc), "engine": "core-agent"}, 400)
@@ -1101,7 +1106,8 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json(preview_error_response("不支持的 Preview 请求契约。", "CONTRACT_UNSUPPORTED"), 400)
                 return self._json(self.app.preview_health_check(body))
             if path == "/api/decide":
-                return self._json(self.app.decide(body))
+                result = self.app.decide(body)
+                return self._json(result, 403 if result.get("error_code") == "TRUSTED_APPROVAL_REQUIRED" else 200)
             if path == "/api/breaker/reset":
                 return self._json(self.app.breaker_reset())
             if path == "/api/reset":
@@ -1113,6 +1119,10 @@ class Handler(BaseHTTPRequestHandler):
                 except ValueError as exc:
                     return self._json({"error": str(exc)}, 400)
             if path == "/api/scenarios/confirm":
+                if self.app.mode != "demo":
+                    return self._json({"success": False, "executed": False,
+                        "error_code": "TRUSTED_APPROVAL_REQUIRED",
+                        "message": "真实模型联调未接可信审批身份；客户端验证标记不能授权执行。"}, 403)
                 from web.banking_service import confirm_action
                 return self._json(confirm_action(body))
             if path == "/api/scenarios/cancel":

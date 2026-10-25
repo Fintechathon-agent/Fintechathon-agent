@@ -21,9 +21,9 @@ class BuildRequestTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             core_agent.build_request("   ")
 
-    def test_question_is_capped(self):
-        payload = core_agent.build_request("啊" * 9000)
-        self.assertEqual(len(payload["text"]), 6000)
+    def test_overlong_question_is_rejected_without_truncation(self):
+        with self.assertRaisesRegex(ValueError, "未截断"):
+            core_agent.build_request("啊" * 9000)
 
 
 def _record(**overrides):

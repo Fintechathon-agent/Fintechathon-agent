@@ -326,4 +326,4 @@ async function runLocalAcceptance(snapshot) {
     live_acceptance_requirements: ["VERIFY_PRODUCTION_WORKER_SHARED_CORE_RISK_TASK", "VERIFY_REAL_MODEL_RISK_CHAIN_WITH_AUTHORIZED_BUDGET", "VERIFY_REAL_USER_APPROVAL_AND_PAPER_ACCOUNT_GATEWAY"] };
 }
 
-module.exports = { runLocalAcceptance, MODEL_LABEL, APPROVAL_LABEL };
+module.exports = { runLocalAcceptance, createCoreHttpContext: context, MODEL_LABEL, APPROVAL_LABEL };
