@@ -25,7 +25,7 @@ async function clickScenario(page, locator, expectedScenario) {
   if (!payload.delegated && payload.result?.scenario !== expectedScenario) {
     throw new Error(`scenario response mismatch: expected ${expectedScenario}, got ${payload.result?.scenario || 'none'}`);
   }
-  await page.locator('#banking-feedback.success').waitFor();
+  await page.locator(`#banking-feedback.${payload.delegated ? 'info' : 'success'}`).waitFor();
   if (payload.delegated) {
     await page.locator('#banking-result .assistant-line').waitFor();
   } else {
@@ -46,8 +46,18 @@ async function main() {
     await openClean(page);
     const chip = page.locator(`.scenario-chip[data-key="${key}"]`);
     if (await chip.count() !== 1) throw new Error(`scenario button missing: ${key}`);
+    const reviewResponse = key === 'wealth' ? page.waitForResponse((response) =>
+      response.url().includes('/api/review') && response.request().method() === 'POST') : null;
     const resultText = await clickScenario(page, chip, key);
     if (!resultText) throw new Error(`scenario button produced no visible result: ${key}`);
+    if (reviewResponse) {
+      const response = await reviewResponse;
+      if (!response.ok()) throw new Error(`unified wealth review failed: ${response.status()}`);
+      const submitted = response.request().postDataJSON();
+      if (!submitted.question || submitted.question !== await page.locator('#nl-question').inputValue()) {
+        throw new Error('unified entry did not pass the wealth question to the review task');
+      }
+    }
     results[key] = resultText.split('\n').slice(0, 3).join(' / ');
   }
 

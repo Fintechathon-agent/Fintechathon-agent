@@ -116,6 +116,21 @@ class GuestHttpTests(unittest.TestCase):
         self.assertEqual(a.ok("/api/bootstrap")["portfolio"]["cash"], cash)
         self.assertEqual(a.ok("/api/scenarios/boot")["balance"], cash)
 
+    def test_one_guest_entry_handles_bill_transfer_and_investment(self):
+        a = self.client()
+        guest = a.ok("/api/account")["user_id"]
+        bill = a.ok("/api/scenarios/run", {"question": "这个月账单分析"})
+        self.assertEqual(bill["result"]["scenario"], "bill")
+        self.assertEqual(bill["result"]["status"], "done")
+        transfer = a.ok("/api/scenarios/run", {"question": "给张伟转账700元，备注房租"})
+        self.assertEqual(transfer["result"]["scenario"], "transfer")
+        self.assertEqual(transfer["result"]["status"], "pending_confirmation")
+        self.assertTrue(a.ok("/api/scenarios/confirm", {"id": transfer["pending"][-1]["id"]})["success"])
+        review = a.ok("/api/review", {"question": "平安银行卖出30%"})
+        self.assertTrue(review["queued"])
+        self.assertEqual(a.ok("/api/account")["user_id"], guest)
+        self.assertEqual(a.ok("/api/bootstrap")["portfolio"]["cash"], 24980.50)
+
     def test_signed_cookie_mode_csrf_identity_and_private_worker_boundaries(self):
         anonymous = Client(self.server.server_port)
         self.assertEqual(anonymous.request("/api/account")[0], 401)

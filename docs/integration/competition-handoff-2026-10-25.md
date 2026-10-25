@@ -2,6 +2,8 @@
 
 > 最新续办入口为 `qiqi/web/guest_gateway.py --port 8877`：本机访客隔离、Finance 统一账本及 262 项回归已完成；每日 20 元测试预算已获用户批准。权限申请文本、当前限制和真实模型/设备验收步骤见 [续办记录](staging-access-and-guests-2026-10-25.md)。下文保留上一轮证据与统计，不能将旧的 0 元授权当作最新授权。
 
+> 统一入口 P0 的本地断点已修复：顶部自然语言输入会自动委派理财请求并发起 `/api/review`，同一访客会话的三场景 HTTP 验收 12/12 通过。公开主聊天源码与团队 staging 仍缺失，故线上同任务闭环未通过。详见 [本地修复与接线边界](unified-entry-local-2026-10-25.md)。
+
 交付分支 `codex/competition-integration-20261025`，[Draft PR #31](https://github.com/Fintechathon-agent/Fintechathon-agent/pull/31)。当前是本地集成候选版，**未完成线上 staging 验收，未生产发布**。模块与唯一 Owner、版本来源、实际架构和阻塞见 [审计](audit-2026-10-25.md)。
 
 ## 可运行与可展示内容

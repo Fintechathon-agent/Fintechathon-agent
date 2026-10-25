@@ -1,6 +1,6 @@
 /* 银行 AI 智能体 · 六场景统一入口（2026-10-11）
    依赖 app.js 的全局工具：api / esc / money / num / toast / tierBadge。
-   只负责场景板块自身，不触碰理财深度分析链路 UI。 */
+   理财请求由统一入口委派给现有理财审查，不复制执行逻辑。 */
 (function () {
   'use strict';
 
@@ -195,16 +195,23 @@
       if (currentBillFile && /账单|流水|支出|消费|扣款|明细/.test(question)) body.bill_file = currentBillFile;
       const res = await api('/api/scenarios/run', { method: 'POST', body });
       if (res.delegated) {
+        const reviewInput = $('#nl-question');
+        const reviewButton = $('#btn-review');
+        if (!reviewInput || !reviewButton || reviewButton.disabled) {
+          throw new Error('理财分析当前不可用，请稍后重试');
+        }
+        reviewInput.value = question;
         $('#banking-result').innerHTML = `
-          <div class="assistant-line">🏦 这是理财请求，已交给右侧「理财深度分析」闭环处理。
-          请到右侧输入框发起（例如「平安银行卖出 30%」）。</div>`;
+          <div class="assistant-line">🏦 已从统一入口发起理财分析。请在理财分析区查看任务计划、风险检查与审批状态。</div>`;
+        reviewButton.click();
       } else {
         renderScenarioResult(res.result);
         if (res.deduplicated) toast('相同待确认请求已合并，仍需完成一次确认');
       }
-      renderBankingPending(res);
-      feedback(res.delegated ? '理财请求已转到右侧深度分析。' : '这一步已经完成，下面是结果。', 'success');
-      if (resultBox) window.requestAnimationFrame(() => resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+      if (!res.delegated) renderBankingPending(res);
+      feedback(res.delegated ? '理财分析已发起，结果与审批状态显示在理财分析区。' : '这一步已经完成，下面是结果。', res.delegated ? 'info' : 'success');
+      const target = res.delegated ? $('.agent-card') : resultBox;
+      if (target) window.requestAnimationFrame(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     } catch (err) {
       toast(`发起失败：${err.message}`);
       feedback(`没有完成：${err.message}`, 'error');
