@@ -1,0 +1,48 @@
+{
+  "report_version": "core-risk-auth-readiness.v1",
+  "date_asia_shanghai": "2026-10-21",
+  "team_baseline": "23a978ea4b24809a201812853bfcf4a0549da023",
+  "risk_pr": 27,
+  "risk_commit": "27bdefbbb38c7d4e7b7dc1f975217862832d1d6f",
+  "verification_scope": "LOCAL_SYNTHETIC_AND_READ_ONLY_PUBLIC_CAPABILITIES",
+  "checks": [
+    { "name": "core_node", "passed": 304, "failed": 0 },
+    { "name": "core_security_subset_included_in_core_node", "passed": 20, "failed": 0 },
+    { "name": "pr27_unmodified_node_snapshot", "passed": 258, "failed": 0 },
+    { "name": "pr27_unmodified_python_snapshot", "passed": 16, "failed": 0 },
+    { "name": "core_worker_with_pr27_adapters", "passed": 5, "failed": 0, "transport": "IN_PROCESS_FETCH_NOT_PUBLIC_HTTP" },
+    { "name": "pr27_original_python_node_local_http_helper", "status": "PASS", "synthetic_model_calls": 1, "real_model_calls": 0, "shortfall_yuan": "2000.00", "callback": "RECORDED", "idempotent_replay": true },
+    { "name": "pr27_examples", "callback_cases": 4, "money_vectors": 12, "status": "PASS" }
+  ],
+  "iterations": [
+    { "stage": "new_regression_tests_before_implementation", "passed": 6, "failed": 6, "reason": "Missing strict machine-key guard, fixed-reviewer guard, readiness metadata and new preflight script." },
+    { "stage": "core_first_full_run", "passed": 295, "failed": 1, "reason": "Existing strict account-summary test harness lacked its machine key. Added synthetic identity and request headers without relaxing assertions." },
+    { "stage": "pr27_first_compatibility_run", "passed": 247, "failed": 11, "reason": "Requiring a fixed reviewer under the existing strict-signature flag broke old fixtures. Introduced an explicit REQUIRE_RISK_REVIEWER opt-in; release readiness requires it, while old signed-only tests stay unchanged." },
+    { "stage": "python_first_environment_run", "passed": 12, "import_errors": 4, "reason": "PyYAML was absent from the bundled runtime; installed pinned PyYAML 6.0.3 in an isolated environment." }
+  ],
+  "read_only_public_probe": {
+    "endpoint": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/api/review/capabilities",
+    "http_status": 200,
+    "model_configured": true,
+    "inference_probe": "NOT_RUN",
+    "risk_callback_signature_configured": false,
+    "risk_dispatch_url_configured": false,
+    "approval_signature_configured": false,
+    "joint_acceptance": false
+  },
+  "shared_contract_fields_changed": false,
+  "risk_owner_source_modified": false,
+  "production_configuration_changed": false,
+  "deployed": false,
+  "real_model_calls": 0,
+  "real_fund_actions": 0,
+  "execution_allowed": false,
+  "joint_acceptance": false,
+  "remaining": [
+    "Owner review of Core security configuration changes and PR27",
+    "Provision matching server-side machine credential, HMAC secret and fixed reviewer on both sides",
+    "Run or deploy the loopback Risk Node bridge with its Python server-side proxy",
+    "Agree model test budget before any real inference",
+    "Deploy reviewed versions and verify the public callback, human approval identity and audit chain"
+  ]
+}

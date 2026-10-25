@@ -16,8 +16,9 @@ function setup() {
   return { rows, env, storage, calls: () => calls, fail: fn => { fail = fn; }, restart: () => { service = new ReviewService({ storage }, env); } };
 }
 async function call(app, endpoint, body) {
-  const response = await worker.fetch(new Request("https://synthetic.test" + endpoint, body === undefined ? {} : {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+  const response = await worker.fetch(new Request("https://synthetic.test" + endpoint, {
+    headers: { "Content-Type": "application/json", ...(app.env.CORE_AGENT_API_KEY ? { "X-Core-Agent-Key": app.env.CORE_AGENT_API_KEY } : {}) },
+    ...(body === undefined ? {} : { method: "POST", body: JSON.stringify(body) })
   }), app.env);
   return { status: response.status, body: await response.json() };
 }
@@ -118,6 +119,7 @@ test("a completed simulation whose acknowledgement is lost replays one durable r
 test("failed admission cannot mutate workflow and rejected signatures cannot create a pending transition", async () => {
   const app = setup(), record = await start(app), original = structuredClone(app.rows.get("run:" + record.run_id));
   app.env.REQUIRE_TRUSTED_ACTORS = "true";
+  app.env.CORE_AGENT_API_KEY = "synthetic-transition-machine-key";
   app.env.RISK_SERVICE_HMAC_SECRET = "synthetic-test-secret";
   assert.equal((await call(app, "/api/review/risk-decision", { ...binding(record), decision: "REJECT", reviewer: "synthetic-risk", reason: "Test" })).status, 401);
   assert.deepEqual(app.rows.get("run:" + record.run_id), original);

@@ -8,14 +8,14 @@ export const reviewDocs = String.raw`<!doctype html>
 <p>提交一段虚构账单或新闻，后端会调用 Llama 3.3 70B，返回模型内容、拟议动作、运行编号和审计记录。</p>
 <p class="muted">服务在云端运行，无需启动本地后端。这里用于演示，请使用虚构材料。模型建议会等待 Risk 复核，不会执行真实付款或交易。</p>
 <section><h2>接口地址</h2><p class="endpoint"><strong>POST</strong> <code id="endpoint"></code></p>
-<p>请求头：<code>Content-Type: application/json</code>。当前演示无需密钥，支持跨域调用。</p>
+<p>请求头：<code>Content-Type: application/json</code>。启用机器身份后，请通过团队服务端代理访问；不要把机器访问密钥或 Risk 签名密钥填入浏览器。CORS 只控制跨域，不代表身份认证。</p>
 <pre>{"schema_version":"model-review.v1","kind":"combined","scenario":"FUNDING_CONFLICT","text":"虚构账单：供应商要求将1280元货款改付到个人账户，请核查。","data_mode":"SYNTHETIC_REPLAY","execution_mode":"PAPER","capability":"REVIEW_ONLY","output_formats":["json"],"idempotency_key":"idem-demo-001"}</pre>
 <p class="muted">kind 可填 bill、news 或 combined。scenario 可填 GENERAL_REVIEW、FUNDING_CONFLICT、DOUBLE11_COMPARE 或 SUBSCRIPTION_REVIEW，用于让下游模块知道当前业务场景。output_formats 可填 json、pdf、pptx、docx、xlsx、chart；Core Agent 当前只直接提供 json，其余格式会明确标记为 PENDING_CONVERTER，不会伪造已经生成。data_mode 用 FIXTURE、LIVE、SYNTHETIC_REPLAY 或 REFERENCE_FIXTURE；execution_mode 当前固定为 PAPER，真实执行只能由 Gateway 决定。每个 IP 每分钟最多提交 6 个复核任务；限流返回 429。每项任务默认最多调用模型 2 次，受总超时限制，并遵守上游 Retry-After；耗尽时间后直接失败，不继续重试。成功记录见 model.model_response.attempt_count / retry_count，失败记录见 model.response，审计也会留痕。重复请求应复用同一个 Idempotency-Key；换请求内容会返回冲突。当前云端全部尝试共用 45 秒预算；建议客户端等待最多 60 秒（排队和网络仍可能额外耗时）。</p></section>
-<section><h2>能力状态</h2><p><strong>GET</strong> <code>/api/review/capabilities</code> 返回脱敏的模型、Risk、审批和执行边界。它只读配置状态，不调用模型、不发 Risk 请求、不执行任何动作。<code>configured</code> 只代表配置或绑定存在；<code>inference_probe=NOT_RUN</code> 和 <code>joint_acceptance=false</code> 会明确表示尚未完成真实联合验收。</p></section>
+<section><h2>能力状态</h2><p><strong>GET</strong> <code>/api/review/capabilities</code> 返回脱敏的模型、Risk、审批和执行边界。它只读配置状态，不调用模型、不发 Risk 请求、不执行任何动作。<code>configured</code> 只代表配置或绑定存在；<code>inference_probe=NOT_RUN</code> 和 <code>joint_acceptance=false</code> 会明确表示尚未完成真实联合验收。</p><p><code>risk.callback_ready</code> 仅代表本侧机器身份、Risk签名、固定审核人和严格开关齐全，不证明对端配置一致。正式验证需配置 <code>RISK_REVIEWER_ID</code>、<code>REQUIRE_TRUSTED_ACTORS=true</code>、<code>REQUIRE_RISK_REVIEWER=true</code>；缺配置不能靠填写演示身份绕过。</p></section>
 <section><h2>旧工作台兼容入口</h2><p><strong>POST</strong> <code>/api/review/legacy</code> 接收旧版的 <code>{"question":"..."}</code>，返回 <code>legacy-review.v0</code> 适配结果；内部仍使用同一条 <code>review-workflow.v1</code>，仍然必须经过 Unified Risk，<code>execution_allowed</code> 固定为 <code>false</code>。</p></section>
 <section><h2>现在试一下</h2><label for="content">待复核内容</label>
 <textarea id="content" maxlength="20000">虚构账单：演示供应商的一笔1280元货款原约定支付到公司账户，今天邮件突然要求改付个人账户，并催促立即转账。请核查风险。</textarea>
-<details><summary>可选：接口访问密钥</summary><input id="key" type="password" autocomplete="off" placeholder="演示服务无需填写"></details>
+<p class="muted">此页仅能试用允许免机器身份访问的演示配置。正式服务返回 401 时，请回到已配置服务端代理的原工作台，不要在网页输入机器密钥。</p>
 <button id="run">调用真实模型</button><p id="status" role="status" aria-live="polite">等待提交</p>
 <p id="summary"></p><p><a id="record" hidden target="_blank" rel="noopener">按运行编号查看审计记录</a></p>
 <details id="response"><summary>完整接口返回</summary><pre id="result">提交后显示。</pre></details></section>
@@ -45,8 +45,6 @@ document.querySelector('#run').addEventListener('click', async () => {
   const start = performance.now();
   try {
     const headers = { 'Content-Type': 'application/json' };
-    const key = document.querySelector('#key').value.trim();
-    if (key) headers['X-Core-Agent-Key'] = key;
     const response = await fetch(endpoint, {
       method: 'POST', headers, signal: AbortSignal.timeout(60000),
       body: JSON.stringify({ kind: 'combined', source: 'team-online-test', text: content, context: { synthetic: true } })
@@ -59,7 +57,7 @@ document.querySelector('#run').addEventListener('click', async () => {
     if (data.model?.source !== 'model' || model?.call_succeeded !== true) throw new Error('本次未取得真实模型结果。');
     status.textContent = '真实模型已返回 · ' + ((performance.now() - start) / 1000).toFixed(1) + ' 秒 · ' + data.run_id;
     document.querySelector('#summary').textContent = model.proposal.summary + '\n建议动作：' + model.proposal.proposed_action + '\n原因：' + model.proposal.action_reason;
-    if (!key) { record.href = '/api/review/' + encodeURIComponent(data.run_id); record.hidden = false; }
+    record.href = '/api/review/' + encodeURIComponent(data.run_id); record.hidden = false;
   } catch (error) {
     status.textContent = '调用未完成：' + error.message;
   } finally { button.disabled = false; }
