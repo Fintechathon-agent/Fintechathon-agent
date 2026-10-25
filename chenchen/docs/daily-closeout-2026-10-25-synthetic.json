@@ -1,0 +1,3348 @@
+{
+  "request": {
+    "contract_version": "investment-agent.v1",
+    "request_id": "req-daily-20261025-health",
+    "operation": "PORTFOLIO_HEALTH_CHECK",
+    "context": {
+      "actor": "agent",
+      "environment": "demo",
+      "data_mode": "SYNTHETIC_REPLAY",
+      "task_id": null,
+      "session_id": null
+    },
+    "input": {
+      "risk_profile": {
+        "investment_horizon_days": 365,
+        "max_drawdown": 0.1,
+        "liquidity_need": "medium"
+      },
+      "portfolio": {
+        "portfolio_id": "golden-demo-portfolio",
+        "as_of": "2026-09-23T08:00:00Z",
+        "cash": 10000,
+        "positions": [
+          {
+            "instrument_id": "EQUITY_ALPHA",
+            "name": "Alpha Holdings",
+            "type": "A_SHARE",
+            "sector": "Technology",
+            "quantity": 100,
+            "price": 47.2
+          },
+          {
+            "instrument_id": "ETF_GROWTH",
+            "name": "Growth ETF",
+            "type": "ETF",
+            "sector": "Technology",
+            "quantity": 100,
+            "price": 75.5
+          },
+          {
+            "instrument_id": "ETF_CONSUMER",
+            "name": "Consumer ETF",
+            "type": "ETF",
+            "sector": "Consumer",
+            "quantity": 100,
+            "price": 47.6
+          },
+          {
+            "instrument_id": "ETF_BOND",
+            "name": "Bond ETF",
+            "type": "ETF",
+            "sector": "Fixed Income",
+            "quantity": 100,
+            "price": 40.5
+          }
+        ]
+      },
+      "market_context": null
+    }
+  },
+  "response": {
+    "contract_version": "investment-agent.v1",
+    "request_id": "req-daily-20261025-health",
+    "operation": "PORTFOLIO_HEALTH_CHECK",
+    "trace": {
+      "contract_version": "investment-agent.v1",
+      "request_id": "req-daily-20261025-health",
+      "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "session_id": "session-3b45ddbe-a5c8-4cad-bc31-9f17b08c022f"
+    },
+    "task_state": {
+      "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "session_id": "session-3b45ddbe-a5c8-4cad-bc31-9f17b08c022f",
+      "contract_version": "investment-agent.v1",
+      "request_id": "req-daily-20261025-health",
+      "intent": "PORTFOLIO_HEALTH_CHECK",
+      "stage": "RISK_CHECK",
+      "status": "HANDOFF_REQUIRED",
+      "risk_profile": {
+        "investment_horizon_days": 365,
+        "max_drawdown": 0.1,
+        "liquidity_need": "medium"
+      },
+      "missing_fields": [],
+      "portfolio_snapshot_id": "snapshot-de37f3dab3586cd6",
+      "risk_profile_id": "risk-profile-2c5fc10a-a3c3-4578-bcd6-3d2cbaa7eda9",
+      "tool_result_refs": [
+        "trace-47a06c109ce838e8",
+        "trace-806989342cd10329",
+        "trace-b859fe1a05c6b119",
+        "trace-1f704db52146f8f1"
+      ],
+      "proposed_action_ids": [
+        "proposal-a-74ef228729",
+        "proposal-b-53a1666dd2",
+        "proposal-c-45eb627fc2"
+      ],
+      "risk_decision_id": null,
+      "approval_id": null,
+      "error_state": null,
+      "checkpoint": {
+        "stage": "RISK_CHECK",
+        "completed": [
+          "VALIDATE_INPUT",
+          "DIAGNOSE",
+          "GENERATE_CANDIDATES",
+          "SIMULATE"
+        ],
+        "result_refs": {
+          "VALIDATE_INPUT": "trace-47a06c109ce838e8",
+          "DIAGNOSE": "trace-806989342cd10329",
+          "GENERATE_CANDIDATES": "trace-b859fe1a05c6b119",
+          "SIMULATE": "trace-1f704db52146f8f1"
+        },
+        "resume_token": "resume-bb97dda4-3aca-4426-965f-08fb125f2b95",
+        "last_tool_result_ref": "trace-1f704db52146f8f1"
+      },
+      "handoff": {
+        "owner": "Safety/Risk/Eval",
+        "reason": "Risk decision is outside Agent Core and Tools ownership."
+      }
+    },
+    "artifacts": {
+      "portfolio_snapshot": {
+        "snapshot_id": "snapshot-de37f3dab3586cd6",
+        "portfolio_id": "golden-demo-portfolio",
+        "as_of": "2026-09-23T08:00:00Z",
+        "positions": [
+          {
+            "instrument_id": "EQUITY_ALPHA",
+            "name": "Alpha Holdings",
+            "type": "A_SHARE",
+            "sector": "Technology",
+            "quantity": 100,
+            "price": 47.2,
+            "market_value": 4720,
+            "weight": 0.15186615
+          },
+          {
+            "instrument_id": "ETF_GROWTH",
+            "name": "Growth ETF",
+            "type": "ETF",
+            "sector": "Technology",
+            "quantity": 100,
+            "price": 75.5,
+            "market_value": 7550,
+            "weight": 0.24292149
+          },
+          {
+            "instrument_id": "ETF_CONSUMER",
+            "name": "Consumer ETF",
+            "type": "ETF",
+            "sector": "Consumer",
+            "quantity": 100,
+            "price": 47.6,
+            "market_value": 4760,
+            "weight": 0.15315315
+          },
+          {
+            "instrument_id": "ETF_BOND",
+            "name": "Bond ETF",
+            "type": "ETF",
+            "sector": "Fixed Income",
+            "quantity": 100,
+            "price": 40.5,
+            "market_value": 4050,
+            "weight": 0.13030888
+          }
+        ],
+        "cash": 10000,
+        "cash_weight": 0.32175032,
+        "total_value": 31080,
+        "data_quality": {
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        }
+      },
+      "health_report": {
+        "report_id": "health-45f227c09db8cce7",
+        "snapshot_id": "snapshot-de37f3dab3586cd6",
+        "metrics": {
+          "cumulative_return": -0.02789133,
+          "annualized_return": -0.69519485,
+          "annualized_volatility": 0.15334647,
+          "max_drawdown": -0.02789133,
+          "sharpe_ratio": -7.79583962,
+          "ending_index": 0.97210867
+        },
+        "cash_weight": 0.32175032,
+        "concentration": {
+          "hhi": 0.22603374,
+          "hhi_basis": "all assets including cash; top-N excludes cash",
+          "top_1": 0.24292149,
+          "top_3": 0.54794079,
+          "largest_instrument": "ETF_GROWTH"
+        },
+        "correlation_matrix": {
+          "EQUITY_ALPHA": {
+            "EQUITY_ALPHA": 1,
+            "ETF_GROWTH": 0.988122,
+            "ETF_CONSUMER": 0.938165,
+            "ETF_BOND": -0.825061
+          },
+          "ETF_GROWTH": {
+            "EQUITY_ALPHA": 0.988122,
+            "ETF_GROWTH": 1,
+            "ETF_CONSUMER": 0.97728,
+            "ETF_BOND": -0.815422
+          },
+          "ETF_CONSUMER": {
+            "EQUITY_ALPHA": 0.938165,
+            "ETF_GROWTH": 0.97728,
+            "ETF_CONSUMER": 1,
+            "ETF_BOND": -0.819951
+          },
+          "ETF_BOND": {
+            "EQUITY_ALPHA": -0.825061,
+            "ETF_GROWTH": -0.815422,
+            "ETF_CONSUMER": -0.819951,
+            "ETF_BOND": 1
+          }
+        },
+        "hidden_clusters": [
+          {
+            "instruments": [
+              "EQUITY_ALPHA",
+              "ETF_GROWTH"
+            ],
+            "correlation": 0.988122
+          },
+          {
+            "instruments": [
+              "EQUITY_ALPHA",
+              "ETF_CONSUMER"
+            ],
+            "correlation": 0.938165
+          },
+          {
+            "instruments": [
+              "ETF_GROWTH",
+              "ETF_CONSUMER"
+            ],
+            "correlation": 0.97728
+          }
+        ],
+        "attention_points": [
+          "largest position exceeds 20%",
+          "multiple instruments move together in the fixed window"
+        ],
+        "data_window": {
+          "start": "2026-09-15",
+          "end": "2026-09-23",
+          "observations": 7,
+          "annualization_factor": 252
+        }
+      },
+      "candidates": [
+        {
+          "proposal_id": "proposal-a-74ef228729",
+          "plan_id": "A",
+          "label": "Keep / minimum action",
+          "objective": "preserve the current allocation and avoid unnecessary turnover",
+          "target_weights": {
+            "CASH": 0.32175033,
+            "EQUITY_ALPHA": 0.15186615,
+            "ETF_GROWTH": 0.24292149,
+            "ETF_CONSUMER": 0.15315315,
+            "ETF_BOND": 0.13030888
+          },
+          "actions": [
+            {
+              "instrument_id": "CASH",
+              "from_weight": 0.32175033,
+              "to_weight": 0.32175033,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "EQUITY_ALPHA",
+              "from_weight": 0.15186615,
+              "to_weight": 0.15186615,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_BOND",
+              "from_weight": 0.13030888,
+              "to_weight": 0.13030888,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_CONSUMER",
+              "from_weight": 0.15315315,
+              "to_weight": 0.15315315,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_GROWTH",
+              "from_weight": 0.24292149,
+              "to_weight": 0.24292149,
+              "delta_weight": 0,
+              "side": "HOLD"
+            }
+          ],
+          "constraints": {
+            "max_single_asset_weight": 0.35,
+            "max_turnover": 0.05,
+            "objective": "minimum_action"
+          },
+          "turnover": 0,
+          "rationale": [
+            "No hard constraint is currently violated; keep the baseline for comparison."
+          ],
+          "expected_metrics": {
+            "max_single_asset_weight": 0.24292149,
+            "cash_weight": 0.32175033
+          },
+          "proposal_hash": "b1c4acfbd501a4221e0e7e766b395102138a5ad99315c7cbcd06e33f243a7b74",
+          "validation": {
+            "valid": true,
+            "errors": []
+          }
+        },
+        {
+          "proposal_id": "proposal-b-53a1666dd2",
+          "plan_id": "B",
+          "label": "Moderate rebalance",
+          "objective": "reduce the largest position with bounded turnover",
+          "target_weights": {
+            "CASH": 0.36467182,
+            "EQUITY_ALPHA": 0.15186615,
+            "ETF_GROWTH": 0.2,
+            "ETF_CONSUMER": 0.15315315,
+            "ETF_BOND": 0.13030888
+          },
+          "actions": [
+            {
+              "instrument_id": "CASH",
+              "from_weight": 0.32175033,
+              "to_weight": 0.36467182,
+              "delta_weight": 0.04292149,
+              "side": "BUY_OR_HOLD_CASH"
+            },
+            {
+              "instrument_id": "EQUITY_ALPHA",
+              "from_weight": 0.15186615,
+              "to_weight": 0.15186615,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_BOND",
+              "from_weight": 0.13030888,
+              "to_weight": 0.13030888,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_CONSUMER",
+              "from_weight": 0.15315315,
+              "to_weight": 0.15315315,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_GROWTH",
+              "from_weight": 0.24292149,
+              "to_weight": 0.2,
+              "delta_weight": -0.04292149,
+              "side": "SELL_OR_REDUCE"
+            }
+          ],
+          "constraints": {
+            "max_single_asset_weight": 0.2,
+            "max_turnover": 0.1,
+            "objective": "concentration_control"
+          },
+          "turnover": 0.04292149,
+          "rationale": [
+            "Cap any security above 20% and move the difference to cash."
+          ],
+          "expected_metrics": {
+            "max_single_asset_weight": 0.2,
+            "cash_weight": 0.36467182
+          },
+          "proposal_hash": "5f7da0e23aac20fb0cb88850548bad2d4b23d6b1eb1f82491aa20d63f871e707",
+          "validation": {
+            "valid": true,
+            "errors": []
+          }
+        },
+        {
+          "proposal_id": "proposal-c-45eb627fc2",
+          "plan_id": "C",
+          "label": "Risk priority",
+          "objective": "reduce correlated exposure and increase the defensive sleeve",
+          "target_weights": {
+            "CASH": 0.38,
+            "EQUITY_ALPHA": 0.14,
+            "ETF_GROWTH": 0.14,
+            "ETF_CONSUMER": 0.14,
+            "ETF_BOND": 0.2
+          },
+          "actions": [
+            {
+              "instrument_id": "CASH",
+              "from_weight": 0.32175033,
+              "to_weight": 0.38,
+              "delta_weight": 0.05824967,
+              "side": "BUY_OR_HOLD_CASH"
+            },
+            {
+              "instrument_id": "EQUITY_ALPHA",
+              "from_weight": 0.15186615,
+              "to_weight": 0.14,
+              "delta_weight": -0.01186615,
+              "side": "SELL_OR_REDUCE"
+            },
+            {
+              "instrument_id": "ETF_BOND",
+              "from_weight": 0.13030888,
+              "to_weight": 0.2,
+              "delta_weight": 0.06969112,
+              "side": "BUY_OR_HOLD_CASH"
+            },
+            {
+              "instrument_id": "ETF_CONSUMER",
+              "from_weight": 0.15315315,
+              "to_weight": 0.14,
+              "delta_weight": -0.01315315,
+              "side": "SELL_OR_REDUCE"
+            },
+            {
+              "instrument_id": "ETF_GROWTH",
+              "from_weight": 0.24292149,
+              "to_weight": 0.14,
+              "delta_weight": -0.10292149,
+              "side": "SELL_OR_REDUCE"
+            }
+          ],
+          "constraints": {
+            "max_single_asset_weight": 0.2,
+            "max_turnover": 0.25,
+            "objective": "risk_budget"
+          },
+          "turnover": 0.12794079,
+          "rationale": [
+            "Reduce the detected correlated cluster, then split released weight between bond ETF and cash."
+          ],
+          "expected_metrics": {
+            "max_single_asset_weight": 0.2,
+            "cash_weight": 0.38
+          },
+          "proposal_hash": "610b4ca5b8fcce69f0f0bfb166d2aeb5703de5bd861e229c295026b548b97966",
+          "validation": {
+            "valid": true,
+            "errors": []
+          }
+        }
+      ],
+      "simulation": {
+        "simulation_id": "simulation-199585da939d4269",
+        "snapshot_id": "snapshot-de37f3dab3586cd6",
+        "historical_window": {
+          "start": "2026-09-15",
+          "end": "2026-09-23"
+        },
+        "transaction_cost_rate": 0.001,
+        "assumptions": {
+          "data_mode": "SYNTHETIC_REPLAY",
+          "initial_capital": 31080,
+          "annualization_factor": 252,
+          "risk_free_rate": 0.02,
+          "portfolio_method": "buy-and-hold",
+          "cost_basis": "one-way turnover times rate charged once",
+          "sample_observations": 7,
+          "caveat": "Ex-post allocation comparison on a short synthetic window, not an out-of-sample strategy backtest."
+        },
+        "comparisons": [
+          {
+            "plan_id": "CURRENT",
+            "proposal_id": "proposal-current-74ef228729",
+            "label": "Current portfolio",
+            "turnover": 0,
+            "transaction_cost": 0,
+            "metrics": {
+              "cumulative_return": -0.02789133,
+              "annualized_return": -0.69519485,
+              "annualized_volatility": 0.15334647,
+              "max_drawdown": -0.02789133,
+              "sharpe_ratio": -7.79583962,
+              "ending_index": 0.97210867
+            },
+            "curve": [
+              {
+                "date": "2026-09-15",
+                "value": 1
+              },
+              {
+                "date": "2026-09-16",
+                "value": 0.9914955
+              },
+              {
+                "date": "2026-09-17",
+                "value": 0.98512717
+              },
+              {
+                "date": "2026-09-18",
+                "value": 0.99392753
+              },
+              {
+                "date": "2026-09-21",
+                "value": 0.9778425
+              },
+              {
+                "date": "2026-09-22",
+                "value": 0.98273126
+              },
+              {
+                "date": "2026-09-23",
+                "value": 0.97210867
+              }
+            ]
+          },
+          {
+            "plan_id": "A",
+            "proposal_id": "proposal-a-74ef228729",
+            "label": "Keep / minimum action",
+            "turnover": 0,
+            "transaction_cost": 0,
+            "metrics": {
+              "cumulative_return": -0.02789133,
+              "annualized_return": -0.69519485,
+              "annualized_volatility": 0.15334647,
+              "max_drawdown": -0.02789133,
+              "sharpe_ratio": -7.79583962,
+              "ending_index": 0.97210867
+            },
+            "curve": [
+              {
+                "date": "2026-09-15",
+                "value": 1
+              },
+              {
+                "date": "2026-09-16",
+                "value": 0.9914955
+              },
+              {
+                "date": "2026-09-17",
+                "value": 0.98512717
+              },
+              {
+                "date": "2026-09-18",
+                "value": 0.99392753
+              },
+              {
+                "date": "2026-09-21",
+                "value": 0.9778425
+              },
+              {
+                "date": "2026-09-22",
+                "value": 0.98273126
+              },
+              {
+                "date": "2026-09-23",
+                "value": 0.97210867
+              }
+            ]
+          },
+          {
+            "plan_id": "B",
+            "proposal_id": "proposal-b-53a1666dd2",
+            "label": "Moderate rebalance",
+            "turnover": 0.04292149,
+            "transaction_cost": 4.292e-05,
+            "metrics": {
+              "cumulative_return": -0.02551882,
+              "annualized_return": -0.66233569,
+              "annualized_volatility": 0.13900778,
+              "max_drawdown": -0.02551882,
+              "sharpe_ratio": -7.87940182,
+              "ending_index": 0.97448118
+            },
+            "curve": [
+              {
+                "date": "2026-09-15",
+                "value": 1
+              },
+              {
+                "date": "2026-09-16",
+                "value": 0.99220403
+              },
+              {
+                "date": "2026-09-17",
+                "value": 0.98642613
+              },
+              {
+                "date": "2026-09-18",
+                "value": 0.99436771
+              },
+              {
+                "date": "2026-09-21",
+                "value": 0.97973192
+              },
+              {
+                "date": "2026-09-22",
+                "value": 0.98413762
+              },
+              {
+                "date": "2026-09-23",
+                "value": 0.97448118
+              }
+            ]
+          },
+          {
+            "plan_id": "C",
+            "proposal_id": "proposal-c-45eb627fc2",
+            "label": "Risk priority",
+            "turnover": 0.12794079,
+            "transaction_cost": 0.00012794,
+            "metrics": {
+              "cumulative_return": -0.02006039,
+              "annualized_return": -0.57305579,
+              "annualized_volatility": 0.11048451,
+              "max_drawdown": -0.02006039,
+              "sharpe_ratio": -7.82526986,
+              "ending_index": 0.97993961
+            },
+            "curve": [
+              {
+                "date": "2026-09-15",
+                "value": 1
+              },
+              {
+                "date": "2026-09-16",
+                "value": 0.99372285
+              },
+              {
+                "date": "2026-09-17",
+                "value": 0.98921842
+              },
+              {
+                "date": "2026-09-18",
+                "value": 0.99543763
+              },
+              {
+                "date": "2026-09-21",
+                "value": 0.98387411
+              },
+              {
+                "date": "2026-09-22",
+                "value": 0.98762863
+              },
+              {
+                "date": "2026-09-23",
+                "value": 0.97993961
+              }
+            ]
+          }
+        ],
+        "scenarios": [
+          {
+            "plan_id": "CURRENT",
+            "distribution": {
+              "method": "block_bootstrap",
+              "block_size": 3,
+              "paths": 2000,
+              "seed": 20260924,
+              "horizon_days": 20,
+              "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+              "p10": -0.0913528,
+              "p50": -0.07048466,
+              "p90": -0.04823071
+            }
+          },
+          {
+            "plan_id": "A",
+            "distribution": {
+              "method": "block_bootstrap",
+              "block_size": 3,
+              "paths": 2000,
+              "seed": 20260924,
+              "horizon_days": 20,
+              "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+              "p10": -0.0913528,
+              "p50": -0.07048466,
+              "p90": -0.04823071
+            }
+          },
+          {
+            "plan_id": "B",
+            "distribution": {
+              "method": "block_bootstrap",
+              "block_size": 3,
+              "paths": 2000,
+              "seed": 20260924,
+              "horizon_days": 20,
+              "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+              "p10": -0.08345959,
+              "p50": -0.06455058,
+              "p90": -0.04436988
+            }
+          },
+          {
+            "plan_id": "C",
+            "distribution": {
+              "method": "block_bootstrap",
+              "block_size": 3,
+              "paths": 2000,
+              "seed": 20260924,
+              "horizon_days": 20,
+              "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+              "p10": -0.06499043,
+              "p50": -0.05054828,
+              "p90": -0.03462233
+            }
+          }
+        ],
+        "limitation": "Historical replay and fixed-seed scenario simulation are not a prediction of future returns."
+      }
+    },
+    "tool_results": {
+      "trace-47a06c109ce838e8": {
+        "tool_name": "portfolio.import",
+        "version": "financial-tools@0.4.0",
+        "inputs_hash": "433a67d262335df71c038d8920341090bf900298bb61d18a50e7bbe589cf7563",
+        "output": {
+          "valid": true,
+          "snapshot": {
+            "snapshot_id": "snapshot-de37f3dab3586cd6",
+            "portfolio_id": "golden-demo-portfolio",
+            "as_of": "2026-09-23T08:00:00Z",
+            "positions": [
+              {
+                "instrument_id": "EQUITY_ALPHA",
+                "name": "Alpha Holdings",
+                "type": "A_SHARE",
+                "sector": "Technology",
+                "quantity": 100,
+                "price": 47.2,
+                "market_value": 4720,
+                "weight": 0.15186615
+              },
+              {
+                "instrument_id": "ETF_GROWTH",
+                "name": "Growth ETF",
+                "type": "ETF",
+                "sector": "Technology",
+                "quantity": 100,
+                "price": 75.5,
+                "market_value": 7550,
+                "weight": 0.24292149
+              },
+              {
+                "instrument_id": "ETF_CONSUMER",
+                "name": "Consumer ETF",
+                "type": "ETF",
+                "sector": "Consumer",
+                "quantity": 100,
+                "price": 47.6,
+                "market_value": 4760,
+                "weight": 0.15315315
+              },
+              {
+                "instrument_id": "ETF_BOND",
+                "name": "Bond ETF",
+                "type": "ETF",
+                "sector": "Fixed Income",
+                "quantity": 100,
+                "price": 40.5,
+                "market_value": 4050,
+                "weight": 0.13030888
+              }
+            ],
+            "cash": 10000,
+            "cash_weight": 0.32175032,
+            "total_value": 31080,
+            "data_quality": {
+              "status": "VALID",
+              "errors": [],
+              "warnings": []
+            }
+          },
+          "errors": [],
+          "warnings": []
+        },
+        "data_as_of": "2026-09-23T08:00:00Z",
+        "warnings": [
+          "Synthetic replay data: seven observations only; not suitable for investment decisions."
+        ],
+        "trace_id": "trace-47a06c109ce838e8"
+      },
+      "trace-806989342cd10329": {
+        "tool_name": "portfolio.diagnose",
+        "version": "financial-tools@0.4.0",
+        "inputs_hash": "47afdede0c23b3a53f4cb1c74408060a1e2bb437342456ecf5b6b3fd1c407b19",
+        "output": {
+          "report_id": "health-45f227c09db8cce7",
+          "snapshot_id": "snapshot-de37f3dab3586cd6",
+          "metrics": {
+            "cumulative_return": -0.02789133,
+            "annualized_return": -0.69519485,
+            "annualized_volatility": 0.15334647,
+            "max_drawdown": -0.02789133,
+            "sharpe_ratio": -7.79583962,
+            "ending_index": 0.97210867
+          },
+          "cash_weight": 0.32175032,
+          "concentration": {
+            "hhi": 0.22603374,
+            "hhi_basis": "all assets including cash; top-N excludes cash",
+            "top_1": 0.24292149,
+            "top_3": 0.54794079,
+            "largest_instrument": "ETF_GROWTH"
+          },
+          "correlation_matrix": {
+            "EQUITY_ALPHA": {
+              "EQUITY_ALPHA": 1,
+              "ETF_GROWTH": 0.988122,
+              "ETF_CONSUMER": 0.938165,
+              "ETF_BOND": -0.825061
+            },
+            "ETF_GROWTH": {
+              "EQUITY_ALPHA": 0.988122,
+              "ETF_GROWTH": 1,
+              "ETF_CONSUMER": 0.97728,
+              "ETF_BOND": -0.815422
+            },
+            "ETF_CONSUMER": {
+              "EQUITY_ALPHA": 0.938165,
+              "ETF_GROWTH": 0.97728,
+              "ETF_CONSUMER": 1,
+              "ETF_BOND": -0.819951
+            },
+            "ETF_BOND": {
+              "EQUITY_ALPHA": -0.825061,
+              "ETF_GROWTH": -0.815422,
+              "ETF_CONSUMER": -0.819951,
+              "ETF_BOND": 1
+            }
+          },
+          "hidden_clusters": [
+            {
+              "instruments": [
+                "EQUITY_ALPHA",
+                "ETF_GROWTH"
+              ],
+              "correlation": 0.988122
+            },
+            {
+              "instruments": [
+                "EQUITY_ALPHA",
+                "ETF_CONSUMER"
+              ],
+              "correlation": 0.938165
+            },
+            {
+              "instruments": [
+                "ETF_GROWTH",
+                "ETF_CONSUMER"
+              ],
+              "correlation": 0.97728
+            }
+          ],
+          "attention_points": [
+            "largest position exceeds 20%",
+            "multiple instruments move together in the fixed window"
+          ],
+          "data_window": {
+            "start": "2026-09-15",
+            "end": "2026-09-23",
+            "observations": 7,
+            "annualization_factor": 252
+          }
+        },
+        "data_as_of": "2026-09-23T08:00:00Z",
+        "warnings": [
+          "Synthetic replay data: seven observations only; not suitable for investment decisions."
+        ],
+        "trace_id": "trace-806989342cd10329"
+      },
+      "trace-b859fe1a05c6b119": {
+        "tool_name": "strategy.generate",
+        "version": "financial-tools@0.4.0",
+        "inputs_hash": "3e0c7157d3fa4da576e4bacb27ca4acfb4be02ace7695da88bdf4a847e6c7d54",
+        "output": {
+          "snapshot_id": "snapshot-de37f3dab3586cd6",
+          "report_id": "health-45f227c09db8cce7",
+          "candidates": [
+            {
+              "proposal_id": "proposal-a-74ef228729",
+              "plan_id": "A",
+              "label": "Keep / minimum action",
+              "objective": "preserve the current allocation and avoid unnecessary turnover",
+              "target_weights": {
+                "CASH": 0.32175033,
+                "EQUITY_ALPHA": 0.15186615,
+                "ETF_GROWTH": 0.24292149,
+                "ETF_CONSUMER": 0.15315315,
+                "ETF_BOND": 0.13030888
+              },
+              "actions": [
+                {
+                  "instrument_id": "CASH",
+                  "from_weight": 0.32175033,
+                  "to_weight": 0.32175033,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "EQUITY_ALPHA",
+                  "from_weight": 0.15186615,
+                  "to_weight": 0.15186615,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_BOND",
+                  "from_weight": 0.13030888,
+                  "to_weight": 0.13030888,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_CONSUMER",
+                  "from_weight": 0.15315315,
+                  "to_weight": 0.15315315,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_GROWTH",
+                  "from_weight": 0.24292149,
+                  "to_weight": 0.24292149,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                }
+              ],
+              "constraints": {
+                "max_single_asset_weight": 0.35,
+                "max_turnover": 0.05,
+                "objective": "minimum_action"
+              },
+              "turnover": 0,
+              "rationale": [
+                "No hard constraint is currently violated; keep the baseline for comparison."
+              ],
+              "expected_metrics": {
+                "max_single_asset_weight": 0.24292149,
+                "cash_weight": 0.32175033
+              },
+              "proposal_hash": "b1c4acfbd501a4221e0e7e766b395102138a5ad99315c7cbcd06e33f243a7b74",
+              "validation": {
+                "valid": true,
+                "errors": []
+              }
+            },
+            {
+              "proposal_id": "proposal-b-53a1666dd2",
+              "plan_id": "B",
+              "label": "Moderate rebalance",
+              "objective": "reduce the largest position with bounded turnover",
+              "target_weights": {
+                "CASH": 0.36467182,
+                "EQUITY_ALPHA": 0.15186615,
+                "ETF_GROWTH": 0.2,
+                "ETF_CONSUMER": 0.15315315,
+                "ETF_BOND": 0.13030888
+              },
+              "actions": [
+                {
+                  "instrument_id": "CASH",
+                  "from_weight": 0.32175033,
+                  "to_weight": 0.36467182,
+                  "delta_weight": 0.04292149,
+                  "side": "BUY_OR_HOLD_CASH"
+                },
+                {
+                  "instrument_id": "EQUITY_ALPHA",
+                  "from_weight": 0.15186615,
+                  "to_weight": 0.15186615,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_BOND",
+                  "from_weight": 0.13030888,
+                  "to_weight": 0.13030888,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_CONSUMER",
+                  "from_weight": 0.15315315,
+                  "to_weight": 0.15315315,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_GROWTH",
+                  "from_weight": 0.24292149,
+                  "to_weight": 0.2,
+                  "delta_weight": -0.04292149,
+                  "side": "SELL_OR_REDUCE"
+                }
+              ],
+              "constraints": {
+                "max_single_asset_weight": 0.2,
+                "max_turnover": 0.1,
+                "objective": "concentration_control"
+              },
+              "turnover": 0.04292149,
+              "rationale": [
+                "Cap any security above 20% and move the difference to cash."
+              ],
+              "expected_metrics": {
+                "max_single_asset_weight": 0.2,
+                "cash_weight": 0.36467182
+              },
+              "proposal_hash": "5f7da0e23aac20fb0cb88850548bad2d4b23d6b1eb1f82491aa20d63f871e707",
+              "validation": {
+                "valid": true,
+                "errors": []
+              }
+            },
+            {
+              "proposal_id": "proposal-c-45eb627fc2",
+              "plan_id": "C",
+              "label": "Risk priority",
+              "objective": "reduce correlated exposure and increase the defensive sleeve",
+              "target_weights": {
+                "CASH": 0.38,
+                "EQUITY_ALPHA": 0.14,
+                "ETF_GROWTH": 0.14,
+                "ETF_CONSUMER": 0.14,
+                "ETF_BOND": 0.2
+              },
+              "actions": [
+                {
+                  "instrument_id": "CASH",
+                  "from_weight": 0.32175033,
+                  "to_weight": 0.38,
+                  "delta_weight": 0.05824967,
+                  "side": "BUY_OR_HOLD_CASH"
+                },
+                {
+                  "instrument_id": "EQUITY_ALPHA",
+                  "from_weight": 0.15186615,
+                  "to_weight": 0.14,
+                  "delta_weight": -0.01186615,
+                  "side": "SELL_OR_REDUCE"
+                },
+                {
+                  "instrument_id": "ETF_BOND",
+                  "from_weight": 0.13030888,
+                  "to_weight": 0.2,
+                  "delta_weight": 0.06969112,
+                  "side": "BUY_OR_HOLD_CASH"
+                },
+                {
+                  "instrument_id": "ETF_CONSUMER",
+                  "from_weight": 0.15315315,
+                  "to_weight": 0.14,
+                  "delta_weight": -0.01315315,
+                  "side": "SELL_OR_REDUCE"
+                },
+                {
+                  "instrument_id": "ETF_GROWTH",
+                  "from_weight": 0.24292149,
+                  "to_weight": 0.14,
+                  "delta_weight": -0.10292149,
+                  "side": "SELL_OR_REDUCE"
+                }
+              ],
+              "constraints": {
+                "max_single_asset_weight": 0.2,
+                "max_turnover": 0.25,
+                "objective": "risk_budget"
+              },
+              "turnover": 0.12794079,
+              "rationale": [
+                "Reduce the detected correlated cluster, then split released weight between bond ETF and cash."
+              ],
+              "expected_metrics": {
+                "max_single_asset_weight": 0.2,
+                "cash_weight": 0.38
+              },
+              "proposal_hash": "610b4ca5b8fcce69f0f0bfb166d2aeb5703de5bd861e229c295026b548b97966",
+              "validation": {
+                "valid": true,
+                "errors": []
+              }
+            }
+          ]
+        },
+        "data_as_of": "2026-09-23T08:00:00Z",
+        "warnings": [
+          "Synthetic replay data: seven observations only; not suitable for investment decisions."
+        ],
+        "trace_id": "trace-b859fe1a05c6b119"
+      },
+      "trace-1f704db52146f8f1": {
+        "tool_name": "simulation.run",
+        "version": "financial-tools@0.4.0",
+        "inputs_hash": "251e211a9970ee2d1f553d08bb8234499fb087237f5710edc878cff5485ef100",
+        "output": {
+          "simulation_id": "simulation-199585da939d4269",
+          "snapshot_id": "snapshot-de37f3dab3586cd6",
+          "historical_window": {
+            "start": "2026-09-15",
+            "end": "2026-09-23"
+          },
+          "transaction_cost_rate": 0.001,
+          "assumptions": {
+            "data_mode": "SYNTHETIC_REPLAY",
+            "initial_capital": 31080,
+            "annualization_factor": 252,
+            "risk_free_rate": 0.02,
+            "portfolio_method": "buy-and-hold",
+            "cost_basis": "one-way turnover times rate charged once",
+            "sample_observations": 7,
+            "caveat": "Ex-post allocation comparison on a short synthetic window, not an out-of-sample strategy backtest."
+          },
+          "comparisons": [
+            {
+              "plan_id": "CURRENT",
+              "proposal_id": "proposal-current-74ef228729",
+              "label": "Current portfolio",
+              "turnover": 0,
+              "transaction_cost": 0,
+              "metrics": {
+                "cumulative_return": -0.02789133,
+                "annualized_return": -0.69519485,
+                "annualized_volatility": 0.15334647,
+                "max_drawdown": -0.02789133,
+                "sharpe_ratio": -7.79583962,
+                "ending_index": 0.97210867
+              },
+              "curve": [
+                {
+                  "date": "2026-09-15",
+                  "value": 1
+                },
+                {
+                  "date": "2026-09-16",
+                  "value": 0.9914955
+                },
+                {
+                  "date": "2026-09-17",
+                  "value": 0.98512717
+                },
+                {
+                  "date": "2026-09-18",
+                  "value": 0.99392753
+                },
+                {
+                  "date": "2026-09-21",
+                  "value": 0.9778425
+                },
+                {
+                  "date": "2026-09-22",
+                  "value": 0.98273126
+                },
+                {
+                  "date": "2026-09-23",
+                  "value": 0.97210867
+                }
+              ]
+            },
+            {
+              "plan_id": "A",
+              "proposal_id": "proposal-a-74ef228729",
+              "label": "Keep / minimum action",
+              "turnover": 0,
+              "transaction_cost": 0,
+              "metrics": {
+                "cumulative_return": -0.02789133,
+                "annualized_return": -0.69519485,
+                "annualized_volatility": 0.15334647,
+                "max_drawdown": -0.02789133,
+                "sharpe_ratio": -7.79583962,
+                "ending_index": 0.97210867
+              },
+              "curve": [
+                {
+                  "date": "2026-09-15",
+                  "value": 1
+                },
+                {
+                  "date": "2026-09-16",
+                  "value": 0.9914955
+                },
+                {
+                  "date": "2026-09-17",
+                  "value": 0.98512717
+                },
+                {
+                  "date": "2026-09-18",
+                  "value": 0.99392753
+                },
+                {
+                  "date": "2026-09-21",
+                  "value": 0.9778425
+                },
+                {
+                  "date": "2026-09-22",
+                  "value": 0.98273126
+                },
+                {
+                  "date": "2026-09-23",
+                  "value": 0.97210867
+                }
+              ]
+            },
+            {
+              "plan_id": "B",
+              "proposal_id": "proposal-b-53a1666dd2",
+              "label": "Moderate rebalance",
+              "turnover": 0.04292149,
+              "transaction_cost": 4.292e-05,
+              "metrics": {
+                "cumulative_return": -0.02551882,
+                "annualized_return": -0.66233569,
+                "annualized_volatility": 0.13900778,
+                "max_drawdown": -0.02551882,
+                "sharpe_ratio": -7.87940182,
+                "ending_index": 0.97448118
+              },
+              "curve": [
+                {
+                  "date": "2026-09-15",
+                  "value": 1
+                },
+                {
+                  "date": "2026-09-16",
+                  "value": 0.99220403
+                },
+                {
+                  "date": "2026-09-17",
+                  "value": 0.98642613
+                },
+                {
+                  "date": "2026-09-18",
+                  "value": 0.99436771
+                },
+                {
+                  "date": "2026-09-21",
+                  "value": 0.97973192
+                },
+                {
+                  "date": "2026-09-22",
+                  "value": 0.98413762
+                },
+                {
+                  "date": "2026-09-23",
+                  "value": 0.97448118
+                }
+              ]
+            },
+            {
+              "plan_id": "C",
+              "proposal_id": "proposal-c-45eb627fc2",
+              "label": "Risk priority",
+              "turnover": 0.12794079,
+              "transaction_cost": 0.00012794,
+              "metrics": {
+                "cumulative_return": -0.02006039,
+                "annualized_return": -0.57305579,
+                "annualized_volatility": 0.11048451,
+                "max_drawdown": -0.02006039,
+                "sharpe_ratio": -7.82526986,
+                "ending_index": 0.97993961
+              },
+              "curve": [
+                {
+                  "date": "2026-09-15",
+                  "value": 1
+                },
+                {
+                  "date": "2026-09-16",
+                  "value": 0.99372285
+                },
+                {
+                  "date": "2026-09-17",
+                  "value": 0.98921842
+                },
+                {
+                  "date": "2026-09-18",
+                  "value": 0.99543763
+                },
+                {
+                  "date": "2026-09-21",
+                  "value": 0.98387411
+                },
+                {
+                  "date": "2026-09-22",
+                  "value": 0.98762863
+                },
+                {
+                  "date": "2026-09-23",
+                  "value": 0.97993961
+                }
+              ]
+            }
+          ],
+          "scenarios": [
+            {
+              "plan_id": "CURRENT",
+              "distribution": {
+                "method": "block_bootstrap",
+                "block_size": 3,
+                "paths": 2000,
+                "seed": 20260924,
+                "horizon_days": 20,
+                "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+                "p10": -0.0913528,
+                "p50": -0.07048466,
+                "p90": -0.04823071
+              }
+            },
+            {
+              "plan_id": "A",
+              "distribution": {
+                "method": "block_bootstrap",
+                "block_size": 3,
+                "paths": 2000,
+                "seed": 20260924,
+                "horizon_days": 20,
+                "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+                "p10": -0.0913528,
+                "p50": -0.07048466,
+                "p90": -0.04823071
+              }
+            },
+            {
+              "plan_id": "B",
+              "distribution": {
+                "method": "block_bootstrap",
+                "block_size": 3,
+                "paths": 2000,
+                "seed": 20260924,
+                "horizon_days": 20,
+                "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+                "p10": -0.08345959,
+                "p50": -0.06455058,
+                "p90": -0.04436988
+              }
+            },
+            {
+              "plan_id": "C",
+              "distribution": {
+                "method": "block_bootstrap",
+                "block_size": 3,
+                "paths": 2000,
+                "seed": 20260924,
+                "horizon_days": 20,
+                "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+                "p10": -0.06499043,
+                "p50": -0.05054828,
+                "p90": -0.03462233
+              }
+            }
+          ],
+          "limitation": "Historical replay and fixed-seed scenario simulation are not a prediction of future returns."
+        },
+        "data_as_of": "2026-09-23T08:00:00Z",
+        "warnings": [
+          "Synthetic replay data: seven observations only; not suitable for investment decisions."
+        ],
+        "trace_id": "trace-1f704db52146f8f1"
+      }
+    },
+    "audit_evidence": {
+      "audit_id": "audit-task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "contract_version": "investment-agent.v1",
+      "request_id": "req-daily-20261025-health",
+      "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "session_id": "session-3b45ddbe-a5c8-4cad-bc31-9f17b08c022f",
+      "events": [
+        {
+          "event_id": "event-bd33ceae-d300-49c9-8320-185eff2f5605",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "session.created",
+          "payload": {
+            "missing_fields": [],
+            "request_id": null
+          },
+          "timestamp": "2026-10-25T14:02:36.219Z"
+        },
+        {
+          "event_id": "event-cdbeff1f-5b86-47e8-bf47-d733399449be",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "contract.received",
+          "payload": {
+            "contract_version": "investment-agent.v1",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.221Z"
+        },
+        {
+          "event_id": "event-c4fac945-9942-45cf-82a5-9a468b21c7ff",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "checkpoint.invalidated",
+          "payload": {
+            "reason": "input changed",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.221Z"
+        },
+        {
+          "event_id": "event-69d460bf-4337-4999-8ecd-13b0702952af",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.started",
+          "payload": {
+            "stage": "VALIDATE_INPUT",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.221Z"
+        },
+        {
+          "event_id": "event-b06b21d1-8305-409a-85f1-5c560811e1d1",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.completed",
+          "payload": {
+            "stage": "VALIDATE_INPUT",
+            "attempt": 1,
+            "result_ref": "trace-47a06c109ce838e8",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.222Z"
+        },
+        {
+          "event_id": "event-d72320e1-fb59-4fa1-a80a-404847a2ebcf",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.started",
+          "payload": {
+            "stage": "DIAGNOSE",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.222Z"
+        },
+        {
+          "event_id": "event-cd1b4439-d25b-483c-b8cd-4111cd0a5f79",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.completed",
+          "payload": {
+            "stage": "DIAGNOSE",
+            "attempt": 1,
+            "result_ref": "trace-806989342cd10329",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.224Z"
+        },
+        {
+          "event_id": "event-0827eb0d-f930-4fc4-9952-bddd4f59a61a",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.started",
+          "payload": {
+            "stage": "GENERATE_CANDIDATES",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.224Z"
+        },
+        {
+          "event_id": "event-cf0e8cb5-ae69-449c-b0b1-23da90d83334",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.completed",
+          "payload": {
+            "stage": "GENERATE_CANDIDATES",
+            "attempt": 1,
+            "result_ref": "trace-b859fe1a05c6b119",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.227Z"
+        },
+        {
+          "event_id": "event-a97c8ab3-c4ec-4091-87f5-f50fbde7621f",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.started",
+          "payload": {
+            "stage": "SIMULATE",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.227Z"
+        },
+        {
+          "event_id": "event-b0edc494-1228-46cc-9792-8c220da0ce69",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.completed",
+          "payload": {
+            "stage": "SIMULATE",
+            "attempt": 1,
+            "result_ref": "trace-1f704db52146f8f1",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.253Z"
+        },
+        {
+          "event_id": "event-02d05359-ab50-4494-b792-a8fcbcdb8bb7",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.handoff",
+          "payload": {
+            "owner": "Safety/Risk/Eval",
+            "reason": "Risk decision is outside Agent Core and Tools ownership.",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.253Z"
+        },
+        {
+          "event_id": "event-f8cf1391-73a6-4033-bc27-4a81b1009285",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "contract.accepted",
+          "payload": {
+            "contract_version": "investment-agent.v1",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.253Z"
+        }
+      ]
+    },
+    "risk_handoff": {
+      "contract_version": "investment-agent.v1",
+      "handoff_id": "handoff-task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "session_id": "session-3b45ddbe-a5c8-4cad-bc31-9f17b08c022f",
+      "status": "PENDING_REVIEW",
+      "decision": "REQUIRED",
+      "owner": "Safety/Risk/Eval",
+      "reason": "Risk decision is outside Agent Core and Tools ownership.",
+      "evidence": {
+        "portfolio_snapshot_id": "snapshot-de37f3dab3586cd6",
+        "health_report_id": "health-45f227c09db8cce7",
+        "proposal_ids": [
+          "proposal-a-74ef228729",
+          "proposal-b-53a1666dd2",
+          "proposal-c-45eb627fc2"
+        ],
+        "simulation_id": "simulation-199585da939d4269",
+        "audit_id": "audit-task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a"
+      },
+      "execution_allowed": false
+    }
+  },
+  "reused_request": {
+    "contract_version": "investment-agent.v1",
+    "request_id": "req-daily-20261025-reuse",
+    "operation": "PORTFOLIO_HEALTH_CHECK",
+    "context": {
+      "actor": "agent",
+      "environment": "demo",
+      "data_mode": "SYNTHETIC_REPLAY",
+      "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "session_id": "session-3b45ddbe-a5c8-4cad-bc31-9f17b08c022f"
+    },
+    "input": {
+      "risk_profile": {
+        "investment_horizon_days": 365,
+        "max_drawdown": 0.1,
+        "liquidity_need": "medium"
+      },
+      "portfolio": {
+        "portfolio_id": "golden-demo-portfolio",
+        "as_of": "2026-09-23T08:00:00Z",
+        "cash": 10000,
+        "positions": [
+          {
+            "instrument_id": "EQUITY_ALPHA",
+            "name": "Alpha Holdings",
+            "type": "A_SHARE",
+            "sector": "Technology",
+            "quantity": 100,
+            "price": 47.2
+          },
+          {
+            "instrument_id": "ETF_GROWTH",
+            "name": "Growth ETF",
+            "type": "ETF",
+            "sector": "Technology",
+            "quantity": 100,
+            "price": 75.5
+          },
+          {
+            "instrument_id": "ETF_CONSUMER",
+            "name": "Consumer ETF",
+            "type": "ETF",
+            "sector": "Consumer",
+            "quantity": 100,
+            "price": 47.6
+          },
+          {
+            "instrument_id": "ETF_BOND",
+            "name": "Bond ETF",
+            "type": "ETF",
+            "sector": "Fixed Income",
+            "quantity": 100,
+            "price": 40.5
+          }
+        ]
+      },
+      "market_context": null
+    }
+  },
+  "reused": {
+    "contract_version": "investment-agent.v1",
+    "request_id": "req-daily-20261025-reuse",
+    "operation": "PORTFOLIO_HEALTH_CHECK",
+    "trace": {
+      "contract_version": "investment-agent.v1",
+      "request_id": "req-daily-20261025-reuse",
+      "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "session_id": "session-3b45ddbe-a5c8-4cad-bc31-9f17b08c022f"
+    },
+    "task_state": {
+      "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "session_id": "session-3b45ddbe-a5c8-4cad-bc31-9f17b08c022f",
+      "contract_version": "investment-agent.v1",
+      "request_id": "req-daily-20261025-reuse",
+      "intent": "PORTFOLIO_HEALTH_CHECK",
+      "stage": "RISK_CHECK",
+      "status": "HANDOFF_REQUIRED",
+      "risk_profile": {
+        "investment_horizon_days": 365,
+        "max_drawdown": 0.1,
+        "liquidity_need": "medium"
+      },
+      "missing_fields": [],
+      "portfolio_snapshot_id": "snapshot-de37f3dab3586cd6",
+      "risk_profile_id": "risk-profile-2c5fc10a-a3c3-4578-bcd6-3d2cbaa7eda9",
+      "tool_result_refs": [
+        "trace-47a06c109ce838e8",
+        "trace-806989342cd10329",
+        "trace-b859fe1a05c6b119",
+        "trace-1f704db52146f8f1"
+      ],
+      "proposed_action_ids": [
+        "proposal-a-74ef228729",
+        "proposal-b-53a1666dd2",
+        "proposal-c-45eb627fc2"
+      ],
+      "risk_decision_id": null,
+      "approval_id": null,
+      "error_state": null,
+      "checkpoint": {
+        "stage": "RISK_CHECK",
+        "completed": [
+          "VALIDATE_INPUT",
+          "DIAGNOSE",
+          "GENERATE_CANDIDATES",
+          "SIMULATE"
+        ],
+        "result_refs": {
+          "VALIDATE_INPUT": "trace-47a06c109ce838e8",
+          "DIAGNOSE": "trace-806989342cd10329",
+          "GENERATE_CANDIDATES": "trace-b859fe1a05c6b119",
+          "SIMULATE": "trace-1f704db52146f8f1"
+        },
+        "resume_token": "resume-bb97dda4-3aca-4426-965f-08fb125f2b95",
+        "last_tool_result_ref": "trace-1f704db52146f8f1"
+      },
+      "handoff": {
+        "owner": "Safety/Risk/Eval",
+        "reason": "Risk decision is outside Agent Core and Tools ownership."
+      }
+    },
+    "artifacts": {
+      "portfolio_snapshot": {
+        "snapshot_id": "snapshot-de37f3dab3586cd6",
+        "portfolio_id": "golden-demo-portfolio",
+        "as_of": "2026-09-23T08:00:00Z",
+        "positions": [
+          {
+            "instrument_id": "EQUITY_ALPHA",
+            "name": "Alpha Holdings",
+            "type": "A_SHARE",
+            "sector": "Technology",
+            "quantity": 100,
+            "price": 47.2,
+            "market_value": 4720,
+            "weight": 0.15186615
+          },
+          {
+            "instrument_id": "ETF_GROWTH",
+            "name": "Growth ETF",
+            "type": "ETF",
+            "sector": "Technology",
+            "quantity": 100,
+            "price": 75.5,
+            "market_value": 7550,
+            "weight": 0.24292149
+          },
+          {
+            "instrument_id": "ETF_CONSUMER",
+            "name": "Consumer ETF",
+            "type": "ETF",
+            "sector": "Consumer",
+            "quantity": 100,
+            "price": 47.6,
+            "market_value": 4760,
+            "weight": 0.15315315
+          },
+          {
+            "instrument_id": "ETF_BOND",
+            "name": "Bond ETF",
+            "type": "ETF",
+            "sector": "Fixed Income",
+            "quantity": 100,
+            "price": 40.5,
+            "market_value": 4050,
+            "weight": 0.13030888
+          }
+        ],
+        "cash": 10000,
+        "cash_weight": 0.32175032,
+        "total_value": 31080,
+        "data_quality": {
+          "status": "VALID",
+          "errors": [],
+          "warnings": []
+        }
+      },
+      "health_report": {
+        "report_id": "health-45f227c09db8cce7",
+        "snapshot_id": "snapshot-de37f3dab3586cd6",
+        "metrics": {
+          "cumulative_return": -0.02789133,
+          "annualized_return": -0.69519485,
+          "annualized_volatility": 0.15334647,
+          "max_drawdown": -0.02789133,
+          "sharpe_ratio": -7.79583962,
+          "ending_index": 0.97210867
+        },
+        "cash_weight": 0.32175032,
+        "concentration": {
+          "hhi": 0.22603374,
+          "hhi_basis": "all assets including cash; top-N excludes cash",
+          "top_1": 0.24292149,
+          "top_3": 0.54794079,
+          "largest_instrument": "ETF_GROWTH"
+        },
+        "correlation_matrix": {
+          "EQUITY_ALPHA": {
+            "EQUITY_ALPHA": 1,
+            "ETF_GROWTH": 0.988122,
+            "ETF_CONSUMER": 0.938165,
+            "ETF_BOND": -0.825061
+          },
+          "ETF_GROWTH": {
+            "EQUITY_ALPHA": 0.988122,
+            "ETF_GROWTH": 1,
+            "ETF_CONSUMER": 0.97728,
+            "ETF_BOND": -0.815422
+          },
+          "ETF_CONSUMER": {
+            "EQUITY_ALPHA": 0.938165,
+            "ETF_GROWTH": 0.97728,
+            "ETF_CONSUMER": 1,
+            "ETF_BOND": -0.819951
+          },
+          "ETF_BOND": {
+            "EQUITY_ALPHA": -0.825061,
+            "ETF_GROWTH": -0.815422,
+            "ETF_CONSUMER": -0.819951,
+            "ETF_BOND": 1
+          }
+        },
+        "hidden_clusters": [
+          {
+            "instruments": [
+              "EQUITY_ALPHA",
+              "ETF_GROWTH"
+            ],
+            "correlation": 0.988122
+          },
+          {
+            "instruments": [
+              "EQUITY_ALPHA",
+              "ETF_CONSUMER"
+            ],
+            "correlation": 0.938165
+          },
+          {
+            "instruments": [
+              "ETF_GROWTH",
+              "ETF_CONSUMER"
+            ],
+            "correlation": 0.97728
+          }
+        ],
+        "attention_points": [
+          "largest position exceeds 20%",
+          "multiple instruments move together in the fixed window"
+        ],
+        "data_window": {
+          "start": "2026-09-15",
+          "end": "2026-09-23",
+          "observations": 7,
+          "annualization_factor": 252
+        }
+      },
+      "candidates": [
+        {
+          "proposal_id": "proposal-a-74ef228729",
+          "plan_id": "A",
+          "label": "Keep / minimum action",
+          "objective": "preserve the current allocation and avoid unnecessary turnover",
+          "target_weights": {
+            "CASH": 0.32175033,
+            "EQUITY_ALPHA": 0.15186615,
+            "ETF_GROWTH": 0.24292149,
+            "ETF_CONSUMER": 0.15315315,
+            "ETF_BOND": 0.13030888
+          },
+          "actions": [
+            {
+              "instrument_id": "CASH",
+              "from_weight": 0.32175033,
+              "to_weight": 0.32175033,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "EQUITY_ALPHA",
+              "from_weight": 0.15186615,
+              "to_weight": 0.15186615,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_BOND",
+              "from_weight": 0.13030888,
+              "to_weight": 0.13030888,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_CONSUMER",
+              "from_weight": 0.15315315,
+              "to_weight": 0.15315315,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_GROWTH",
+              "from_weight": 0.24292149,
+              "to_weight": 0.24292149,
+              "delta_weight": 0,
+              "side": "HOLD"
+            }
+          ],
+          "constraints": {
+            "max_single_asset_weight": 0.35,
+            "max_turnover": 0.05,
+            "objective": "minimum_action"
+          },
+          "turnover": 0,
+          "rationale": [
+            "No hard constraint is currently violated; keep the baseline for comparison."
+          ],
+          "expected_metrics": {
+            "max_single_asset_weight": 0.24292149,
+            "cash_weight": 0.32175033
+          },
+          "proposal_hash": "b1c4acfbd501a4221e0e7e766b395102138a5ad99315c7cbcd06e33f243a7b74",
+          "validation": {
+            "valid": true,
+            "errors": []
+          }
+        },
+        {
+          "proposal_id": "proposal-b-53a1666dd2",
+          "plan_id": "B",
+          "label": "Moderate rebalance",
+          "objective": "reduce the largest position with bounded turnover",
+          "target_weights": {
+            "CASH": 0.36467182,
+            "EQUITY_ALPHA": 0.15186615,
+            "ETF_GROWTH": 0.2,
+            "ETF_CONSUMER": 0.15315315,
+            "ETF_BOND": 0.13030888
+          },
+          "actions": [
+            {
+              "instrument_id": "CASH",
+              "from_weight": 0.32175033,
+              "to_weight": 0.36467182,
+              "delta_weight": 0.04292149,
+              "side": "BUY_OR_HOLD_CASH"
+            },
+            {
+              "instrument_id": "EQUITY_ALPHA",
+              "from_weight": 0.15186615,
+              "to_weight": 0.15186615,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_BOND",
+              "from_weight": 0.13030888,
+              "to_weight": 0.13030888,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_CONSUMER",
+              "from_weight": 0.15315315,
+              "to_weight": 0.15315315,
+              "delta_weight": 0,
+              "side": "HOLD"
+            },
+            {
+              "instrument_id": "ETF_GROWTH",
+              "from_weight": 0.24292149,
+              "to_weight": 0.2,
+              "delta_weight": -0.04292149,
+              "side": "SELL_OR_REDUCE"
+            }
+          ],
+          "constraints": {
+            "max_single_asset_weight": 0.2,
+            "max_turnover": 0.1,
+            "objective": "concentration_control"
+          },
+          "turnover": 0.04292149,
+          "rationale": [
+            "Cap any security above 20% and move the difference to cash."
+          ],
+          "expected_metrics": {
+            "max_single_asset_weight": 0.2,
+            "cash_weight": 0.36467182
+          },
+          "proposal_hash": "5f7da0e23aac20fb0cb88850548bad2d4b23d6b1eb1f82491aa20d63f871e707",
+          "validation": {
+            "valid": true,
+            "errors": []
+          }
+        },
+        {
+          "proposal_id": "proposal-c-45eb627fc2",
+          "plan_id": "C",
+          "label": "Risk priority",
+          "objective": "reduce correlated exposure and increase the defensive sleeve",
+          "target_weights": {
+            "CASH": 0.38,
+            "EQUITY_ALPHA": 0.14,
+            "ETF_GROWTH": 0.14,
+            "ETF_CONSUMER": 0.14,
+            "ETF_BOND": 0.2
+          },
+          "actions": [
+            {
+              "instrument_id": "CASH",
+              "from_weight": 0.32175033,
+              "to_weight": 0.38,
+              "delta_weight": 0.05824967,
+              "side": "BUY_OR_HOLD_CASH"
+            },
+            {
+              "instrument_id": "EQUITY_ALPHA",
+              "from_weight": 0.15186615,
+              "to_weight": 0.14,
+              "delta_weight": -0.01186615,
+              "side": "SELL_OR_REDUCE"
+            },
+            {
+              "instrument_id": "ETF_BOND",
+              "from_weight": 0.13030888,
+              "to_weight": 0.2,
+              "delta_weight": 0.06969112,
+              "side": "BUY_OR_HOLD_CASH"
+            },
+            {
+              "instrument_id": "ETF_CONSUMER",
+              "from_weight": 0.15315315,
+              "to_weight": 0.14,
+              "delta_weight": -0.01315315,
+              "side": "SELL_OR_REDUCE"
+            },
+            {
+              "instrument_id": "ETF_GROWTH",
+              "from_weight": 0.24292149,
+              "to_weight": 0.14,
+              "delta_weight": -0.10292149,
+              "side": "SELL_OR_REDUCE"
+            }
+          ],
+          "constraints": {
+            "max_single_asset_weight": 0.2,
+            "max_turnover": 0.25,
+            "objective": "risk_budget"
+          },
+          "turnover": 0.12794079,
+          "rationale": [
+            "Reduce the detected correlated cluster, then split released weight between bond ETF and cash."
+          ],
+          "expected_metrics": {
+            "max_single_asset_weight": 0.2,
+            "cash_weight": 0.38
+          },
+          "proposal_hash": "610b4ca5b8fcce69f0f0bfb166d2aeb5703de5bd861e229c295026b548b97966",
+          "validation": {
+            "valid": true,
+            "errors": []
+          }
+        }
+      ],
+      "simulation": {
+        "simulation_id": "simulation-199585da939d4269",
+        "snapshot_id": "snapshot-de37f3dab3586cd6",
+        "historical_window": {
+          "start": "2026-09-15",
+          "end": "2026-09-23"
+        },
+        "transaction_cost_rate": 0.001,
+        "assumptions": {
+          "data_mode": "SYNTHETIC_REPLAY",
+          "initial_capital": 31080,
+          "annualization_factor": 252,
+          "risk_free_rate": 0.02,
+          "portfolio_method": "buy-and-hold",
+          "cost_basis": "one-way turnover times rate charged once",
+          "sample_observations": 7,
+          "caveat": "Ex-post allocation comparison on a short synthetic window, not an out-of-sample strategy backtest."
+        },
+        "comparisons": [
+          {
+            "plan_id": "CURRENT",
+            "proposal_id": "proposal-current-74ef228729",
+            "label": "Current portfolio",
+            "turnover": 0,
+            "transaction_cost": 0,
+            "metrics": {
+              "cumulative_return": -0.02789133,
+              "annualized_return": -0.69519485,
+              "annualized_volatility": 0.15334647,
+              "max_drawdown": -0.02789133,
+              "sharpe_ratio": -7.79583962,
+              "ending_index": 0.97210867
+            },
+            "curve": [
+              {
+                "date": "2026-09-15",
+                "value": 1
+              },
+              {
+                "date": "2026-09-16",
+                "value": 0.9914955
+              },
+              {
+                "date": "2026-09-17",
+                "value": 0.98512717
+              },
+              {
+                "date": "2026-09-18",
+                "value": 0.99392753
+              },
+              {
+                "date": "2026-09-21",
+                "value": 0.9778425
+              },
+              {
+                "date": "2026-09-22",
+                "value": 0.98273126
+              },
+              {
+                "date": "2026-09-23",
+                "value": 0.97210867
+              }
+            ]
+          },
+          {
+            "plan_id": "A",
+            "proposal_id": "proposal-a-74ef228729",
+            "label": "Keep / minimum action",
+            "turnover": 0,
+            "transaction_cost": 0,
+            "metrics": {
+              "cumulative_return": -0.02789133,
+              "annualized_return": -0.69519485,
+              "annualized_volatility": 0.15334647,
+              "max_drawdown": -0.02789133,
+              "sharpe_ratio": -7.79583962,
+              "ending_index": 0.97210867
+            },
+            "curve": [
+              {
+                "date": "2026-09-15",
+                "value": 1
+              },
+              {
+                "date": "2026-09-16",
+                "value": 0.9914955
+              },
+              {
+                "date": "2026-09-17",
+                "value": 0.98512717
+              },
+              {
+                "date": "2026-09-18",
+                "value": 0.99392753
+              },
+              {
+                "date": "2026-09-21",
+                "value": 0.9778425
+              },
+              {
+                "date": "2026-09-22",
+                "value": 0.98273126
+              },
+              {
+                "date": "2026-09-23",
+                "value": 0.97210867
+              }
+            ]
+          },
+          {
+            "plan_id": "B",
+            "proposal_id": "proposal-b-53a1666dd2",
+            "label": "Moderate rebalance",
+            "turnover": 0.04292149,
+            "transaction_cost": 4.292e-05,
+            "metrics": {
+              "cumulative_return": -0.02551882,
+              "annualized_return": -0.66233569,
+              "annualized_volatility": 0.13900778,
+              "max_drawdown": -0.02551882,
+              "sharpe_ratio": -7.87940182,
+              "ending_index": 0.97448118
+            },
+            "curve": [
+              {
+                "date": "2026-09-15",
+                "value": 1
+              },
+              {
+                "date": "2026-09-16",
+                "value": 0.99220403
+              },
+              {
+                "date": "2026-09-17",
+                "value": 0.98642613
+              },
+              {
+                "date": "2026-09-18",
+                "value": 0.99436771
+              },
+              {
+                "date": "2026-09-21",
+                "value": 0.97973192
+              },
+              {
+                "date": "2026-09-22",
+                "value": 0.98413762
+              },
+              {
+                "date": "2026-09-23",
+                "value": 0.97448118
+              }
+            ]
+          },
+          {
+            "plan_id": "C",
+            "proposal_id": "proposal-c-45eb627fc2",
+            "label": "Risk priority",
+            "turnover": 0.12794079,
+            "transaction_cost": 0.00012794,
+            "metrics": {
+              "cumulative_return": -0.02006039,
+              "annualized_return": -0.57305579,
+              "annualized_volatility": 0.11048451,
+              "max_drawdown": -0.02006039,
+              "sharpe_ratio": -7.82526986,
+              "ending_index": 0.97993961
+            },
+            "curve": [
+              {
+                "date": "2026-09-15",
+                "value": 1
+              },
+              {
+                "date": "2026-09-16",
+                "value": 0.99372285
+              },
+              {
+                "date": "2026-09-17",
+                "value": 0.98921842
+              },
+              {
+                "date": "2026-09-18",
+                "value": 0.99543763
+              },
+              {
+                "date": "2026-09-21",
+                "value": 0.98387411
+              },
+              {
+                "date": "2026-09-22",
+                "value": 0.98762863
+              },
+              {
+                "date": "2026-09-23",
+                "value": 0.97993961
+              }
+            ]
+          }
+        ],
+        "scenarios": [
+          {
+            "plan_id": "CURRENT",
+            "distribution": {
+              "method": "block_bootstrap",
+              "block_size": 3,
+              "paths": 2000,
+              "seed": 20260924,
+              "horizon_days": 20,
+              "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+              "p10": -0.0913528,
+              "p50": -0.07048466,
+              "p90": -0.04823071
+            }
+          },
+          {
+            "plan_id": "A",
+            "distribution": {
+              "method": "block_bootstrap",
+              "block_size": 3,
+              "paths": 2000,
+              "seed": 20260924,
+              "horizon_days": 20,
+              "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+              "p10": -0.0913528,
+              "p50": -0.07048466,
+              "p90": -0.04823071
+            }
+          },
+          {
+            "plan_id": "B",
+            "distribution": {
+              "method": "block_bootstrap",
+              "block_size": 3,
+              "paths": 2000,
+              "seed": 20260924,
+              "horizon_days": 20,
+              "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+              "p10": -0.08345959,
+              "p50": -0.06455058,
+              "p90": -0.04436988
+            }
+          },
+          {
+            "plan_id": "C",
+            "distribution": {
+              "method": "block_bootstrap",
+              "block_size": 3,
+              "paths": 2000,
+              "seed": 20260924,
+              "horizon_days": 20,
+              "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+              "p10": -0.06499043,
+              "p50": -0.05054828,
+              "p90": -0.03462233
+            }
+          }
+        ],
+        "limitation": "Historical replay and fixed-seed scenario simulation are not a prediction of future returns."
+      }
+    },
+    "tool_results": {
+      "trace-47a06c109ce838e8": {
+        "tool_name": "portfolio.import",
+        "version": "financial-tools@0.4.0",
+        "inputs_hash": "433a67d262335df71c038d8920341090bf900298bb61d18a50e7bbe589cf7563",
+        "output": {
+          "valid": true,
+          "snapshot": {
+            "snapshot_id": "snapshot-de37f3dab3586cd6",
+            "portfolio_id": "golden-demo-portfolio",
+            "as_of": "2026-09-23T08:00:00Z",
+            "positions": [
+              {
+                "instrument_id": "EQUITY_ALPHA",
+                "name": "Alpha Holdings",
+                "type": "A_SHARE",
+                "sector": "Technology",
+                "quantity": 100,
+                "price": 47.2,
+                "market_value": 4720,
+                "weight": 0.15186615
+              },
+              {
+                "instrument_id": "ETF_GROWTH",
+                "name": "Growth ETF",
+                "type": "ETF",
+                "sector": "Technology",
+                "quantity": 100,
+                "price": 75.5,
+                "market_value": 7550,
+                "weight": 0.24292149
+              },
+              {
+                "instrument_id": "ETF_CONSUMER",
+                "name": "Consumer ETF",
+                "type": "ETF",
+                "sector": "Consumer",
+                "quantity": 100,
+                "price": 47.6,
+                "market_value": 4760,
+                "weight": 0.15315315
+              },
+              {
+                "instrument_id": "ETF_BOND",
+                "name": "Bond ETF",
+                "type": "ETF",
+                "sector": "Fixed Income",
+                "quantity": 100,
+                "price": 40.5,
+                "market_value": 4050,
+                "weight": 0.13030888
+              }
+            ],
+            "cash": 10000,
+            "cash_weight": 0.32175032,
+            "total_value": 31080,
+            "data_quality": {
+              "status": "VALID",
+              "errors": [],
+              "warnings": []
+            }
+          },
+          "errors": [],
+          "warnings": []
+        },
+        "data_as_of": "2026-09-23T08:00:00Z",
+        "warnings": [
+          "Synthetic replay data: seven observations only; not suitable for investment decisions."
+        ],
+        "trace_id": "trace-47a06c109ce838e8"
+      },
+      "trace-806989342cd10329": {
+        "tool_name": "portfolio.diagnose",
+        "version": "financial-tools@0.4.0",
+        "inputs_hash": "47afdede0c23b3a53f4cb1c74408060a1e2bb437342456ecf5b6b3fd1c407b19",
+        "output": {
+          "report_id": "health-45f227c09db8cce7",
+          "snapshot_id": "snapshot-de37f3dab3586cd6",
+          "metrics": {
+            "cumulative_return": -0.02789133,
+            "annualized_return": -0.69519485,
+            "annualized_volatility": 0.15334647,
+            "max_drawdown": -0.02789133,
+            "sharpe_ratio": -7.79583962,
+            "ending_index": 0.97210867
+          },
+          "cash_weight": 0.32175032,
+          "concentration": {
+            "hhi": 0.22603374,
+            "hhi_basis": "all assets including cash; top-N excludes cash",
+            "top_1": 0.24292149,
+            "top_3": 0.54794079,
+            "largest_instrument": "ETF_GROWTH"
+          },
+          "correlation_matrix": {
+            "EQUITY_ALPHA": {
+              "EQUITY_ALPHA": 1,
+              "ETF_GROWTH": 0.988122,
+              "ETF_CONSUMER": 0.938165,
+              "ETF_BOND": -0.825061
+            },
+            "ETF_GROWTH": {
+              "EQUITY_ALPHA": 0.988122,
+              "ETF_GROWTH": 1,
+              "ETF_CONSUMER": 0.97728,
+              "ETF_BOND": -0.815422
+            },
+            "ETF_CONSUMER": {
+              "EQUITY_ALPHA": 0.938165,
+              "ETF_GROWTH": 0.97728,
+              "ETF_CONSUMER": 1,
+              "ETF_BOND": -0.819951
+            },
+            "ETF_BOND": {
+              "EQUITY_ALPHA": -0.825061,
+              "ETF_GROWTH": -0.815422,
+              "ETF_CONSUMER": -0.819951,
+              "ETF_BOND": 1
+            }
+          },
+          "hidden_clusters": [
+            {
+              "instruments": [
+                "EQUITY_ALPHA",
+                "ETF_GROWTH"
+              ],
+              "correlation": 0.988122
+            },
+            {
+              "instruments": [
+                "EQUITY_ALPHA",
+                "ETF_CONSUMER"
+              ],
+              "correlation": 0.938165
+            },
+            {
+              "instruments": [
+                "ETF_GROWTH",
+                "ETF_CONSUMER"
+              ],
+              "correlation": 0.97728
+            }
+          ],
+          "attention_points": [
+            "largest position exceeds 20%",
+            "multiple instruments move together in the fixed window"
+          ],
+          "data_window": {
+            "start": "2026-09-15",
+            "end": "2026-09-23",
+            "observations": 7,
+            "annualization_factor": 252
+          }
+        },
+        "data_as_of": "2026-09-23T08:00:00Z",
+        "warnings": [
+          "Synthetic replay data: seven observations only; not suitable for investment decisions."
+        ],
+        "trace_id": "trace-806989342cd10329"
+      },
+      "trace-b859fe1a05c6b119": {
+        "tool_name": "strategy.generate",
+        "version": "financial-tools@0.4.0",
+        "inputs_hash": "3e0c7157d3fa4da576e4bacb27ca4acfb4be02ace7695da88bdf4a847e6c7d54",
+        "output": {
+          "snapshot_id": "snapshot-de37f3dab3586cd6",
+          "report_id": "health-45f227c09db8cce7",
+          "candidates": [
+            {
+              "proposal_id": "proposal-a-74ef228729",
+              "plan_id": "A",
+              "label": "Keep / minimum action",
+              "objective": "preserve the current allocation and avoid unnecessary turnover",
+              "target_weights": {
+                "CASH": 0.32175033,
+                "EQUITY_ALPHA": 0.15186615,
+                "ETF_GROWTH": 0.24292149,
+                "ETF_CONSUMER": 0.15315315,
+                "ETF_BOND": 0.13030888
+              },
+              "actions": [
+                {
+                  "instrument_id": "CASH",
+                  "from_weight": 0.32175033,
+                  "to_weight": 0.32175033,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "EQUITY_ALPHA",
+                  "from_weight": 0.15186615,
+                  "to_weight": 0.15186615,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_BOND",
+                  "from_weight": 0.13030888,
+                  "to_weight": 0.13030888,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_CONSUMER",
+                  "from_weight": 0.15315315,
+                  "to_weight": 0.15315315,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_GROWTH",
+                  "from_weight": 0.24292149,
+                  "to_weight": 0.24292149,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                }
+              ],
+              "constraints": {
+                "max_single_asset_weight": 0.35,
+                "max_turnover": 0.05,
+                "objective": "minimum_action"
+              },
+              "turnover": 0,
+              "rationale": [
+                "No hard constraint is currently violated; keep the baseline for comparison."
+              ],
+              "expected_metrics": {
+                "max_single_asset_weight": 0.24292149,
+                "cash_weight": 0.32175033
+              },
+              "proposal_hash": "b1c4acfbd501a4221e0e7e766b395102138a5ad99315c7cbcd06e33f243a7b74",
+              "validation": {
+                "valid": true,
+                "errors": []
+              }
+            },
+            {
+              "proposal_id": "proposal-b-53a1666dd2",
+              "plan_id": "B",
+              "label": "Moderate rebalance",
+              "objective": "reduce the largest position with bounded turnover",
+              "target_weights": {
+                "CASH": 0.36467182,
+                "EQUITY_ALPHA": 0.15186615,
+                "ETF_GROWTH": 0.2,
+                "ETF_CONSUMER": 0.15315315,
+                "ETF_BOND": 0.13030888
+              },
+              "actions": [
+                {
+                  "instrument_id": "CASH",
+                  "from_weight": 0.32175033,
+                  "to_weight": 0.36467182,
+                  "delta_weight": 0.04292149,
+                  "side": "BUY_OR_HOLD_CASH"
+                },
+                {
+                  "instrument_id": "EQUITY_ALPHA",
+                  "from_weight": 0.15186615,
+                  "to_weight": 0.15186615,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_BOND",
+                  "from_weight": 0.13030888,
+                  "to_weight": 0.13030888,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_CONSUMER",
+                  "from_weight": 0.15315315,
+                  "to_weight": 0.15315315,
+                  "delta_weight": 0,
+                  "side": "HOLD"
+                },
+                {
+                  "instrument_id": "ETF_GROWTH",
+                  "from_weight": 0.24292149,
+                  "to_weight": 0.2,
+                  "delta_weight": -0.04292149,
+                  "side": "SELL_OR_REDUCE"
+                }
+              ],
+              "constraints": {
+                "max_single_asset_weight": 0.2,
+                "max_turnover": 0.1,
+                "objective": "concentration_control"
+              },
+              "turnover": 0.04292149,
+              "rationale": [
+                "Cap any security above 20% and move the difference to cash."
+              ],
+              "expected_metrics": {
+                "max_single_asset_weight": 0.2,
+                "cash_weight": 0.36467182
+              },
+              "proposal_hash": "5f7da0e23aac20fb0cb88850548bad2d4b23d6b1eb1f82491aa20d63f871e707",
+              "validation": {
+                "valid": true,
+                "errors": []
+              }
+            },
+            {
+              "proposal_id": "proposal-c-45eb627fc2",
+              "plan_id": "C",
+              "label": "Risk priority",
+              "objective": "reduce correlated exposure and increase the defensive sleeve",
+              "target_weights": {
+                "CASH": 0.38,
+                "EQUITY_ALPHA": 0.14,
+                "ETF_GROWTH": 0.14,
+                "ETF_CONSUMER": 0.14,
+                "ETF_BOND": 0.2
+              },
+              "actions": [
+                {
+                  "instrument_id": "CASH",
+                  "from_weight": 0.32175033,
+                  "to_weight": 0.38,
+                  "delta_weight": 0.05824967,
+                  "side": "BUY_OR_HOLD_CASH"
+                },
+                {
+                  "instrument_id": "EQUITY_ALPHA",
+                  "from_weight": 0.15186615,
+                  "to_weight": 0.14,
+                  "delta_weight": -0.01186615,
+                  "side": "SELL_OR_REDUCE"
+                },
+                {
+                  "instrument_id": "ETF_BOND",
+                  "from_weight": 0.13030888,
+                  "to_weight": 0.2,
+                  "delta_weight": 0.06969112,
+                  "side": "BUY_OR_HOLD_CASH"
+                },
+                {
+                  "instrument_id": "ETF_CONSUMER",
+                  "from_weight": 0.15315315,
+                  "to_weight": 0.14,
+                  "delta_weight": -0.01315315,
+                  "side": "SELL_OR_REDUCE"
+                },
+                {
+                  "instrument_id": "ETF_GROWTH",
+                  "from_weight": 0.24292149,
+                  "to_weight": 0.14,
+                  "delta_weight": -0.10292149,
+                  "side": "SELL_OR_REDUCE"
+                }
+              ],
+              "constraints": {
+                "max_single_asset_weight": 0.2,
+                "max_turnover": 0.25,
+                "objective": "risk_budget"
+              },
+              "turnover": 0.12794079,
+              "rationale": [
+                "Reduce the detected correlated cluster, then split released weight between bond ETF and cash."
+              ],
+              "expected_metrics": {
+                "max_single_asset_weight": 0.2,
+                "cash_weight": 0.38
+              },
+              "proposal_hash": "610b4ca5b8fcce69f0f0bfb166d2aeb5703de5bd861e229c295026b548b97966",
+              "validation": {
+                "valid": true,
+                "errors": []
+              }
+            }
+          ]
+        },
+        "data_as_of": "2026-09-23T08:00:00Z",
+        "warnings": [
+          "Synthetic replay data: seven observations only; not suitable for investment decisions."
+        ],
+        "trace_id": "trace-b859fe1a05c6b119"
+      },
+      "trace-1f704db52146f8f1": {
+        "tool_name": "simulation.run",
+        "version": "financial-tools@0.4.0",
+        "inputs_hash": "251e211a9970ee2d1f553d08bb8234499fb087237f5710edc878cff5485ef100",
+        "output": {
+          "simulation_id": "simulation-199585da939d4269",
+          "snapshot_id": "snapshot-de37f3dab3586cd6",
+          "historical_window": {
+            "start": "2026-09-15",
+            "end": "2026-09-23"
+          },
+          "transaction_cost_rate": 0.001,
+          "assumptions": {
+            "data_mode": "SYNTHETIC_REPLAY",
+            "initial_capital": 31080,
+            "annualization_factor": 252,
+            "risk_free_rate": 0.02,
+            "portfolio_method": "buy-and-hold",
+            "cost_basis": "one-way turnover times rate charged once",
+            "sample_observations": 7,
+            "caveat": "Ex-post allocation comparison on a short synthetic window, not an out-of-sample strategy backtest."
+          },
+          "comparisons": [
+            {
+              "plan_id": "CURRENT",
+              "proposal_id": "proposal-current-74ef228729",
+              "label": "Current portfolio",
+              "turnover": 0,
+              "transaction_cost": 0,
+              "metrics": {
+                "cumulative_return": -0.02789133,
+                "annualized_return": -0.69519485,
+                "annualized_volatility": 0.15334647,
+                "max_drawdown": -0.02789133,
+                "sharpe_ratio": -7.79583962,
+                "ending_index": 0.97210867
+              },
+              "curve": [
+                {
+                  "date": "2026-09-15",
+                  "value": 1
+                },
+                {
+                  "date": "2026-09-16",
+                  "value": 0.9914955
+                },
+                {
+                  "date": "2026-09-17",
+                  "value": 0.98512717
+                },
+                {
+                  "date": "2026-09-18",
+                  "value": 0.99392753
+                },
+                {
+                  "date": "2026-09-21",
+                  "value": 0.9778425
+                },
+                {
+                  "date": "2026-09-22",
+                  "value": 0.98273126
+                },
+                {
+                  "date": "2026-09-23",
+                  "value": 0.97210867
+                }
+              ]
+            },
+            {
+              "plan_id": "A",
+              "proposal_id": "proposal-a-74ef228729",
+              "label": "Keep / minimum action",
+              "turnover": 0,
+              "transaction_cost": 0,
+              "metrics": {
+                "cumulative_return": -0.02789133,
+                "annualized_return": -0.69519485,
+                "annualized_volatility": 0.15334647,
+                "max_drawdown": -0.02789133,
+                "sharpe_ratio": -7.79583962,
+                "ending_index": 0.97210867
+              },
+              "curve": [
+                {
+                  "date": "2026-09-15",
+                  "value": 1
+                },
+                {
+                  "date": "2026-09-16",
+                  "value": 0.9914955
+                },
+                {
+                  "date": "2026-09-17",
+                  "value": 0.98512717
+                },
+                {
+                  "date": "2026-09-18",
+                  "value": 0.99392753
+                },
+                {
+                  "date": "2026-09-21",
+                  "value": 0.9778425
+                },
+                {
+                  "date": "2026-09-22",
+                  "value": 0.98273126
+                },
+                {
+                  "date": "2026-09-23",
+                  "value": 0.97210867
+                }
+              ]
+            },
+            {
+              "plan_id": "B",
+              "proposal_id": "proposal-b-53a1666dd2",
+              "label": "Moderate rebalance",
+              "turnover": 0.04292149,
+              "transaction_cost": 4.292e-05,
+              "metrics": {
+                "cumulative_return": -0.02551882,
+                "annualized_return": -0.66233569,
+                "annualized_volatility": 0.13900778,
+                "max_drawdown": -0.02551882,
+                "sharpe_ratio": -7.87940182,
+                "ending_index": 0.97448118
+              },
+              "curve": [
+                {
+                  "date": "2026-09-15",
+                  "value": 1
+                },
+                {
+                  "date": "2026-09-16",
+                  "value": 0.99220403
+                },
+                {
+                  "date": "2026-09-17",
+                  "value": 0.98642613
+                },
+                {
+                  "date": "2026-09-18",
+                  "value": 0.99436771
+                },
+                {
+                  "date": "2026-09-21",
+                  "value": 0.97973192
+                },
+                {
+                  "date": "2026-09-22",
+                  "value": 0.98413762
+                },
+                {
+                  "date": "2026-09-23",
+                  "value": 0.97448118
+                }
+              ]
+            },
+            {
+              "plan_id": "C",
+              "proposal_id": "proposal-c-45eb627fc2",
+              "label": "Risk priority",
+              "turnover": 0.12794079,
+              "transaction_cost": 0.00012794,
+              "metrics": {
+                "cumulative_return": -0.02006039,
+                "annualized_return": -0.57305579,
+                "annualized_volatility": 0.11048451,
+                "max_drawdown": -0.02006039,
+                "sharpe_ratio": -7.82526986,
+                "ending_index": 0.97993961
+              },
+              "curve": [
+                {
+                  "date": "2026-09-15",
+                  "value": 1
+                },
+                {
+                  "date": "2026-09-16",
+                  "value": 0.99372285
+                },
+                {
+                  "date": "2026-09-17",
+                  "value": 0.98921842
+                },
+                {
+                  "date": "2026-09-18",
+                  "value": 0.99543763
+                },
+                {
+                  "date": "2026-09-21",
+                  "value": 0.98387411
+                },
+                {
+                  "date": "2026-09-22",
+                  "value": 0.98762863
+                },
+                {
+                  "date": "2026-09-23",
+                  "value": 0.97993961
+                }
+              ]
+            }
+          ],
+          "scenarios": [
+            {
+              "plan_id": "CURRENT",
+              "distribution": {
+                "method": "block_bootstrap",
+                "block_size": 3,
+                "paths": 2000,
+                "seed": 20260924,
+                "horizon_days": 20,
+                "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+                "p10": -0.0913528,
+                "p50": -0.07048466,
+                "p90": -0.04823071
+              }
+            },
+            {
+              "plan_id": "A",
+              "distribution": {
+                "method": "block_bootstrap",
+                "block_size": 3,
+                "paths": 2000,
+                "seed": 20260924,
+                "horizon_days": 20,
+                "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+                "p10": -0.0913528,
+                "p50": -0.07048466,
+                "p90": -0.04823071
+              }
+            },
+            {
+              "plan_id": "B",
+              "distribution": {
+                "method": "block_bootstrap",
+                "block_size": 3,
+                "paths": 2000,
+                "seed": 20260924,
+                "horizon_days": 20,
+                "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+                "p10": -0.08345959,
+                "p50": -0.06455058,
+                "p90": -0.04436988
+              }
+            },
+            {
+              "plan_id": "C",
+              "distribution": {
+                "method": "block_bootstrap",
+                "block_size": 3,
+                "paths": 2000,
+                "seed": 20260924,
+                "horizon_days": 20,
+                "sampling": "joint asset daily returns; identical block indices across Current/A/B/C",
+                "p10": -0.06499043,
+                "p50": -0.05054828,
+                "p90": -0.03462233
+              }
+            }
+          ],
+          "limitation": "Historical replay and fixed-seed scenario simulation are not a prediction of future returns."
+        },
+        "data_as_of": "2026-09-23T08:00:00Z",
+        "warnings": [
+          "Synthetic replay data: seven observations only; not suitable for investment decisions."
+        ],
+        "trace_id": "trace-1f704db52146f8f1"
+      }
+    },
+    "audit_evidence": {
+      "audit_id": "audit-task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "contract_version": "investment-agent.v1",
+      "request_id": "req-daily-20261025-reuse",
+      "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "session_id": "session-3b45ddbe-a5c8-4cad-bc31-9f17b08c022f",
+      "events": [
+        {
+          "event_id": "event-bd33ceae-d300-49c9-8320-185eff2f5605",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "session.created",
+          "payload": {
+            "missing_fields": [],
+            "request_id": null
+          },
+          "timestamp": "2026-10-25T14:02:36.219Z"
+        },
+        {
+          "event_id": "event-cdbeff1f-5b86-47e8-bf47-d733399449be",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "contract.received",
+          "payload": {
+            "contract_version": "investment-agent.v1",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.221Z"
+        },
+        {
+          "event_id": "event-c4fac945-9942-45cf-82a5-9a468b21c7ff",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "checkpoint.invalidated",
+          "payload": {
+            "reason": "input changed",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.221Z"
+        },
+        {
+          "event_id": "event-69d460bf-4337-4999-8ecd-13b0702952af",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.started",
+          "payload": {
+            "stage": "VALIDATE_INPUT",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.221Z"
+        },
+        {
+          "event_id": "event-b06b21d1-8305-409a-85f1-5c560811e1d1",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.completed",
+          "payload": {
+            "stage": "VALIDATE_INPUT",
+            "attempt": 1,
+            "result_ref": "trace-47a06c109ce838e8",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.222Z"
+        },
+        {
+          "event_id": "event-d72320e1-fb59-4fa1-a80a-404847a2ebcf",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.started",
+          "payload": {
+            "stage": "DIAGNOSE",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.222Z"
+        },
+        {
+          "event_id": "event-cd1b4439-d25b-483c-b8cd-4111cd0a5f79",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.completed",
+          "payload": {
+            "stage": "DIAGNOSE",
+            "attempt": 1,
+            "result_ref": "trace-806989342cd10329",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.224Z"
+        },
+        {
+          "event_id": "event-0827eb0d-f930-4fc4-9952-bddd4f59a61a",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.started",
+          "payload": {
+            "stage": "GENERATE_CANDIDATES",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.224Z"
+        },
+        {
+          "event_id": "event-cf0e8cb5-ae69-449c-b0b1-23da90d83334",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.completed",
+          "payload": {
+            "stage": "GENERATE_CANDIDATES",
+            "attempt": 1,
+            "result_ref": "trace-b859fe1a05c6b119",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.227Z"
+        },
+        {
+          "event_id": "event-a97c8ab3-c4ec-4091-87f5-f50fbde7621f",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.started",
+          "payload": {
+            "stage": "SIMULATE",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.227Z"
+        },
+        {
+          "event_id": "event-b0edc494-1228-46cc-9792-8c220da0ce69",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.completed",
+          "payload": {
+            "stage": "SIMULATE",
+            "attempt": 1,
+            "result_ref": "trace-1f704db52146f8f1",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.253Z"
+        },
+        {
+          "event_id": "event-02d05359-ab50-4494-b792-a8fcbcdb8bb7",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "stage.handoff",
+          "payload": {
+            "owner": "Safety/Risk/Eval",
+            "reason": "Risk decision is outside Agent Core and Tools ownership.",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.253Z"
+        },
+        {
+          "event_id": "event-f8cf1391-73a6-4033-bc27-4a81b1009285",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "contract.accepted",
+          "payload": {
+            "contract_version": "investment-agent.v1",
+            "request_id": "req-daily-20261025-health"
+          },
+          "timestamp": "2026-10-25T14:02:36.253Z"
+        },
+        {
+          "event_id": "event-7662fed0-dbf8-483d-a681-7de5df7accd6",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "contract.received",
+          "payload": {
+            "contract_version": "investment-agent.v1",
+            "request_id": "req-daily-20261025-reuse"
+          },
+          "timestamp": "2026-10-25T14:02:36.255Z"
+        },
+        {
+          "event_id": "event-280db86a-03da-4b5c-be8d-1663bb39d592",
+          "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+          "actor": "harness",
+          "event_type": "contract.accepted",
+          "payload": {
+            "contract_version": "investment-agent.v1",
+            "request_id": "req-daily-20261025-reuse"
+          },
+          "timestamp": "2026-10-25T14:02:36.255Z"
+        }
+      ]
+    },
+    "risk_handoff": {
+      "contract_version": "investment-agent.v1",
+      "handoff_id": "handoff-task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "task_id": "task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a",
+      "session_id": "session-3b45ddbe-a5c8-4cad-bc31-9f17b08c022f",
+      "status": "PENDING_REVIEW",
+      "decision": "REQUIRED",
+      "owner": "Safety/Risk/Eval",
+      "reason": "Risk decision is outside Agent Core and Tools ownership.",
+      "evidence": {
+        "portfolio_snapshot_id": "snapshot-de37f3dab3586cd6",
+        "health_report_id": "health-45f227c09db8cce7",
+        "proposal_ids": [
+          "proposal-a-74ef228729",
+          "proposal-b-53a1666dd2",
+          "proposal-c-45eb627fc2"
+        ],
+        "simulation_id": "simulation-199585da939d4269",
+        "audit_id": "audit-task-d49b3db0-b801-4db9-a0d9-dacbcc38cb4a"
+      },
+      "execution_allowed": false
+    }
+  },
+  "failure": {
+    "contract_version": "investment-agent.v1",
+    "request_id": "req-daily-20261025-failure",
+    "operation": "PORTFOLIO_HEALTH_CHECK",
+    "trace": {
+      "contract_version": "investment-agent.v1",
+      "error_contract_version": "core-agent-error.v1",
+      "source_contract_version": "investment-agent.v1",
+      "request_id": "req-daily-20261025-failure",
+      "task_id": "task-f5d49aaf-d4d7-4b8e-b5a5-904db17cf25f",
+      "session_id": "session-da7b1dce-7c96-48dd-b3e5-87ba4d869b34",
+      "run_id": null,
+      "audit_id": "audit-task-f5d49aaf-d4d7-4b8e-b5a5-904db17cf25f",
+      "handoff_id": null
+    },
+    "error": {
+      "code": "REQUEST_FAILED",
+      "message": "synthetic timeout",
+      "retryable": false,
+      "stage": "DIAGNOSE",
+      "recovery": "Review the request and retry after correcting the reported issue.",
+      "details": null
+    },
+    "error_contract_version": "core-agent-error.v1",
+    "source_contract_version": "investment-agent.v1"
+  },
+  "semantic_rejected": true,
+  "handoff": {
+    "handoff_version": "risk-handoff.v1",
+    "contract_version": "model-review.v1",
+    "workflow_version": "review-workflow.v1",
+    "schema_version": "model-review.v1",
+    "handoff_id": "handoff-4e5ca0a0-18f3-4463-a05e-d145cdcf3439",
+    "task_id": "task-iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+    "request_id": "iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+    "session_id": "session-4c09d9ab-de8a-44df-b4b3-3d98a8e851d2",
+    "run_id": "review-825a7fd3-bdcc-45e6-a93c-50cda5704dbd",
+    "audit_id": "audit-65f85cc2-fc06-44ec-a32f-05e6923c5bbb",
+    "data_mode": "SYNTHETIC_REPLAY",
+    "execution_mode": "PAPER",
+    "capability": "REVIEW_ONLY",
+    "scenario": "FUNDING_CONFLICT",
+    "output_contract": {
+      "contract_version": "agent-output.v1",
+      "requested_formats": [
+        "json"
+      ],
+      "available_formats": [
+        "json"
+      ],
+      "status": "READY",
+      "pending_formats": [],
+      "side_effects": false
+    },
+    "portfolio_snapshot_id": null,
+    "risk_profile_version": "risk-profile.v1",
+    "plan_id": "plan-13253a09-506e-4a09-9aae-996e4ef353cd",
+    "plan_hash": "52485d77e17e4668a1c03bf8d19c5bb60a12f048b7dd5f7a62ed7551c81f1ae8",
+    "policy_version": "risk-policy.v1",
+    "workflow_status": "PENDING_RISK",
+    "status": "PENDING_REVIEW",
+    "decision": "REQUIRED",
+    "owner": "Unified Risk",
+    "execution_allowed": false,
+    "proposal": {
+      "proposed_action": "REQUEST_MORE_INFO",
+      "action_reason": "缺乏账户余额、具体日期和交易明细。",
+      "risk_level": "unknown",
+      "requested_action": null,
+      "action_parameters": {
+        "amount": 8000,
+        "currency": "CNY"
+      },
+      "model_response_id": "chatcmpl-88526a62-6314-4941-8074-560068d24a42",
+      "proposal_sha256": "52485d77e17e4668a1c03bf8d19c5bb60a12f048b7dd5f7a62ed7551c81f1ae8"
+    },
+    "reviewed_input": {
+      "schema_version": "model-review.v1",
+      "request_id": "iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+      "task_id": "task-iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+      "session_id": "session-4c09d9ab-de8a-44df-b4b3-3d98a8e851d2",
+      "source_task_id": null,
+      "source": "synthetic-iteration-verification",
+      "kind": "combined",
+      "text": "【虚构测试】我打算投入8000元买基金，下个月房租4500元，视频会员每月25元。尚未提供余额和具体日期，请列出需要补充的信息，不要虚构账户余额、优惠或交易结果。",
+      "context": {},
+      "action_parameters": {
+        "amount": 8000,
+        "currency": "CNY"
+      },
+      "requested_action": null,
+      "allow_rule_fallback": false,
+      "data_mode": "SYNTHETIC_REPLAY",
+      "execution_mode": "PAPER",
+      "capability": "REVIEW_ONLY",
+      "portfolio_snapshot_id": null,
+      "risk_profile_version": "risk-profile.v1",
+      "plan_id": null,
+      "plan_hash": null,
+      "policy_version": "risk-policy.v1",
+      "idempotency_key": "iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+      "memory_consent": false,
+      "scenario": "FUNDING_CONFLICT",
+      "output_formats": [
+        "json"
+      ]
+    },
+    "input_authority": "UNVERIFIED_CALLER_INPUT",
+    "model": {
+      "source": "model",
+      "status": "PROPOSED",
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "provider_response_id": "chatcmpl-88526a62-6314-4941-8074-560068d24a42",
+      "call_succeeded": true,
+      "attempt_count": 1,
+      "retry_count": 0
+    },
+    "evidence": {
+      "input_sha256": "57af87262333c7db1fae7d9cf6f1afaeaaaa29710722a9e1e12ddb20c50d3672",
+      "model_response_id": "chatcmpl-88526a62-6314-4941-8074-560068d24a42",
+      "proposal_sha256": "52485d77e17e4668a1c03bf8d19c5bb60a12f048b7dd5f7a62ed7551c81f1ae8",
+      "audit_id": "audit-65f85cc2-fc06-44ec-a32f-05e6923c5bbb",
+      "plan_id": "plan-13253a09-506e-4a09-9aae-996e4ef353cd",
+      "plan_hash": "52485d77e17e4668a1c03bf8d19c5bb60a12f048b7dd5f7a62ed7551c81f1ae8",
+      "policy_version": "risk-policy.v1"
+    },
+    "approval": {
+      "approval_id": "approval-07d07565-a958-431a-8c6d-a6154f1ce526",
+      "task_id": "task-iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+      "required": true,
+      "status": "BLOCKED",
+      "decision": null,
+      "proposal_sha256": "52485d77e17e4668a1c03bf8d19c5bb60a12f048b7dd5f7a62ed7551c81f1ae8",
+      "approver": null,
+      "decided_at": null,
+      "expires_at": null
+    },
+    "risk_dispatch": {
+      "dispatch_id": "risk-dispatch-6a70d59d-9bfa-43f7-9c31-43f0b1eed721",
+      "status": "FAILED",
+      "attempts": 1,
+      "failed_at": "2026-10-17T04:00:51.962Z",
+      "error_code": "RISK_OWNER_NOT_CONFIGURED"
+    },
+    "memory_write_status": "NOT_REQUESTED",
+    "trace": {
+      "schema_version": "model-review.v1",
+      "request_id": "iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+      "task_id": "task-iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+      "session_id": "session-4c09d9ab-de8a-44df-b4b3-3d98a8e851d2",
+      "run_id": "review-825a7fd3-bdcc-45e6-a93c-50cda5704dbd",
+      "audit_id": "audit-65f85cc2-fc06-44ec-a32f-05e6923c5bbb",
+      "handoff_id": "handoff-4e5ca0a0-18f3-4463-a05e-d145cdcf3439"
+    },
+    "audit": {
+      "audit_id": "audit-65f85cc2-fc06-44ec-a32f-05e6923c5bbb",
+      "event_count": 9,
+      "latest_event": {
+        "event_id": "event-4d9d9255-deb5-4d8f-b184-3a45f3aa7ba0",
+        "task_id": "task-iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+        "actor": "risk-gateway",
+        "event_type": "risk.handoff.dispatch_failed",
+        "payload": {
+          "dispatch_id": "risk-dispatch-6a70d59d-9bfa-43f7-9c31-43f0b1eed721",
+          "code": "RISK_OWNER_NOT_CONFIGURED",
+          "request_id": "iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+          "task_id": "task-iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+          "session_id": "session-4c09d9ab-de8a-44df-b4b3-3d98a8e851d2",
+          "run_id": "review-825a7fd3-bdcc-45e6-a93c-50cda5704dbd",
+          "audit_id": "audit-65f85cc2-fc06-44ec-a32f-05e6923c5bbb",
+          "handoff_id": "handoff-4e5ca0a0-18f3-4463-a05e-d145cdcf3439",
+          "trace": {
+            "request_id": "iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+            "task_id": "task-iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+            "session_id": "session-4c09d9ab-de8a-44df-b4b3-3d98a8e851d2",
+            "run_id": "review-825a7fd3-bdcc-45e6-a93c-50cda5704dbd",
+            "audit_id": "audit-65f85cc2-fc06-44ec-a32f-05e6923c5bbb",
+            "handoff_id": "handoff-4e5ca0a0-18f3-4463-a05e-d145cdcf3439"
+          }
+        },
+        "timestamp": "2026-10-17T04:00:51.962Z"
+      }
+    },
+    "record_endpoint": "/api/review/task/task-iteration-20261017-ff6f39ef-77df-4c21-9184-d8fadb885fd4",
+    "callback": {
+      "callback_version": "risk-callback.v1",
+      "endpoint": "/api/review/risk-callback",
+      "method": "POST",
+      "required_fields": [
+        "callback_version",
+        "handoff_id",
+        "task_id",
+        "request_id",
+        "run_id",
+        "audit_id",
+        "proposal_sha256",
+        "decision",
+        "reviewer",
+        "reason"
+      ],
+      "decisions": [
+        "APPROVE",
+        "REJECT",
+        "REQUEST_MORE_INFO"
+      ],
+      "retry_policy": "Identical accepted callback returns DUPLICATE without another decision or audit event. Changed callbacks are rejected. REQUEST_MORE_INFO requires a new reviewed task."
+    }
+  }
+}
