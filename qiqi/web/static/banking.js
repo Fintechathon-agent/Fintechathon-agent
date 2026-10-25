@@ -11,6 +11,7 @@
     card: '💳', subscription: '🔁', cross_scene: '🎂',
   };
   let activeSource = 'bank';
+  let currentBillFile = null;
   const SOURCE_GUIDES = {
     bank: {
       name: '手机银行',
@@ -29,8 +30,8 @@
     },
     file: {
       name: '本地文件',
-      steps: ['找到你已经导出的账单文件。', '最好是 CSV 或 TXT；如果是 Excel，请先另存为 CSV。', '点击下面的「选择账单文件」。', '文件只在当前浏览器里读取，不会自动发给外部服务。'],
-      tip: '至少需要一列金额；有日期、商户和分类时，分析会更准确。',
+      steps: ['找到你已经导出的账单文件。', '只支持 UTF-8 CSV 或 TXT；如果是 Excel，请先另存为 CSV。', '点击下面的「选择账单文件」。', '文件会发送到本次演示后端进行账单分析。请只使用虚构资料。'],
+      tip: '文件须包含金额和日期列，最多 2000 笔、256 KiB；超过限制会明确报错。',
     },
   };
 
@@ -107,85 +108,18 @@
     if (guide) guide.classList.add('hidden');
   }
 
-  function parseCsvRows(text) {
-    const rows = [];
-    let row = [], cell = '', quoted = false;
-    const source = String(text || '').replace(/^\uFEFF/, '');
-    for (let i = 0; i < source.length; i += 1) {
-      const char = source[i];
-      const next = source[i + 1];
-      if (char === '"' && quoted && next === '"') { cell += '"'; i += 1; continue; }
-      if (char === '"') { quoted = !quoted; continue; }
-      if (!quoted && (char === ',' || char === '\t')) { row.push(cell.trim()); cell = ''; continue; }
-      if (!quoted && (char === '\n' || char === '\r')) {
-        if (char === '\r' && next === '\n') i += 1;
-        row.push(cell.trim());
-        if (row.some((value) => value)) rows.push(row);
-        row = []; cell = ''; continue;
-      }
-      cell += char;
-    }
-    if (cell || row.length) { row.push(cell.trim()); if (row.some((value) => value)) rows.push(row); }
-    if (rows.length < 2) return [];
-    const normalize = (value) => String(value || '').replace(/[\s:：()（）【】\[\]]/g, '').toLowerCase();
-    const headers = rows.shift().map(normalize);
-    const find = (names) => headers.findIndex((header) => names.some((name) => header.includes(name)));
-    const amountIndex = find(['金额', '交易金额', '支出', '消费金额', '付款金额', 'amount', 'expense']);
-    if (amountIndex < 0) return [];
-    const merchantIndex = find(['商户', '交易对方', '对方户名', '交易描述', '摘要', '商品', '名称', '备注', 'merchant', 'description']);
-    const dateIndex = find(['日期', '交易时间', '时间', '账单时间', 'date', 'time']);
-    const categoryIndex = find(['分类', '交易分类', '消费分类', 'category']);
-    return rows.map((values) => {
-      const rawAmount = String(values[amountIndex] || '').replace(/[,¥￥元\s]/g, '');
-      const amount = Math.abs(Number(rawAmount.replace(/[^\d.-]/g, '')));
-      if (!Number.isFinite(amount) || amount <= 0) return null;
-      return {
-        amount,
-        merchant: values[merchantIndex] || '未填写商户',
-        date: values[dateIndex] || '日期未填写',
-        category: values[categoryIndex] || '未分类',
-      };
-    }).filter(Boolean);
-  }
-
-  function renderLocalBillSummary(rows, filename) {
-    const box = $('#local-bill-result');
-    if (!box) return;
-    if (!rows.length) {
-      box.innerHTML = '<div class="local-bill-error">我没有读懂这个文件。请确认它是 CSV / TXT，并且至少有一列“金额”。</div>';
-      feedback('文件没有读懂，你可以换一个账单文件再试。', 'error');
-      return;
-    }
-    const total = rows.reduce((sum, row) => sum + row.amount, 0);
-    const categories = rows.reduce((map, row) => {
-      map[row.category] = (map[row.category] || 0) + row.amount;
-      return map;
-    }, {});
-    const topCategory = Object.entries(categories).sort((a, b) => b[1] - a[1])[0];
-    const topMerchant = rows.reduce((map, row) => {
-      map[row.merchant] = (map[row.merchant] || 0) + row.amount;
-      return map;
-    }, {});
-    const topSpend = Object.entries(topMerchant).sort((a, b) => b[1] - a[1])[0];
-    box.innerHTML = `
-      <div class="local-bill-card">
-        <div class="local-bill-head"><b>已读懂这份账单</b><span>${esc(filename)}</span></div>
-        <div class="local-bill-stats">
-          <div><small>读取流水</small><strong>${num(rows.length)} 笔</strong></div>
-          <div><small>合计支出</small><strong>¥${money(total)}</strong></div>
-          <div><small>最多花在</small><strong>${esc(topCategory ? topCategory[0] : '未分类')}</strong></div>
-        </div>
-        <div class="local-bill-note">最高频商户：${esc(topSpend ? topSpend[0] : '未填写')} · 这份文件只在当前浏览器里处理。</div>
-      </div>`;
-    feedback(`已读懂 ${num(rows.length)} 笔流水，可以继续看异常扣款。`, 'success');
-  }
-
   async function handleBillFile(file) {
     if (!file) return;
     try {
+      if (!/\.(csv|txt)$/i.test(file.name)) throw new Error('只支持 UTF-8 CSV/TXT 文件');
+      if (file.size > 256 * 1024) throw new Error('账单超过 256 KiB，请拆分后重试');
       const text = await file.text();
-      renderLocalBillSummary(parseCsvRows(text), file.name);
+      currentBillFile = { name: file.name, text };
+      const box = $('#local-bill-result');
+      if (box) box.textContent = `已选择 ${file.name}，正在用本次文件生成账单报告。`;
+      await runBanking('分析这份账单');
     } catch (err) {
+      currentBillFile = null;
       feedback(`读取失败：${err.message}`, 'error');
     }
   }
@@ -257,7 +191,9 @@
     const originalLabel = btn.textContent;
     btn.textContent = '正在处理…';
     try {
-      const res = await api('/api/scenarios/run', { method: 'POST', body: { question } });
+      const body = { question };
+      if (currentBillFile && /账单|流水|支出|消费|扣款|明细/.test(question)) body.bill_file = currentBillFile;
+      const res = await api('/api/scenarios/run', { method: 'POST', body });
       if (res.delegated) {
         $('#banking-result').innerHTML = `
           <div class="assistant-line">🏦 这是理财请求，已交给右侧「理财深度分析」闭环处理。
@@ -344,7 +280,9 @@
           <span class="chip ${a.severity === 'warning' ? 'gold' : 'chip-dim'}">${esc(a.rule)}</span>
           <span>${esc(a.detail)}</span>
         </div>`).join('');
+      const source = d.source_record;
       html = `
+        ${source ? `<div class="small muted">来源：${esc(source.filename)} · 批次 ${esc(source.batch_id)} · 原始 ${esc(source.row_count)} 行 · 任务 ${esc(d.trace_id)}</div>` : '<div class="small muted">来源：固定虚构演示账本</div>'}
         <div class="sub-title">📊 ${esc(d.period)} 支出 ${esc(d.transaction_count)} 笔 · 合计 ¥${money(d.total_spend)}</div>
         <div class="cat-list">${bars}</div>
         ${d.insights && d.insights.length ? `<div class="sub-title">💡 洞察</div><ul class="plain-list">${d.insights.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}

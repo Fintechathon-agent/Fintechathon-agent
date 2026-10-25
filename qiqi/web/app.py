@@ -1008,6 +1008,12 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:      # noqa: N802
         path = urlparse(self.path).path
+        if path == "/api/scenarios/run":
+            try:
+                if int(self.headers.get("Content-Length", "0")) > 1024 * 1024:
+                    return self._json({"error": "账单请求超过 1 MiB；未进行截断分析"}, 413)
+            except ValueError:
+                return self._json({"error": "Content-Length 无效"}, 400)
         body = self._body_json()
         try:
             if path == "/api/review":
@@ -1024,7 +1030,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(self.app.reset())
             if path == "/api/scenarios/run":
                 from web.banking_service import run_scenario
-                return self._json(run_scenario(str(body.get("question", ""))))
+                try:
+                    return self._json(run_scenario(str(body.get("question", "")), body.get("bill_file")))
+                except ValueError as exc:
+                    return self._json({"error": str(exc)}, 400)
             if path == "/api/scenarios/confirm":
                 from web.banking_service import confirm_action
                 return self._json(confirm_action(body))

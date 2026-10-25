@@ -222,6 +222,18 @@ test("legacy ledger survives migration and unknown usage consumes its hold", asy
   assert.equal(budget.held_micros, 0);
 });
 
+test("fractional-cent booked cost plus an existing ten-cent hold blocks a fifty-cent cap", async () => {
+  const env = { ...config, BAILIAN_TEST_BUDGET_CNY: "0.50", BAILIAN_DAILY_BUDGET_CNY: "0.50" };
+  const app = setup(env);
+  await app.db.put({ "bailian-budget:v1": { version: 2, reserved_cents: 0, attempts: 0,
+    minute: 0, minute_count: 0, spent_micros: 400203, held_micros: 100000,
+    day: "", daily_spent_micros: 0, daily_held_micros: 0 } });
+  await assert.rejects(app.guard.reserve({ run_id: "fractional-boundary", attempt: 1,
+    request: {}, model: "qwen3.8-flash" }), error =>
+    error.code === "DAILY_BUDGET_EXHAUSTED" && error.details.budget_scope === "TOTAL");
+  assert.equal((await app.db.get("bailian-budget:v1")).attempts, 0);
+});
+
 test("Beijing daily cap resets while the total ledger remains", async () => {
   const env = { ...config, BAILIAN_TEST_BUDGET_CNY: "0.03", BAILIAN_DAILY_BUDGET_CNY: "0.01" };
   const app = setup(env);

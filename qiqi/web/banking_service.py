@@ -20,6 +20,8 @@ from typing import Optional
 
 from agent.banking import route as banking_route
 from agent.banking import tier_label
+from agent.banking.bill_import import parse_statement
+from agent.banking.router import detect_scenario
 from agent.banking.tiers import tier_of_operation
 from agent.banking.cards import normalize_card_operation
 from agent.banking.gates import check_transfer, check_card_operation, check_subscription_cancel
@@ -257,7 +259,7 @@ def scenario_overview() -> dict:
     }
 
 
-def _run_and_queue(state, question: str, *, seeded: bool = False):
+def _run_and_queue(state, question: str, *, seeded: bool = False, bills_data=None):
     """跑一次确定性场景，并把黄/红操作挂到运行态待确认队列。
 
     返回 (ScenarioResult, deduplicated)。seeded=True 表示来自「预置演示
@@ -265,7 +267,7 @@ def _run_and_queue(state, question: str, *, seeded: bool = False):
     因 10 分钟 TTL 过期被清走。
     """
     res = banking_route(
-        question, bills_data=demo_bills(), cards_data=state.cards,
+        question, bills_data=bills_data if bills_data is not None else demo_bills(), cards_data=state.cards,
         contacts=demo_contacts(), balance=state.balance,
         daily_cumulative=state.daily_cumulative, user_id=USER_ID,
         cancelled_subs=state.cancelled_subs,
@@ -312,23 +314,39 @@ def _run_and_queue(state, question: str, *, seeded: bool = False):
 
 
 @_transactional
-def run_scenario(text: str) -> dict:
+def run_scenario(text: str, bill_file: dict | None = None) -> dict:
     question = (text or "").strip()
     if not question:
         return {"delegated": False, "result": None, "message": "请输入自然语言请求"}
     state = get_banking_state()
     _prune_pending(state)
     _promote_due(state)
-    res, deduplicated = _run_and_queue(state, question)
+    source_record = None
+    imported = None
+    if bill_file is not None:
+        if detect_scenario(question) != "bill" or not isinstance(bill_file, dict):
+            raise ValueError("上传账单只能绑定账单分析任务")
+        imported, source_record = parse_statement(bill_file.get("name"), bill_file.get("text"))
+    res, deduplicated = _run_and_queue(state, question, bills_data=imported)
     if res.status == "delegated":
         return {"delegated": True, "result": None, "message": res.message}
+    trace_id = "bill_" + uuid4().hex if source_record else None
+    provenance = _provenance()
+    if source_record and res.scenario == "bill" and res.status == "done":
+        res.data["source_record"] = source_record
+        res.data["trace_id"] = trace_id
+        provenance = {**provenance, "source": "uploaded_file", "source_label": "本次上传的文件",
+                      "batch_id": source_record["batch_id"]}
+        _audit_event(state, "banking_bill_import_analyzed", trace_id, {
+            "batch_id": source_record["batch_id"], "period": res.data["period"],
+            "row_count": source_record["row_count"], "total_spend": res.data["total_spend"]})
     return {"delegated": False, "result": {
         "scenario": res.scenario, "scenario_label": res.scenario_label,
         "intent": res.intent, "plan": res.plan, "tier": res.tier,
         "tier_label": tier_label(res.tier), "status": res.status,
         "message": res.message, "data": res.data,
     }, "pending": state.pending, "scheduled": state.scheduled,
-        "breaker": get_breaker().state(), "provenance": _provenance(), "deduplicated": deduplicated}
+        "breaker": get_breaker().state(), "provenance": provenance, "deduplicated": deduplicated}
 
 
 @_transactional

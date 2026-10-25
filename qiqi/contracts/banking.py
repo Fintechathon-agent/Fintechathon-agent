@@ -43,7 +43,7 @@ class BillRecord:
     ts: str                    # 交易时间 ISO
     merchant: str
     category: str              # 餐饮/交通/购物/娱乐/居住/医疗/教育/其他
-    amount: float              # 元，负数=支出
+    amount: float              # 元：正数=支出，负数=退款，零=非支出收入
     channel: str = "card"      # card / bank / subscription
     city: str = ""
     country: str = "CN"

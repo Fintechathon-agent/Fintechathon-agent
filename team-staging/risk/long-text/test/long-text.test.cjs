@@ -114,7 +114,10 @@ test("salary forecast does not increase today's investment capacity", () => {
 });
 test("uncertain income stays out of current and expected cash totals", () => {
   const { store, draft } = setup(scenario + "下个月10号可能有奖金8000元。");
-  const result = confirm(store, draft).result;
+  const income = draft.items.find(x => x.type === "INCOME" && x.certainty === "UNCERTAIN");
+  assert.equal(income.disposition, "UNRESOLVED");
+  const reviewed = store.correct("alice", { ...binding(draft), items: [{ id: income.id, disposition: "INCLUDE" }] });
+  const result = confirm(store, reviewed).result;
   assert.equal(result.metrics.expected_income_minor, 0);
   assert.equal(result.uncertain_income_excluded.length, 1);
 });

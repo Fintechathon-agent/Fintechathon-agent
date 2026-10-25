@@ -295,7 +295,10 @@ def _run_transfer(question, contacts, balance, daily_cumulative, plan, label) ->
 
 
 def _run_bill(question, bills_data, plan, label) -> ScenarioResult:
-    period = bills.parse_bill_period(question)
+    explicit_period = re.search(r"\d{4}\s*年|去年|今年|上个月|上月|这个月|本月|当月", question)
+    period = ("上传文件全部记录" if not explicit_period and
+              any(r.source == "uploaded_file" for r in bills_data)
+              else bills.parse_bill_period(question))
     report = bills.analyze_period(bills_data, period)
     mark_plan(plan, "validate", "done")
     mark_plan(plan, "period", "done")

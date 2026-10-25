@@ -19,8 +19,8 @@
 
 ## 本地验证
 
-- `node --test chenchen/tests/bailian.test.mjs chenchen/tests/bailian-worker.test.mjs`：16/16 通过，供应商 HTTP 全部替身。
+- `node --test chenchen/tests/bailian.test.mjs chenchen/tests/bailian-worker.test.mjs`：17/17 通过，供应商 HTTP 全部替身；含 40.0203 分已记账、10 分占用、50 分上限的边界夹具。
 - `npm.cmd run check --prefix chenchen`：通过。
-- `npm.cmd test --prefix chenchen`：287/287 通过。
+- `npm.cmd test --prefix chenchen`：288/288 通过。
 
 真实账户、非流式回答、流式回答、工具调用、Risk 联调和 staging 扣费对账均未在本轮完成；本分支不得据此切换生产模型。
