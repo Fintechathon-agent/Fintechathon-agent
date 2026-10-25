@@ -1,0 +1,16 @@
+{
+  "repository": "Fintechathon-agent/Fintechathon-agent",
+  "commit": "9e0a10587c1494e921102e384ec2677e2b099eec",
+  "files": {
+    "daily-engine.cjs": {
+      "source": "modules/safety-risk-eval/daily-engine.cjs",
+      "source_sha256": "9b3223ac2aac8aa9ffc93fbff5b903ae6c9da744a32dfce9d58bfceee1626b39",
+      "vendored_sha256": "cd303d423d5d62ab919b62780b4a4ad7cd4a27a3f5e508568b07914e8dbd5a74"
+    },
+    "policy-config.v1.json": {
+      "source": "docs/safety-risk-eval/daily-policy-v1/policy-config.v1.json",
+      "source_sha256": "ea9f25711edfe84950297052c2944dbb4d1640c8a6a12e36aebd86227a1193ea",
+      "vendored_sha256": "ea9f25711edfe84950297052c2944dbb4d1640c8a6a12e36aebd86227a1193ea"
+    }
+  }
+}

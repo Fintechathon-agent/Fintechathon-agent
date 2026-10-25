@@ -1,3 +1,4 @@
 .wrangler/
 .wrangler-dry-run/
 chenchen/.wrangler-dry-run/
+/output/risk-build-check/

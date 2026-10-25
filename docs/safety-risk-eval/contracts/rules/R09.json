@@ -1,0 +1,42 @@
+{
+  "rule_id": "R09",
+  "title_zh": "防重复执行与结果核查",
+  "version": "risk-rules.v0.1-draft",
+  "status": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW",
+  "stages": [
+    "EXECUTION_PREFLIGHT"
+  ],
+  "check_key": "execution_idempotency",
+  "input_refs": [
+    "/execution"
+  ],
+  "conditions": [
+    {
+      "condition_id": "R09-policy",
+      "metric": "execution_idempotency",
+      "operator": "POLICY_CHECK",
+      "threshold": null,
+      "threshold_ref": null,
+      "unit": "POLICY",
+      "basis": "POLICY",
+      "group": "ANY"
+    }
+  ],
+  "reason_codes": [
+    "DUPLICATE_EXECUTION",
+    "IDEMPOTENCY_CONFLICT",
+    "EXECUTION_RESULT_UNKNOWN"
+  ],
+  "failure_decisions": [
+    "REVIEW",
+    "BLOCK"
+  ],
+  "acceptance_policy_zh": "结果未知先核查，不允许通过接受风险重试。",
+  "enforcement_owner": [
+    "ORCHESTRATOR",
+    "TOOLS"
+  ],
+  "recovery_zh": "返回已确认结果；未知先核查；相同键不同内容拒绝。",
+  "source": "MODULE4_PROPOSAL",
+  "notes_zh": "配置仅供队内虚构演示；规则定义不是可执行规则引擎。"
+}
