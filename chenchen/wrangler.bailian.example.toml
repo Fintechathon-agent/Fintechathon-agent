@@ -9,7 +9,7 @@ workers_dev = true
 
 [vars]
 MODEL_PROVIDER = "aliyun_bailian"
-MODEL_NAME = "qwen3.7-flash"
+MODEL_NAME = "qwen3.8-flash"
 MODEL_API_STYLE = "chat_completions"
 MODEL_RESPONSE_FORMAT = "json_object"
 MODEL_TIMEOUT_MS = "30000"
@@ -21,6 +21,7 @@ BAILIAN_REGION = "cn-beijing"
 BAILIAN_WORKSPACE_ID = ""
 BAILIAN_ALLOW_PAID_CALLS = "false"
 BAILIAN_TEST_BUDGET_CNY = "0"
+BAILIAN_DAILY_BUDGET_CNY = "0"
 BAILIAN_MAX_OUTPUT_TOKENS = "1600"
 REQUIRE_TRUSTED_ACTORS = "true"
 RATE_LIMIT_PER_MINUTE = "60"
