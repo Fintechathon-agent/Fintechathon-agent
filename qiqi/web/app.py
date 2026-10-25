@@ -970,6 +970,9 @@ class Handler(BaseHTTPRequestHandler):
                 return self._file(path[len("/static/"):])
             if path == "/api/bootstrap":
                 return self._json(self.app.bootstrap())
+            if path == "/api/risk-conversation/status":
+                from web import risk_conversation
+                return self._json({"configured": risk_conversation.configured()})
             if path == "/api/approvals":
                 return self._json({"approvals": self.app.list_approvals()})
             if path == "/api/memory":
@@ -1017,6 +1020,13 @@ class Handler(BaseHTTPRequestHandler):
         body = self._body_json()
         try:
             if path == "/api/review":
+                from web import risk_conversation
+                if risk_conversation.requested(body):
+                    try:
+                        status, result = risk_conversation.review(body)
+                        return self._json(result, status)
+                    except risk_conversation.ConversationError as exc:
+                        return self._json(exc.payload(), exc.status)
                 return self._json(self.app.review(str(body.get("question", ""))))
             if path == "/api/health-check/run":
                 if body.get("contract_version") != "investment-agent.v1" or body.get("operation") != "PORTFOLIO_HEALTH_CHECK":
