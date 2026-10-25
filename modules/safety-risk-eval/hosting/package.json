@@ -1,0 +1,7 @@
+{
+  "name": "risk-online-build",
+  "private": true,
+  "type": "module",
+  "devDependencies": { "esbuild": "0.28.2", "drizzle-kit": "0.31.10", "drizzle-orm": "0.45.2" },
+  "scripts": { "build": "node build.mjs", "db:generate": "drizzle-kit generate", "test": "node --test test/*.test.mjs" }
+}
