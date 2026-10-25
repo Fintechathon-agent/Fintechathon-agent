@@ -161,7 +161,8 @@ class ExistingEntryTests(unittest.TestCase):
         self.handler = Handler
 
     def post(self, body):
-        fake = SimpleNamespace(path="/api/review", _body_json=Mock(return_value=body),
+        fake = SimpleNamespace(path="/api/review", _raw_body=Mock(return_value=json.dumps(body).encode()),
+                               _decode_json=lambda raw: json.loads(raw),
                                _json=Mock(), _error=Mock(), app=SimpleNamespace(review=Mock(return_value={"old": True})))
         self.handler.do_POST(fake)
         return fake

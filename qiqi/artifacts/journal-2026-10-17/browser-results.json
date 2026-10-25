@@ -1,0 +1,32 @@
+[
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "overflow": false,
+    "inputHit": true,
+    "sendHeight": 44,
+    "errors": [],
+    "failed": [],
+    "persistence": true,
+    "editDelete": true,
+    "download": true,
+    "noTrades": true
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": false,
+    "inputHit": true,
+    "sendHeight": 44,
+    "errors": [],
+    "failed": [],
+    "persistence": true,
+    "editDelete": true,
+    "download": true,
+    "noTrades": true
+  }
+]

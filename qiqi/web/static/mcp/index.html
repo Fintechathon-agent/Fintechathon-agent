@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MCP 能力中心 · Finance Lab</title>
+  <meta name="description" content="把银行 AI 业务系统逆向蒸馏为 MCP 能力中心：查询自动执行，动作只入队，确认权留在人审界面。">
+  <meta name="theme-color" content="#0b0a09">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/mcp.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/team/" aria-label="Finance Lab 首页">
+      <span class="brand-mark">FL</span>
+      <span class="brand-text">FINANCE LAB<small>MCP CAPABILITY CENTER</small></span>
+    </a>
+    <div class="topbar-meta">
+      <span class="status" id="conn-status"><i></i>正在握手</span>
+      <a class="ghost-link" href="/compare">任务台</a>
+      <a class="ghost-link" href="/evidence">证据看板</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span>REVERSE DISTILLATION · MCP SERVER</p>
+        <h1>把业务系统，<br><em>蒸馏成 Agent 能调用的能力</em></h1>
+        <p class="lede">盘点业务入口 → 抽取原子能力 → 契约化 → 挂载权限与审计 → 发布 MCP。
+          Agent 可以查询、可以发起请求，但不能自建自批。</p>
+      </div>
+      <div class="stats" aria-label="能力统计">
+        <div class="stat"><b id="stat-total">—</b><span>全部能力</span></div>
+        <div class="stat"><b id="stat-query">—</b><span>只读查询</span></div>
+        <div class="stat"><b id="stat-action">—</b><span>业务动作</span></div>
+        <div class="stat"><b id="stat-plan">—</b><span>联动计划</span></div>
+      </div>
+    </section>
+
+    <section class="policy" role="note">
+      <div class="policy-icon">!</div>
+      <div>
+        <strong>审批权不进入工具面</strong>
+        <p>MCP 只暴露「查询」与「发起请求」。转账、锁卡、挂失、取消订阅、跨场景计划一律只写入待确认队列；
+          确认与红色强验证必须由前端人审界面完成。本次会话不提供 <code>confirm</code> 工具。</p>
+      </div>
+      <span class="policy-badge">HUMAN IN THE LOOP</span>
+    </section>
+
+    <section class="workspace">
+      <aside class="catalog" aria-label="能力目录">
+        <div class="catalog-head"><h2>能力目录</h2><span id="tool-count">—</span></div>
+        <div class="catalog-note">按「查询 / 动作 / 计划」分组。点击查看契约并调用。</div>
+        <div id="tool-list" class="tool-list">
+          <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+        </div>
+      </aside>
+
+      <section class="detail" aria-live="polite">
+        <div id="tool-empty" class="empty">
+          <p class="eyebrow"><span></span>WAITING FOR SELECTION</p>
+          <h2>选择一个能力</h2>
+          <p>左侧列出的是从既有六场景业务系统反向蒸馏出的原子能力。查询类自动执行；动作类只生成待确认事项。</p>
+        </div>
+
+        <article id="tool-detail" hidden>
+          <header class="detail-head">
+            <div>
+              <p class="tool-kind" id="tool-kind">QUERY</p>
+              <h2 id="tool-title"></h2>
+              <code id="tool-name"></code>
+            </div>
+            <div class="badges">
+              <span class="tier" id="tool-tier"></span>
+              <span class="badge" id="tool-confirm"></span>
+            </div>
+          </header>
+          <p class="tool-desc" id="tool-desc"></p>
+
+          <div class="confirm-callout" id="confirm-callout" hidden>
+            <strong>只入队，不执行</strong>
+            <p>调用成功后返回 <code>pending_ids</code>。请把 ID 展示给用户，并引导到任务台完成确认/强验证；
+              不要声称资金动作已完成。</p>
+          </div>
+
+          <form id="tool-form" class="tool-form" autocomplete="off">
+            <div class="form-head"><h3>调用参数</h3><span>inputSchema 自动生成</span></div>
+            <div id="form-fields" class="fields"></div>
+            <div class="form-actions">
+              <button type="submit" class="primary" id="invoke-btn">调用工具 <span>↗</span></button>
+              <button type="button" class="secondary" id="fill-example">填入示例</button>
+            </div>
+          </form>
+
+          <details class="contract">
+            <summary>查看输入契约（JSON Schema）</summary>
+            <pre id="tool-schema"></pre>
+          </details>
+
+          <section class="result" id="result" hidden>
+            <div class="result-head">
+              <h3>调用结果</h3>
+              <span id="result-status" class="pill"></span>
+            </div>
+            <p id="result-message" class="result-message"></p>
+            <div id="pending-box" class="pending-box" hidden></div>
+            <details>
+              <summary>结构化结果（structuredContent）</summary>
+              <pre id="result-json"></pre>
+            </details>
+          </section>
+        </article>
+      </section>
+
+      <aside class="rpc" aria-label="原始 JSON-RPC">
+        <div class="rpc-head"><h2>JSON-RPC 轨迹</h2><span>实时</span></div>
+        <div class="rpc-hint">前端平台通过 <code>POST /mcp</code> 与能力中心通信。以下是真实请求与响应。</div>
+        <pre id="rpc-log" class="rpc-log"></pre>
+
+        <div class="connect">
+          <h3>接入方式</h3>
+          <p class="connect-label">stdio（Claude Desktop 等）</p>
+          <pre class="snippet">{
+  "mcpServers": {
+    "finance-lab": {
+      "command": "python",
+      "args": ["-m", "mcp_center.server"],
+      "cwd": "&lt;仓库根目录&gt;"
+    }
+  }
+}</pre>
+          <p class="connect-label">HTTP（前端 Agent 平台）</p>
+          <pre class="snippet">curl http://127.0.0.1:8765/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,
+       "method":"tools/list"}'</pre>
+          <div class="connect-links">
+            <a href="/api/mcp/manifest" target="_blank" rel="noreferrer">能力清单 manifest ↗</a>
+            <a href="/api/mcp/tools" target="_blank" rel="noreferrer">tools/list ↗</a>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <span>FINANCE LAB · FINTECHATHON 2026</span>
+    <span>演示数据 · 不连接真实账户 · 不执行真实资金动作</span>
+  </footer>
+
+  <script src="/mcp.js"></script>
+</body>
+</html>
