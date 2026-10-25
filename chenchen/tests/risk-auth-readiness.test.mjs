@@ -92,6 +92,22 @@ test("capabilities distinguish configured callback security from joint acceptanc
   for (const value of [machineKey, riskSecret, reviewer]) assert.equal(JSON.stringify(result.body).includes(value), false);
 });
 
+test("an approval service signature does not claim verified end-user identity", async () => {
+  const approvalSecret = "synthetic-approval-service-secret";
+  const app = setup({ APPROVAL_SERVICE_HMAC_SECRET: approvalSecret });
+  const result = await app.call("/api/review/capabilities");
+  assert.equal(result.status, 200);
+  assert.equal(result.body.approval.signature_configured, true);
+  assert.equal(result.body.approval.service_signature_ready, true);
+  assert.equal(result.body.approval.end_user_identity_ready, false);
+  assert.equal(result.body.approval.trusted_identity_ready, false);
+  assert.equal(result.body.funding.source, "DEMO_FUNDING_PLAN");
+  assert.equal(result.body.funding.account_binding_ready, false);
+  assert.equal(result.body.funding.shared_cash_ledger_ready, false);
+  assert.equal(result.body.acceptance.joint_acceptance, false);
+  assert.equal(JSON.stringify(result.body).includes(approvalSecret), false);
+});
+
 for (const [decision, status] of [["APPROVE", "PENDING_APPROVAL"], ["REJECT", "REJECTED"], ["REQUEST_MORE_INFO", "PENDING_RISK"]]) {
   test("signed " + decision + " callback survives restart without duplicate decisions or execution", async () => {
     const app = setup();

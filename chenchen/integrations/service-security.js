@@ -80,9 +80,13 @@ function capabilityStatus(env = {}) {
     },
     approval: {
       decision_endpoint: "/api/review/approval", signature_configured: approvalSecretConfigured,
-      trusted_identity_ready: approvalSecretConfigured,
+      service_signature_ready: approvalSecretConfigured,
+      // The HMAC authenticates the approval service, not the end user.
+      end_user_identity_ready: false,
+      trusted_identity_ready: false,
       demo_actor_labels_allowed: !approvalSecretConfigured && !ready.strict_actors_required
     },
+    funding: { source: "DEMO_FUNDING_PLAN", account_binding_ready: false, shared_cash_ledger_ready: false },
     execution: { mode: "PAPER", allowed: false, gateway_connected: false },
     acceptance: { synthetic_local: true, real_model: false, formal_risk_callback: false, joint_acceptance: false }
   };

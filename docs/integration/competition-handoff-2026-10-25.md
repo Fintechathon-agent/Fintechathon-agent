@@ -4,6 +4,8 @@
 
 > 统一入口 P0 的本地断点已修复：顶部自然语言输入会自动委派理财请求并发起 `/api/review`，同一访客会话的三场景 HTTP 验收 12/12 通过。公开主聊天源码与团队 staging 仍缺失，故线上同任务闭环未通过。详见 [本地修复与接线边界](unified-entry-local-2026-10-25.md)。
 
+> 身份与资金 P0-2 复核发现 Core 将审批服务 HMAC 配置误报为最终用户身份就绪；该状态字段已修正。Finance 本机访客隔离和统一现金测试通过，但跨服务可信用户审批、Core 预留与 Finance 账本仍未闭环。逐环节证据及剩余输入见 [P0-2 复核](p0-2-identity-funds-closure-2026-10-25.md)。
+
 交付分支 `codex/competition-integration-20261025`，[Draft PR #31](https://github.com/Fintechathon-agent/Fintechathon-agent/pull/31)。当前是本地集成候选版，**未完成线上 staging 验收，未生产发布**。模块与唯一 Owner、版本来源、实际架构和阻塞见 [审计](audit-2026-10-25.md)。
 
 ## 可运行与可展示内容
