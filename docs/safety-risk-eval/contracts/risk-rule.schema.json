@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/risk-draft/risk-rule.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "rule_id": {
+      "enum": [
+        "R01",
+        "R02",
+        "R03",
+        "R04",
+        "R05",
+        "R06",
+        "R07",
+        "R08",
+        "R09",
+        "R10"
+      ]
+    },
+    "title_zh": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "const": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW"
+    },
+    "stages": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "PLAN_REVIEW",
+          "EXECUTION_PREFLIGHT"
+        ]
+      },
+      "minItems": 1
+    },
+    "check_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "condition_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "metric": {
+            "type": "string",
+            "minLength": 1
+          },
+          "operator": {
+            "enum": [
+              "GT",
+              "GTE",
+              "POLICY_CHECK"
+            ]
+          },
+          "threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "threshold_ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unit": {
+            "enum": [
+              "RATIO",
+              "CNY",
+              "CORRELATION",
+              "POLICY"
+            ]
+          },
+          "basis": {
+            "enum": [
+              "TOTAL_ASSETS",
+              "INVESTED_ASSETS",
+              "SAMPLE",
+              "USER_CONSTRAINT",
+              "POLICY"
+            ]
+          },
+          "group": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "condition_id",
+          "metric",
+          "operator",
+          "threshold",
+          "threshold_ref",
+          "unit",
+          "basis",
+          "group"
+        ]
+      },
+      "minItems": 1
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "failure_decisions": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "REVIEW",
+          "BLOCK",
+          "ERROR"
+        ]
+      },
+      "minItems": 1
+    },
+    "acceptance_policy_zh": {
+      "type": "string",
+      "minLength": 1
+    },
+    "enforcement_owner": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "ORCHESTRATOR",
+          "CORE_MEMORY",
+          "TOOLS",
+          "RISK",
+          "FRONTEND"
+        ]
+      },
+      "minItems": 1
+    },
+    "recovery_zh": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "enum": [
+        "SOP_CONFIRMED",
+        "PRODUCT_CONFIRMED",
+        "MODULE4_PROPOSAL"
+      ]
+    },
+    "notes_zh": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "rule_id",
+    "title_zh",
+    "version",
+    "status",
+    "stages",
+    "check_key",
+    "input_refs",
+    "conditions",
+    "reason_codes",
+    "failure_decisions",
+    "acceptance_policy_zh",
+    "enforcement_owner",
+    "recovery_zh",
+    "source",
+    "notes_zh"
+  ]
+}

@@ -561,6 +561,10 @@ class DemoApp:
         approved = payload.get("approved") is True
         comment = str(payload.get("comment", "")).strip()
 
+        if approved and self.mode != "demo":
+            return {"success": False, "executed": False, "error_code": "TRUSTED_APPROVAL_REQUIRED",
+                    "message": "真实模型联调未接可信审批身份；演示验证码和人脸标记不能授权执行。"}
+
         # 熔断锁定期间拒绝一切裁决（fail-closed，需先人工恢复）
         if approved and get_breaker().is_locked():
             return {
@@ -910,13 +914,20 @@ class Handler(BaseHTTPRequestHandler):
         self._send(200, target.read_bytes(), types.get(target.suffix, "application/octet-stream"))
 
     def _body_json(self) -> dict:
+        return self._decode_json(self._raw_body())
+
+    def _raw_body(self) -> bytes:
         try:
             length = int(self.headers.get("Content-Length", "0") or 0)
         except ValueError:
             length = 0
         if length <= 0:
+            return b""
+        return self.rfile.read(length)
+
+    def _decode_json(self, raw: bytes) -> dict:
+        if not raw:
             return {}
-        raw = self.rfile.read(length)
         try:
             data = json.loads(raw.decode("utf-8"))
             return data if isinstance(data, dict) else {}
@@ -966,10 +977,26 @@ class Handler(BaseHTTPRequestHandler):
                 rel = path[len("/team/"):].lstrip("/")
                 if rel:
                     return self._file(f"team-preview/{rel}")
+            # MCP 能力中心：独立控制台，不改动已冻结的主界面。
+            if path in ("/mcp", "/mcp/", "/mcp/index.html"):
+                return self._file("mcp/index.html")
+            if path in ("/mcp.css", "/mcp/mcp.css"):
+                return self._file("mcp/mcp.css")
+            if path in ("/mcp.js", "/mcp/mcp.js"):
+                return self._file("mcp/mcp.js")
+            if path == "/api/mcp/manifest":
+                from mcp_center.capabilities import manifest
+                return self._json(manifest())
+            if path == "/api/mcp/tools":
+                from mcp_center.capabilities import tool_descriptors
+                return self._json({"tools": tool_descriptors()})
             if path.startswith("/static/"):
                 return self._file(path[len("/static/"):])
             if path == "/api/bootstrap":
                 return self._json(self.app.bootstrap())
+            if path == "/api/risk-conversation/status":
+                from web import risk_conversation
+                return self._json({"configured": risk_conversation.configured()})
             if path == "/api/approvals":
                 return self._json({"approvals": self.app.list_approvals()})
             if path == "/api/memory":
@@ -1002,30 +1029,100 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/scenarios/pending":
                 from web.banking_service import promote_due_scheduled
                 return self._json(promote_due_scheduled())
+            if path == "/api/core-agent/status":
+                # 只读探活：不调用模型、不发 Risk。
+                from web import core_agent
+                try:
+                    return self._json(core_agent.status())
+                except core_agent.CoreAgentError as exc:
+                    return self._json({
+                        "reachable": False,
+                        "base_url": core_agent.base_url(),
+                        "error": str(exc),
+                    }, 503)
         except Exception as exc:      # noqa: BLE001
             return self._error(exc)
         self._send(404, "404".encode(), "text/plain; charset=utf-8")
 
     def do_POST(self) -> None:      # noqa: N802
         path = urlparse(self.path).path
-        body = self._body_json()
+        if path == "/api/scenarios/run":
+            try:
+                if int(self.headers.get("Content-Length", "0")) > 1024 * 1024:
+                    return self._json({"error": "账单请求超过 1 MiB；未进行截断分析"}, 413)
+            except ValueError:
+                return self._json({"error": "Content-Length 无效"}, 400)
+        raw = self._raw_body()
+        body = self._decode_json(raw)
         try:
+            if path == "/api/journal/parse":
+                # Stateless extraction: no write to shared demo/account memory.
+                from web.journal import extract
+                try:
+                    return self._json(extract(body.get("text")))
+                except ValueError as exc:
+                    return self._json({"error": str(exc)}, 400)
+            # MCP over HTTP：标准 JSON-RPC 2.0，支持单条与批量请求。
+            if path in ("/mcp", "/mcp/"):
+                from mcp_center.server import handle_raw
+                context = {"session_id": "mcp_http_" + uuid.uuid4().hex[:12],
+                           "client_info": {}}
+                result, status = handle_raw(raw, context)
+                if result is None:
+                    return self._send(202, b"", "application/json; charset=utf-8")
+                return self._json(result, status)
             if path == "/api/review":
+                from web import risk_conversation
+                if risk_conversation.requested(body):
+                    try:
+                        status, result = risk_conversation.review(body)
+                        return self._json(result, status)
+                    except risk_conversation.ConversationError as exc:
+                        return self._json(exc.payload(), exc.status)
                 return self._json(self.app.review(str(body.get("question", ""))))
+            if path == "/api/core-agent/review":
+                # 统一后端真实联调：失败原样返回错误状态，不回退规则引擎。
+                from web import core_agent
+                try:
+                    result = core_agent.review(
+                        str(body.get("question", "")),
+                        kind=str(body.get("kind") or "combined"),
+                        scenario=str(body.get("scenario") or "GENERAL_REVIEW"),
+                        idempotency_key=body.get("idempotency_key"),
+                    )
+                except ValueError as exc:
+                    return self._json({"error": str(exc), "engine": "core-agent"}, 400)
+                except core_agent.CoreAgentError as exc:
+                    return self._json({
+                        "error": str(exc),
+                        "error_contract_version": "core-agent-error.v1",
+                        "engine": "core-agent",
+                        "execution_allowed": False,
+                        "backend": (exc.payload or {}).get("error") if isinstance(exc.payload, dict) else None,
+                    }, exc.status_code if exc.status_code >= 400 else 502)
+                return self._json(result)
             if path == "/api/health-check/run":
                 if body.get("contract_version") != "investment-agent.v1" or body.get("operation") != "PORTFOLIO_HEALTH_CHECK":
                     return self._json(preview_error_response("不支持的 Preview 请求契约。", "CONTRACT_UNSUPPORTED"), 400)
                 return self._json(self.app.preview_health_check(body))
             if path == "/api/decide":
-                return self._json(self.app.decide(body))
+                result = self.app.decide(body)
+                return self._json(result, 403 if result.get("error_code") == "TRUSTED_APPROVAL_REQUIRED" else 200)
             if path == "/api/breaker/reset":
                 return self._json(self.app.breaker_reset())
             if path == "/api/reset":
                 return self._json(self.app.reset())
             if path == "/api/scenarios/run":
                 from web.banking_service import run_scenario
-                return self._json(run_scenario(str(body.get("question", ""))))
+                try:
+                    return self._json(run_scenario(str(body.get("question", "")), body.get("bill_file")))
+                except ValueError as exc:
+                    return self._json({"error": str(exc)}, 400)
             if path == "/api/scenarios/confirm":
+                if self.app.mode != "demo":
+                    return self._json({"success": False, "executed": False,
+                        "error_code": "TRUSTED_APPROVAL_REQUIRED",
+                        "message": "真实模型联调未接可信审批身份；客户端验证标记不能授权执行。"}, 403)
                 from web.banking_service import confirm_action
                 return self._json(confirm_action(body))
             if path == "/api/scenarios/cancel":

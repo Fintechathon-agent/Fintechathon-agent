@@ -20,6 +20,8 @@ from typing import Optional
 
 from agent.banking import route as banking_route
 from agent.banking import tier_label
+from agent.banking.bill_import import parse_statement
+from agent.banking.router import detect_scenario
 from agent.banking.tiers import tier_of_operation
 from agent.banking.cards import normalize_card_operation
 from agent.banking.gates import check_transfer, check_card_operation, check_subscription_cancel
@@ -38,6 +40,8 @@ SEED_PENDING_TTL_SECONDS = 2 * 60 * 60
 DEMO_AS_OF = "2026-10-11"
 DEMO_PROVENANCE = {
     "source": "demo_fixture",
+    "verification_mode": "DEMO_MOCK",
+    "identity_verified": False,
     "source_label": "演示固定数据",
     "simulation_notice": "演示模拟：不会发生真实资金转移、短信/人脸验证或外部下单。",
 }
@@ -257,7 +261,7 @@ def scenario_overview() -> dict:
     }
 
 
-def _run_and_queue(state, question: str, *, seeded: bool = False):
+def _run_and_queue(state, question: str, *, seeded: bool = False, bills_data=None):
     """跑一次确定性场景，并把黄/红操作挂到运行态待确认队列。
 
     返回 (ScenarioResult, deduplicated)。seeded=True 表示来自「预置演示
@@ -265,11 +269,17 @@ def _run_and_queue(state, question: str, *, seeded: bool = False):
     因 10 分钟 TTL 过期被清走。
     """
     res = banking_route(
-        question, bills_data=demo_bills(), cards_data=state.cards,
-        contacts=demo_contacts(), balance=state.balance,
+        question, bills_data=bills_data if bills_data is not None else demo_bills(), cards_data=state.cards,
+        contacts=demo_contacts(), balance=getattr(state, "spendable_balance", state.balance),
         daily_cumulative=state.daily_cumulative, user_id=USER_ID,
         cancelled_subs=state.cancelled_subs,
     )
+    if hasattr(state, "spendable_balance") and state.spendable_balance != state.balance:
+        res.message = res.message.replace("账户余额", "扣除已确认保留后的可安排现金")
+        for check in res.data.get("gate_checks", []):
+            check["detail"] = check.get("detail", "").replace("账户余额", "扣除已确认保留后的可安排现金")
+        res.data["account_cash"] = state.balance
+        res.data["spendable_cash"] = state.spendable_balance
     deduplicated = False
     if res.status not in ("pending_confirmation", "scheduled"):
         return res, deduplicated
@@ -312,23 +322,42 @@ def _run_and_queue(state, question: str, *, seeded: bool = False):
 
 
 @_transactional
-def run_scenario(text: str) -> dict:
+def run_scenario(text: str, bill_file: dict | None = None) -> dict:
     question = (text or "").strip()
     if not question:
         return {"delegated": False, "result": None, "message": "请输入自然语言请求"}
     state = get_banking_state()
     _prune_pending(state)
     _promote_due(state)
-    res, deduplicated = _run_and_queue(state, question)
+    source_record = None
+    imported = None
+    if bill_file is not None:
+        if detect_scenario(question) != "bill" or not isinstance(bill_file, dict):
+            raise ValueError("上传账单只能绑定账单分析任务")
+        imported, source_record = parse_statement(bill_file.get("name"), bill_file.get("text"))
+    res, deduplicated = _run_and_queue(state, question, bills_data=imported)
     if res.status == "delegated":
         return {"delegated": True, "result": None, "message": res.message}
+    trace_id = "bill_" + uuid4().hex if source_record else None
+    provenance = _provenance()
+    if res.intent.get("name") == "fund_knowledge":
+        provenance = {"source": "curated_definition", "source_label": "程序内置的基金定义",
+                      "simulation_notice": "仅作知识解释；未调用账户工具、未提出或执行买卖动作。"}
+    if source_record and res.scenario == "bill" and res.status == "done":
+        res.data["source_record"] = source_record
+        res.data["trace_id"] = trace_id
+        provenance = {**provenance, "source": "uploaded_file", "source_label": "本次上传的文件",
+                      "batch_id": source_record["batch_id"]}
+        _audit_event(state, "banking_bill_import_analyzed", trace_id, {
+            "batch_id": source_record["batch_id"], "period": res.data["period"],
+            "row_count": source_record["row_count"], "total_spend": res.data["total_spend"]})
     return {"delegated": False, "result": {
         "scenario": res.scenario, "scenario_label": res.scenario_label,
         "intent": res.intent, "plan": res.plan, "tier": res.tier,
         "tier_label": tier_label(res.tier), "status": res.status,
-        "message": res.message, "data": res.data,
+        "message": res.message, "data": res.data, "provenance": provenance,
     }, "pending": state.pending, "scheduled": state.scheduled,
-        "breaker": get_breaker().state(), "provenance": _provenance(), "deduplicated": deduplicated}
+        "breaker": get_breaker().state(), "provenance": provenance, "deduplicated": deduplicated}
 
 
 @_transactional
@@ -387,7 +416,10 @@ def confirm_action(payload: dict) -> dict:
     if scenario == "transfer" and operation == "transfer":
         req = TransferRequest(request_id=pending_id, payee=request.get("payee", ""),
                               amount=float(request.get("amount", 0)))
-        passed, checks = check_transfer(req, demo_contacts(), state.balance, state.daily_cumulative)
+        passed, checks = check_transfer(req, demo_contacts(), getattr(state, "spendable_balance", state.balance), state.daily_cumulative)
+        if hasattr(state, "spendable_balance") and state.spendable_balance != state.balance:
+            for check in checks:
+                check["detail"] = check.get("detail", "").replace("账户余额", "扣除已确认保留后的可安排现金")
         tier = tier_of_operation("transfer", "transfer_now", req.amount, state.daily_cumulative)
     elif scenario == "transfer" and operation == "aa_collect":
         passed = bool(request.get("payee")) and float(request.get("amount", 0)) > 0

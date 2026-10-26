@@ -18,6 +18,8 @@ export async function verifyAccountSummary({ input = fixture, synthetic = true, 
   const env = {
     MODEL_PROVIDER: "workers_ai", MODEL_MAX_ATTEMPTS: "1", MODEL_REQUESTS_PER_MINUTE: "100", MODEL_DISABLE_RULE_FALLBACK: "true",
     RATE_LIMIT_PER_MINUTE: "0", REQUIRE_TRUSTED_ACTORS: "true", RISK_SERVICE_HMAC_SECRET: randomBytes(32).toString("hex"),
+    CORE_AGENT_API_KEY: randomBytes(32).toString("hex"),
+    REQUIRE_RISK_REVIEWER: "true", RISK_REVIEWER_ID: "synthetic-risk-reviewer",
     APPROVAL_SERVICE_HMAC_SECRET: randomBytes(32).toString("hex"),
     AI: { run: async (_model, request) => {
       captured.push(structuredClone(request));
@@ -33,11 +35,11 @@ export async function verifyAccountSummary({ input = fixture, synthetic = true, 
   let service = new ReviewService({ storage }, env);
   env.REVIEW_SERVICE = { idFromName: name => name, get: () => service };
   async function call(endpoint, body, expected, owner = null) {
-    const headers = { "Content-Type": "application/json" };
+    const headers = { "Content-Type": "application/json", "X-Core-Agent-Key": env.CORE_AGENT_API_KEY };
     if (owner) headers[owner === "risk" ? "X-Risk-Signature" : "X-Approval-Signature"] =
       await bridge.signatureFor(body, env[owner === "risk" ? "RISK_SERVICE_HMAC_SECRET" : "APPROVAL_SERVICE_HMAC_SECRET"]);
-    const response = await worker.fetch(new Request("https://account-summary.invalid" + endpoint, body === undefined ? {} : {
-      method: "POST", headers, body: JSON.stringify(body)
+    const response = await worker.fetch(new Request("https://account-summary.invalid" + endpoint, {
+      headers, ...(body === undefined ? {} : { method: "POST", body: JSON.stringify(body) })
     }), env);
     const result = await response.json();
     transport.push({ endpoint, method: body === undefined ? "GET" : "POST", request: body ?? null, signed_by_test_harness: Boolean(owner),

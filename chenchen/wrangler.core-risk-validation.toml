@@ -1,0 +1,26 @@
+name = "finance-lab-core-risk-validation"
+main = "deployment/worker.js"
+compatibility_date = "2026-10-11"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+[vars]
+CORS_ORIGINS = "https://backend-only.invalid"
+RATE_LIMIT_PER_MINUTE = "20"
+MODEL_PROVIDER = "workers_ai"
+MODEL_NAME = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+MODEL_FALLBACK_TO_RULES = "false"
+MODEL_DISABLE_RULE_FALLBACK = "true"
+MODEL_MAX_ATTEMPTS = "1"
+REQUIRE_TRUSTED_ACTORS = "true"
+REQUIRE_RISK_REVIEWER = "true"
+RISK_REVIEWER_ID = "risk-conversation-cloudflare-v1"
+# Deliberately no AI binding: no model inference in the zero-budget environment.
+
+[[durable_objects.bindings]]
+name = "REVIEW_SERVICE"
+class_name = "ReviewService"
+
+[[migrations]]
+tag = "review-service-v1"
+new_sqlite_classes = ["ReviewService"]

@@ -1,0 +1,44 @@
+{
+  "rule_id": "R08",
+  "title_zh": "完整计划的有效确认",
+  "version": "risk-rules.v0.1-draft",
+  "status": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW",
+  "stages": [
+    "EXECUTION_PREFLIGHT"
+  ],
+  "check_key": "plan_approval",
+  "input_refs": [
+    "/approval",
+    "/binding"
+  ],
+  "conditions": [
+    {
+      "condition_id": "R08-policy",
+      "metric": "plan_approval",
+      "operator": "POLICY_CHECK",
+      "threshold": null,
+      "threshold_ref": null,
+      "unit": "POLICY",
+      "basis": "POLICY",
+      "group": "ANY"
+    }
+  ],
+  "reason_codes": [
+    "APPROVAL_REQUIRED",
+    "APPROVAL_REJECTED",
+    "APPROVAL_INVALIDATED",
+    "RISK_ACCEPTANCE_REQUIRED"
+  ],
+  "failure_decisions": [
+    "REVIEW",
+    "BLOCK"
+  ],
+  "acceptance_policy_zh": "接受风险与确认整套计划分开；确认不能覆盖阻止或错误。",
+  "enforcement_owner": [
+    "ORCHESTRATOR",
+    "TOOLS"
+  ],
+  "recovery_zh": "核对身份、版本、有效期，重新检查并确认。",
+  "source": "SOP_CONFIRMED",
+  "notes_zh": "配置仅供队内虚构演示；规则定义不是可执行规则引擎。"
+}

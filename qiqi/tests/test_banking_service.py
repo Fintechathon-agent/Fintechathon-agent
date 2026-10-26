@@ -34,6 +34,17 @@ class IsolatedBankingCase(unittest.TestCase):
 
 class BankingServiceFlowTests(IsolatedBankingCase):
 
+    def test_fund_definition_is_answered_without_a_trade_plan(self):
+        result = run_scenario("基金是什么")
+        self.assertFalse(result["delegated"])
+        self.assertEqual(result["result"]["status"], "done")
+        self.assertEqual(result["result"]["intent"]["name"], "fund_knowledge")
+        self.assertEqual(result["result"]["data"]["answer_source"], "curated_definition")
+        self.assertFalse(result["result"]["data"]["execution_required"])
+        self.assertEqual(result["pending"], [])
+        self.assertIn("基金是", result["result"]["message"])
+        self.assertEqual(result["result"]["provenance"]["source"], "curated_definition")
+
     def test_cross_scene_funding_confirmation_is_queued_and_consumed(self):
         result = run_scenario("我爱人10月25日生日，锁定1000元活期")
         self.assertEqual(result["result"]["status"], "pending_confirmation")

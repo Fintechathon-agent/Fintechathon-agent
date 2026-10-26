@@ -62,8 +62,8 @@ def _portfolio_snapshot(raw: dict[str, Any]) -> tuple[dict[str, Any] | None, lis
 
     portfolio_id = str(raw.get("portfolio_id") or "preview-demo").strip()
     as_of = _date(raw.get("as_of"))
-    cash = _number(raw.get("cash"), 0.0)
-    if cash < 0:
+    cash = _number(raw.get("cash"), math.nan)
+    if isinstance(raw.get("cash"), bool) or not math.isfinite(cash) or cash < 0:
         missing.append("input.portfolio.cash")
 
     positions: list[dict[str, Any]] = []
@@ -80,9 +80,9 @@ def _portfolio_snapshot(raw: dict[str, Any]) -> tuple[dict[str, Any] | None, lis
         price = _number(item.get("price", item.get("current_price")), 0.0)
         if not instrument_id:
             missing.append(f"input.portfolio.positions[{index}].instrument_id")
-        if quantity <= 0:
+        if isinstance(item.get("quantity"), bool) or quantity <= 0:
             missing.append(f"input.portfolio.positions[{index}].quantity")
-        if price <= 0:
+        if isinstance(item.get("price", item.get("current_price")), bool) or price <= 0:
             missing.append(f"input.portfolio.positions[{index}].price")
         if not instrument_id or quantity <= 0 or price <= 0:
             continue

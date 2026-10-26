@@ -1,0 +1,22 @@
+审计待投递事件保留，将在下次请求重试
+Traceback (most recent call last):
+  File "C:\Users\zxc\Documents\ChatGPT\banking agent\team-source\Fintechathon-agent-integration-20261025\qiqi\web\banking_service.py", line 107, in _flush_audit
+    log_action(event["action"], USER_ID, event["action_id"],
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               {**event["detail"], "event_id": event["event_id"]}, event["result"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\python\Lib\unittest\mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\python\Lib\unittest\mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\python\Lib\unittest\mock.py", line 1234, in _execute_mock_call
+    raise effect
+OSError: audit unavailable
+LLM 决策失败: fake timeout，尝试降级
+真实模型调用失败（不回退）: fake timeout
+----------------------------------------------------------------------
+Ran 251 tests in 7.462s
+
+OK

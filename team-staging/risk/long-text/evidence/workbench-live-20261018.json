@@ -1,0 +1,274 @@
+{
+  "verified_at": "2026-10-17T17:14:13.283Z",
+  "as_of": "2026-10-18",
+  "origin": "http://127.0.0.1:8780",
+  "mode": "LIVE_MODEL_WITH_SYNTHETIC_PAPER_ONLY",
+  "task_id": "daily-task-78fd0fa5-a62b-4aa8-b8d3-6094670d6107",
+  "draft_id": "long-1f39f150-bf57-4555-ac62-0bf7bff35b71",
+  "source_text": "我目前现金5万元，保底1万元。每月5号交房租3500元，下个月20号交学费2万元。我每月10号工资8000元，想拿2万元买基金。",
+  "final_items": [
+    {
+      "id": "item-0",
+      "text": "我目前现金5万元",
+      "source_span": {
+        "start": 0,
+        "end": 8
+      },
+      "type": "CASH",
+      "classification": {
+        "status": "UNSPECIFIED",
+        "hints": [],
+        "subject": "SELF_REPORTED"
+      },
+      "amount_minor": 5000000,
+      "amounts": [
+        {
+          "text": "5万元",
+          "amount_minor": 5000000
+        }
+      ],
+      "issues": [],
+      "due_date": null,
+      "recurrence": "ONCE",
+      "anchor_day": null,
+      "date_notes": [],
+      "certainty": "EXPECTED",
+      "disposition": "INCLUDE",
+      "exclusion_reason": "",
+      "related_item_id": null,
+      "requires_split": false,
+      "duplicate_of": null,
+      "corrected": false
+    },
+    {
+      "id": "item-1",
+      "text": "保底1万元",
+      "source_span": {
+        "start": 9,
+        "end": 14
+      },
+      "type": "RESERVE",
+      "classification": {
+        "status": "UNSPECIFIED",
+        "hints": [],
+        "subject": "UNSPECIFIED"
+      },
+      "amount_minor": 1000000,
+      "amounts": [
+        {
+          "text": "1万元",
+          "amount_minor": 1000000
+        }
+      ],
+      "issues": [],
+      "due_date": null,
+      "recurrence": "ONCE",
+      "anchor_day": null,
+      "date_notes": [],
+      "certainty": "EXPECTED",
+      "disposition": "INCLUDE",
+      "exclusion_reason": "",
+      "related_item_id": null,
+      "requires_split": false,
+      "duplicate_of": null,
+      "corrected": false
+    },
+    {
+      "id": "item-2",
+      "text": "每月5号交房租3500元",
+      "source_span": {
+        "start": 15,
+        "end": 27
+      },
+      "type": "EXPENSE",
+      "classification": {
+        "status": "PLANNED",
+        "hints": [
+          "PLANNED"
+        ],
+        "subject": "UNSPECIFIED"
+      },
+      "amount_minor": 350000,
+      "amounts": [
+        {
+          "text": "3500元",
+          "amount_minor": 350000
+        }
+      ],
+      "issues": [],
+      "due_date": "2026-11-05",
+      "recurrence": "MONTHLY",
+      "anchor_day": 5,
+      "date_notes": [],
+      "certainty": "EXPECTED",
+      "disposition": "INCLUDE",
+      "exclusion_reason": "",
+      "related_item_id": null,
+      "requires_split": false,
+      "duplicate_of": null,
+      "corrected": false
+    },
+    {
+      "id": "item-3",
+      "text": "下个月20号交学费2万元",
+      "source_span": {
+        "start": 28,
+        "end": 40
+      },
+      "type": "EXPENSE",
+      "classification": {
+        "status": "PLANNED",
+        "hints": [
+          "PLANNED"
+        ],
+        "subject": "UNSPECIFIED"
+      },
+      "amount_minor": 2000000,
+      "amounts": [
+        {
+          "text": "2万元",
+          "amount_minor": 2000000
+        }
+      ],
+      "issues": [],
+      "due_date": "2026-11-20",
+      "recurrence": "ONCE",
+      "anchor_day": 20,
+      "date_notes": [],
+      "certainty": "EXPECTED",
+      "disposition": "INCLUDE",
+      "exclusion_reason": "",
+      "related_item_id": null,
+      "requires_split": false,
+      "duplicate_of": null,
+      "corrected": false
+    },
+    {
+      "id": "item-4",
+      "text": "我每月10号工资8000元",
+      "source_span": {
+        "start": 41,
+        "end": 54
+      },
+      "type": "INCOME",
+      "classification": {
+        "status": "PLANNED",
+        "hints": [
+          "PLANNED"
+        ],
+        "subject": "SELF_REPORTED"
+      },
+      "amount_minor": 800000,
+      "amounts": [
+        {
+          "text": "8000元",
+          "amount_minor": 800000
+        }
+      ],
+      "issues": [],
+      "due_date": "2026-11-10",
+      "recurrence": "MONTHLY",
+      "anchor_day": 10,
+      "date_notes": [],
+      "certainty": "EXPECTED",
+      "disposition": "INCLUDE",
+      "exclusion_reason": "",
+      "related_item_id": null,
+      "requires_split": false,
+      "duplicate_of": null,
+      "corrected": false
+    },
+    {
+      "id": "item-5",
+      "text": "想拿2万元买基金",
+      "source_span": {
+        "start": 55,
+        "end": 63
+      },
+      "type": "INVESTMENT",
+      "classification": {
+        "status": "PLANNED",
+        "hints": [
+          "PLANNED"
+        ],
+        "subject": "UNSPECIFIED"
+      },
+      "amount_minor": 1000000,
+      "amounts": [
+        {
+          "text": "2万元",
+          "amount_minor": 2000000
+        }
+      ],
+      "issues": [],
+      "due_date": "2026-10-18",
+      "recurrence": "ONCE",
+      "anchor_day": null,
+      "date_notes": [
+        "未给出投资日期，草稿按分析日占用测算，须核对"
+      ],
+      "certainty": "EXPECTED",
+      "disposition": "INCLUDE",
+      "exclusion_reason": "",
+      "related_item_id": null,
+      "requires_split": false,
+      "duplicate_of": null,
+      "corrected": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "protected-cash-conflict",
+      "decision": "BLOCK",
+      "shortfall_minor": 700000
+    },
+    {
+      "name": "handoff-idempotent",
+      "passed": true
+    },
+    {
+      "name": "hard-conflict-cannot-confirm",
+      "passed": true
+    },
+    {
+      "name": "source-change-invalidates-old-model-and-approval",
+      "passed": true
+    },
+    {
+      "name": "revise-same-task",
+      "decision": "ALLOW",
+      "projected_free_after_minor": 300000
+    },
+    {
+      "name": "confirmed-paper-execution-and-replay",
+      "passed": true,
+      "execution_id": "daily-execution-7fb01df8-b940-4a89-be37-bd9759169cb9",
+      "holds": 1,
+      "audit_events": 17
+    }
+  ],
+  "models": [
+    {
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "run_id": "review-e4abd125-20a6-4b56-b3d3-21a1077838c5",
+      "provider_response_id": "chatcmpl-160a9612-c8d0-45d4-9eb7-a7e2e256008e",
+      "input_sha256": "e3ce18a5c8bd3221dd01ed22d891d02323c8ad8dc04607868eebfd306aa1fed6",
+      "proposal_sha256": "540863876e19acba26d56a00112bd1152fb1370d21e204ff5088e3fbd9a31b1f",
+      "core_audit_id": "audit-a5e4c220-7c0d-442a-9552-19782f830d98",
+      "summary": "信息不足，存在资金占用冲突，需要进一步核实。",
+      "risk_decision": "BLOCK"
+    },
+    {
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "run_id": "review-4f18f892-1287-412d-8702-88f59cfcf9e2",
+      "provider_response_id": "chatcmpl-736d14b0-865c-4d0b-9145-3bf4435774a1",
+      "input_sha256": "79d683f955cfd1bb83e799248b0f1a4679eaa1805591222afc8692a513d3018d",
+      "proposal_sha256": "deee4c21d045045412ca38bf8ff93de961a75a6b18166713ade692e65d5ea597",
+      "core_audit_id": "audit-26c475dc-e644-472c-9427-0f3ea941da1f",
+      "summary": "信息不足，需要核实投资和支出明细。",
+      "risk_decision": "ALLOW"
+    }
+  ],
+  "real_account_connected": false,
+  "real_transactions": false
+}

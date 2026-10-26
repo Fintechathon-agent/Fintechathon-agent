@@ -137,7 +137,9 @@ class CrossSceneTests(unittest.TestCase):
     def test_explicit_date_still_works(self):
         r = _route("我爱人10月25日生日，生日前2天订花和蛋糕，锁定1000元活期")
         self.assertEqual(r.scenario, "cross_scene")
-        self.assertIn("2026-10-25", r.intent["slots"]["birthday"])
+        birthday = datetime.fromisoformat(r.intent["slots"]["birthday"])
+        self.assertEqual((birthday.month, birthday.day), (10, 25))
+        self.assertGreaterEqual(birthday.date(), datetime.now().date())
 
 
 class WealthVerbTests(unittest.TestCase):
