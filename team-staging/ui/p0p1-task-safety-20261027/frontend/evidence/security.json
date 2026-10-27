@@ -1,0 +1,11 @@
+{
+  "scanned": 117,
+  "credentialPatterns": [
+    "private-key",
+    "github-credential",
+    "provider-credential"
+  ],
+  "hits": [],
+  "modelCalls": 0,
+  "scope": "Tracked candidate text, forbidden filenames, runtime file integrity. This is not a penetration test."
+}

@@ -1,0 +1,13 @@
+investment-only/** -text whitespace=cr-at-eol
+workspace.html -text whitespace=cr-at-eol
+versions/workspace-investment.js -text whitespace=cr-at-eol
+versions/workspace.js -text whitespace=cr-at-eol
+versions/workspace-model.mjs -text whitespace=cr-at-eol
+# Keep candidate module bytes identical in Windows checkouts and Git archives.
+versions/workspace-store.mjs text eol=lf
+versions/workspace-unified.mjs text eol=lf
+versions/workspace-unified.css text eol=lf
+versions/workspace-adapter.mjs text eol=lf
+versions/workspace-api.mjs text eol=lf
+preview-manifest.json text eol=lf
+candidate-manifest.json text eol=lf

@@ -1,0 +1,30 @@
+{
+  "runtimeFiles": 86,
+  "source": "Git index bytes",
+  "mismatches": [
+    "acceptance/2026-10-19/evidence/cloud-public.json",
+    "acceptance/2026-10-19/evidence/live-local.json",
+    "acceptance/2026-10-19/evidence/live-student.json",
+    "acceptance/2026-10-19/evidence/student-checks.json",
+    "acceptance/2026-10-19/evidence/student-cloud-check.json",
+    "acceptance/2026-10-19/evidence/student-direct-network.json",
+    "acceptance/2026-10-19/evidence/worker-build.json",
+    "acceptance/2026-10-19/evidence/workerd-local.json",
+    "build-info.json",
+    "catalog.html",
+    "conversation-config.json",
+    "conversation.html",
+    "landing.html",
+    "risk-workbench.html",
+    "versions/archive-scene.css",
+    "versions/conversation-brand.css",
+    "versions/conversation-brand.mjs",
+    "versions/conversation.css",
+    "versions/conversation.js",
+    "versions/landing.css",
+    "versions/preview.css",
+    "versions/workspace-refinement.css",
+    "versions/workspace.css"
+  ],
+  "result": "FAIL"
+}

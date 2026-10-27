@@ -1,0 +1,53 @@
+{
+  "startedAt": "2026-10-27T11:58:12.211Z",
+  "modelCalls": 0,
+  "externalWrites": 0,
+  "widths": [
+    {
+      "width": 320,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 430,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 1024,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "views": 6,
+      "overflow": false
+    }
+  ],
+  "steps": [
+    "Current-run baseline screenshots captured before candidate interactions",
+    "Seven required widths x six navigation views; one visible panel; no horizontal page overflow",
+    "Actual pinned Core health HTTP response, same task in unified tasks and audit, refresh and server re-query",
+    "XSS escaped, DEMO remains local, form labels and keyboard route focus"
+  ],
+  "errors": [],
+  "fixtures": "Named synthetic fixtures only; actual Core health calculation is separately identified.",
+  "result": "FAIL",
+  "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#refresh-shared')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"secondary\" id=\"refresh-shared\">刷新来源状态</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at F:\\人工智能AI 比赛\\output\\p0p1-20261027\\personal\\tests\\browser.cjs:81:98",
+  "completedAt": "2026-10-27T11:59:01.371Z"
+}

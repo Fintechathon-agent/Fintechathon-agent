@@ -1,0 +1,12 @@
+test_block_event_is_persisted_without_sensitive_text (test_service.ServiceTests.test_block_event_is_persisted_without_sensitive_text) ... ok
+test_candidate_task_is_idempotent_persistent_and_cannot_execute (test_service.ServiceTests.test_candidate_task_is_idempotent_persistent_and_cannot_execute) ... ok
+test_completed_analysis_replay_is_served_without_another_provider_attempt (test_service.ServiceTests.test_completed_analysis_replay_is_served_without_another_provider_attempt) ... ok
+test_confirmation_and_analysis_ownership_are_required (test_service.ServiceTests.test_confirmation_and_analysis_ownership_are_required) ... ok
+test_missing_consent_never_records_provider_attempt (test_service.ServiceTests.test_missing_consent_never_records_provider_attempt) ... ok
+test_session_files_are_isolated_and_not_named_by_user_paths (test_service.ServiceTests.test_session_files_are_isolated_and_not_named_by_user_paths) ... ok
+test_stale_budget_source_is_rejected_before_model (test_service.ServiceTests.test_stale_budget_source_is_rejected_before_model) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 2.290s
+
+OK

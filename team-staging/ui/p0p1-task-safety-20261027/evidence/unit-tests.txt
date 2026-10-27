@@ -1,0 +1,44 @@
+✔ frozen team health contract retains only actual trace fields (3.8235ms)
+✔ task phase remains independent: PENDING_RISK (1.6373ms)
+✔ task phase remains independent: PENDING_APPROVAL (1.0642ms)
+✔ task phase remains independent: READY_FOR_SIMULATION (2.0868ms)
+✔ task phase remains independent: SIMULATED (1.1225ms)
+✔ task phase remains independent: REJECTED (0.9333ms)
+✔ task phase remains independent: EXPIRED (1.052ms)
+✔ task phase remains independent: MODEL_FAILED (1.1142ms)
+✔ task phase remains independent: FUNDING_BLOCKED (0.9611ms)
+✔ task phase remains independent: CANCELLED (1.2682ms)
+✔ all six trace identifiers reject mismatches without inventing aliases (5.9806ms)
+✔ audit events from another task are rejected; historical request provenance is retained (2.2335ms)
+✔ business Risk mapping retains Owner authentication boundary: APPROVE (1.272ms)
+✔ business Risk mapping retains Owner authentication boundary: REQUEST_MORE_INFO (0.8937ms)
+✔ business Risk mapping retains Owner authentication boundary: REJECT (0.8218ms)
+✔ receipt must bind task, execution, plan hash, mode and side effects (1.3987ms)
+✔ expiry, source changes and service errors independently stop the next step (0.1669ms)
+✔ candidate task is never formal Risk, approval or execution (0.2295ms)
+✔ consent binds question, scope, snapshot revision and goal (0.2674ms)
+✔ configured status and HTTP 200 alone do not prove a real provider response (0.2081ms)
+✔ legacy projection also refuses live, unbound or side-effectful success receipts (0.1561ms)
+✔ live mode, mismatched plans and execution authority are refused at the adapter boundary (4.6379ms)
+✔ actual pinned Core: health, same-task Risk/approval/PAPER, rejection and hash conflict (118.9794ms)
+✔ tampered local storage cannot restore service results, identity, Risk or receipts (17.5014ms)
+✔ only service references survive refresh; read projections are not stored (15.7364ms)
+✔ failed source reads clear old provider success and never render local task as formal (38.9083ms)
+✔ HTTP 401 stays stopped and does not expose upstream text (60.3072ms)
+✔ HTTP 403 stays stopped and does not expose upstream text (0.9166ms)
+✔ HTTP 409 stays stopped and does not expose upstream text (0.466ms)
+✔ HTTP 423 stays stopped and does not expose upstream text (0.6184ms)
+✔ HTTP 404 stays stopped and does not expose upstream text (0.5866ms)
+✔ HTTP 429 stays stopped and does not expose upstream text (0.4387ms)
+✔ concurrent duplicate submissions share one request without automatic retry (2.0046ms)
+✔ timeout and lost network acknowledgement remain UNKNOWN and do not retry (24.2173ms)
+✔ HTML or invalid JSON cannot become a success result (1.6488ms)
+✔ transport rejects cross-origin, undeclared base paths and traversal (0.366ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 351.0054
