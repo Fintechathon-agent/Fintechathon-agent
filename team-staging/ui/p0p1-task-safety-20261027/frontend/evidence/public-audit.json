@@ -1,0 +1,122 @@
+[
+  {
+    "url": "https://lixjanus526-art.github.io/finance-lab-ui-preview/landing.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "checkedAt": "2026-10-27T12:03:47.0321519Z",
+    "sha256": "54c31c99be6ab9dfff282c93aa98bad2ab53b09352a3552392af20e13d894cc5",
+    "scripts": [
+      "versions/landing.js?v=20261021-minimal",
+      "versions/archive.js?v=20261021-minimal"
+    ]
+  },
+  {
+    "url": "https://lixjanus526-art.github.io/finance-lab-ui-preview/workspace.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "checkedAt": "2026-10-27T12:03:48.4513215Z",
+    "sha256": "feafb5807a3de24be47861b71fb02c6508dce82bfa04e60e5c01da9f28d5dadb",
+    "scripts": [
+      "versions/workspace-investment.js?v=20261024-shell",
+      "versions/workspace-unified.mjs?v=20261024-consent"
+    ]
+  },
+  {
+    "url": "https://xinlan-qwen38-share.lixjanus526.workers.dev/health",
+    "status": 200,
+    "contentType": "application/json",
+    "checkedAt": "2026-10-27T12:03:49.5473456Z",
+    "body": {
+      "status": "ok",
+      "service": "xinlan-qwen38-share",
+      "model": "qwen3.8-flash",
+      "configured": true,
+      "paidEnabled": true,
+      "accessMode": "PUBLIC"
+    }
+  },
+  {
+    "url": "https://xinlan-qwen38-share.lixjanus526.workers.dev/api/assistant/workspace/state",
+    "status": 404,
+    "contentType": "application/json; charset=utf-8",
+    "checkedAt": "2026-10-27T12:03:51.5160355Z"
+  },
+  {
+    "url": "https://finance-lab-risk-bridge.realchenchenluo.workers.dev/health",
+    "status": 200,
+    "contentType": "application/json; charset=utf-8",
+    "checkedAt": "2026-10-27T12:03:52.9314839Z",
+    "body": {
+      "status": "ok",
+      "service": "risk-conversation",
+      "deployment": "CLOUD_VALIDATION",
+      "owner_source": "PR27-27bdefb",
+      "model_calls_enabled": false,
+      "joint_acceptance": false,
+      "execution_allowed": false
+    }
+  },
+  {
+    "url": "https://finance-lab-core-risk-validation.realchenchenluo.workers.dev/health",
+    "status": 200,
+    "contentType": "application/json; charset=utf-8",
+    "checkedAt": "2026-10-27T12:03:54.9933995Z",
+    "body": {
+      "status": "ok",
+      "service": "core-agent",
+      "contract_version": "investment-agent.v1",
+      "review_endpoint": "/api/review",
+      "docs": "/docs",
+      "model": {
+        "provider": "cloudflare_workers_ai",
+        "name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "configured": false
+      },
+      "audit_storage": "durable_object"
+    }
+  },
+  {
+    "url": "https://finance-lab-risk-bridge.realchenchenluo.workers.dev/api/status",
+    "status": 401,
+    "contentType": "application/json; charset=utf-8",
+    "checkedAt": "2026-10-27T12:03:56.2820294Z"
+  },
+  {
+    "url": "https://finance-lab-core-risk-validation.realchenchenluo.workers.dev/api/review/task/ui-audit-nonexistent",
+    "status": 401,
+    "contentType": "application/json; charset=utf-8",
+    "checkedAt": "2026-10-27T12:03:57.2316000Z"
+  },
+  {
+    "url": "https://finance-lab-core-risk-validation.realchenchenluo.workers.dev/api/review/capabilities",
+    "status": 401,
+    "contentType": "application/json; charset=utf-8",
+    "checkedAt": "2026-10-27T12:03:58.8541758Z",
+    "body": {
+      "contract_version": "investment-agent.v1",
+      "request_id": null,
+      "operation": "PORTFOLIO_HEALTH_CHECK",
+      "trace": {
+        "contract_version": "investment-agent.v1",
+        "error_contract_version": "core-agent-error.v1",
+        "source_contract_version": "investment-agent.v1",
+        "request_id": null,
+        "task_id": null,
+        "session_id": null,
+        "run_id": null,
+        "audit_id": null,
+        "handoff_id": null
+      },
+      "error": {
+        "code": "AUTHENTICATION_REQUIRED",
+        "message": "API authentication is required",
+        "retryable": false,
+        "stage": "AUTHENTICATION",
+        "recovery": "Use the server-side X-Core-Agent-Key through your backend proxy.",
+        "details": null
+      },
+      "error_contract_version": "core-agent-error.v1",
+      "source_contract_version": "investment-agent.v1"
+    }
+  }
+]

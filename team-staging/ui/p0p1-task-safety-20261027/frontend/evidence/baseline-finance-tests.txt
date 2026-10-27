@@ -1,0 +1,169 @@
+======================================================================
+ERROR: test_backtest_metrics (unittest.loader._FailedTest.test_backtest_metrics)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_backtest_metrics
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_backtest_metrics.py", line 6, in <module>
+    from agent.tools.backtest import BacktestEngine
+ModuleNotFoundError: No module named 'agent'
+
+
+======================================================================
+ERROR: test_banking_scenarios (unittest.loader._FailedTest.test_banking_scenarios)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_banking_scenarios
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_banking_scenarios.py", line 18, in <module>
+    from contracts.banking import BankCard, BillRecord, Contact
+ModuleNotFoundError: No module named 'contracts'
+
+
+======================================================================
+ERROR: test_banking_service (unittest.loader._FailedTest.test_banking_service)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_banking_service
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_banking_service.py", line 8, in <module>
+    from agent.risk.circuit_breaker import init_breaker
+ModuleNotFoundError: No module named 'agent'
+
+
+======================================================================
+ERROR: test_execution_safety (unittest.loader._FailedTest.test_execution_safety)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_execution_safety
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_execution_safety.py", line 17, in <module>
+    from agent.banking.transfers import parse_schedule, parse_transfer_request
+ModuleNotFoundError: No module named 'agent'
+
+
+======================================================================
+ERROR: test_fund_ops (unittest.loader._FailedTest.test_fund_ops)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_fund_ops
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_fund_ops.py", line 8, in <module>
+    from agent.tools import fund_ops
+ModuleNotFoundError: No module named 'agent'
+
+
+======================================================================
+ERROR: test_intent_planner_breaker (unittest.loader._FailedTest.test_intent_planner_breaker)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_intent_planner_breaker
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_intent_planner_breaker.py", line 6, in <module>
+    from agent.core.intent import parse_intent
+ModuleNotFoundError: No module named 'agent'
+
+
+======================================================================
+ERROR: test_model_mode (unittest.loader._FailedTest.test_model_mode)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_model_mode
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_model_mode.py", line 6, in <module>
+    from agent.orchestrator.orchestrator import DecisionMaker, ModelDecisionError
+ModuleNotFoundError: No module named 'agent'
+
+
+======================================================================
+ERROR: test_nl_robustness (unittest.loader._FailedTest.test_nl_robustness)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_nl_robustness
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_nl_robustness.py", line 14, in <module>
+    from agent.banking.router import route
+ModuleNotFoundError: No module named 'agent'
+
+
+======================================================================
+ERROR: test_preview_contract (unittest.loader._FailedTest.test_preview_contract)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_preview_contract
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_preview_contract.py", line 6, in <module>
+    from web.demo_data import fresh_portfolio, portfolio_dict
+ModuleNotFoundError: No module named 'web'
+
+
+======================================================================
+ERROR: test_report_contract (unittest.loader._FailedTest.test_report_contract)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_report_contract
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_report_contract.py", line 12, in <module>
+    from contracts.report import (
+ModuleNotFoundError: No module named 'contracts'
+
+
+======================================================================
+ERROR: test_risk_history (unittest.loader._FailedTest.test_risk_history)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_risk_history
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\loader.py", line 339, in _get_module_from_name
+    __import__(name)
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\�˹�����AI ����\qiqi\tests\test_risk_history.py", line 8, in <module>
+    from agent.risk.engine import RiskEngine
+ModuleNotFoundError: No module named 'agent'
+
+
+----------------------------------------------------------------------
+Ran 12 tests in 3.258s
+
+FAILED (errors=11)
