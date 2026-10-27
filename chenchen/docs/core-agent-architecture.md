@@ -91,3 +91,7 @@ flowchart LR
 ## 2026-10-26 main 基线复核
 
 两份 main 独立 284/284 回归、32/32 Schema 与语义检查通过。10 月 21 日可信 reviewer/云适配开发提交 9e6bed1 尚未合入任一 main；不将留存云部署证据称作 main 已完成正式审核。更新图像、字段归属与停止点见 core-agent-integration-guide-2026-10-26.md 及同名 DOCX。
+
+## 2026-10-27 main 基线复核
+
+两份 main 独立 284/284 回归、32/32 Schema 与语义检查通过。10 月 21 日可信 reviewer/云适配开发提交 9e6bed1 尚未合入任一 main；不将留存云部署证据称作 main 已完成正式审核。更新图像、字段归属与停止点见 core-agent-integration-guide-2026-10-27.md 及同名 DOCX。

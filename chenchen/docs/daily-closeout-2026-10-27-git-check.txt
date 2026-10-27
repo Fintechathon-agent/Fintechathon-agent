@@ -1,0 +1,7 @@
+Checked at 2026-10-27T14:04:24.5517573Z
+
+git diff --check: exit 0
+Credential pattern scan of 10-27 text artifacts: no matches
+Allowed scope: chenchen/docs only; business code and runtime Schemas unchanged
+
+git diff --cached --check: will run before commit; failure prevents commit
