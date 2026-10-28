@@ -1,0 +1,38 @@
+{
+  "checked_at": "2026-10-28T14:04:16.543278+00:00",
+  "checks": [
+    {
+      "command": "git diff --check",
+      "exit": 0,
+      "output": ""
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit": 0,
+      "output": ""
+    }
+  ],
+  "credential_pattern_matches": [],
+  "staged_docs": [
+    "chenchen/docs/core-agent-architecture-2026-10-28.png",
+    "chenchen/docs/core-agent-architecture.md",
+    "chenchen/docs/core-agent-daily-update-2026-10-28.docx",
+    "chenchen/docs/core-agent-daily-update-2026-10-28.md",
+    "chenchen/docs/core-agent-daily-update.md",
+    "chenchen/docs/core-agent-integration-guide-2026-10-28.docx",
+    "chenchen/docs/core-agent-integration-guide-2026-10-28.md",
+    "chenchen/docs/core-agent-sequence-2026-10-28.png",
+    "chenchen/docs/core-agent-sequence.md",
+    "chenchen/docs/daily-closeout-2026-10-28-check.txt",
+    "chenchen/docs/daily-closeout-2026-10-28-render.txt",
+    "chenchen/docs/daily-closeout-2026-10-28-synthetic.json",
+    "chenchen/docs/daily-closeout-2026-10-28-tests.txt",
+    "chenchen/docs/daily-closeout-2026-10-28-trace.json",
+    "chenchen/docs/daily-closeout-2026-10-28-trace.txt",
+    "chenchen/docs/daily-closeout-2026-10-28-verification.json",
+    "chenchen/docs/daily-closeout-check-2026-10-28.py"
+  ],
+  "original_workspaces_preserved": true,
+  "local_named_main_is_stale": true,
+  "tested_baseline": "origin/main snapshot in detached worktree"
+}
