@@ -1,0 +1,12 @@
+{
+  "name": "finance-lab-submission-parallel-v1",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=22.13.0"},
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "smoke": "node scripts/smoke.mjs"
+  }
+}
