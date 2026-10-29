@@ -2,6 +2,7 @@
 
 const { evaluateDaily } = require("../daily-engine.cjs");
 const { minorToYuan } = require("./money.cjs");
+const { deriveAssessment } = require("../unified-rating/assessment.cjs");
 
 const CONTRACT_VERSION = "conversation-finance.v1";
 const NOTICE = "仅分析用户确认的虚构资金池；共享资金占用、真实账户、审批和执行网关尚未可信接通。本结果不授予执行权限。";
@@ -154,6 +155,7 @@ function assessConversation(input) {
   const finance = parseFinance(input.dailyFinance);
   const facts = normalizedFacts(finance, question);
   const result = evaluateDaily(facts, { now: input.now, checkId: input.checkId });
+  const unifiedAssessment = deriveAssessment(result);
   const metrics = { ...result.metrics };
   for (const name of ["free_before_minor", "available_for_new_action_minor", "protected_before_minor", "holds_before_minor", "projected_independent_floor_minor", "projected_free_after_minor", "shortfall_minor", "action_total_minor", "after_action_date_gap_minor", "budget_over_minor", "emergency_allocation_after_minor"]) metrics[name.replace(/_minor$/, "_yuan")] = displayAmount(result.metrics[name]);
   const canSize = ["INVESTMENT", "CONSUMPTION", "SUBSCRIPTION_PAYMENT"].includes(finance?.action.type) && Number.isSafeInteger(result.metrics.available_for_new_action_minor) && Number.isSafeInteger(finance?.action.fees_minor);
@@ -176,10 +178,10 @@ function assessConversation(input) {
   const advice = { decision: result.decision, summary, metrics, reasons, warnings: result.warnings, next_actions: nextActions, protected_purposes: protectedPurposes, execution_allowed: false, program_generated: true, notice_zh: NOTICE, basis: confirmedBasis ? "USER_CONFIRMED_SINGLE_SYNTHETIC_POOL" : "UNCONFIRMED_SYNTHETIC_INPUT", input_confirmation: { facts_confirmed: finance?.facts_confirmed === true, purposes_confirmed: finance?.purposes_confirmed === true && Array.isArray(finance?.snapshot.purposes), existing_holds_declared: finance?.existing_holds_minor != null }, shared_ledger_verified: false, approval_status: "PENDING", risk_check_id: result.risk_check_id, policy_version: result.policy_version };
   return {
     risk_result: result,
-    assistant_message: [summary, amountsMessage, shortfallMessage, salaryMessage, reasons.map(row => row.message_zh).join(""), NOTICE].filter(Boolean).join("\n"),
+    assistant_message: [`本次生活资金风险：${unifiedAssessment.label_zh}；资料覆盖：${{FULL:"完整",PARTIAL:"部分",UNAVAILABLE:"不可评估"}[unifiedAssessment.coverage]}。`, summary, amountsMessage, shortfallMessage, salaryMessage, reasons.map(row => row.message_zh).join(""), NOTICE].filter(Boolean).join("\n"),
     next_actions: nextActions,
-    risk_advice: advice,
-    model_context: { deterministic_risk: { ...advice, result_authority: "DETERMINISTIC_ANALYSIS_ONLY", financial_facts_from_question: false, external_content_authority: "UNTRUSTED_BUSINESS_DATA", model_may_not_override_decision: true, execution_authorization: "NOT_GRANTED" } },
+    risk_advice: { ...advice, unified_assessment: unifiedAssessment },
+    model_context: { deterministic_risk: { ...advice, unified_assessment: unifiedAssessment, result_authority: "DETERMINISTIC_ANALYSIS_ONLY", financial_facts_from_question: false, external_content_authority: "UNTRUSTED_BUSINESS_DATA", model_may_not_override_decision: true, execution_authorization: "NOT_GRANTED" } },
     action_parameters: { type: finance?.action.type || null, currency: "CNY", unit: "YUAN", amount: displayAmount(finance?.action.amount_minor), fees: displayAmount(finance?.action.fees_minor), scheduled_at: finance?.action.at ?? null, source_unit: "MINOR" }
   };
 }

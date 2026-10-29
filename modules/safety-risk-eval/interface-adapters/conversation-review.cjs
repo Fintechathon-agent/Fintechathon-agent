@@ -32,7 +32,7 @@ function createConversationReviewer({ store, config, fetchImpl = fetch, now = ()
       store.update(key, { risk_check_id: risk.risk_check_id, policy_version: risk.policy_version, checked_at: risk.checked_at, facts_hash: factsHash,
         finance_snapshot: finance ?? null, assessment: risk, risk_advice: assessment.risk_advice, assistant_message: assessment.assistant_message, versions_current: true });
       store.audit(key, "CONVERSATION_RISK_CHECKED", { risk_check_id: risk.risk_check_id, policy_version: risk.policy_version, facts_hash: factsHash, decision: risk.decision,
-        metrics: risk.metrics, reasons: risk.reasons, data_mode: assessment.risk_advice.basis, execution_allowed: false });
+        metrics: risk.metrics, reasons: risk.reasons, unified_assessment: assessment.risk_advice.unified_assessment, data_mode: assessment.risk_advice.basis, execution_allowed: false });
       if (risk.decision === "ERROR") reject("RISK_CHECK_FAILED", "必需资料或计算异常，本次模型请求和正式回调均暂停。", 503);
       if (!config.apiKey || !config.hmacSecret || !config.reviewer) reject("TRUSTED_CORE_CONFIGURATION_REQUIRED", "服务端尚未配置统一Core访问与Risk签名身份；程序已评估，真实模型及正式回调链路保持暂停。", 503);
       const dailyLimit = config.dailyLimit ?? 20, today = at.slice(0, 10);
