@@ -1,6 +1,8 @@
-# 统一评级与权限执行适配 v1.0
+# 日常资金风控与权限执行适配 v1.1
 
 负责人：Vesper。2026-10-29。当前交付为日常资金评级、权限判断模块及现有工作台接线；团队主聊天、正式用户审批和唯一托管账本尚未联合验收。
+
+v1.1 增加确定性结果一致性校验、必要版本和模型发送范围校验。余额等核心证据缺失显示未知；已确认硬冲突伴随独立可选预算缺失显示高／部分覆盖。详见[规则与权限说明](../../../docs/safety-risk-eval/unified-runtime-v1.1/规则与权限说明.md)、[22项能力覆盖表](../../../docs/safety-risk-eval/unified-runtime-v1.1/能力覆盖表.md)和[验证报告](../../../docs/safety-risk-eval/unified-runtime-v1.1/验证报告.md)。v1.0 规范与历史审计保持原样。
 
 ## 本轮已实现
 
@@ -9,7 +11,7 @@
 - `permission.cjs` 校验精确动作、用户、调用者、资源归属、用途、接收方、环境、有效期和版本交集。独立授权不能相互拼接，管理员身份不自动获得用户资产权限。
 - 原工作台 `/risk` 新增评级、资料覆盖、来源检查编号和权限说明。`/api/safety/unified-policy` 仅提供已登记公开规则帮助，不读取私人资料，不创建会话或模型调用。
 - `/api/paper-trade/execute` 在既有会话、CSRF 和任务归属核验后调用权限模块。当前 `paper.commit` 返回 `DENY / PAPER_GATEWAY_NOT_CONNECTED`，先审计再响应 403，不扣款、不调用原执行函数。原网关保留为后续独立防线。
-- 新评级在日常任务创建/修改时以 `UNIFIED_ASSESSMENT_RECORDED` 关联保存；执行权限拒绝以 `UNIFIED_PERMISSION_CHECKED` 保存。权限事件仅表示本次门禁检查，不改写既有金融风险结果。
+- 新评级在日常任务创建/修改时以 `UNIFIED_ASSESSMENT_RECORDED` 关联保存；历史读取返回当时保存的评级。当前一致性校验另列 `current_validation`，异常时显示未知并暂停模型和确认；源结果为 `ERROR` 时也暂停。执行权限拒绝以 `UNIFIED_PERMISSION_CHECKED` 保存，不改写既有金融风险结果。
 
 ## 评级的含义和边界
 
@@ -45,11 +47,11 @@ L0—L4 是动作分类。L1/L2 的成立需要当前资源和明确授权；L3 
 node --test modules/safety-risk-eval/unified-rating/test/*.test.cjs
 node --test modules/safety-risk-eval/interface-adapters/test/*.test.cjs
 node --test modules/safety-risk-eval/network-resilience/test/*.test.cjs modules/safety-risk-eval/joint-acceptance/test/*.test.cjs
-node modules/safety-risk-eval/unified-rating/install-site.mjs <已审查的工作台v12源码目录>
+node modules/safety-risk-eval/unified-rating/install-site.mjs <已审查的工作台v13源码目录>
 node modules/safety-risk-eval/unified-rating/verify-site.mjs <准备发布的源码目录> <报告路径>
 ```
 
-安装器仅接受指定 Site ID、v12 原入口和原底座哈希；遇到新版本停下复核，不覆盖队友修改。静态 JSON 依赖转为 ESM，无运行时 `eval`。原网络监测、前端错误提示、CSRF、会话和归属核验保持。
+安装器仅接受指定 Site ID、v13 原入口和原底座哈希；遇到新版本停下复核，不覆盖队友修改。纯程序的本地依赖静态编译为 ESM，无运行时 `eval`。原网络监测、前端错误提示、CSRF、会话和归属核验保持。模型服务未核实可用时禁用模型按钮；切换示例也标记旧结果。
 
 `site-fixture.mjs` 与 `preview-site.mjs` 使用本机内存 SQLite 作为 D1 测试替身，不打包到 Worker。HTTP 验证不连接外部服务、不调用模型。规范包的 30 项验收设计仍为设计清单，不把 888 项配置检查或本轮子集测试改称 30 项联合验收。
 

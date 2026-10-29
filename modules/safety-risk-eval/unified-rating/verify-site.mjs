@@ -4,6 +4,7 @@ import vm from "node:vm";
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
 import { createD1, dailyFixture } from "./site-fixture.mjs";
+import dailyEngine from "../daily-engine.cjs";
 const root = path.resolve(process.argv[2]), DB = createD1(root), env = { DB };
 const worker = (await import(pathToFileURL(path.join(root,"dist/server/index.js")).href)).default;
 const rows = [];
@@ -22,6 +23,7 @@ async function visitor() {
 try {
   const policy = await worker.fetch(new Request("https://synthetic.invalid/api/safety/unified-policy"),env), p = await policy.json();
   assert.equal(policy.status,200); assert.equal(p.permission.decision,"ALLOW"); assert.equal(p.capabilities.length,22); assert.equal(policy.headers.has("set-cookie"),false);
+  assert.equal(p.policy_version,"risk-policy.v1.1"); assert.equal(p.permission_policy_version,"permission-policy.v1.1");
   pass("public policy registered read, no private session or model call");
   assert.equal((await worker.fetch(new Request("https://synthetic.invalid/api/safety/unified-policy",{method:"POST"}),env)).status,405); pass("public policy cannot be mutated");
   for(const route of ["/risk","/risk/app.js","/risk/daily.js","/risk/unified.js","/risk/unified.css"]) {
@@ -34,6 +36,7 @@ try {
   const high=await a.request("/api/safety/daily/tasks",dailyFixture()); assert.equal(high.status,200);
   const id=high.body.input.binding.task_id;
   assert.equal(high.body.unified_assessment.business_risk_band,"HIGH"); assert.equal(high.body.unified_assessment.risk_decision,"BLOCK");
+  assert.equal(high.body.unified_assessment.validation_status,"VALID");
   assert.equal(high.body.unified_permission.decision,"DENY"); pass("server derives HIGH from real deterministic daily result");
   let audit=await a.request("/api/safety/audit?task_id="+id); assert.ok(audit.body.some(x=>x.event_type==="UNIFIED_ASSESSMENT_RECORDED")); pass("grade persisted as linked audit sidecar");
   assert.equal((await b.request("/api/safety/task?task_id="+id)).status,403); pass("second session cannot read first task");
@@ -57,6 +60,47 @@ try {
   delete modified.snapshot;
   const revised=await a.request("/api/safety/daily/revise",modified); assert.equal(revised.status,200); assert.notEqual(revised.body.approval.status,"CONFIRMED"); pass("relevant plan change invalidates old confirmation");
   assert.equal((await b.request("/api/paper-trade/execute",{task_id:lowId,idempotency_key:"another-key"})).status,403); pass("execution denial still checks session ownership first");
+  const optional = dailyFixture();
+  optional.budget={enabled:true,period_take_home_minor:null,needs_minor:0,goals_minor:null,wants_minor:null,category_remaining_minor:null,require_acceptance:false};
+  const partial=await a.request("/api/safety/daily/tasks",optional); assert.equal(partial.status,200);
+  assert.equal(partial.body.unified_assessment.business_risk_band,"HIGH"); assert.equal(partial.body.unified_assessment.coverage,"PARTIAL");
+  assert.equal(partial.body.unified_assessment.validation_status,"VALID"); pass("independent missing budget cannot hide a confirmed rent conflict");
+  const legacy={...partial.body.unified_assessment,policy_version:"risk-policy.v1.0",business_risk_band:"UNKNOWN",label_zh:"未知"};
+  delete legacy.validation_status; delete legacy.validation_errors; delete legacy.unknown_items;
+  const legacyId=partial.body.input.binding.task_id;
+  DB.seedHistoricalAssessmentForTest(legacyId,legacy);
+  const oldAudit=(await a.request("/api/safety/audit?task_id="+legacyId)).body;
+  const historical=await a.request("/api/safety/task?task_id="+legacyId);
+  assert.deepEqual(historical.body.unified_assessment,legacy); assert.equal(historical.body.current_validation.validation_status,"VALID");
+  assert.deepEqual((await a.request("/api/safety/audit?task_id="+legacyId)).body,oldAudit); pass("v1.0 historical sidecar and signed audit remain unchanged on read");
+  DB.corruptTaskForTest(lowId,record=>{record.review.checks.find(x=>x.rule_id==="D02").status="BLOCK";});
+  const corrupted=await a.request("/api/safety/task?task_id="+lowId);
+  assert.equal(corrupted.status,200); assert.equal(corrupted.body.review.decision,"ALLOW");
+  assert.equal(corrupted.body.unified_assessment.business_risk_band,"LOW"); assert.equal(corrupted.body.current_validation.validation_status,"INVALID");
+  pass("inconsistent evidence has INVALID current validation while historical assessment is preserved");
+  const modelDenied=await a.request("/api/safety/daily/model-review",{task_id:lowId});
+  assert.equal(modelDenied.status,503); assert.equal(modelDenied.body.error.code,"RISK_RESULT_INVALID");
+  assert.equal(modelDenied.body.execution_allowed,false); assert.equal(externalCalls,0); assert.equal(DB.modelBudgetWrites,0);
+  pass("invalid result prevents model request and budget claim, downstream calls zero");
+  const approvalDenied=await a.request("/api/safety/confirm",{task_id:lowId,risk_check_id:revised.body.review.risk_check_id,binding:revised.body.input.binding,accepted_reason_ids:[],confirmed:true});
+  assert.equal(approvalDenied.status,503); assert.equal(approvalDenied.body.error.code,"RISK_RESULT_INVALID"); pass("invalid result cannot confirm a plan");
+  audit=await a.request("/api/safety/audit?task_id="+lowId);
+  assert.equal(audit.body.filter(x=>x.event_type==="UNIFIED_RESULT_REJECTED").length,2); pass("invalid-result refusals are linked to the same task audit");
+  DB.corruptTaskForTest(lowId,record=>{record.review.policy_version="unsupported-policy";});
+  const unsupported=await a.request("/api/safety/daily/model-review",{task_id:lowId});
+  assert.equal(unsupported.status,503); assert.equal(unsupported.body.current_validation.validation_status,"UNSUPPORTED");
+  assert.equal(externalCalls,0); pass("unsupported source version fails closed before downstream access");
+  const errorTask=await a.request("/api/safety/daily/tasks",dailyFixture(500000)), errorId=errorTask.body.input.binding.task_id;
+  const time=new Date().toISOString();
+  const rawError=dailyEngine.evaluateDaily({currency:"CNY",amount_unit:"MINOR",scope:"ANALYSIS",cash_ledger_minor:1000000,cash_available_minor:1000000,
+    holds:[],purposes:[],income_events:[],as_of:time,action_at:time,action_type:"OPTIONAL_INVESTMENT",action_amount_minor:500000,fees_minor:0,
+    extra_nonoverlapping_hold_minor:0,hard_floor_state:"DISABLED_CONFIRMED",ledger_revision:0,required_evidence:"USER_CONFIRMED_SYNTHETIC",
+    required_services:"AVAILABLE",approval_state:"PENDING",versions_current:true,audit_result_write:"FAILED"},{now:time,checkId:"synthetic-error-review"});
+  assert.equal(rawError.decision,"ERROR"); DB.corruptTaskForTest(errorId,r=>{r.review=rawError;});
+  const engineError=await a.request("/api/safety/daily/model-review",{task_id:errorId});
+  assert.equal(engineError.status,503); assert.equal(engineError.body.current_validation.validation_status,"VALID");
+  assert.equal(engineError.body.error.code,"RISK_CHECK_FAILED"); assert.equal(DB.modelBudgetWrites,0); assert.equal(externalCalls,0);
+  pass("validly formatted engine ERROR stops model and budget access");
   DB.failWrites=true;
   const unavailable=await a.request("/api/safety/daily/tasks",dailyFixture()); assert.equal(unavailable.status,503); assert.equal(unavailable.body.execution_allowed,false); pass("audit/storage failure is visible error, never success");
   assert.equal(externalCalls,0);

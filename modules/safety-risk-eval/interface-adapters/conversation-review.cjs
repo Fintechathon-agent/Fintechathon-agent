@@ -3,6 +3,7 @@ const { randomUUID } = require("node:crypto");
 const { isDeepStrictEqual } = require("node:util");
 const { normalizeConversationFinance, reject } = require("./conversation-input.cjs");
 const { assessConversation } = require("./conversation-risk.cjs");
+const { deriveAssessment } = require("../unified-rating/assessment.cjs");
 const { createCoreClient } = require("./core-client.cjs");
 const { buildRiskCallbackDraft, extractCoreBinding } = require("./risk-callback.cjs");
 const { sendRiskCallback } = require("./risk-callback-sender.cjs");
@@ -16,7 +17,7 @@ function assertWorkflowEvidence(workflow, handoff) {
     typeof model?.raw_text !== "string" || !model.raw_text || ["proposed_action", "action_reason", "risk_level"].some(key => model?.proposal?.[key] !== handoff.proposal[key])) reject("CONVERSATION_MODEL_EVIDENCE_MISMATCH", "展示的模型原文、提议与风险交接证据不一致，不能采用或回写该结果。", 409);
 }
 
-function createConversationReviewer({ store, config, fetchImpl = fetch, now = () => new Date().toISOString() }) {
+function createConversationReviewer({ store, config, fetchImpl = fetch, now = () => new Date().toISOString(), assessImpl = assessConversation }) {
   const client = createCoreClient({ ...config, fetchImpl });
   async function review(payload, actor = "finance-lab-demo-server") {
     if (!payload || typeof payload !== "object" || Array.isArray(payload) || Object.keys(payload).some(key => !["question", "daily_finance_yuan", "idempotency_key"].includes(key))) reject("UNTRUSTED_CONTROL_FIELD", "问答入口不接受审批、执行或风险结论字段。");
@@ -27,12 +28,21 @@ function createConversationReviewer({ store, config, fetchImpl = fetch, now = ()
     const begun = store.begin(key, fingerprint); if (begun.replay) return { ...begun.response, replayed: true };
     try {
       const at = now(), finance = normalizeConversationFinance(payload.daily_finance_yuan, at);
-      const assessment = assessConversation({ question: payload.question, dailyFinance: finance, now: at, checkId: `conversation-risk-${randomUUID()}` });
+      // The assessor is an internal dependency, never selected by an HTTP field.
+      const assessment = assessImpl({ question: payload.question, dailyFinance: finance, now: at, checkId: `conversation-risk-${randomUUID()}` });
+      const unified = deriveAssessment(assessment.risk_result);
+      assessment.risk_advice = { ...assessment.risk_advice, unified_assessment: unified };
+      assessment.model_context = { ...assessment.model_context, deterministic_risk: { ...assessment.model_context?.deterministic_risk, unified_assessment: unified } };
+      if (unified.validation_status !== "VALID") {
+        assessment.risk_advice.summary = "风险结果未通过一致性校验，本次模型复核和回调已暂停。请修复资料或计算结果后重新检查。";
+        assessment.assistant_message = assessment.risk_advice.summary;
+      }
       const risk = assessment.risk_result, factsHash = hash(finance ?? null);
-      store.update(key, { risk_check_id: risk.risk_check_id, policy_version: risk.policy_version, checked_at: risk.checked_at, facts_hash: factsHash,
+      store.update(key, { risk_check_id: risk?.risk_check_id ?? null, policy_version: risk?.policy_version ?? null, checked_at: risk?.checked_at ?? null, facts_hash: factsHash,
         finance_snapshot: finance ?? null, assessment: risk, risk_advice: assessment.risk_advice, assistant_message: assessment.assistant_message, versions_current: true });
-      store.audit(key, "CONVERSATION_RISK_CHECKED", { risk_check_id: risk.risk_check_id, policy_version: risk.policy_version, facts_hash: factsHash, decision: risk.decision,
-        metrics: risk.metrics, reasons: risk.reasons, unified_assessment: assessment.risk_advice.unified_assessment, data_mode: assessment.risk_advice.basis, execution_allowed: false });
+      store.audit(key, "CONVERSATION_RISK_CHECKED", { risk_check_id: risk?.risk_check_id ?? null, policy_version: risk?.policy_version ?? null, facts_hash: factsHash, decision: risk?.decision ?? null,
+        metrics: risk?.metrics ?? null, reasons: risk?.reasons ?? null, unified_assessment: assessment.risk_advice.unified_assessment, data_mode: assessment.risk_advice.basis, execution_allowed: false });
+      if (unified.validation_status !== "VALID") reject("RISK_RESULT_INVALID", "风险结果格式、版本或内部状态无法验证，本次模型请求和正式回调均暂停。", 503);
       if (risk.decision === "ERROR") reject("RISK_CHECK_FAILED", "必需资料或计算异常，本次模型请求和正式回调均暂停。", 503);
       if (!config.apiKey || !config.hmacSecret || !config.reviewer) reject("TRUSTED_CORE_CONFIGURATION_REQUIRED", "服务端尚未配置统一Core访问与Risk签名身份；程序已评估，真实模型及正式回调链路保持暂停。", 503);
       const dailyLimit = config.dailyLimit ?? 20, today = at.slice(0, 10);

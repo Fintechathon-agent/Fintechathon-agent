@@ -14,6 +14,7 @@ const { ReviewWorkflowStore } = require("../../../../chenchen/integrations/revie
 const { buildRiskHandoffPackage } = require("../../../../chenchen/integrations/risk-handoff.js");
 const { verifyOwnerRequest } = require("../../../../chenchen/integrations/owner-bridge.js");
 const { makeFixture } = require("../fixture-data.cjs");
+const { assessConversation } = require("../conversation-risk.cjs");
 const CONFIG = { baseUrl: "https://core.synthetic.invalid", apiKey: "synthetic-core-key", hmacSecret: "synthetic-risk-signature-secret", reviewer: "synthetic-risk-owner", timeoutMs: 5000 };
 const AT = "2026-10-21T04:00:00.000Z";
 function payload(amount = "8000.00") { return { question: "我想买基金，但下个月还要交房租，这笔安排会不会影响生活？", idempotency_key: `synthetic-${randomUUID()}`,
@@ -92,6 +93,45 @@ test("missing server credentials preserves program advice but makes zero model o
   });
   assert.equal(f.calls.length, 0);
 });
+
+for (const mutation of ["contradictory_check", "unsupported_policy"]) test(`invalid program result ${mutation} stops before model and callback with linked audit`, async t => {
+  const f = await fixture(t);
+  const reviewer = createConversationReviewer({ store: f.journal, config: CONFIG, fetchImpl: f.coreFetch, now: () => AT,
+    assessImpl(input) {
+      const result = assessConversation(input);
+      if (mutation === "contradictory_check") result.risk_result.checks.find(row => row.rule_id === "D02").status = "BLOCK";
+      else result.risk_result.policy_version = "unregistered-source-policy";
+      // A forged cached sidecar must not override validation of the raw result.
+      result.risk_advice.unified_assessment = { validation_status: "VALID", business_risk_band: "LOW" };
+      return result;
+    } });
+  await assert.rejects(reviewer.review(payload("1000.00")), error => {
+    assert.equal(error.code, "RISK_RESULT_INVALID");
+    assert.equal(error.partial.risk_advice.unified_assessment.business_risk_band, "UNKNOWN");
+    assert.notEqual(error.partial.risk_advice.unified_assessment.validation_status, "VALID");
+    assert.equal(error.partial.risk_callback.status, "NOT_SENT"); return true;
+  });
+  assert.equal(f.calls.length, 0); assert.equal(f.modelInputs.length, 0);
+  assert.equal(f.journal.events.some(row => row.event_type === "RISK_CALLBACK_INTENT"), false);
+  const saved = Object.values(f.journal.data.requests)[0];
+  assert.equal(saved.assessment.decision, "ALLOW");
+  assert.equal(f.journal.events.find(row => row.event_type === "CONVERSATION_RISK_CHECKED").unified_assessment.business_risk_band, "UNKNOWN");
+  assert.ok(f.journal.events.some(row => row.event_type === "CONVERSATION_FAILED"));
+});
+test("missing raw risk result is retained as null with UNKNOWN audit and no downstream calls", async t => {
+  const f = await fixture(t);
+  const reviewer = createConversationReviewer({ store:f.journal, config:CONFIG, fetchImpl:f.coreFetch, now:()=>AT,
+    assessImpl: input => ({...assessConversation(input),risk_result:null}) });
+  await assert.rejects(reviewer.review(payload()), error => {
+    assert.equal(error.code,"RISK_RESULT_INVALID");
+    assert.equal(error.partial.risk_advice.unified_assessment.business_risk_band,"UNKNOWN");
+    return true;
+  });
+  assert.equal(Object.values(f.journal.data.requests)[0].assessment,null);
+  assert.equal(f.calls.length,0);
+  assert.ok(f.journal.events.some(row=>row.event_type==="CONVERSATION_RISK_CHECKED" && row.unified_assessment.validation_status==="INVALID"));
+});
+
 test("global demo quota blocks new model calls without silently falling back", async t => {
   const f = await fixture(t), reviewer = createConversationReviewer({ store: f.journal, config: { ...CONFIG, dailyLimit: 1 }, fetchImpl: f.coreFetch, now: () => AT });
   await reviewer.review(payload("1000.00"));
