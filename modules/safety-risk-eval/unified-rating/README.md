@@ -4,6 +4,8 @@
 
 v1.1 增加确定性结果一致性校验、必要版本和模型发送范围校验。余额等核心证据缺失显示未知；已确认硬冲突伴随独立可选预算缺失显示高／部分覆盖。详见[规则与权限说明](../../../docs/safety-risk-eval/unified-runtime-v1.1/规则与权限说明.md)、[22项能力覆盖表](../../../docs/safety-risk-eval/unified-runtime-v1.1/能力覆盖表.md)和[验证报告](../../../docs/safety-risk-eval/unified-runtime-v1.1/验证报告.md)。v1.0 规范与历史审计保持原样。
 
+2026-10-30补验修复：完整计划确认会产生新检查，现为确认重检另存评级审计，避免确认后评级丢失。原工作台第15版已在线复查；Worker HTTP现为30项。见[补验及交接报告](../../../docs/safety-risk-eval/unified-runtime-v1.1/浏览器补验与确认重检修复-2026-10-30.md)。
+
 ## 本轮已实现
 
 - `assessment.cjs` 消费现有 `daily-engine.cjs` 的确定性检查结果，输出 `LOW / NOTICE / ELEVATED / HIGH / UNKNOWN` 及资料覆盖 `FULL / PARTIAL / UNAVAILABLE`。不从模型 `risk_level` 或外部数据集标签推导权限、余额或本人批准。
@@ -47,11 +49,11 @@ L0—L4 是动作分类。L1/L2 的成立需要当前资源和明确授权；L3 
 node --test modules/safety-risk-eval/unified-rating/test/*.test.cjs
 node --test modules/safety-risk-eval/interface-adapters/test/*.test.cjs
 node --test modules/safety-risk-eval/network-resilience/test/*.test.cjs modules/safety-risk-eval/joint-acceptance/test/*.test.cjs
-node modules/safety-risk-eval/unified-rating/install-site.mjs <已审查的工作台v13源码目录>
+node modules/safety-risk-eval/unified-rating/install-site.mjs <已审查的工作台v13或v14源码目录>
 node modules/safety-risk-eval/unified-rating/verify-site.mjs <准备发布的源码目录> <报告路径>
 ```
 
-安装器仅接受指定 Site ID、v13 原入口和原底座哈希；遇到新版本停下复核，不覆盖队友修改。纯程序的本地依赖静态编译为 ESM，无运行时 `eval`。原网络监测、前端错误提示、CSRF、会话和归属核验保持。模型服务未核实可用时禁用模型按钮；切换示例也标记旧结果。
+安装器仅接受指定 Site ID、已审查v13/v14入口和底座哈希；当前线上v15不能直接重装，后续先读取最新源码与审查差异，不覆盖队友修改。纯程序的本地依赖静态编译为 ESM，无运行时 `eval`。原网络监测、前端错误提示、CSRF、会话和归属核验保持。模型服务未核实可用时禁用模型按钮；切换示例也标记旧结果。
 
 `site-fixture.mjs` 与 `preview-site.mjs` 使用本机内存 SQLite 作为 D1 测试替身，不打包到 Worker。HTTP 验证不连接外部服务、不调用模型。规范包的 30 项验收设计仍为设计清单，不把 888 项配置检查或本轮子集测试改称 30 项联合验收。
 

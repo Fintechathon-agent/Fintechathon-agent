@@ -6,11 +6,15 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const projectId = "appgprj_6ac9a87727948191a202fedf09841f82";
 const hash = x => createHash("sha256").update(x).digest("hex");
 const normalize = x => x.replace(/\r\n/g,"\n");
-const baseline = {
+const baselines = {13: {
   "index.js":"368b2095397ceb64032ae03799bfd5180902b75b64a76b9752da6d254bbda8db",
   "index-unified-base.js":"86d3596268b48bfd522801c7a1b8b14bd6b0329f36bfc0543517ac1ba4dacf2f",
   "network-assets.mjs":"b60a53c740670dc5d638e7a02d774be9e7dbc5505498fb50eaca2f1cc831684b"
-};
+}, 14: {
+  "index.js":"368b2095397ceb64032ae03799bfd5180902b75b64a76b9752da6d254bbda8db",
+  "index-unified-base.js":"7601c2acbc5d78c2e6c620f2c1cd12a950d588b0f231e293e6dbdd481be4b9e2",
+  "network-assets.mjs":"2c5d2eaefdfd8cbc7677ceef3599fde097f9bd319b36ed973491b5c2f06137c3"
+}};
 function once(source,before,after) {
   if(source.indexOf(before)<0 || source.indexOf(before)!==source.lastIndexOf(before)) throw new Error("Reviewed source anchor changed; inspect the newer Site before installing.");
   return source.replace(before,after);
@@ -53,12 +57,15 @@ export async function installSite(directory) {
   const root=path.resolve(directory), manifest=JSON.parse(fs.readFileSync(path.join(root,".openai/hosting.json")));
   if(manifest.project_id!==projectId) throw new Error("Wrong Site selected.");
   const server=path.join(root,"dist/server"), content={};
-  for(const [file,digest] of Object.entries(baseline)) {
+  for(const file of Object.keys(baselines[13])) {
     content[file]=normalize(fs.readFileSync(path.join(server,file),"utf8"));
-    if(hash(content[file])!==digest) throw new Error("The reviewed version 13 baseline changed; preserve it and inspect before updating.");
   }
+  const baselineVersion=Object.keys(baselines).find(version=>Object.entries(baselines[version]).every(([file,digest])=>hash(content[file])===digest));
+  if(!baselineVersion) throw new Error("The reviewed version 13/14 baseline changed; preserve it and inspect before updating.");
+  const baseline=baselines[baselineVersion];
   const compiled=compileEvaluators(), outputs=compiled.outputs;
   let base=content["index-unified-base.js"];
+  if(baselineVersion==="13") {
   base=once(base,'      let result;',`      // Revalidate stored evidence before confirmation or model access.
       if (request.method === "POST" && ["/api/safety/daily/model-review", "/api/safety/confirm"].includes(url.pathname)) {
         const selected = gatewayFor(payload.task_id), current = selected.inspect(payload.task_id, actor);
@@ -74,20 +81,33 @@ export async function installSite(directory) {
       }
       let result;`);
   base=once(base,'      result = enrichDailyRecord(result);',`      result = enrichDailyRecord(result, { events: store.events, newCheck: request.method === "POST" && ["/api/safety/daily/tasks", "/api/safety/daily/revise"].includes(url.pathname) });`);
+  }
+  // Confirmation creates a new check. Persist its sidecar alongside that new
+  // check without recalculating or rewriting the previous signed audit event.
+  base=once(base,'        result = gatewayFor(payload.task_id).confirm(payload.task_id, actor, payload);',`        const selected = gatewayFor(payload.task_id);
+        result = selected.confirm(payload.task_id, actor, payload);
+        const rechecked = selected.inspect(payload.task_id, actor);
+        if (rechecked.kind === "DAILY_CASHFLOW") {
+          const enriched = enrichDailyRecord(rechecked, { newCheck: true });
+          selected.event("UNIFIED_ASSESSMENT_RECORDED", rechecked, { unified_assessment: enriched.unified_assessment,
+            permission: enriched.unified_permission, assessment_stage: "CONFIRMATION_RECHECK", execution_allowed: false });
+        }`);
   outputs.set("index-unified-base.js",base);
   outputs.set("unified-bridge.mjs",fs.readFileSync(path.join(here,"site-bridge.mjs"),"utf8"));
   const assets=structuredClone((await import(pathToFileURL(path.join(server,"network-assets.mjs")).href)).default);
   if(!assets["/risk/daily.js"].body.includes("window.UnifiedRisk.render(task);")) throw new Error("Daily UI integration anchor missing.");
-  assets["/risk/daily.js"].body=once(assets["/risk/daily.js"].body,"window.UnifiedRisk.render(task);","window.UnifiedRisk.render(task); if (dirty) window.UnifiedRisk.invalidate();");
+  if(baselineVersion==="13") assets["/risk/daily.js"].body=once(assets["/risk/daily.js"].body,"window.UnifiedRisk.render(task);","window.UnifiedRisk.render(task); if (dirty) window.UnifiedRisk.invalidate();");
   for(const [ext,type] of [["js","text/javascript"],["css","text/css"]]) assets["/risk/unified."+ext]={body:fs.readFileSync(path.join(here,"workbench."+ext),"utf8"),type:type+"; charset=utf-8"};
+  if(baselineVersion==="13") {
   assets["/risk/daily.js"].body=once(assets["/risk/daily.js"].body,'UNIFIED_ASSESSMENT_RECORDED: "统一风险评级已记录",','UNIFIED_RESULT_REJECTED: "风险结果校验失败，已暂停后续操作", UNIFIED_ASSESSMENT_RECORDED: "统一风险评级已记录",');
   assets["/risk/connection.js"].body=once(assets["/risk/connection.js"].body,'window.RiskConnection = { request, enforceButtons, checkHealth, reportUiError };',
     'window.RiskConnection = { request, enforceButtons, checkHealth, reportUiError, modelAvailable: () => writable() && health?.services.core.status === "UP" && health?.services.core.model_configured === true };');
+  }
   outputs.set("network-assets.mjs","export default "+JSON.stringify(assets)+";\n");
   const config=JSON.parse(fs.readFileSync(path.join(here,"runtime-config.v1.1.json")));
   outputs.set("runtime-config.mjs","export default "+JSON.stringify(config)+";\n");
   for(const [file,data] of outputs) fs.writeFileSync(path.join(server,file),data);
-  const result={project_id:projectId,baseline_site_version:13,baseline_hashes:baseline,
+  const result={project_id:projectId,baseline_site_version:Number(baselineVersion),baseline_hashes:baseline,
     policy_version:config.risk_policy_version,permission_policy_version:config.permission_policy_version,
     entry_sha256:hash(content["index.js"]),unified_base_sha256:hash(base),
     implementation_scope:"DAILY_RESULT_VALIDATION_PERMISSION_REQUIREMENTS_AND_CLOSED_WRITES",

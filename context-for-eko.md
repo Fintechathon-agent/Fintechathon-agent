@@ -1,14 +1,14 @@
 # AI Banking Agent / Personal AI Fund Manager：接手上下文
 
-> 更新日期：2026-10-29，北京时间。面向完全没看过本次对话的接手者。
+> 更新日期：2026-10-30，北京时间。面向完全没看过本次对话的接手者。
 > 本文件总结产品决策、已核实代码、测试与发布证据。历史口头汇报不等于当前线上验收；后续以仓库和同版本部署证据复核。
 
 ## 0. 先读这几条
 
 - 用户是**潘心恬，Vesper**，负责第四板块 **Safety / Risk / Eval**，不是金融数据或前端模块负责人。
 - 最近实施的是**日常资金风控与权限优化 v1.1**：先完善规则、权限和本地验证，再接团队后端。用户明确要求在旧仓库 **PR #37** 继续，不在本轮迁移新仓库。
-- **原工作台已发布第14版**，沿用原网址及公开访问范围。模型调用、付费接口和真实金融操作在本轮均为0。
-- 本轮487项程序测试、26项Worker HTTP和12项本地组件HTTP验证通过。**真实本人审批、团队共享账本、统一执行网关尚未联合验收，不能说整个产品已经打通。**
+- **原工作台已发布第15版**，沿用原网址及公开访问范围。10月30日补验修复了确认重检未保存评级的问题；未点击真实模型、执行和重复执行按钮。
+- 原487项程序测试、12项本地组件HTTP验证记录保留；10月30日修复回归112项及现有Worker HTTP共30项通过，线上低风险确认与变参已补验。**真实本人审批、团队共享账本、统一执行网关尚未联合验收，不能说整个产品已经打通。**
 - L3模拟资金写入关闭，L4真实交易始终禁止；低风险、Risk通过、用户确认、服务HMAC认证都不能单独开启写入。
 - 当前文件与v1.1代码会一并更新到PR #37。接手后用`git log -1`及PR远程head核对最终提交；不要把下面的“实施前基线”误作最终交付提交。
 
@@ -66,12 +66,13 @@ Vesper不替代Research作市场结论，不维护市场数据供应，不自行
 | 用户原项目工作目录 | `C:\Users\lenovo\Documents\ChatGPT\银行agent`，不要假定它与当前worktree状态相同 |
 | 原在线工作台 | [日常资金与风险工作台](https://fund-risk-workbench.panxintian44.chatgpt.site/risk) |
 | Site ID | `appgprj_6ac9a87727948191a202fedf09841f82` |
-| 已发布版本 | **14**；平台原生部署`succeeded`，随后回读仍为v14、public、active |
-| v14站点源码提交 | `797a930ad7233fa8e6015381105f47d515f08ecc`，属于Site独立源码仓库，不是团队PR的提交号 |
+| 已发布版本 | **15**；平台原生部署`succeeded`，线上浏览器已补验确认后LOW保留、变参BLOCK及执行关闭 |
+| v15站点源码提交 | `bde20b6dca5f3a4aa5b7bc815f73b0aac81cc8b7`，属于Site独立源码仓库，不是团队PR的提交号 |
+| v14基线源码提交 | `797a930ad7233fa8e6015381105f47d515f08ecc`，保留历史部署证据 |
 | v13基线源码提交 | `f1c1bd746b029a30e1518aa527dfcfbd770b71ea` |
 | 本机Site源码副本 | `C:\Users\lenovo\.codex\tmp\risk-runtime-site-20261029`，临时副本不应当作唯一长期来源 |
 
-站点部署记录见[deployment.json](docs/safety-risk-eval/unified-runtime-v1.1/evidence/deployment.json)。
+站点最新部署记录见[v15 deployment](docs/safety-risk-eval/unified-runtime-v1.1/evidence/browser-20261030/deployment-v15.json)；旧v14的[deployment.json](docs/safety-risk-eval/unified-runtime-v1.1/evidence/deployment.json)保持原样。最新补验和交接入口：[补验报告](docs/safety-risk-eval/unified-runtime-v1.1/浏览器补验与确认重检修复-2026-10-30.md)、[队友交接请求](docs/safety-risk-eval/unified-runtime-v1.1/队友交接请求-2026-10-30.md)。
 
 团队曾提供Core服务：`https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev`及其`/health`、`/docs`，历史上还有`/api/risk-workbench/handoff`。本地问答适配器调用`POST /api/review`并验证Core交接证据。接口存在、健康检查成功和真实模型推理成功是三件事，后续必须重新核对当前部署。
 
@@ -146,7 +147,7 @@ modules/safety-risk-eval/
     permission.cjs                       按22能力矩阵进行精确权限判断
     site-bridge.mjs                      原Site桥接与历史评级保留
     workbench.js / workbench.css          原页面评级与权限提示
-    install-site.mjs                     以已审查v13为基线的构建/接线器
+    install-site.mjs                     以已审查v13/v14为基线的构建/接线器
     verify-site.mjs                      实际Worker入口HTTP测试
     site-fixture.mjs                     仅测试/预览的内存SQLite D1适配
     preview-site.mjs                     本机预览8789；不打包入线上Worker
@@ -327,7 +328,7 @@ node modules/safety-risk-eval/unified-rating/preview-site.mjs <安装后源码�
 # 预览地址 http://127.0.0.1:8789/risk
 ```
 
-**当前线上已是v14。上面的安装器刻意只接受v13基线，直接对v14运行会拒绝。**下次改站点应重新读取最新源码和版本，审查差异后调整安装路径/基线，不要回退或强行绕过哈希检查。
+**当前线上已是v15。上面的安装器刻意只接受已审查v13/v14基线，直接对v15运行会拒绝。**下次改站点应重新读取最新源码和版本，审查差异后调整安装路径/基线，不要回退或强行绕过哈希检查。
 
 ### 5.4 真实模型服务配置的名称
 
@@ -393,15 +394,15 @@ AGENTS要求：每轮修改前查工作区和远端，保留协作者修改；�
 | 金额与问答/回调适配 | 261/261 |
 | 网络提示与联合预检 | 114/114 |
 | 程序合计 | **487/487** |
-| 实际ESM Worker HTTP＋内存D1 | **26/26**，外部请求0、模型预算写入0 |
+| 实际ESM Worker HTTP＋内存D1 | **30/30**（新增4项确认重检回归），外部请求0、模型预算写入0；v13/v14两基线复建均通过，不能把重复运行相加成60个不同用例 |
 | 本地Core/Risk组件HTTP | **12/12**，模型、审批身份和存储均为替身 |
 | v1.0规范包 | 888结构检查、4坏配置拒绝、3快照摘要核验；30组应用设计案例仍未执行 |
-| 原工作台发布 | v14成功，public范围保持；不代表团队主聊天接线成功 |
+| 原工作台发布 | v15成功，public范围保持；不代表团队主聊天接线成功 |
 | 真实模型、付费API、真实金融操作 | 本轮均0 |
 
 浏览器已观察：8000元投资挤占学费时HIGH/BLOCK及6000元缺口；金额修改和示例切换均标旧结果；余额未知显示UNKNOWN及待补字段；Core不可达显示错误并禁用模型；执行关闭。
 
-额外一次低风险方案浏览器复核遇到自动化超时，**未算浏览器通过**。低风险路径已有程序和Worker HTTP证据。INVALID/UNSUPPORTED及历史LOW失效显示由最小DOM测试验证，没有向公开站点增加故障注入入口。
+低风险方案浏览器复核曾超时；10月30日补验发现确认重检的新检查编号缺少评级旁路。现已修复并在第15版在线复查：2000元LOW，2000.01元HIGH/BLOCK、旧确认失效；改回2000元并确认后仍LOW，审计关联，现金与占用不变。原失败/旧v14证据保留。INVALID/UNSUPPORTED由最小DOM与HTTP测试验证，没有向公开站点增加故障注入入口。
 
 主要报告：[验证报告](docs/safety-risk-eval/unified-runtime-v1.1/验证报告.md)。不能把“代码已推送”“PR可合并”“离线通过”“站点可达”直接改写为团队端到端Done。
 
@@ -432,7 +433,7 @@ AGENTS要求：每轮修改前查工作区和远端，保留协作者修改；�
 
 1. 读本文件、v1.1三份说明和deployment.json，再查PR #37 head、审核、CI及最新远端。此文件不记录自己的最终提交SHA，避免自引用；用Git/PR核对。
 2. 如果PR37尚待评审，保持In Review；不要自行合并main或把旧仓库产出算成新SoT仓库已收录。
-3. 复跑适合后续改动的测试；未改代码只读交接时不建空提交。改站点前重新取得当前v14或更高版本，禁止直接重跑v13安装器覆盖。
+3. 复跑适合后续改动的测试；未改代码只读交接时不建空提交。改站点前重新取得当前v15或更高版本，禁止直接重跑只接受v13/v14的安装器覆盖。
 
 ### 8.2 后续真正的P0联调
 
