@@ -1,0 +1,1 @@
+canonical render_docx.py attempted for both dated DOCX files; failed before rendering because bundled Python lacks pdf2image (ModuleNotFoundError). No page PNGs generated; page-by-page layout QA incomplete and not claimed.

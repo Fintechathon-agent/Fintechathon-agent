@@ -136,3 +136,8 @@ sequenceDiagram
 ## 2026-10-28 main 基线复核
 
 两份 main 独立 284/284 回归、32/32 Schema 与语义检查通过。10 月 21 日可信 reviewer/云适配开发提交 9e6bed1 尚未合入任一 main；不将留存云部署证据称作 main 已完成正式审核。更新图像、字段归属与停止点见 core-agent-integration-guide-2026-10-28.md 及同名 DOCX。
+
+
+## 2026-10-29 时序维护
+
+本日复核请求→Contract→Session/Context/TaskState→Harness→Tools/Quant→Audit→Risk Handoff→等待/重试/终止顺序；无新 Risk 派发或人审回写。
