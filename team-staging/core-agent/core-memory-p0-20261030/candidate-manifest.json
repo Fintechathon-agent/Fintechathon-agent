@@ -4,6 +4,8 @@
   "source_repository": "https://github.com/realchenchenluo/agent",
   "source_branch": "codex/core-memory-p0-20261030",
   "source_sha": "d9afccce1372333cead5ca397240bb348694058d",
+  "team_pr": "https://github.com/Fintechathon-agent/Fintechathon-agent/pull/39",
+  "team_snapshot_commit": "dd2c49ece7c7c573cdc830b8988e48b350759b36",
   "team_path": "team-staging/core-agent/core-memory-p0-20261030",
   "local_targeted": {"tests": 31, "passed": 31, "failed": 0},
   "local_full": {"tests": 418, "passed": 417, "skipped": 1, "failed": 0},

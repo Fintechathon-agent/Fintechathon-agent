@@ -5,6 +5,7 @@ Owner：陈全宝（林粹）
 来源分支：`codex/core-memory-p0-20261030`  
 来源候选 SHA：`d9afccce1372333cead5ca397240bb348694058d`  
 团队 staging 路径：`team-staging/core-agent/core-memory-p0-20261030/`
+团队 PR：[Fintechathon-agent/Fintechathon-agent#39](https://github.com/Fintechathon-agent/Fintechathon-agent/pull/39)（Draft，未合并）
 
 这个目录是 Core Owner 的独立审查快照，供团队临时共创、联调和验收使用。它不会覆盖 `team-release`，也不修改其他 Owner 的目录。
 
