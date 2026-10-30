@@ -141,3 +141,8 @@ sequenceDiagram
 ## 2026-10-29 时序维护
 
 本日复核请求→Contract→Session/Context/TaskState→Harness→Tools/Quant→Audit→Risk Handoff→等待/重试/终止顺序；无新 Risk 派发或人审回写。
+
+
+## 2026-10-30 复核
+
+沿用既有职责与停止点；本日 284/284 回归及 32/32 严格 Schema/语义追踪通过。图与字段限制见 core-agent-integration-guide-2026-10-30.md 与 DOCX；正式 Risk 闭环待 Owner 确认。

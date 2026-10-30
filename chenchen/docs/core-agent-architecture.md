@@ -104,3 +104,8 @@ flowchart LR
 ## 2026-10-29 主链路维护
 
 今日 main 无业务代码变更；复跑 284/284 回归及 Contract 边界检查，沿用并登记本日架构图。Risk Handoff/PENDING_REVIEW 仍是停止点，Quant 与 Memory 规则未修改。
+
+
+## 2026-10-30 复核
+
+沿用既有职责与停止点；本日 284/284 回归及 32/32 严格 Schema/语义追踪通过。图与字段限制见 core-agent-integration-guide-2026-10-30.md 与 DOCX；正式 Risk 闭环待 Owner 确认。

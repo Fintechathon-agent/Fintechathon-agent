@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\33183\.codex\plugins\cache\openai-primary-runtime\documents\26.1025.11240\skills\documents\render_docx.py", line 16, in <module>
+    from pdf2image import convert_from_path, pdfinfo_from_path
+ModuleNotFoundError: No module named 'pdf2image'
+Traceback (most recent call last):
+  File "C:\Users\33183\.codex\plugins\cache\openai-primary-runtime\documents\26.1025.11240\skills\documents\render_docx.py", line 16, in <module>
+    from pdf2image import convert_from_path, pdfinfo_from_path
+ModuleNotFoundError: No module named 'pdf2image'
