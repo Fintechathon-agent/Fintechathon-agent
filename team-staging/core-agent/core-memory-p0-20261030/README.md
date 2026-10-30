@@ -3,7 +3,7 @@
 Owner：陈全宝（林粹）  
 候选来源：`realchenchenluo/agent`  
 来源分支：`codex/core-memory-p0-20261030`  
-来源候选 SHA：`6b69fa3a87b934644597ba8988bd3888a4c453aa`  
+来源候选 SHA：`6b69fa3a87b934644597ba8988bd3888a4c453aa`
 团队 staging 路径：`team-staging/core-agent/core-memory-p0-20261030/`
 团队 PR：[Fintechathon-agent/Fintechathon-agent#39](https://github.com/Fintechathon-agent/Fintechathon-agent/pull/39)（Draft，未合并）
 
