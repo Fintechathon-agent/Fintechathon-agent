@@ -1,0 +1,61 @@
+{
+  "checked_at": "2026-10-31T14:08:06.491866+00:00",
+  "baseline": {
+    "exit": 0,
+    "stdout": "576504f193035482acb7216d20640d6a4ae457d2",
+    "stderr": ""
+  },
+  "same_day_main_commits": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "named_local_main": {
+    "exit": 0,
+    "stdout": "23a978ea4b24809a201812853bfcf4a0549da023",
+    "stderr": ""
+  },
+  "origin_main": {
+    "exit": 0,
+    "stdout": "576504f193035482acb7216d20640d6a4ae457d2",
+    "stderr": ""
+  },
+  "trusted_cloud_commit_is_main_ancestor": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "tests": {
+    "check_exit": 0,
+    "test_exit": 0,
+    "passed": 284,
+    "failed": 0,
+    "skipped": 0,
+    "trace_passed": 32,
+    "trace_failed": 0,
+    "positive_schema_cases": 7
+  },
+  "business_changes_by_automation": false,
+  "external_model_risk_trade_calls": 0,
+  "formal_risk_joint_acceptance": false,
+  "docx_structure": "PASS two images and valid OOXML each",
+  "page_layout_acceptance": "INCOMPLETE canonical renderer missing LibreOffice soffice.exe",
+  "environment": {
+    "python": "C:\\Users\\33183\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "CORE_AGENT_NODE": "C:\\Users\\33183\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "PYTHONPATH": "C:\\Users\\33183\\.codex\\automations\\core-agent-daily-update\\python-deps"
+  },
+  "commands": [
+    "npm run check",
+    "npm test -- --test-reporter=tap",
+    "python docs/daily-closeout-check-2026-10-31.py",
+    "git diff --check",
+    "git diff --cached --check"
+  ],
+  "main_key_file_presence": {
+    "deployment/risk-worker.js": false,
+    "integrations/service-security.js": false,
+    "scripts/check-risk-callback-config.js": false,
+    "integrations/owner-bridge.js": true
+  }
+}
