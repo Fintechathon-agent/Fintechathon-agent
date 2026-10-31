@@ -1,0 +1,27 @@
+{
+  "candidate": "core-memory-p0-20261030",
+  "owner": "陈全宝（林粹）",
+  "source_repository": "https://github.com/realchenchenluo/agent",
+  "source_branch": "codex/core-memory-p0-20261030",
+  "source_sha": "fe3a4baeb4046d74f43bee807ed5042cf5b6ea43",
+  "team_pr": "https://github.com/Fintechathon-agent/Fintechathon-agent/pull/39",
+  "team_snapshot_base_commit": "dd2c49ece7c7c573cdc830b8988e48b350759b36",
+  "team_path": "team-staging/core-agent/core-memory-p0-20261030",
+  "local_targeted": {
+    "tests": 31,
+    "passed": 31,
+    "failed": 0
+  },
+  "local_full": {
+    "tests": 418,
+    "passed": 417,
+    "skipped": 1,
+    "failed": 0
+  },
+  "model_mode": "SYNTHETIC_TEST_DOUBLE",
+  "execution_mode": "PAPER",
+  "real_model_call": false,
+  "real_money_execution": false,
+  "risk_joint_signoff": "PENDING",
+  "joint_acceptance": "NO-GO"
+}

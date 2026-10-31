@@ -19,6 +19,7 @@
 | [执行保护与交接候选 v1](execution-guards-v1/DELIVERY.md) | 批准过期阻断、重复回执与审计覆盖修复、字段补丁 | 220 项回归通过；公共接口候选未应用，待双方确认 |
 | [任务持久登记与故障恢复 v1](durable-recovery-v1/DELIVERY.md) | 防止重启后重复调用，核查失败记录与 UI 接入条件 | 213 项回归、4 进程磁盘测试通过；正式接入待确认 |
 | [Core × Risk 源码联调 v1](owner-integration-v1/DELIVERY.md) | 并发修复、实际风控源码联调、严格接口阻塞证据 | 205 项回归与 9 组本地联调通过；公共接口检查未通过，待双方确认 |
+| [Core + Risk P0 集成候选 2026-10-30](core-risk-p0-integration-20261030/README.md) | Core Memory/身份与 Risk PR #3 安全修复的独立候选；只读和显式 PAPER 模拟能力分开 | 本地 Core 434/435（1 跳过）、Risk 262/262、联合预检 20/20；线上仍 NO-GO，待统一 SHA 与双方部署核验 |
 | [生活请求、购物与订阅 v1](life-planning-v1/DELIVERY.md) | 长句核对、报价账单联动、接口与同任务审计测试 | 本地可运行，待联合验收 |
 | [待确认清单 v0](conversation-intake/DELIVERY.md) | 旧版原文拆分试验 | 保留，可用于对照与回退 |
 | [百炼模型适配](bailian/DELIVERY.md) | 服务端模型接入与预算边界 | 未开通、未授权付费；使用本地替身验证 |
