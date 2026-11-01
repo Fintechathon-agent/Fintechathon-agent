@@ -150,3 +150,7 @@ sequenceDiagram
 ## 2026-10-31 main 基线复核
 
 本日两份 main 各 284/284 回归、32/32 严格 Schema 与语义检查通过。新健康请求前缀 req-daily-20261031；模型为 10 月 17 日留存合成回放。当前架构、时序图和字段归属见 core-agent-integration-guide-2026-10-31.docx 及同名 Markdown。模型 session 可选、健康进程内状态、跨链映射和正式 Risk 业务验收限制继续保留；不标称 Risk 已完成审核闭环。
+
+## 2026-11-01 main 基线复核
+
+本日两份 main 各 284/284 回归、32/32 严格 Schema 与语义检查通过。新健康请求前缀 req-daily-20261101；模型为 10 月 17 日留存合成回放。当前架构、时序图和字段归属见 core-agent-integration-guide-2026-11-01.docx 及同名 Markdown。模型 session 可选、健康进程内状态、跨链映射和正式 Risk 业务验收限制继续保留；不标称 Risk 已完成审核闭环。

@@ -1,0 +1,41 @@
+{
+  "checked_at": "2026-11-01T14:04:40.463180+00:00",
+  "command": "python chenchen/docs/daily-interface-alignment-2026-11-01.py TEAM_ROOT PERSONAL_ROOT",
+  "baselines": {
+    "team": "282b0890d726dca03476d8afa189bf127b8f8a5c",
+    "personal": "ced1ccad50319ba69385d7cbbe9c12114c840062"
+  },
+  "passed": 4,
+  "failed": 0,
+  "checks": [
+    {
+      "schema": "investment-agent.v1.schema.json",
+      "schema_id": "https://fintechathon-agent.github.io/contracts/investment-agent.v1.schema.json",
+      "team_sha256": "b4cf5eff4a65efdfc9a2cad6a42a2180c887e99d0eb1d570f068d2d965ed2383",
+      "personal_sha256": "b4cf5eff4a65efdfc9a2cad6a42a2180c887e99d0eb1d570f068d2d965ed2383",
+      "passed": true
+    },
+    {
+      "schema": "model-review.v1.schema.json",
+      "schema_id": "https://fintechathon-agent.github.io/contracts/model-review.v1.schema.json",
+      "team_sha256": "4d5d111c74d199104fbcf2f8409d3464b31c6b4d2a8f4f9f36e5755cdf73ad69",
+      "personal_sha256": "4d5d111c74d199104fbcf2f8409d3464b31c6b4d2a8f4f9f36e5755cdf73ad69",
+      "passed": true
+    },
+    {
+      "schema": "risk-handoff.v1.schema.json",
+      "schema_id": "https://fintechathon-agent.github.io/contracts/risk-handoff.v1.schema.json",
+      "team_sha256": "4905c1e9453ad8db946bddd7c8d64d5f99b8d2649be0351facbc262b990c0c3a",
+      "personal_sha256": "4905c1e9453ad8db946bddd7c8d64d5f99b8d2649be0351facbc262b990c0c3a",
+      "passed": true
+    },
+    {
+      "schema": "core-agent-error.v1.schema.json",
+      "schema_id": "https://fintechathon-agent.github.io/contracts/core-agent-error.v1.schema.json",
+      "team_sha256": "2da099863c10feea80dd7de488aa7a048f1fc9a02cbb47f1c2584e9806e25401",
+      "personal_sha256": "2da099863c10feea80dd7de488aa7a048f1fc9a02cbb47f1c2584e9806e25401",
+      "passed": true
+    }
+  ],
+  "scope": "Exact schema definition comparison only; not Owner acceptance, runtime interoperability, or live Risk review."
+}
