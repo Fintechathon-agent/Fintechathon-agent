@@ -17,13 +17,13 @@ python qiqi/web/guest_gateway.py --port 8879 --frontend personal --joint-core-ri
 ```text
 同一页面输入
   ├─ 账单、转账 → Finance /api/scenarios/run → 访客模拟账本、待确认和模拟回执
-  └─ 理财 → Finance /api/scenarios/run 委派
-              → Finance /api/personal-fund/review（从服务端访客账本取现金）
+  └─ 理财 → Finance /api/scenarios/run 委派 → 用户核对演示账面现金
+              → Finance /api/personal-fund/review（核对余额版本，从服务端访客账本取现金）
               → Risk /api/review（确定性检查）
               → Core /api/review → Risk HMAC 回写 Core → 同 task_id 只读结果
 ```
 
-浏览器不能提交 `user_id`、风险结论或批准。Risk 请求编号由服务端访客身份和浏览器本轮编号派生，避免不同访客复用同一个幂等任务。现金取自 Finance 账本，未确认的保护用途、已有占用、投资金额仍为未知；因此程序可能返回 `REVIEW`，不会将问题中的数字当成已确认的金融事实。页面显示 Core `task_id`、Risk 检查号、审计号和签名回写状态。任何不完整回写或身份校验失败都不会成为成功结果。
+浏览器不能提交 `user_id`、风险结论或批准。理财委派后，前端先展示 Finance 账本中的演示账面现金；用户明确核对后，浏览器仅回传这一余额版本，服务端要求它与当前账本相等，随后才把账面现金作为已核对的虚构事实发往 Risk。Risk 请求编号由服务端访客身份和浏览器本轮编号派生，避免不同访客复用同一个幂等任务。未确认的保护用途、已有占用、净可用额和投资金额仍为未知；因此程序可能返回 `REVIEW`，不会将问题中的数字或未知占用当成已确认的金融事实。页面显示 Core `task_id`、Risk 检查号、审计号和签名回写状态。任何不完整回写或身份校验失败都不会成为成功结果。
 
 账单与转账当前由 Finance 确定性服务处理；它们没有伪装成 Core/Risk 的同任务结果。此候选没有真实用户登录、正式审批、真实模型、跨机器持久存储或执行网关，`execution_allowed=false`。它尚未部署到公开主聊天或团队 staging，不能称为三场景线上联合验收。
 

@@ -86,7 +86,7 @@ function investmentHtml(data) {
     <p>任务号：<code>${escapeHtml(data.task_id)}</code><br>风控检查号：<code>${escapeHtml(data.risk_check_id)}</code><br>审计号：<code>${escapeHtml(data.audit_id)}</code></p>
     <p>程序风控：${escapeHtml(data.risk_advice?.decision || 'UNKNOWN')}；签名回写：${escapeHtml(data.risk_callback?.status || 'UNKNOWN')}；Core 任务：${escapeHtml(data.workflow_status || 'UNKNOWN')}。</p>
     ${proposal ? `<details class="details"><summary>查看 Core 合成模型提议</summary><p>${escapeHtml(proposal.reason || proposal.action || '')}</p></details>` : ''}
-    <p class="scope-note">Finance 访客模拟现金 ¥${yuan((data.finance_account?.cash_minor || 0) / 100)}；本次未确认投资金额、用途和占用，不能据此批准操作。模型为本机合成测试替身；没有真实模型调用、本人审批或资金执行。</p>`;
+    <p class="scope-note">Finance 访客模拟账面现金 ¥${yuan((data.finance_account?.cash_minor || 0) / 100)}；现有占用未知，净可用额仍待核对。本次投资金额与保护用途也未确认，不能据此批准操作。模型为本机合成测试替身；没有真实模型调用、本人审批或资金执行。</p>`;
   return `<p>${escapeHtml(data.assistant_message || data.reasoning || '理财诊断已完成。')}</p>
     ${portfolio ? `<p>演示组合：${portfolio.position_count} 只持仓，总市值 ¥${yuan(portfolio.total_value)}；现金 ¥${yuan(portfolio.cash)}。</p>` : ''}
     ${data.risk_alert ? `<p class="error">${escapeHtml(data.risk_alert)}</p>` : ''}
@@ -97,6 +97,10 @@ function investmentHtml(data) {
 function answerHtml(turn) {
   if (turn.loading) return '<p class="phase">后端正在处理…</p>';
   if (turn.error) return `<p class="error">${escapeHtml(turn.error)}</p>`;
+  if (turn.pendingInvestment) return `<p>Finance 演示账本当前账面现金 ¥${yuan(turn.pendingInvestment.cashMinor / 100)}。请核对这份虚构账面余额，再发起 Core／Risk 同任务只读分析。</p>
+    <button class="confirm" data-review="${escapeHtml(turn.reviewKey)}">已核对演示账面余额，继续分析</button>
+    <p class="scope-note">这一步仅确认账面现金，不是投资批准；现有占用与净可用额、投资金额和保护用途仍会保留为未知。</p>
+    ${turn.reviewError ? `<p class="error">${escapeHtml(turn.reviewError)}</p>` : ''}`;
   if (turn.action) return `<p>${escapeHtml(turn.action.message || (turn.action.success ? '模拟操作已处理。' : '操作未完成。'))}</p>${turn.action.receipt ? `<details class="details"><summary>查看模拟回执</summary><pre>${escapeHtml(JSON.stringify(turn.action.receipt, null, 2))}</pre></details>` : ''}`;
   if (turn.investment) return investmentHtml(turn.investment) + planHtml(turn.investment.plan);
   const result = turn.scenario?.result;
@@ -130,9 +134,9 @@ async function send(question) {
   try {
     const scenario = await api('/api/scenarios/run', { question: turn.question }, request.signal);
     if (scenario.delegated) {
-      turn.investment = await api('/api/personal-fund/review', {
-        question: turn.question, idempotency_key: `personal-${turn.requestKey ||= crypto.randomUUID().replaceAll('-', '')}`,
-      }, request.signal);
+      const account = await api('/api/account', undefined, request.signal);
+      turn.reviewKey = crypto.randomUUID();
+      turn.pendingInvestment = { cashMinor: account.cash_minor };
     } else {
       turn.scenario = scenario;
     }
@@ -145,6 +149,33 @@ async function send(question) {
     request = null;
     setBusy(false);
     if (current === chat) render();
+  }
+}
+
+async function reviewInvestment(button) {
+  const turn = current.turns.find((item) => item.reviewKey === button.dataset.review);
+  if (!turn?.pendingInvestment || request) return;
+  request = new AbortController();
+  setBusy(true);
+  turn.loading = true;
+  render();
+  try {
+    turn.investment = await api('/api/personal-fund/review', {
+      question: turn.question,
+      idempotency_key: `personal-${turn.requestKey ||= crypto.randomUUID().replaceAll('-', '')}`,
+      confirmed_cash_minor: turn.pendingInvestment.cashMinor,
+    }, request.signal);
+    turn.pendingInvestment = null;
+    turn.reviewError = null;
+  } catch (error) {
+    turn.reviewError = error.name === 'AbortError'
+      ? '已停止等待；后端状态可能未知。请勿重复提交资金操作。'
+      : `联合核对未完成：${error.message}`;
+  } finally {
+    turn.loading = false;
+    request = null;
+    setBusy(false);
+    render();
   }
 }
 
@@ -195,7 +226,8 @@ $('examples').onclick = (event) => {
   if (button) send(button.textContent.replace(/^(账单分析|模拟转账|理财诊断)/, '').trim());
 };
 $('messages').onclick = (event) => {
-  const button = event.target.closest('[data-confirm], [data-cancel]');
+  const button = event.target.closest('[data-review], [data-confirm], [data-cancel]');
+  if (button?.dataset.review) reviewInvestment(button);
   if (button?.dataset.confirm) act(button, '/api/scenarios/confirm', '确认模拟转账');
   if (button?.dataset.cancel) act(button, '/api/scenarios/cancel', '取消模拟转账');
 };

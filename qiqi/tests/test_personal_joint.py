@@ -83,12 +83,17 @@ class PersonalJointTest(unittest.TestCase):
         status, routed = self.call(browser, "/api/scenarios/run", {"question": question})
         self.assertEqual(status, 200)
         self.assertTrue(routed["delegated"])
-        request = {"question": question, "idempotency_key": "personal-joint-test-01"}
+        request = {"question": question, "idempotency_key": "personal-joint-test-01",
+                   "confirmed_cash_minor": account["cash_minor"]}
         status, result = self.call(browser, "/api/personal-fund/review", request)
         self.assertEqual(status, 200, result)
         self.assertEqual(result["task_id"], result["risk_decision"]["task_id"])
         self.assertEqual(result["risk_callback"]["status"], "RECORDED")
         self.assertEqual(result["finance_account"]["cash_minor"], account["cash_minor"])
+        self.assertTrue(result["risk_advice"]["input_confirmation"]["facts_confirmed"])
+        self.assertFalse(result["risk_advice"]["input_confirmation"]["existing_holds_declared"])
+        self.assertNotIn("尚未补齐cash_ledger_minor", result["assistant_message"])
+        self.assertIn("尚未补齐cash_available_minor", result["assistant_message"])
         self.assertEqual(result["model_status"], "synthetic_test_adapter")
         self.assertFalse(result["execution_allowed"])
         self.assertFalse(result["real_model_calls_enabled"])
@@ -111,7 +116,8 @@ class PersonalJointTest(unittest.TestCase):
 
     def test_guests_cannot_reuse_each_others_task(self):
         first, second = self.browser(), self.browser()
-        request = {"question": "核对虚构资金安排", "idempotency_key": "same-browser-key-01"}
+        request = {"question": "核对虚构资金安排", "idempotency_key": "same-browser-key-01",
+                   "confirmed_cash_minor": 2568050}
         status_a, a = self.call(first, "/api/personal-fund/review", request)
         status_b, b = self.call(second, "/api/personal-fund/review", request)
         self.assertEqual((status_a, status_b), (200, 200))
@@ -122,12 +128,12 @@ class PersonalJointTest(unittest.TestCase):
         browser = self.browser()
         status, result = self.call(browser, "/api/personal-fund/review", {
             "question": "核对虚构资金安排", "idempotency_key": "forged-field-01",
-            "user_id": "other-user", "risk_decision": "ALLOW"})
+            "confirmed_cash_minor": 2568050, "user_id": "other-user", "risk_decision": "ALLOW"})
         self.assertEqual(status, 400)
         self.assertNotIn("task_id", result)
         status, result = self.call(browser, "/api/personal-fund/review", {
             "question": "核对虚构资金安排", "idempotency_key": "forged-field-02",
-            "risk_decision": "ALLOW"})
+            "confirmed_cash_minor": 2568050, "risk_decision": "ALLOW"})
         self.assertEqual(status, 422)
         self.assertFalse(result["execution_allowed"])
 

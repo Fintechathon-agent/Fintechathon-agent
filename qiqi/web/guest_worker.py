@@ -123,19 +123,24 @@ def main():
                                            "execution_allowed": False}, 503)
                     body = self._body_json()
                     question, request_key = body.get("question"), body.get("idempotency_key")
-                    if (set(body) != {"question", "idempotency_key"} or not isinstance(question, str)
+                    confirmed_cash = body.get("confirmed_cash_minor")
+                    if (set(body) != {"question", "idempotency_key", "confirmed_cash_minor"} or not isinstance(question, str)
                             or not 1 <= len(question.strip()) <= 2000 or not isinstance(request_key, str)
-                            or not re.fullmatch(r"[A-Za-z0-9_-]{8,80}", request_key)):
-                        return self._json({"error": "问题或请求编号无效；不接受浏览器指定账户、风控或批准字段",
+                            or not re.fullmatch(r"[A-Za-z0-9_-]{8,80}", request_key)
+                            or type(confirmed_cash) is not int):
+                        return self._json({"error": "请先核对本浏览器的演示现金；不接受浏览器指定账户、风控或批准字段",
                                            "execution_allowed": False}, 422)
                     from web import risk_conversation
                     account_before = account.summary()
+                    if confirmed_cash != account_before["cash_minor"]:
+                        return self._json({"error": "演示余额已变化，请重新核对后发起新任务",
+                                           "execution_allowed": False}, 409)
                     floor = account_before["preferences"]["minimum_cash_minor"]
                     finance = {"cash_yuan": str(Decimal(account_before["cash_minor"]) / 100),
                                "floor_yuan": str(Decimal(floor) / 100) if floor is not None else None,
                                "amount_yuan": None, "fees_yuan": None, "holds_yuan": None,
                                "purpose_yuan": None, "due_yuan": None,
-                               "facts_confirmed": False, "purpose_confirmed": False}
+                               "facts_confirmed": True, "purpose_confirmed": False}
                     try:
                         scoped_key = "pf-" + hashlib.sha256(f"{owner}:{request_key}".encode()).hexdigest()
                         status, result = risk_conversation.review({"question": question.strip(),
