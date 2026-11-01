@@ -50,7 +50,7 @@ def exclusive_directory(directory):
 
 
 class GuestRegistry:
-    def __init__(self, root, mode="demo", max_workers=8):
+    def __init__(self, root, mode="demo", max_workers=8, joint=None):
         if mode not in ("demo", "live"):
             raise ValueError("Unknown mode")
         self.root, self.mode, self.max_workers = Path(root).resolve(), mode, max_workers
@@ -66,6 +66,7 @@ class GuestRegistry:
             raise ValueError("Invalid session signing key; no replacement was generated")
         self.lock = threading.RLock()
         self.workers = {}
+        self.joint = joint
 
     @property
     def cookie_name(self):
@@ -120,6 +121,12 @@ class GuestRegistry:
                 raise RuntimeError("本地演示访客容量已满，请稍后重试")
             token = secrets.token_urlsafe(48)
             env = dict(os.environ, FINANCE_GUEST_BACKEND_TOKEN=token, PYTHONUTF8="1")
+            env.pop("FINANCE_JOINT_LOCAL", None)
+            if self.joint:
+                env.update(FINANCE_JOINT_LOCAL="1", CORE_AGENT_BASE_URL=self.joint["core_origin"],
+                           CORE_AGENT_API_KEY=self.joint["core_key"],
+                           RISK_CONVERSATION_BASE_URL=self.joint["risk_origin"],
+                           RISK_CONVERSATION_API_KEY=self.joint["risk_key"])
             process = subprocess.Popen([sys.executable, "-u", str(ROOT / "web/guest_worker.py"),
                 "--directory", str(self.root / self.mode / identity), "--guest", identity, "--mode", self.mode],
                 stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
@@ -177,7 +184,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
         if self.headers.get("Host") != expected:
             return self.respond(403, {"error": "只允许配置的本机来源"})
         origin = self.headers.get("Origin")
-        landing_navigation = (self.command == "GET" and path.path in ("/", "/index.html")
+        landing_navigation = (self.command == "GET" and path.path in ("/", "/index.html", "/personal-fund", "/personal-fund/")
                               and self.headers.get("Sec-Fetch-Mode") == "navigate"
                               and self.headers.get("Sec-Fetch-Dest") == "document")
         if (origin and origin != "http://" + expected) or (self.headers.get("Sec-Fetch-Site") == "cross-site" and not landing_navigation):
@@ -188,7 +195,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
         identity = registry.verify(self.headers.get("Cookie", ""))
         new_cookie = None
         if not identity:
-            if self.command == "GET" and path.path in ("/", "/index.html"):
+            if self.command == "GET" and path.path in ("/", "/index.html", "/personal-fund", "/personal-fund/"):
                 identity, new_cookie = registry.issue()
             else:
                 return self.respond(401, {"error": "请先打开首页建立独立访客会话"})
@@ -211,7 +218,8 @@ class GatewayHandler(BaseHTTPRequestHandler):
         try:
             worker = registry.worker(identity)
             connection = http.client.HTTPConnection("127.0.0.1", worker["port"], timeout=65)
-            connection.request(self.command, self.path, body=body, headers={
+            forwarded_path = "/personal-fund/" if self.server.frontend == "personal" and path.path in ("/", "/index.html") else self.path
+            connection.request(self.command, forwarded_path, body=body, headers={
                 "Content-Type": "application/json", "X-Finance-Backend-Token": worker["token"]})
             response = connection.getresponse()
             raw = response.read(8 * MAX_BODY + 1)
@@ -231,11 +239,12 @@ class GatewayHandler(BaseHTTPRequestHandler):
 class GuestServer(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, address, registry):
+    def __init__(self, address, registry, frontend="finance"):
         if address[0] != "127.0.0.1":
             raise ValueError("This guest profile is loopback-only")
         super().__init__(address, GatewayHandler)
         self.registry = registry
+        self.frontend = frontend
 
 
 def main():
@@ -243,20 +252,58 @@ def main():
     parser.add_argument("--port", type=int, default=8877)
     parser.add_argument("--state-dir", type=Path)
     parser.add_argument("--mode", choices=("demo", "live"), default="demo")
+    parser.add_argument("--frontend", choices=("finance", "personal"), default="finance")
+    parser.add_argument("--joint-core-risk", action="store_true",
+                        help="Use local synthetic Core/Risk handlers for same-task review")
     args = parser.parse_args()
+    if args.joint_core_risk and (args.frontend != "personal" or args.mode != "demo"):
+        parser.error("The local Core/Risk harness requires --frontend personal --mode demo")
     directory = args.state_dir.resolve() if args.state_dir else Path(tempfile.mkdtemp(prefix="fund-guests-"))
     with exclusive_directory(directory):
-        registry = GuestRegistry(directory, args.mode)
-        server = GuestServer(("127.0.0.1", args.port), registry)
-        print(json.dumps({"url": f"http://127.0.0.1:{server.server_port}/", "state_directory": str(directory),
-                          "mode": args.mode, "real_model_calls_enabled": False}), flush=True)
+        joint_process = None
         try:
-            server.serve_forever()
-        except KeyboardInterrupt:
-            pass
+            joint = None
+            if args.joint_core_risk:
+                script = ROOT.parent / "modules/safety-risk-eval/joint-acceptance/personal-fund-runtime.cjs"
+                safe_env = {key: os.environ[key] for key in
+                            ("PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "TEMP", "TMP", "TMPDIR", "HOME", "USERPROFILE")
+                            if key in os.environ}
+                joint_process = subprocess.Popen(["node", str(script)], stdin=subprocess.PIPE,
+                                                 stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                                                 text=True, encoding="utf-8", env=safe_env,
+                                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+                result = queue.Queue()
+                threading.Thread(target=lambda: result.put(joint_process.stdout.readline()), daemon=True).start()
+                try:
+                    joint = json.loads(result.get(timeout=20))
+                    if not all(isinstance(joint.get(key), str) and joint[key] for key in
+                               ("core_origin", "core_key", "risk_origin", "risk_key")):
+                        raise ValueError("Invalid local joint service")
+                except (queue.Empty, ValueError, json.JSONDecodeError):
+                    raise RuntimeError("本机 Core/Risk 联合服务启动失败；未切换到静态结果") from None
+            registry = GuestRegistry(directory, args.mode, joint=joint)
+            server = GuestServer(("127.0.0.1", args.port), registry, args.frontend)
+            print(json.dumps({"url": f"http://127.0.0.1:{server.server_port}/", "state_directory": str(directory),
+                              "mode": args.mode, "frontend": args.frontend,
+                              "joint_core_risk": bool(joint), "real_model_calls_enabled": False}), flush=True)
+            try:
+                server.serve_forever()
+            except KeyboardInterrupt:
+                pass
+            finally:
+                server.server_close()
+                registry.close()
         finally:
-            server.server_close()
-            registry.close()
+            if joint_process:
+                if joint_process.stdin:
+                    joint_process.stdin.close()
+                try:
+                    joint_process.wait(timeout=8)
+                except subprocess.TimeoutExpired:
+                    joint_process.terminate()
+                    joint_process.wait(timeout=5)
+                if joint_process.stdout:
+                    joint_process.stdout.close()
 
 
 if __name__ == "__main__":

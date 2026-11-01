@@ -951,6 +951,12 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path in ("/", "/index.html"):
                 return self._file("index.html")
+            if path in ("/personal-fund", "/personal-fund/", "/personal-fund/index.html"):
+                return self._file("personal-fund/index.html")
+            if path.startswith("/personal-fund/"):
+                rel = path[len("/personal-fund/"):].lstrip("/")
+                if rel:
+                    return self._file(f"personal-fund/{rel}")
             if path in ("/compare", "/compare/", "/compare/index.html"):
                 return self._file("compare/index.html")
             if path in ("/favicon.svg", "/compare/favicon.svg", "/favicon.ico"):
