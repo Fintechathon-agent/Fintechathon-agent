@@ -1,0 +1,39 @@
+{
+  "rule_id": "R10",
+  "title_zh": "必要审计记录",
+  "version": "risk-rules.v0.1-draft",
+  "status": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW",
+  "stages": [
+    "EXECUTION_PREFLIGHT"
+  ],
+  "check_key": "audit_durability",
+  "input_refs": [
+    "/audit_context"
+  ],
+  "conditions": [
+    {
+      "condition_id": "R10-policy",
+      "metric": "audit_durability",
+      "operator": "POLICY_CHECK",
+      "threshold": null,
+      "threshold_ref": null,
+      "unit": "POLICY",
+      "basis": "POLICY",
+      "group": "ANY"
+    }
+  ],
+  "reason_codes": [
+    "PRE_EXECUTION_AUDIT_FAILED"
+  ],
+  "failure_decisions": [
+    "ERROR"
+  ],
+  "acceptance_policy_zh": "记录失败不能通过用户确认放行。",
+  "enforcement_owner": [
+    "ORCHESTRATOR",
+    "TOOLS"
+  ],
+  "recovery_zh": "恢复可靠记录后重检，执行结果不明先核查。",
+  "source": "SOP_CONFIRMED",
+  "notes_zh": "配置仅供队内虚构演示；规则定义不是可执行规则引擎。"
+}

@@ -1,0 +1,48 @@
+{
+  "checked_at": "2026-10-11T17:48:26.798Z",
+  "base": "https://fund-risk-workbench.panxintian44.chatgpt.site",
+  "scope": "Live remote Core handoff, deterministic workflow; not an LLM run",
+  "evidence": {
+    "source": {
+      "contract_version": "investment-agent.v1",
+      "request_id": "remote-core-a1f06a22-a458-49ff-bd54-e9e8dd53a72d",
+      "task_id": "task-a27f96a5-58e9-441a-af9b-e486acf66ea2",
+      "session_id": "session-348e6de5-2603-4147-a73d-78ac1ad33b0b",
+      "handoff_id": "handoff-task-a27f96a5-58e9-441a-af9b-e486acf66ea2",
+      "audit_id": "audit-task-a27f96a5-58e9-441a-af9b-e486acf66ea2"
+    },
+    "local_task_id": "import-task-23350463-ace7-48f6-a3ae-18da3cc62124",
+    "service_receipt": {
+      "endpoint": "https://personal-ai-fund-manager-core-agent.realchenchenluo.workers.dev/api/risk-workbench/handoff",
+      "request_id": "remote-core-a1f06a22-a458-49ff-bd54-e9e8dd53a72d",
+      "request_digest": "8f510a720e745a82dfb20241f06e2ac32647129d43fb3b88ae41e532bc76b1db",
+      "response_digest": "0631b6785c22b0c7dadfcaab7885a84a11fd8e698fc4291069c73d56251a1743",
+      "started_at": "2026-10-11T17:48:22.197Z",
+      "received_at": "2026-10-11T17:48:22.281Z",
+      "verification": "SERVER_FETCH_PINNED_HTTPS",
+      "service_auth": "PUBLIC_DEMO_NO_CALLER_AUTH",
+      "capability": "READ_ONLY_HANDOFF",
+      "integration_version": "core-agent-to-risk-workbench.cloudflare@0.1.0"
+    }
+  },
+  "boundary": {
+    "forged": 400,
+    "noCsrf": 403,
+    "execution_status": "NOT_STARTED",
+    "reasons": [
+      "POLICY_CORE_READ_ONLY",
+      "POLICY_APPROVAL_STALE",
+      "POLICY_RISK_NOT_ELIGIBLE"
+    ]
+  },
+  "checks": [
+    "health-online",
+    "live-handoff-import",
+    "risk-and-audit",
+    "idempotent-replay",
+    "readonly-enforcement",
+    "client-field-and-csrf-rejection",
+    "desktop-mobile-no-overflow"
+  ],
+  "page_errors": []
+}

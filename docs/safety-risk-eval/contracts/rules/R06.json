@@ -1,0 +1,42 @@
+{
+  "rule_id": "R06",
+  "title_zh": "历史最大回撤",
+  "version": "risk-rules.v0.1-draft",
+  "status": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW",
+  "stages": [
+    "PLAN_REVIEW",
+    "EXECUTION_PREFLIGHT"
+  ],
+  "check_key": "historical_drawdown",
+  "input_refs": [
+    "/upstream/artifacts/simulation/comparisons",
+    "/profile/max_historical_drawdown"
+  ],
+  "conditions": [
+    {
+      "condition_id": "R06-dd",
+      "metric": "historical_drawdown_magnitude",
+      "operator": "GT",
+      "threshold": null,
+      "threshold_ref": "/profile/max_historical_drawdown",
+      "unit": "RATIO",
+      "basis": "USER_CONSTRAINT",
+      "group": "ANY"
+    }
+  ],
+  "reason_codes": [
+    "MAX_DRAWDOWN_EXCEEDED"
+  ],
+  "failure_decisions": [
+    "REVIEW"
+  ],
+  "acceptance_policy_zh": "明确接受历史回撤风险；不是未来损失上限。",
+  "enforcement_owner": [
+    "RISK",
+    "ORCHESTRATOR",
+    "TOOLS"
+  ],
+  "recovery_zh": "修改方案或逐项接受该风险后确认完整计划。",
+  "source": "MODULE4_PROPOSAL",
+  "notes_zh": "配置仅供队内虚构演示；规则定义不是可执行规则引擎。"
+}

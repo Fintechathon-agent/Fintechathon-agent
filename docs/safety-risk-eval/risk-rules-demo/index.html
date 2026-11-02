@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171513">
+  <title>固定风险规则 · Finance Lab</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="model.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#workspace">跳到风控工作区</a>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Finance Lab 风控演示首页"><span class="brand-mark">K<span>↗</span></span><span>FINANCE <b>LAB</b></span></a>
+    <nav aria-label="原型导航"><a href="#workspace" aria-current="page">规则演示</a><a href="#architecture">逻辑架构</a><a href="README.md">使用说明</a></nav>
+    <span class="prototype-tag">第四板块 · 评审原型</span>
+  </header>
+  <main>
+    <section class="intro">
+      <div><h1>看清边界，再确认模拟。</h1><p>用固定案例，核对每一条风险规则如何影响下一步。</p></div>
+      <div class="intro-note"><strong>规则版本 0.1</strong><span>虚构数据 · 固定回放 · 无真实交易</span><span>未接正式风控／审批网关</span></div>
+    </section>
+    <div class="prototype-notice"><strong>这是可交互原型。</strong>检查结论来自预设案例，指标来自案例数据；不是正式风险引擎。执行与审计仅在本页内存中演示，刷新即清空。</div>
+    <div class="workspace" id="workspace">
+      <aside class="case-sidebar" aria-label="固定演示案例">
+        <div class="sidebar-title"><h2>选择一个案例</h2><span id="case-count"></span></div>
+        <label class="filter-label" for="case-filter">筛选案例</label><select id="case-filter"><option value="all">全部案例</option><option value="allow">通过与边界</option><option value="review">需要接受风险</option><option value="block">硬性拦截</option><option value="repair">故障与恢复</option><option value="flow">确认与执行状态</option></select>
+        <div id="case-list" class="case-list"></div>
+        <p class="sidebar-foot">R01—R10 全覆盖。<br>超限仍可只读比较；执行资格另行检查。</p>
+      </aside>
+      <div class="case-workspace">
+        <section class="case-heading"><div><div class="case-meta" id="case-meta"></div><h2 id="case-title"></h2><p id="case-description"></p></div><button class="button secondary" id="reset-case">重新开始此案例</button></section>
+        <section class="plan-strip" aria-label="方案与数据"><div><span>任务与拟议方案</span><strong id="plan-version"></strong></div><div><span>数据模式</span><strong>固定虚构历史回放</strong></div><div><span>数据时点</span><strong>2026-09-23 · 演示快照</strong></div><div><span>需保留现金</span><strong id="reserve"></strong></div></section>
+        <section class="surface metrics-section">
+          <div class="section-heading"><h3>双口径检查</h3><span>上限为演示配置，超过才触发</span></div>
+          <div class="table-scroll"><table class="metrics-table"><caption class="sr-only">当前方案的两个计算口径与限制</caption><thead><tr><th scope="col">指标</th><th scope="col">占总资产<br><small>含现金</small></th><th scope="col">占投资部分<br><small>不含现金</small></th></tr></thead><tbody id="metrics-body"></tbody></table></div>
+          <div class="portfolio-line" id="portfolio-line"></div>
+          <div class="supporting-metrics" id="supporting-metrics"></div>
+          <details><summary>持仓、行业汇总与证据口径</summary><div id="evidence-details"></div></details>
+          <div id="improvement-panel" hidden></div>
+        </section>
+        <section class="surface checks-section">
+          <div class="section-heading"><h3>逐条检查结果</h3><button class="button" id="run-check">运行案例检查</button></div>
+          <div class="verdict" id="verdict" role="status" aria-live="polite"></div>
+          <div class="rules" id="rules"></div>
+          <div class="check-actions"><button class="button secondary" id="repair-data" hidden>演示修复后重检</button><span id="repair-note"></span></div>
+        </section>
+        <section class="surface approval-section">
+          <div class="section-heading"><h3>用户确认与演示执行</h3><span>通过检查 ≠ 已获授权</span></div>
+          <div class="state-strip" id="state-strip"></div>
+          <div id="approval-guidance" class="guidance"></div>
+          <fieldset id="acceptances"><legend>逐项接受仍然存在的风险</legend><div id="acceptance-list"></div></fieldset>
+          <label class="check-label full-plan"><input type="checkbox" id="confirm-plan"><span>我已查看完整拟议动作、金额、数据模式和风险；仅确认本次完整模拟计划。</span></label>
+          <div class="approval-actions"><button class="button" id="approve">确认完整模拟计划</button><button class="button secondary" id="reject">拒绝本次模拟</button><button class="button secondary" id="invalidate" hidden>演示方案版本变化</button><button class="button secondary" id="revoke" hidden>撤回确认</button></div>
+          <div class="execution-area"><div><strong id="execution-title">演示执行尚未启动</strong><p id="execution-guidance"></p></div><button class="button" id="execute">执行模拟（原型）</button></div>
+          <div class="execution-extra"><button class="button secondary" id="repeat" hidden>再次提交同一请求</button><button class="button secondary" id="reconcile" hidden>核查演示执行状态</button><button class="button secondary" id="invalidate-key" hidden>演示同一请求内容被修改</button></div>
+          <div id="receipt" class="receipt" hidden></div>
+        </section>
+        <section class="surface audit-section"><div class="section-heading"><h3>审计关联记录</h3><button class="button secondary" id="export-audit">导出演示记录</button></div><p class="audit-note">仅演示内存缓冲，不代表持久化审计。拒绝、失效与中止保留原因；失败写入不能冒充成功。</p><div id="audit-error" hidden></div><ol id="audit-list" class="audit-list"></ol><details><summary>查看本案例的审计字段</summary><pre id="audit-json"></pre></details></section>
+      </div>
+    </div>
+    <section id="architecture" class="architecture-section"><div class="section-heading"><div><h2>从规则到执行边界</h2><p>风险结论、用户确认和执行状态分别记录。确认只能接受指定风险，不能覆盖硬性阻止。</p></div><a class="button secondary" href="architecture.svg" target="_blank" rel="noopener">放大查看架构图</a></div><img src="architecture.svg" alt="风控架构：输入与规则检查，三条状态线，用户可接受复核与必须修复复核的分流，演示执行门槛，以及五个板块交接。" width="1200" height="1120" loading="lazy"><p class="architecture-caption">正式契约与执行拦截点待团队评审；现有主流程仍停在风控交接点。</p></section>
+  </main>
+  <footer>第四板块提案已确定 · 跨模块待团队确认 · 不代表整个模块已完成正式联调<br>历史回撤不是未来损失上限；短窗口相关性不证明长期关系。</footer>
+  <noscript><p class="noscript">请启用 JavaScript 查看固定案例与确认交互。</p></noscript>
+</body>
+</html>
