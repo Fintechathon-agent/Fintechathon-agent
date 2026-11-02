@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1120" role="img" aria-labelledby="title desc">
+  <title id="title">固定风险规则与执行边界</title><desc id="desc">从任务与数据进入风险检查，区分风险结论、用户确认和执行三条状态线。执行须满足版本、风险接受、审计及去重条件；五个团队板块分别承担输入、判断、拦截与展示职责。</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#9b8b79"/></marker><style>text{font-family:'Microsoft YaHei','PingFang SC',sans-serif;fill:#29231d} .title{font-size:27px;font-weight:600}.head{font-size:18px;font-weight:600}.body{font-size:15px}.small{font-size:13px;fill:#695d50}.tiny{font-size:12px;fill:#695d50}.label{font-size:15px;font-weight:600}.box{fill:#f6f2ed;stroke:#d9cfc2}.green{fill:#eaf4ed;stroke:#a8c6b3}.amber{fill:#fff5de;stroke:#d9bd81}.red{fill:#fcf0ed;stroke:#d8b0a9}.line{fill:none;stroke:#9b8b79;stroke-width:1.6;marker-end:url(#arrow)}.separator{stroke:#e5ddd3;stroke-width:1}</style></defs>
+  <rect width="1200" height="1120" fill="#fffdf9"/>
+  <text x="36" y="51" class="title">固定风险规则：从检查到模拟执行</text><text x="36" y="77" class="small">第四板块评审提案 · 固定规则 v0.1 · 原型内存演示，不代表正式网关已接通</text>
+  <rect x="36" y="103" width="295" height="97" rx="12" class="box"/><text x="56" y="132" class="head">可信输入与版本</text><text x="56" y="157" class="body">用户约束、持仓、资金、完整计划</text><text x="56" y="180" class="small">数据／规则版本、证据、授权上下文</text>
+  <path d="M335 151H382" class="line"/>
+  <rect x="388" y="103" width="377" height="97" rx="12" class="box"/><text x="408" y="132" class="head">R01—R10 检查与结构化原因</text><text x="408" y="157" class="body">权限 · 数据 · 资金 · 双口径风险</text><text x="408" y="180" class="small">确认 · 去重 · 审计；保留全部触发原因</text>
+  <path d="M769 151H816" class="line"/>
+  <rect x="822" y="103" width="342" height="97" rx="12" class="amber"/><text x="842" y="132" class="head">阻止 ＞ 复核 ＞ 通过</text><text x="842" y="157" class="body">通过检查不等于已经获准执行</text><text x="842" y="180" class="small">只读比较与执行资格分开</text>
+  <line x1="36" y1="222" x2="1164" y2="222" class="separator"/>
+  <text x="36" y="262" class="head">风险检查</text>
+  <rect x="174" y="277" width="170" height="53" rx="9" class="box"/><text x="222" y="308" class="label">待检查</text>
+  <path d="M346 303H394" class="line"/><rect x="400" y="277" width="170" height="53" rx="9" class="box"/><text x="449" y="308" class="label">检查中</text>
+  <path d="M572 303H633V260H680" class="line"/><path d="M633 303H680" class="line"/><path d="M633 303V346H680" class="line"/>
+  <rect x="686" y="239" width="208" height="42" rx="8" class="green"/><text x="703" y="266" class="label">通过 ALLOW</text>
+  <rect x="686" y="282" width="208" height="42" rx="8" class="amber"/><text x="703" y="309" class="label">需要复核 REVIEW</text>
+  <rect x="686" y="325" width="208" height="42" rx="8" class="red"/><text x="703" y="352" class="label">阻止 BLOCK</text>
+  <text x="932" y="260" class="body">可接受：逐项明确接受</text><text x="932" y="284" class="small">回撤／相关性／行业未知</text><text x="932" y="306" class="small">合格的逐步改善例外</text><text x="932" y="337" class="body">必须修复：先修复重检</text><text x="932" y="361" class="small">数据／检查／审计故障</text>
+  <text x="174" y="389" class="small">检查未完成不允许执行；接受风险后，原始复核原因仍保留。</text>
+  <line x1="36" y1="408" x2="1164" y2="408" class="separator"/>
+  <text x="36" y="450" class="head">用户确认</text><rect x="174" y="461" width="170" height="53" rx="9" class="box"/><text x="222" y="492" class="label">未确认</text>
+  <path d="M346 487H410V444H680" class="line"/><path d="M410 487H680" class="line"/><path d="M410 487V530H680" class="line"/>
+  <text x="453" y="436" class="tiny">全部风险接受＋完整计划确认</text><text x="453" y="477" class="tiny">明确拒绝</text><text x="453" y="520" class="tiny">撤回或相关版本变化</text>
+  <rect x="686" y="423" width="208" height="42" rx="8" class="green"/><text x="703" y="450" class="label">已确认 APPROVED</text>
+  <rect x="686" y="466" width="208" height="42" rx="8" class="box"/><text x="703" y="493" class="label">已拒绝 REJECTED</text>
+  <rect x="686" y="509" width="208" height="42" rx="8" class="amber"/><text x="703" y="536" class="label">已失效 INVALIDATED</text>
+  <text x="932" y="447" class="body">确认绑定整次任务</text><text x="932" y="471" class="small">方案／画像／规则／数据版本</text><text x="932" y="496" class="body">不能覆盖硬性阻止</text><text x="932" y="520" class="small">变更后重新检查与确认</text>
+  <line x1="36" y1="572" x2="1164" y2="572" class="separator"/>
+  <text x="36" y="614" class="head">模拟执行</text><rect x="174" y="630" width="170" height="53" rx="9" class="box"/><text x="222" y="661" class="label">未启动</text>
+  <path d="M346 656H394" class="line"/><rect x="400" y="630" width="170" height="53" rx="9" class="box"/><text x="449" y="661" class="label">执行中</text>
+  <path d="M572 656H633V613H680" class="line"/><path d="M633 656H680" class="line"/><path d="M633 656V699H680" class="line"/>
+  <rect x="686" y="592" width="208" height="42" rx="8" class="green"/><text x="703" y="619" class="label">成功 SUCCEEDED</text>
+  <rect x="686" y="635" width="208" height="42" rx="8" class="red"/><text x="703" y="662" class="label">失败 FAILED</text>
+  <rect x="686" y="678" width="208" height="42" rx="8" class="amber"/><text x="703" y="705" class="label">结果未知 UNKNOWN</text>
+  <text x="932" y="615" class="body">重复请求返回原回执</text><text x="932" y="639" class="small">相同标识＋不同内容则阻止</text><text x="932" y="670" class="body">未知先核查，禁止盲目重试</text><text x="932" y="694" class="small">核查恢复原回执，不新发执行</text>
+  <text x="174" y="744" class="small">成功、失败、中止均关联审计；审计写入失败先暂停，不能伪造“已记录”。</text>
+  <rect x="36" y="775" width="1128" height="122" rx="12" fill="#211a14"/>
+  <text x="58" y="806" class="head" style="fill:#ffb680">执行前的共同门槛：所有条件同时满足</text>
+  <text x="58" y="835" class="body" style="fill:#fff4e8">检查有效 · 无硬性阻止 · 可接受风险全部接受 · 确认绑定当前版本 · 审计可写 · 无重复／未知请求</text>
+  <text x="58" y="866" class="small" style="fill:#e3c8af">安全条件缺失 → 暂停相关执行并说明恢复动作；已有可靠的只读分析可以保留。</text>
+  <text x="36" y="944" class="head">团队接入边界 · 正式接口待架构负责人统一</text>
+  <rect x="36" y="964" width="1128" height="95" rx="10" class="box"/>
+  <text x="54" y="994" class="label">第一板块</text><text x="54" y="1020" class="small">契约／路由／工具入口拦截</text>
+  <text x="288" y="994" class="label">第二板块</text><text x="288" y="1020" class="small">可信上下文／状态／存储</text>
+  <text x="512" y="994" class="label">第三板块</text><text x="512" y="1020" class="small">数据／计算／执行边界</text>
+  <text x="737" y="994" class="label">第四板块</text><text x="737" y="1020" class="small">规则／原因／确认验证</text>
+  <text x="954" y="994" class="label">第五板块</text><text x="954" y="1020" class="small">提示／逐项接受／展示</text>
+  <text x="36" y="1094" class="small">阈值为产品演示配置；历史回撤不是未来损失上限；原型尚未连接正式风险引擎或审批网关。</text>
+</svg>
