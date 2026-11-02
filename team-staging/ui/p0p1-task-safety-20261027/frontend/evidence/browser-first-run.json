@@ -1,0 +1,51 @@
+{
+  "startedAt": "2026-10-27T11:57:23.286Z",
+  "modelCalls": 0,
+  "externalWrites": 0,
+  "widths": [
+    {
+      "width": 320,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 430,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 1024,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "views": 6,
+      "overflow": false
+    }
+  ],
+  "steps": [
+    "Current-run baseline screenshots captured before candidate interactions",
+    "Seven required widths x six navigation views; one visible panel; no horizontal page overflow"
+  ],
+  "errors": [],
+  "fixtures": "Named synthetic fixtures only; actual Core health calculation is separately identified.",
+  "result": "FAIL",
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n14 !== 1\n\n    at F:\\人工智能AI 比赛\\output\\p0p1-20261027\\personal\\tests\\browser.cjs:49:46",
+  "completedAt": "2026-10-27T11:57:39.930Z"
+}

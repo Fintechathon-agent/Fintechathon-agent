@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-27",
+  "tests": 31,
+  "pass": 29,
+  "fail": 2,
+  "failures": [
+    "Test expected absent handoff_id although the pinned team fixture contains handoff-task-demo-001. Corrected fixture expectation; no service ID was changed.",
+    "Integration test used Harness.run, which does not exist. Corrected test to the actual team Harness method."
+  ],
+  "modelCalls": 0
+}

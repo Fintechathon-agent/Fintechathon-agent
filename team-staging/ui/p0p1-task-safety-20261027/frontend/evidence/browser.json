@@ -1,0 +1,57 @@
+{
+  "startedAt": "2026-10-27T12:13:58.411Z",
+  "modelCalls": 0,
+  "externalWrites": 0,
+  "widths": [
+    {
+      "width": 320,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 375,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 430,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 1024,
+      "views": 6,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "views": 6,
+      "overflow": false
+    }
+  ],
+  "steps": [
+    "Current-run baseline screenshots captured before candidate interactions",
+    "Seven required widths x six navigation views; one visible panel; no horizontal page overflow",
+    "Actual pinned Core health HTTP response, same task in unified tasks and audit, refresh and server re-query",
+    "XSS escaped, DEMO remains local, form labels and keyboard route focus",
+    "Synthetic candidate: question, selected scope and service source revision changes revoke consent",
+    "Synthetic HTTP 401/403/409/423; accelerated timeout; refresh retains UNKNOWN; original request recovered with zero resend",
+    "Synthetic frozen-contract responses: all nine task phases render independently; no execution or approval control"
+  ],
+  "errors": [],
+  "fixtures": "Named synthetic fixtures only; actual Core health calculation is separately identified.",
+  "postsToRealCore": 1,
+  "syntheticAnalysisPosts": 5,
+  "result": "PASS",
+  "completedAt": "2026-10-27T12:14:20.702Z"
+}

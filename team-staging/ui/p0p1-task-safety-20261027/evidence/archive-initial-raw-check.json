@@ -1,0 +1,5 @@
+{
+  "result": "FAIL",
+  "reason": "The initial raw hash check did not apply declared LF canonicalization. A following archive check observed only a regenerated security report line ending. The original report bytes were restored, the team scan was saved separately, and both final checks pass.",
+  "firstFile": "acceptance/2026-10-19/evidence/cloud-public.json"
+}

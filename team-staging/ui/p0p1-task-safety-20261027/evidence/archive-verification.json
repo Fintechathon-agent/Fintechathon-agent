@@ -1,0 +1,10 @@
+{
+  "archiveFiles": 131,
+  "runtimeFiles": 86,
+  "sourceCommit": "a25896680ea0f27f80201f48c44034e1bfb73669",
+  "archiveSha256": "cff671ee536e59d87b7e1b5bd7b2a3a07f54452a4e916838d668525f24d2bf3a",
+  "allArchiveBytesMatch": true,
+  "allRuntimeCanonicalHashesMatch": true,
+  "hashConvention": "LF entries normalize CRLF to LF as declared in candidate-manifest; other bytes are preserved.",
+  "result": "PASS"
+}

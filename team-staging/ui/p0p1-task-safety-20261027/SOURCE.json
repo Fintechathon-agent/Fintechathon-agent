@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Shanghai",
+  "personalRepository": "https://github.com/lixjanus526-art/finance-lab-ui-preview",
+  "personalBaseBranch": "preview",
+  "personalBaseCommit": "ebd3a190f727d8060f12a9224b3e157084f7b43e",
+  "personalBranch": "codex/p0p1-task-safety-20261027",
+  "personalCommit": "a25896680ea0f27f80201f48c44034e1bfb73669",
+  "archiveSha256": "cff671ee536e59d87b7e1b5bd7b2a3a07f54452a4e916838d668525f24d2bf3a",
+  "teamRepository": "https://github.com/Fintechathon-agent/Fintechathon-agent",
+  "teamBaseCommit": "fa53166cec9e3fb1ee4d720a31e3066bcc3f3c66",
+  "teamBranch": "codex/ui-task-safety-20261027",
+  "coreReferenceCommit": "b88cfd27c229605b86fae9e50f5c6e88d4f17b7b",
+  "sharedReferenceBlobs": {
+    "chenchen/contracts/examples/health-check.response.json": "c68eb83aa0bd272b702d84900dda0c30aba611fd",
+    "chenchen/contracts/examples/model-review.response.json": "b3073d36948546cb69791f5d4a867605ac7d5c26",
+    "chenchen/contracts/risk-handoff.v1.schema.json": "4f0255d13fd0c6917894c1054240afdf4ed52426",
+    "chenchen/contracts/investment-agent.v1.schema.json": "4808b3eb6e248107122068439f29d51b3abc8875",
+    "chenchen/integrations/review-workflow.js": "2b1d71f7e12727bb9a02bfffb924cdba1233149c"
+  },
+  "provenance": "frontend is a Git archive of the personal commit; the listed reference blobs match current team main and the public Core reference.",
+  "runtimeHashConvention": "Entries marked lineEndings=LF normalize CRLF to LF; PRESERVE entries keep their bytes. The complete frontend matches the Git archive byte for byte.",
+  "deployment": "NOT_DEPLOYED",
+  "jointAcceptance": "WAITING_OWNERS",
+  "modelCallsThisRound": 0,
+  "execution_allowed": false,
+  "teamReleaseChanged": false,
+  "publicPreviewChanged": false
+}

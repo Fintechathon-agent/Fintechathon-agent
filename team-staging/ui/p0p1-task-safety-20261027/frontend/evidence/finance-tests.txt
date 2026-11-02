@@ -1,0 +1,27 @@
+审计待投递事件保留，将在下次请求重试
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\人工智能AI 比赛\qiqi\web\banking_service.py", line 103, in _flush_audit
+    log_action(event["action"], USER_ID, event["action_id"],
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\mock.py", line 1139, in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\mock.py", line 1143, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Y7000P\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\mock.py", line 1198, in _execute_mock_call
+    raise effect
+OSError: audit unavailable
+LLM 决策失败: fake timeout，尝试降级
+真实模型调用失败（不回退）: fake timeout
+======================================================================
+FAIL: test_explicit_date_still_works (test_nl_robustness.CrossSceneTests.test_explicit_date_still_works)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Y7000P\.codex\worktrees\finance-p0p1-20261027\人工智能AI 比赛\qiqi\tests\test_nl_robustness.py", line 140, in test_explicit_date_still_works
+    self.assertIn("2026-10-25", r.intent["slots"]["birthday"])
+AssertionError: '2026-10-25' not found in '2027-10-25'
+
+----------------------------------------------------------------------
+Ran 171 tests in 13.337s
+
+FAILED (failures=1)

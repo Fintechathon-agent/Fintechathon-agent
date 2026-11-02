@@ -1,0 +1,50 @@
+/* Match the shared black, gray and orange palette without changing layout or logos. */
+body.archive-workbench {
+  --canvas:#0b0a09;
+  --archive-surface:#191715;
+  --text-primary:#f3eee8;
+  --text-secondary:#c9c0b6;
+  --signal-orange:#ff914a;
+  --accent:var(--signal-orange);
+  --green:var(--signal-orange);
+  --paper:var(--canvas);
+  --ink:var(--text-primary);
+  --muted:var(--text-secondary);
+  color-scheme:dark;
+  background:var(--canvas);
+  color:var(--text-primary);
+}
+body.archive-workbench .accent-text,
+body.archive-workbench .eyebrow,
+body.archive-workbench .section-kicker { color:var(--signal-orange); }
+body.archive-workbench :is(button,.button) {
+  background:var(--signal-orange);
+  color:#17100a;
+  border-color:var(--signal-orange);
+}
+body.archive-workbench :is(button,.button):hover:not(:disabled) {
+  background:#ffad77;
+  border-color:#ffad77;
+  color:#17100a;
+}
+body.archive-workbench :is(button.secondary,.button.secondary,.tip-toggle,.subtle) {
+  background:transparent;
+  color:var(--signal-orange);
+  border-color:#88715c;
+}
+body.archive-workbench .sidebar .workspace-switch a[aria-current],
+body.archive-workbench .journey-item.active {
+  background:#302015;
+  color:#ffb47f;
+  border-color:#80502e;
+}
+body.archive-workbench summary { color:var(--signal-orange); }
+body.archive-workbench :is(input,select,textarea) {
+  background:#151310;
+  color:var(--text-primary);
+  border-color:#88715c;
+}
+body.archive-workbench input[type=checkbox] { accent-color:var(--signal-orange); }
+body.archive-workbench .plan-card.highlighted { border-color:var(--signal-orange); }
+body.archive-workbench :is(.notice,.inline-feedback,.review) { border-color:#80502e; }
+body.archive-workbench :focus-visible { outline-color:var(--signal-orange); }
