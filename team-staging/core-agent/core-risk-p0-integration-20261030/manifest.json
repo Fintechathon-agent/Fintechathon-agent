@@ -1,0 +1,35 @@
+{
+  "snapshot_version": "core-risk-p0-integration.v1",
+  "owner": "陈全宝（林粹）",
+  "area": "team-staging",
+  "status": "LOCAL_CANDIDATE_ONLINE_NO_GO",
+  "personal_repo": "https://github.com/realchenchenluo/agent",
+  "personal_branch": "codex/core-risk-p0-integration-20261030",
+  "personal_sha": "4f98bcfb",
+  "core_base_sha": "fe3a4baeb4046d74f43bee807ed5042cf5b6ea43",
+  "risk_commits": [
+    "e17c881c1b7d24747c039a25a8bf7447009f0456",
+    "c1cc3c4bbab4700b5c156f09a649cbbf62e979a6",
+    "b15dbc2da0bcb59aa0394d86ad3383e90ffe2925"
+  ],
+  "contract": {
+    "machine_identity": "CORE_AGENT_API_KEY",
+    "hmac_secret": "RISK_SERVICE_HMAC_SECRET",
+    "execution_mode": "PAPER",
+    "capabilities": ["REVIEW_ONLY", "SIMULATION_ONLY"],
+    "real_execution": false
+  },
+  "verification": {
+    "core_node": "438 passed, 1 skipped, 0 failed out of 439",
+    "risk_interface": "262 passed, 0 failed",
+    "joint_preflight": "20 passed, 0 failed",
+    "golden_path": "PASS",
+    "fixed_reviewer_wrong_identity": "OWNER_ACTOR_MISMATCH",
+    "strict_config_invalid": "FAIL_CLOSED",
+    "approval_trusted_identity_ready": false,
+    "real_model_calls": 0,
+    "real_financial_operations": 0
+  },
+  "release_area_changed": false,
+  "secrets_in_snapshot": false
+}
