@@ -1,0 +1,8 @@
+{
+  "name": "risk-interface-adapters",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline money conversion and non-dispatching Core Risk callback drafts",
+  "scripts": { "test": "node --test test/*.test.cjs", "examples:check": "node write-examples.cjs --check" },
+  "engines": { "node": ">=22" }
+}
