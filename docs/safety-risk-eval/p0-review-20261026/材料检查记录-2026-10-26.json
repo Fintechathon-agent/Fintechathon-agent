@@ -1,0 +1,1726 @@
+{
+  "artifact_type": "DOCUMENT_CONSISTENCY_REVIEW",
+  "date": "2026-10-26",
+  "scope": "DOCUMENTS_AND_DESIGNED_VECTORS_ONLY_NOT_APPLICATION_OR_STAGING_EXECUTION",
+  "baseline_sha": "4f0144715fa78114741139f22b76fbefb70cc14f",
+  "passed": 426,
+  "failed": 0,
+  "case_groups": 20,
+  "designed_boundary_vectors": 27,
+  "staging_cases_run": 0,
+  "staging_joint_acceptance": false,
+  "real_model_calls": 0,
+  "file_sha256": {
+    "README.md": "0f6715374a6af7d3e28d7ba87d05e0326bef75835d7b1d281408262027349a6e",
+    "接口差异表-v0.1.md": "155acfdfe4005ffd2969a0eba6491d309825a7f2b056d67ec7936bdf81475225",
+    "风险规则覆盖表-v0.1.md": "4a23187e0c32b9758079a48dcde4b40bd784e423cdf80502eb59373f56df7131",
+    "联合验收用例-v0.1.md": "2fc4bd5353f43342d769c4556b812f06f86cc971b26751a05ddefa11b24d33d1",
+    "联合验收用例-v0.1.json": "57465b62c087fa2cdaf257777e926ac4af7a5036e15e274f4cb0f7b9120a33a0"
+  },
+  "checks": [
+    {
+      "id": "utf8:README.md",
+      "result": "PASS"
+    },
+    {
+      "id": "utf8:接口差异表-v0.1.md",
+      "result": "PASS"
+    },
+    {
+      "id": "utf8:风险规则覆盖表-v0.1.md",
+      "result": "PASS"
+    },
+    {
+      "id": "utf8:联合验收用例-v0.1.md",
+      "result": "PASS"
+    },
+    {
+      "id": "utf8:联合验收用例-v0.1.json",
+      "result": "PASS"
+    },
+    {
+      "id": "case_ids",
+      "result": "PASS"
+    },
+    {
+      "id": "boundary_count",
+      "result": "PASS"
+    },
+    {
+      "id": "not_executed",
+      "result": "PASS"
+    },
+    {
+      "id": "no_real_calls_or_trades",
+      "result": "PASS"
+    },
+    {
+      "id": "JC01:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC01:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC01:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC01:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC02:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC02:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC02:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC02:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC03:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC03:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC03:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC03:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC04:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC04:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC04:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC04:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC05:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC05:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC05:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC05:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC06:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC06:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC06:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC06:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC07:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC07:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC07:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC07:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC08:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC08:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC08:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC08:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC09:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC09:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC09:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC09:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC10:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC10:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC10:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC10:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC11:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC11:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC11:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC11:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC12:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC12:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC12:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC12:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC13:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC13:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC13:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC13:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC14:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC14:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC14:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC14:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC15:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC15:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC15:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC15:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC17:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC17:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC17:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC17:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC18:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC18:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC18:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC18:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC19:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC19:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC19:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC19:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC20:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC20:references",
+      "result": "PASS"
+    },
+    {
+      "id": "JC20:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC20:gate",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_total-EQ:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_total-EQ:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_total-EQ:comparison",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_total-GT:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_total-GT:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_total-GT:comparison",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_total-EQ:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_total-EQ:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_total-EQ:comparison",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_total-GT:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_total-GT:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_total-GT:comparison",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_invested-EQ:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_invested-EQ:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_invested-EQ:comparison",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_invested-GT:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_invested-GT:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-single_invested-GT:comparison",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_invested-EQ:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_invested-EQ:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_invested-EQ:comparison",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_invested-GT:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_invested-GT:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-top3_invested-GT:comparison",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-sector_total-EQ:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-sector_total-EQ:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-sector_total-GT:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-sector_total-GT:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-sector_invested-EQ:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-sector_invested-EQ:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-sector_invested-GT:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-sector_invested-GT:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-UNKNOWN:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-UNKNOWN:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-KNOWN-EXCESS-WITH-UNKNOWN:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R05-KNOWN-EXCESS-WITH-UNKNOWN:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R06-DRAWDOWN:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R06-DRAWDOWN:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R07-PAIR-EQ:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R07-PAIR-EQ:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R07-PAIR-EQ:pair",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R07-PAIR-GT:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R07-PAIR-GT:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R07-PAIR-GT:pair",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R07-RHO-LT:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R07-RHO-LT:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R07-RHO-LT:pair",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-IMPROVEMENT-VALID:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-IMPROVEMENT-VALID:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-IMPROVEMENT-WORSENS:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-IMPROVEMENT-WORSENS:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D05-SOFT-BUDGET:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D05-SOFT-BUDGET:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D06-SOFT-RESERVE:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D06-SOFT-RESERVE:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D07-MISSING:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D07-MISSING:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D07-LATE:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D07-LATE:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-DUAL-BASIS:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-DUAL-BASIS:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-ZERO-INVESTED:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-R04-ZERO-INVESTED:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D07-LATEST-UNCERTAIN:schema",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D07-LATEST-UNCERTAIN:markdown",
+      "result": "PASS"
+    },
+    {
+      "id": "F01:protection",
+      "result": "PASS"
+    },
+    {
+      "id": "F01:free",
+      "result": "PASS"
+    },
+    {
+      "id": "JC01:cash",
+      "result": "PASS"
+    },
+    {
+      "id": "JC06:atomic",
+      "result": "PASS"
+    },
+    {
+      "id": "JC12:matched_payment",
+      "result": "PASS"
+    },
+    {
+      "id": "JC12:date_fixture",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D05-SOFT-BUDGET:enabled",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D06-SOFT-RESERVE:enabled",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D07-MISSING:dates",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D07-LATE:dates",
+      "result": "PASS"
+    },
+    {
+      "id": "JC16-D07-LATEST-UNCERTAIN:dates",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:R01",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:R02",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:R03",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:R04",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:R05",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:R06",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:R07",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:R08",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:R09",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:R10",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:D01",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:D02",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:D03",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:D04",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:D05",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:D06",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:D07",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:D08",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:P0-G01",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:P0-G02",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:P0-G03",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:P0-G04",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:P0-G05",
+      "result": "PASS"
+    },
+    {
+      "id": "coverage:P0-G06",
+      "result": "PASS"
+    },
+    {
+      "id": "link:README.md:接口差异表-v0.1.md",
+      "result": "PASS"
+    },
+    {
+      "id": "link:README.md:风险规则覆盖表-v0.1.md",
+      "result": "PASS"
+    },
+    {
+      "id": "link:README.md:联合验收用例-v0.1.md",
+      "result": "PASS"
+    },
+    {
+      "id": "link:README.md:联合验收用例-v0.1.json",
+      "result": "PASS"
+    },
+    {
+      "id": "link:README.md:材料检查记录-2026-10-26.json",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:194",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:195",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:196",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:197",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:198",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:199",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:200",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:201",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:202",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:203",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:204",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:205",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:206",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:207",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:208",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:209",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:210",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:211",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:212",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:213",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:214",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:215",
+      "result": "PASS"
+    },
+    {
+      "id": "table:README.md:216",
+      "result": "PASS"
+    },
+    {
+      "id": "link:接口差异表-v0.1.md:README.md",
+      "result": "PASS"
+    },
+    {
+      "id": "link:接口差异表-v0.1.md:联合验收用例-v0.1.md",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:219",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:220",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:221",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:222",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:223",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:224",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:225",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:226",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:227",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:228",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:229",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:230",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:231",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:232",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:233",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:234",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:235",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:236",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:237",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:238",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:239",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:240",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:241",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:242",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:243",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:244",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:245",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:246",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:247",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:248",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:249",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:250",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:251",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:252",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:253",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:254",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:255",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:256",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:257",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:258",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:259",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:260",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:261",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:262",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:263",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:264",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:265",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:266",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:267",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:268",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:269",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:270",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:271",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:272",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:273",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:274",
+      "result": "PASS"
+    },
+    {
+      "id": "table:接口差异表-v0.1.md:275",
+      "result": "PASS"
+    },
+    {
+      "id": "link:风险规则覆盖表-v0.1.md:README.md",
+      "result": "PASS"
+    },
+    {
+      "id": "link:风险规则覆盖表-v0.1.md:联合验收用例-v0.1.md",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:278",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:279",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:280",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:281",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:282",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:283",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:284",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:285",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:286",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:287",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:288",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:289",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:290",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:291",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:292",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:293",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:294",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:295",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:296",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:297",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:298",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:299",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:300",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:301",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:302",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:303",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:304",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:305",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:306",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:307",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:308",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:309",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:310",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:311",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:312",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:313",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:314",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:315",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:316",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:317",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:318",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:319",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:320",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:321",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:322",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:323",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:324",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:325",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:326",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:327",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:328",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:329",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:330",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:331",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:332",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:333",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:334",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:335",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:336",
+      "result": "PASS"
+    },
+    {
+      "id": "table:风险规则覆盖表-v0.1.md:337",
+      "result": "PASS"
+    },
+    {
+      "id": "link:联合验收用例-v0.1.md:接口差异表-v0.1.md",
+      "result": "PASS"
+    },
+    {
+      "id": "link:联合验收用例-v0.1.md:风险规则覆盖表-v0.1.md",
+      "result": "PASS"
+    },
+    {
+      "id": "link:联合验收用例-v0.1.md:README.md",
+      "result": "PASS"
+    },
+    {
+      "id": "link:联合验收用例-v0.1.md:联合验收用例-v0.1.json",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:342",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:343",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:344",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:345",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:346",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:347",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:348",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:349",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:350",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:351",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:352",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:353",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:354",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:355",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:356",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:357",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:358",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:359",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:360",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:361",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:362",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:363",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:364",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:365",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:366",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:367",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:368",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:369",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:370",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:371",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:372",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:373",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:374",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:375",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:376",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:377",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:378",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:379",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:380",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:381",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:382",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:383",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:384",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:385",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:386",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:387",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:388",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:389",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:390",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:391",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:392",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:393",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:394",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:395",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:396",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:397",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:398",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:399",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:400",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:401",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:402",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:403",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:404",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:405",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:406",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:407",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:408",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:409",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:410",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:411",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:412",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:413",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:414",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:415",
+      "result": "PASS"
+    },
+    {
+      "id": "table:联合验收用例-v0.1.md:416",
+      "result": "PASS"
+    },
+    {
+      "id": "source:4f01447:chenchen/docs/core-agent-daily-update-2026-10-25.md",
+      "result": "PASS"
+    },
+    {
+      "id": "source:3c66ff8:docs/integration/competition-handoff-2026-10-25.md",
+      "result": "PASS"
+    },
+    {
+      "id": "source:d63bf44:docs/safety-risk-eval/contracts/rules/R01.json",
+      "result": "PASS"
+    },
+    {
+      "id": "source:9e6bed1:chenchen/docs/core-risk-cloud-deployment-2026-10-21.md",
+      "result": "PASS"
+    },
+    {
+      "id": "source:27bdefb:docs/safety-risk-eval/接口字段对应与回调适配-v1.0.md",
+      "result": "PASS"
+    },
+    {
+      "id": "source:cf06879:team-staging/ui/tinglan-ai-20261018/share-worker.mjs",
+      "result": "PASS"
+    },
+    {
+      "id": "source:4b35156:docs/safety-risk-eval/网络异常监测与恢复-v1.0.md",
+      "result": "PASS"
+    },
+    {
+      "id": "attachment:team-api-handoff-20261024.zip",
+      "result": "PASS"
+    },
+    {
+      "id": "attachment:p0-2-identity-funds-closure-2026-10-25(1).md",
+      "result": "PASS"
+    }
+  ]
+}
