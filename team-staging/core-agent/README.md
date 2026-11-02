@@ -2,6 +2,8 @@
 
 | 内容 | 用途 | 状态 |
 | --- | --- | --- |
+| [Core／Risk Cloudflare 联调部署](../../chenchen/docs/core-risk-cloud-deployment-2026-10-21.md) | 独立双 Worker、服务端身份、SQLite 审计和原 Risk 规则适配 | 已部署；14 项公网检查、9 项专项通过；模型调用关闭，完整联合验收未完成 |
+| [Core／Risk 身份与回调接线准备](../../chenchen/docs/core-risk-callback-setup-2026-10-21.md) | 固定审核人、机器身份、配置预检与 PR #27 兼容验证；公共回调字段不变 | Core 304/304、Risk Node 258/258、Python 16/16、跨模块 5/5；模型替身，尚未部署／联合验收 |
 | [投资页设计层接回](../../chenchen/docs/investment-ui-iteration-2026-10-20.md) | 对照团队工作台补回资产总览、风控工作台、重点卡片和分区跳转；保留易读报告和 Risk Handoff 边界 | 本地浏览器实测通过；待团队确认后再进入正式交付区 |
 | [易读报告与10000例复测](report-benchmark-v6/DELIVERY.md) | 先结论后细节、TXT导出、中文测试分类、缺资料保护 | 9900→10000/10000，284项回归通过；本地模拟，正式联合验收待完成 |
 | [追加10000例：多任务资金与接口边界](integration-benchmark-v5/DELIVERY.md) | 重试字段顺序兼容、旧任务兼容、签名与跨任务回写阻断 | 9750→10000/10000，278项回归通过；本地模拟，未部署生产 |

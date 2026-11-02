@@ -13,6 +13,7 @@ from __future__ import annotations
 import re
 from collections import Counter, defaultdict
 from datetime import datetime
+from decimal import Decimal
 
 from contracts.banking import BillAnomaly, BillRecord, BillReport
 
@@ -22,9 +23,13 @@ def detect_anomalies(records: list[BillRecord]) -> list[BillAnomaly]:
 
     by_merchant: dict[str, list[BillRecord]] = defaultdict(list)
     for r in records:
+        if r.amount <= 0:
+            continue
         by_merchant[r.merchant].append(r)
 
     for r in records:
+        if r.amount <= 0:
+            continue
         if r.amount >= 5000:
             anomalies.append(BillAnomaly(
                 rule="large_amount", severity="warning", tx_id=r.tx_id,
@@ -67,27 +72,40 @@ def detect_anomalies(records: list[BillRecord]) -> list[BillAnomaly]:
 
 
 def analyze_period(records: list[BillRecord], period: str) -> BillReport:
-    """按周期聚合：period 形如 2026-10 或 2026。"""
-    if len(period) == 7:       # 月
+    """按周期聚合；上传文件可明确使用“上传文件全部记录”。"""
+    if period == "上传文件全部记录":
+        rows = list(records)
+    elif len(period) == 7:       # 月
         rows = [r for r in records if r.ts[:7] == period]
     else:                      # 年
         rows = [r for r in records if r.ts[:4] == period]
 
+    def minor(record: BillRecord) -> int:
+        cents = Decimal(str(record.amount)) * 100
+        if not cents.is_finite() or cents != cents.to_integral_value():
+            raise ValueError("账单金额须精确到分")
+        return int(cents)
+
     spend_rows = [r for r in rows if r.amount > 0]
-    total = round(sum(r.amount for r in spend_rows), 2)
-    by_category: dict[str, float] = defaultdict(float)
-    for r in spend_rows:
-        by_category[r.category] = round(by_category[r.category] + r.amount, 2)
-    top = Counter()
-    for r in spend_rows:
-        top[r.merchant] += r.amount
-    top_merchants = [(m, round(v, 2)) for m, v in top.most_common(5)]
+    refund_rows = [r for r in rows if r.amount < 0]
+    included = spend_rows + refund_rows
+    total_minor = sum(minor(r) for r in included)
+    total = total_minor / 100
+    by_category_minor: dict[str, int] = defaultdict(int)
+    top_minor: dict[str, int] = defaultdict(int)
+    for r in included:
+        by_category_minor[r.category] += minor(r)
+        top_minor[r.merchant] += minor(r)
+    by_category = {key: value / 100 for key, value in by_category_minor.items()}
+    top_merchants = [(key, value / 100) for key, value in sorted(top_minor.items(), key=lambda item: item[1], reverse=True)[:5]]
 
     insights: list[str] = []
     if by_category:
         biggest_cat, biggest_val = max(by_category.items(), key=lambda kv: kv[1])
         pct = biggest_val / total * 100 if total else 0
         insights.append(f"{period} 最大支出类别为「{biggest_cat}」共 {biggest_val:,.0f} 元（{pct:.0f}%）")
+    if refund_rows:
+        insights.append(f"{len(refund_rows)} 笔退款已抵减同期间支出；收入不计入支出，重复扣款保留并标记")
     anomalies = detect_anomalies(rows)
     if anomalies:
         warns = [a for a in anomalies if a.severity == "warning"]

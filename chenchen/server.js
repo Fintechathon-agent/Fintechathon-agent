@@ -12,6 +12,7 @@ const modelReview = require("./integrations/model-review");
 const legacyReviewAdapter = require("./integrations/legacy-review-adapter");
 const riskHandoff = require("./integrations/risk-handoff");
 const ownerBridge = require("./integrations/owner-bridge");
+const serviceSecurity = require("./integrations/service-security");
 const { ReviewWorkflowStore, WorkflowError } = require("./integrations/review-workflow");
 const { randomUUID } = require("node:crypto");
 const { MerchantSession, demo: merchantDemo } = require("./merchant/ledger");
@@ -107,13 +108,7 @@ function parseBody(request) {
 }
 
 function requireReviewApiKey(request) {
-  const expected = String(process.env.CORE_AGENT_API_KEY || "").trim();
-  if (!expected || request.headers["x-core-agent-key"] === expected) return;
-  throw new modelReview.ReviewError("AUTHENTICATION_REQUIRED", "API authentication is required", {
-    statusCode: 401,
-    stage: "AUTHENTICATION",
-    recovery: "Provide the configured X-Core-Agent-Key and retry."
-  });
+  serviceSecurity.verifyCoreRequest(request.headers, process.env);
 }
 
 function storeReviewRun(result) {
@@ -172,6 +167,11 @@ async function handleApi(request, response, pathname, url) {
   let body = {};
   if (method === "POST") body = await parseBody(request);
   if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("JSON body must be an object");
+  if (method === "GET" && pathname === "/api/review/capabilities") {
+    requireReviewApiKey(request);
+    sendJson(response, 200, serviceSecurity.capabilityStatus(process.env));
+    return true;
+  }
   if (method === "POST" && (pathname === "/api/review" || pathname === "/api/review/legacy")) {
     body = {
       ...body,

@@ -41,6 +41,7 @@ _PRIVILEGE_BYPASS_RE = re.compile(
 _OUT_OF_SCOPE_RE = re.compile(
     r"(机票|酒店|外卖|天气|打车|游戏|考试|写代码|写\s*.{0,6}\s*(作文|文章|论文))"
 )
+_FUND_DEFINITION_RE = re.compile(r"^\s*(基金是什么|什么是基金)[？?。！!\s]*$")
 
 
 def detect_scenario(text: str) -> str:
@@ -109,6 +110,16 @@ def route(
             plan={"intent": "out_of_scope", "nodes": []},
             tier="green", status="done",
             message="银行 AI 智能体只办理银行业务：转账、账单、理财、卡片、订阅与跨场景联动。",
+        )
+
+    if _FUND_DEFINITION_RE.fullmatch(question):
+        return ScenarioResult(
+            scenario="wealth", scenario_label="基金知识解释",
+            intent={"name": "fund_knowledge", "label": "基金知识问题", "question": question},
+            plan={"intent": "fund_knowledge", "nodes": []}, tier="green", status="done",
+            data={"answer_source": "curated_definition", "execution_required": False},
+            message="基金是把多位投资者的资金汇集起来，按基金合同约定投资和管理的产品。不同基金的资产、费用和风险不同；仅凭这个问题不能判断你是否该买入或卖出。",
+            audit_actions=[("banking_fund_knowledge_query", {"source": "curated_definition"})],
         )
 
     scenario = detect_scenario(question)
@@ -295,7 +306,10 @@ def _run_transfer(question, contacts, balance, daily_cumulative, plan, label) ->
 
 
 def _run_bill(question, bills_data, plan, label) -> ScenarioResult:
-    period = bills.parse_bill_period(question)
+    explicit_period = re.search(r"\d{4}\s*年|去年|今年|上个月|上月|这个月|本月|当月", question)
+    period = ("上传文件全部记录" if not explicit_period and
+              any(r.source == "uploaded_file" for r in bills_data)
+              else bills.parse_bill_period(question))
     report = bills.analyze_period(bills_data, period)
     mark_plan(plan, "validate", "done")
     mark_plan(plan, "period", "done")

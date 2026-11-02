@@ -1,0 +1,30 @@
+{
+  "schema_status": "DRAFT",
+  "source_main_commit": "7fc144ba38b23356d662aa65117028b81521fafc",
+  "description_zh": "上游由主分支Harness生成，Risk预期手工编写。画像、计划和行业补充均虚构。ERROR输入通过形状校验但故意引用错误。没有执行交易或写入正式审计。",
+  "cases": [
+    {
+      "name": "allow",
+      "expected_decision": "ALLOW",
+      "expected_input_semantic_errors": []
+    },
+    {
+      "name": "review",
+      "expected_decision": "REVIEW",
+      "expected_input_semantic_errors": []
+    },
+    {
+      "name": "block",
+      "expected_decision": "BLOCK",
+      "expected_input_semantic_errors": []
+    },
+    {
+      "name": "error",
+      "expected_decision": "ERROR",
+      "expected_input_semantic_errors": [
+        "EVIDENCE_MISMATCH"
+      ]
+    }
+  ],
+  "compatibility_note_zh": "2026-10-14：保留原始虚构财务事实，补齐新共享契约所需 trace 与 audit_evidence，并重算预期输入摘要。补充审计明确标为手工兼容示例，不代表生产 Core 执行记录。"
+}

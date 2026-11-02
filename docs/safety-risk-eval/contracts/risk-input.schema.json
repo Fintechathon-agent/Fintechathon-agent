@@ -1,0 +1,560 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fintechathon-agent.github.io/contracts/risk-draft/risk-input.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "risk-contract.v0.1-draft"
+    },
+    "schema_status": {
+      "const": "DRAFT"
+    },
+    "risk_request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stage": {
+      "enum": [
+        "PLAN_REVIEW",
+        "EXECUTION_PREFLIGHT"
+      ]
+    },
+    "requested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "upstream": {
+      "$ref": "https://fintechathon-agent.github.io/contracts/investment-agent.v1.schema.json#/$defs/HealthCheckResponse"
+    },
+    "binding": {
+      "$ref": "https://fintechathon-agent.github.io/contracts/risk-draft/common.schema.json#/$defs/Binding"
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "environment": {
+          "const": "demo"
+        },
+        "identity_source": {
+          "enum": [
+            "DEMO_FIXTURE",
+            "TRUSTED_RUNTIME"
+          ]
+        },
+        "actor_user_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "portfolio_owner_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authorized_tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "requested_tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requested_operation": {
+          "enum": [
+            "ANALYZE",
+            "PAPER_TRADE",
+            "REAL_TRADE"
+          ]
+        },
+        "external_content_may_grant_permission": {
+          "const": false
+        }
+      },
+      "required": [
+        "environment",
+        "identity_source",
+        "actor_user_id",
+        "portfolio_owner_id",
+        "authorized_tools",
+        "requested_tool",
+        "requested_operation",
+        "external_content_may_grant_permission"
+      ]
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "confirmed_by_user": {
+          "type": "boolean"
+        },
+        "confirmed_by": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confirmed_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unknown_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "reserve_cash": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "max_historical_drawdown": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forbidden_instruments": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "allowed_instruments": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "confirmed_by_user",
+        "confirmed_by",
+        "confirmed_at",
+        "unknown_fields",
+        "reserve_cash",
+        "max_historical_drawdown",
+        "forbidden_instruments",
+        "allowed_instruments"
+      ]
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "purpose": {
+          "enum": [
+            "COMPARE",
+            "SIMULATE"
+          ]
+        },
+        "data_mode": {
+          "enum": [
+            "SYNTHETIC_REPLAY",
+            "HISTORICAL_REPLAY",
+            "LATEST_AVAILABLE"
+          ]
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "step_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "replay_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "orders": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "instrument_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "side": {
+                      "enum": [
+                        "BUY",
+                        "SELL"
+                      ]
+                    },
+                    "quantity": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "reference_price": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "estimated_fee": {
+                      "type": "number",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "instrument_id",
+                    "side",
+                    "quantity",
+                    "reference_price",
+                    "estimated_fee"
+                  ]
+                },
+                "minItems": 0
+              },
+              "cash_before": {
+                "type": "number",
+                "minimum": 0
+              },
+              "cash_after": {
+                "type": "number",
+                "minimum": 0
+              },
+              "sellable_quantities": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            "required": [
+              "step_id",
+              "replay_date",
+              "orders",
+              "cash_before",
+              "cash_after",
+              "sellable_quantities"
+            ]
+          },
+          "minItems": 1
+        },
+        "improvement_focus": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "metric": {
+                  "enum": [
+                    "SINGLE_ASSET",
+                    "TOP_THREE",
+                    "SECTOR"
+                  ]
+                },
+                "basis": {
+                  "enum": [
+                    "TOTAL_ASSETS",
+                    "INVESTED_ASSETS"
+                  ]
+                },
+                "subject_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "baseline_evidence_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "metric",
+                "basis",
+                "subject_id",
+                "baseline_evidence_ref"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "purpose",
+        "data_mode",
+        "steps",
+        "improvement_focus"
+      ]
+    },
+    "data_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "usage": {
+          "enum": [
+            "HISTORICAL_REPLAY",
+            "CURRENT_ADVICE"
+          ]
+        },
+        "freshness_policy_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "valid_until": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "classification": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "instrument_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sector_weights": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "unknown_weight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1
+              },
+              "as_of": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "taxonomy": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "instrument_id",
+              "sector_weights",
+              "unknown_weight",
+              "source",
+              "as_of",
+              "taxonomy",
+              "version"
+            ]
+          },
+          "minItems": 1
+        },
+        "trading_rules": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "source": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "as_of": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "instruments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "instrument_id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "lot_size": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "calendar_ref": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "settlement_ref": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "fee_schedule_ref": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "instrument_id",
+                      "lot_size",
+                      "calendar_ref",
+                      "settlement_ref",
+                      "fee_schedule_ref"
+                    ]
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "version",
+                "source",
+                "as_of",
+                "instruments"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "source",
+        "as_of",
+        "version",
+        "usage",
+        "freshness_policy_id",
+        "valid_until",
+        "classification",
+        "trading_rules"
+      ]
+    },
+    "approval": {
+      "$ref": "https://fintechathon-agent.github.io/contracts/risk-draft/common.schema.json#/$defs/Approval"
+    },
+    "execution": {
+      "$ref": "https://fintechathon-agent.github.io/contracts/risk-draft/common.schema.json#/$defs/Execution"
+    },
+    "audit_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "correlation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pre_execution_record_status": {
+          "enum": [
+            "NOT_ATTEMPTED",
+            "RECORDED",
+            "FAILED"
+          ]
+        },
+        "pre_execution_record_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "correlation_id",
+        "pre_execution_record_status",
+        "pre_execution_record_id"
+      ]
+    }
+  },
+  "required": [
+    "contract_version",
+    "schema_status",
+    "risk_request_id",
+    "stage",
+    "requested_at",
+    "upstream",
+    "binding",
+    "context",
+    "profile",
+    "plan",
+    "data_context",
+    "approval",
+    "execution",
+    "audit_context"
+  ]
+}
