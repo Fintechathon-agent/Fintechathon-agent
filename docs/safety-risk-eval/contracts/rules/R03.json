@@ -1,0 +1,45 @@
+{
+  "rule_id": "R03",
+  "title_zh": "资金、可卖持仓与用户硬约束",
+  "version": "risk-rules.v0.1-draft",
+  "status": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW",
+  "stages": [
+    "PLAN_REVIEW",
+    "EXECUTION_PREFLIGHT"
+  ],
+  "check_key": "capacity_and_constraints",
+  "input_refs": [
+    "/plan/steps",
+    "/profile"
+  ],
+  "conditions": [
+    {
+      "condition_id": "R03-policy",
+      "metric": "capacity_and_constraints",
+      "operator": "POLICY_CHECK",
+      "threshold": null,
+      "threshold_ref": null,
+      "unit": "POLICY",
+      "basis": "POLICY",
+      "group": "ANY"
+    }
+  ],
+  "reason_codes": [
+    "INSUFFICIENT_CASH",
+    "INSUFFICIENT_SELLABLE_QUANTITY",
+    "RESERVE_CASH_VIOLATION",
+    "FORBIDDEN_ASSET"
+  ],
+  "failure_decisions": [
+    "BLOCK"
+  ],
+  "acceptance_policy_zh": "硬约束不可接受覆盖。",
+  "enforcement_owner": [
+    "RISK",
+    "ORCHESTRATOR",
+    "TOOLS"
+  ],
+  "recovery_zh": "补充资金、修改持仓或由用户重新确认约束后重检。",
+  "source": "MODULE4_PROPOSAL",
+  "notes_zh": "配置仅供队内虚构演示；规则定义不是可执行规则引擎。"
+}
