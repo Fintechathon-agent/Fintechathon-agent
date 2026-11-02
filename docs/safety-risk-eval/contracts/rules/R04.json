@@ -1,0 +1,75 @@
+{
+  "rule_id": "R04",
+  "title_zh": "单只与前三大资产集中度",
+  "version": "risk-rules.v0.1-draft",
+  "status": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW",
+  "stages": [
+    "PLAN_REVIEW",
+    "EXECUTION_PREFLIGHT"
+  ],
+  "check_key": "asset_concentration",
+  "input_refs": [
+    "/upstream/artifacts/candidates",
+    "/upstream/artifacts/portfolio_snapshot"
+  ],
+  "conditions": [
+    {
+      "condition_id": "R04-single_total",
+      "metric": "single_total",
+      "operator": "GT",
+      "threshold": 0.35,
+      "threshold_ref": null,
+      "unit": "RATIO",
+      "basis": "TOTAL_ASSETS",
+      "group": "ANY"
+    },
+    {
+      "condition_id": "R04-top3_total",
+      "metric": "top3_total",
+      "operator": "GT",
+      "threshold": 0.75,
+      "threshold_ref": null,
+      "unit": "RATIO",
+      "basis": "TOTAL_ASSETS",
+      "group": "ANY"
+    },
+    {
+      "condition_id": "R04-single_invested",
+      "metric": "single_invested",
+      "operator": "GT",
+      "threshold": 0.5,
+      "threshold_ref": null,
+      "unit": "RATIO",
+      "basis": "INVESTED_ASSETS",
+      "group": "ANY"
+    },
+    {
+      "condition_id": "R04-top3_invested",
+      "metric": "top3_invested",
+      "operator": "GT",
+      "threshold": 0.9,
+      "threshold_ref": null,
+      "unit": "RATIO",
+      "basis": "INVESTED_ASSETS",
+      "group": "ANY"
+    }
+  ],
+  "reason_codes": [
+    "SINGLE_ASSET_LIMIT_EXCEEDED",
+    "TOP_THREE_LIMIT_EXCEEDED",
+    "GRADUAL_IMPROVEMENT_ACCEPTANCE"
+  ],
+  "failure_decisions": [
+    "BLOCK",
+    "REVIEW"
+  ],
+  "acceptance_policy_zh": "仅合格的逐步改善例外允许逐项接受。",
+  "enforcement_owner": [
+    "RISK",
+    "ORCHESTRATOR",
+    "TOOLS"
+  ],
+  "recovery_zh": "降低占比，或提交符合全部条件的逐步改善方案。",
+  "source": "MODULE4_PROPOSAL",
+  "notes_zh": "现金不参与排名；等于阈值不超限。逐步改善要求选定重点严格下降，两个口径均无新增或加重的其他硬超限，剩余超限逐项接受；不能覆盖R01/R03。零投资分母标记不适用，不计算为0%。"
+}

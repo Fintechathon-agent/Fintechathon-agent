@@ -1,0 +1,804 @@
+{
+  "version": "request-corpus.v1",
+  "provenance": "ASSISTANT_AUTHORED_SYNTHETIC",
+  "purpose": "开发分类和回归验证；未使用用户原案例、真实银行流水或个人身份资料",
+  "cases": [
+    {
+      "id": "cash-01",
+      "split": "development",
+      "text": "我现在有现金三万元",
+      "expected": [
+        "CASH"
+      ]
+    },
+    {
+      "id": "cash-02",
+      "split": "development",
+      "text": "银行卡里有48000元",
+      "expected": [
+        "CASH"
+      ]
+    },
+    {
+      "id": "cash-03",
+      "split": "regression",
+      "text": "手头还有2.5万元",
+      "expected": [
+        "CASH"
+      ]
+    },
+    {
+      "id": "cash-04",
+      "split": "development",
+      "text": "活期余额8000元",
+      "expected": [
+        "CASH"
+      ]
+    },
+    {
+      "id": "cash-05",
+      "split": "development",
+      "text": "可用资金是6000元",
+      "expected": [
+        "CASH"
+      ]
+    },
+    {
+      "id": "cash-06",
+      "split": "regression",
+      "text": "帮我查一下余额",
+      "expected": [
+        "CASH"
+      ]
+    },
+    {
+      "id": "income-01",
+      "split": "development",
+      "text": "下月工资9000元",
+      "expected": [
+        "INCOME"
+      ]
+    },
+    {
+      "id": "income-02",
+      "split": "development",
+      "text": "我每月薪水12000元",
+      "expected": [
+        "INCOME"
+      ]
+    },
+    {
+      "id": "income-03",
+      "split": "regression",
+      "text": "今年奖金2万元还没到账",
+      "expected": [
+        "INCOME"
+      ]
+    },
+    {
+      "id": "income-04",
+      "split": "development",
+      "text": "医疗报销3000元预计下周回来",
+      "expected": [
+        "INCOME"
+      ]
+    },
+    {
+      "id": "income-05",
+      "split": "development",
+      "text": "机票退款1500元还没收到",
+      "expected": [
+        "INCOME"
+      ]
+    },
+    {
+      "id": "income-06",
+      "split": "regression",
+      "text": "奖学金每月5000元",
+      "expected": [
+        "INCOME"
+      ]
+    },
+    {
+      "id": "expense-01",
+      "split": "development",
+      "text": "下个月房租3500元",
+      "expected": [
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "expense-02",
+      "split": "development",
+      "text": "学费下周交18000元",
+      "expected": [
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "expense-03",
+      "split": "regression",
+      "text": "生活费每月2500元",
+      "expected": [
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "expense-04",
+      "split": "development",
+      "text": "下周要看病花3000元",
+      "expected": [
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "expense-05",
+      "split": "development",
+      "text": "今年保费6000元",
+      "expected": [
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "expense-06",
+      "split": "regression",
+      "text": "旅行预算7000元",
+      "expected": [
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "expense-07",
+      "split": "development",
+      "text": "换一台电脑要8000元",
+      "expected": [
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "expense-08",
+      "split": "development",
+      "text": "吃饭每天60元",
+      "expected": [
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "debt-01",
+      "split": "development",
+      "text": "信用卡下月要还4500元",
+      "expected": [
+        "DEBT"
+      ]
+    },
+    {
+      "id": "debt-02",
+      "split": "development",
+      "text": "房贷月供6000元",
+      "expected": [
+        "DEBT"
+      ]
+    },
+    {
+      "id": "debt-03",
+      "split": "regression",
+      "text": "准备提前还款3万元",
+      "expected": [
+        "DEBT"
+      ]
+    },
+    {
+      "id": "debt-04",
+      "split": "development",
+      "text": "花呗还有2000元待还",
+      "expected": [
+        "DEBT"
+      ]
+    },
+    {
+      "id": "debt-05",
+      "split": "development",
+      "text": "想借款一万元",
+      "expected": [
+        "DEBT"
+      ]
+    },
+    {
+      "id": "debt-06",
+      "split": "regression",
+      "text": "贷款年利率4%怎么安排还款",
+      "expected": [
+        "DEBT"
+      ]
+    },
+    {
+      "id": "savings-01",
+      "split": "development",
+      "text": "应急金留两万元",
+      "expected": [
+        "SAVINGS"
+      ]
+    },
+    {
+      "id": "savings-02",
+      "split": "development",
+      "text": "我想每月存钱1000元",
+      "expected": [
+        "SAVINGS"
+      ]
+    },
+    {
+      "id": "savings-03",
+      "split": "regression",
+      "text": "把定期存款留到到期",
+      "expected": [
+        "SAVINGS"
+      ]
+    },
+    {
+      "id": "savings-04",
+      "split": "development",
+      "text": "备用金不能动",
+      "expected": [
+        "SAVINGS"
+      ]
+    },
+    {
+      "id": "savings-05",
+      "split": "development",
+      "text": "我希望储蓄三万元",
+      "expected": [
+        "SAVINGS"
+      ]
+    },
+    {
+      "id": "savings-06",
+      "split": "regression",
+      "text": "退休养老金要留一笔",
+      "expected": [
+        "SAVINGS"
+      ]
+    },
+    {
+      "id": "investment-01",
+      "split": "development",
+      "text": "想投资5000元",
+      "expected": [
+        "INVESTMENT"
+      ]
+    },
+    {
+      "id": "investment-02",
+      "split": "development",
+      "text": "每月定投指数基金1000元",
+      "expected": [
+        "INVESTMENT"
+      ]
+    },
+    {
+      "id": "investment-03",
+      "split": "regression",
+      "text": "我想买股票",
+      "expected": [
+        "INVESTMENT"
+      ]
+    },
+    {
+      "id": "investment-04",
+      "split": "development",
+      "text": "准备all in AI",
+      "expected": [
+        "INVESTMENT"
+      ]
+    },
+    {
+      "id": "investment-05",
+      "split": "development",
+      "text": "剩余的钱买基金",
+      "expected": [
+        "INVESTMENT"
+      ]
+    },
+    {
+      "id": "investment-06",
+      "split": "regression",
+      "text": "想投纳斯达克",
+      "expected": [
+        "INVESTMENT"
+      ]
+    },
+    {
+      "id": "portfolio-01",
+      "split": "development",
+      "text": "帮我分析目前的持仓",
+      "expected": [
+        "PORTFOLIO"
+      ]
+    },
+    {
+      "id": "portfolio-02",
+      "split": "development",
+      "text": "看看我的仓位风险",
+      "expected": [
+        "PORTFOLIO"
+      ]
+    },
+    {
+      "id": "portfolio-03",
+      "split": "regression",
+      "text": "持有的基金亏了怎么办",
+      "expected": [
+        "PORTFOLIO"
+      ]
+    },
+    {
+      "id": "portfolio-04",
+      "split": "development",
+      "text": "准备赎回这只基金",
+      "expected": [
+        "PORTFOLIO"
+      ]
+    },
+    {
+      "id": "portfolio-05",
+      "split": "development",
+      "text": "检查我的投资组合风险",
+      "expected": [
+        "PORTFOLIO"
+      ]
+    },
+    {
+      "id": "portfolio-06",
+      "split": "regression",
+      "text": "我想调仓",
+      "expected": [
+        "PORTFOLIO"
+      ]
+    },
+    {
+      "id": "comparison-01",
+      "split": "development",
+      "text": "帮我比价这台手机",
+      "expected": [
+        "COMPARISON"
+      ]
+    },
+    {
+      "id": "comparison-02",
+      "split": "development",
+      "text": "同款商品哪个平台便宜",
+      "expected": [
+        "COMPARISON"
+      ]
+    },
+    {
+      "id": "comparison-03",
+      "split": "regression",
+      "text": "比较两家的电脑报价",
+      "expected": [
+        "COMPARISON"
+      ]
+    },
+    {
+      "id": "comparison-04",
+      "split": "development",
+      "text": "京东这款优惠后价格怎么样",
+      "expected": [
+        "COMPARISON"
+      ]
+    },
+    {
+      "id": "comparison-05",
+      "split": "development",
+      "text": "同款手机两个平台价格不一样",
+      "expected": [
+        "COMPARISON"
+      ]
+    },
+    {
+      "id": "comparison-06",
+      "split": "regression",
+      "text": "哪里买冰箱划算",
+      "expected": [
+        "COMPARISON"
+      ]
+    },
+    {
+      "id": "subscription-01",
+      "split": "development",
+      "text": "视频会员每月30元",
+      "expected": [
+        "SUBSCRIPTION"
+      ]
+    },
+    {
+      "id": "subscription-02",
+      "split": "development",
+      "text": "想取消音乐订阅",
+      "expected": [
+        "SUBSCRIPTION"
+      ]
+    },
+    {
+      "id": "subscription-03",
+      "split": "regression",
+      "text": "下个月自动续费128元",
+      "expected": [
+        "SUBSCRIPTION"
+      ]
+    },
+    {
+      "id": "subscription-04",
+      "split": "development",
+      "text": "不要再自动扣款",
+      "expected": [
+        "SUBSCRIPTION"
+      ]
+    },
+    {
+      "id": "subscription-05",
+      "split": "development",
+      "text": "已经取消会员了",
+      "expected": [
+        "SUBSCRIPTION"
+      ]
+    },
+    {
+      "id": "subscription-06",
+      "split": "regression",
+      "text": "订阅是否值得继续",
+      "expected": [
+        "SUBSCRIPTION"
+      ]
+    },
+    {
+      "id": "transfer-01",
+      "split": "development",
+      "text": "帮我转账500元",
+      "expected": [
+        "TRANSFER"
+      ]
+    },
+    {
+      "id": "transfer-02",
+      "split": "development",
+      "text": "我要转给同学200元",
+      "expected": [
+        "TRANSFER"
+      ]
+    },
+    {
+      "id": "transfer-03",
+      "split": "regression",
+      "text": "想向家人汇款3000元",
+      "expected": [
+        "TRANSFER"
+      ]
+    },
+    {
+      "id": "transfer-04",
+      "split": "development",
+      "text": "把钱从一个账户转到另一个账户",
+      "expected": [
+        "TRANSFER"
+      ]
+    },
+    {
+      "id": "transfer-05",
+      "split": "development",
+      "text": "这笔转入还没收到",
+      "expected": [
+        "TRANSFER"
+      ]
+    },
+    {
+      "id": "transfer-06",
+      "split": "regression",
+      "text": "不需要转出这笔钱",
+      "expected": [
+        "TRANSFER"
+      ]
+    },
+    {
+      "id": "account_security-01",
+      "split": "development",
+      "text": "我的银行卡丢了",
+      "expected": [
+        "ACCOUNT_SECURITY"
+      ]
+    },
+    {
+      "id": "account_security-02",
+      "split": "development",
+      "text": "我想挂失信用卡",
+      "expected": [
+        "ACCOUNT_SECURITY"
+      ]
+    },
+    {
+      "id": "account_security-03",
+      "split": "regression",
+      "text": "银行卡疑似被盗刷",
+      "expected": [
+        "ACCOUNT_SECURITY"
+      ]
+    },
+    {
+      "id": "account_security-04",
+      "split": "development",
+      "text": "发现一笔陌生扣款",
+      "expected": [
+        "ACCOUNT_SECURITY"
+      ]
+    },
+    {
+      "id": "account_security-05",
+      "split": "development",
+      "text": "账户被冻结了怎么办",
+      "expected": [
+        "ACCOUNT_SECURITY"
+      ]
+    },
+    {
+      "id": "account_security-06",
+      "split": "regression",
+      "text": "有人让我提供验证码可能是诈骗",
+      "expected": [
+        "ACCOUNT_SECURITY"
+      ]
+    },
+    {
+      "id": "explanation-01",
+      "split": "development",
+      "text": "什么是基金",
+      "expected": [
+        "EXPLANATION"
+      ]
+    },
+    {
+      "id": "explanation-02",
+      "split": "development",
+      "text": "定投是什么意思",
+      "expected": [
+        "EXPLANATION"
+      ]
+    },
+    {
+      "id": "explanation-03",
+      "split": "regression",
+      "text": "复利如何计算",
+      "expected": [
+        "EXPLANATION"
+      ]
+    },
+    {
+      "id": "explanation-04",
+      "split": "development",
+      "text": "解释一下信用卡最低还款",
+      "expected": [
+        "EXPLANATION"
+      ]
+    },
+    {
+      "id": "explanation-05",
+      "split": "development",
+      "text": "股票和债券有什么区别",
+      "expected": [
+        "EXPLANATION"
+      ]
+    },
+    {
+      "id": "explanation-06",
+      "split": "regression",
+      "text": "为什么这只基金下跌",
+      "expected": [
+        "EXPLANATION"
+      ]
+    },
+    {
+      "id": "budget_plan-01",
+      "split": "development",
+      "text": "帮我做预算",
+      "expected": [
+        "BUDGET_PLAN"
+      ]
+    },
+    {
+      "id": "budget_plan-02",
+      "split": "development",
+      "text": "钱不够了怎么办",
+      "expected": [
+        "BUDGET_PLAN"
+      ]
+    },
+    {
+      "id": "budget_plan-03",
+      "split": "regression",
+      "text": "我的资金怎么安排",
+      "expected": [
+        "BUDGET_PLAN"
+      ]
+    },
+    {
+      "id": "budget_plan-04",
+      "split": "development",
+      "text": "能投资多少",
+      "expected": [
+        "BUDGET_PLAN"
+      ]
+    },
+    {
+      "id": "context-01",
+      "split": "development",
+      "text": "你好",
+      "expected": [
+        "CONTEXT"
+      ]
+    },
+    {
+      "id": "context-02",
+      "split": "development",
+      "text": "谢谢你",
+      "expected": [
+        "CONTEXT"
+      ]
+    },
+    {
+      "id": "context-03",
+      "split": "regression",
+      "text": "我的想法如下：",
+      "expected": [
+        "CONTEXT"
+      ]
+    },
+    {
+      "id": "context-04",
+      "split": "development",
+      "text": "我在德国留学",
+      "expected": [
+        "CONTEXT"
+      ]
+    },
+    {
+      "id": "unknown-01",
+      "split": "development",
+      "text": "我想处理一下那个事情",
+      "expected": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "id": "unknown-02",
+      "split": "development",
+      "text": "能帮我弄好吗",
+      "expected": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "id": "unknown-03",
+      "split": "regression",
+      "text": "明天会下雨吗",
+      "expected": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "id": "unknown-04",
+      "split": "development",
+      "text": "我喜欢蓝色",
+      "expected": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "id": "mixed-01",
+      "split": "regression",
+      "text": "现金7万元，下个月交房租3500元，打算买基金8000元",
+      "expected": [
+        "CASH",
+        "EXPENSE",
+        "INVESTMENT"
+      ]
+    },
+    {
+      "id": "mixed-02",
+      "split": "regression",
+      "text": "工资下周到账，我想先偿还信用卡",
+      "expected": [
+        "INCOME",
+        "DEBT"
+      ]
+    },
+    {
+      "id": "mixed-03",
+      "split": "regression",
+      "text": "不要买股票，房租已经交了",
+      "expected": [
+        "INVESTMENT",
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "mixed-04",
+      "split": "regression",
+      "text": "如果奖金到账，就投资6000元",
+      "expected": [
+        "INCOME",
+        "INVESTMENT"
+      ]
+    },
+    {
+      "id": "mixed-05",
+      "split": "regression",
+      "text": "朋友想借款2万元，我想留应急金1万元",
+      "expected": [
+        "DEBT",
+        "SAVINGS"
+      ]
+    },
+    {
+      "id": "mixed-06",
+      "split": "regression",
+      "text": "比价这款电脑，预算支出不超过6000元",
+      "expected": [
+        "COMPARISON",
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "mixed-07",
+      "split": "regression",
+      "text": "我想取消订阅，同时计划每月存钱",
+      "expected": [
+        "SUBSCRIPTION",
+        "SAVINGS"
+      ]
+    },
+    {
+      "id": "mixed-08",
+      "split": "regression",
+      "text": "基金持仓的市值为3万元，现金有2万元",
+      "expected": [
+        "PORTFOLIO",
+        "CASH"
+      ]
+    },
+    {
+      "id": "mixed-09",
+      "split": "regression",
+      "text": "我的资金怎么规划，旅游花8000元，机票另付2000元",
+      "expected": [
+        "BUDGET_PLAN",
+        "EXPENSE"
+      ]
+    },
+    {
+      "id": "mixed-10",
+      "split": "regression",
+      "text": "帮我转账，另外检查投资组合风险",
+      "expected": [
+        "TRANSFER",
+        "PORTFOLIO"
+      ]
+    },
+    {
+      "id": "mixed-11",
+      "split": "regression",
+      "text": "我想挂失信用卡，也要处理本月还款",
+      "expected": [
+        "ACCOUNT_SECURITY",
+        "DEBT"
+      ]
+    },
+    {
+      "id": "mixed-12",
+      "split": "regression",
+      "text": "什么是基金，然后帮我比价手机",
+      "expected": [
+        "EXPLANATION",
+        "COMPARISON"
+      ]
+    }
+  ]
+}
