@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-29",
+  "independent_package_directory": true,
+  "manifest_files_verified": 43,
+  "module_tests_passed": 10,
+  "code_hashes": {
+    "runtime.mjs": "195be992d441127050f00c19dc00f8cc4784fd026f0acbebc08e81f5a14216eb",
+    "server.mjs": "738f0626bcd36cf95fe85da8e358db2ca4c9f29ab1e1e26d7cb68f8f9f8b0bd7",
+    "storage.mjs": "c82fac6e81123ef32fa658558c0a21eb2e852876f9700b96f8659e360fb3a9fa",
+    "build.mjs": "4457832418314262d41ef3db3b2b6ea7ffc16daea35cb8caa3ec0d5bc020a8f1",
+    "scripts/package.mjs": "a51591de9f690118bb2a235140ff99e4a38733869815e4b95a981ee339d0ba4a"
+  },
+  "package_excludes_secrets_database_and_git": true,
+  "live_model_tested": false,
+  "docker_build_tested": false,
+  "cloud_deployed": false
+}

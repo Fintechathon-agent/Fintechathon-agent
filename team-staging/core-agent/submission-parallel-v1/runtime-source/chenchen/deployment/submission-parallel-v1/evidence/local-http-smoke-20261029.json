@@ -1,0 +1,44 @@
+{
+  "started_at": "2026-10-29T11:23:20.191Z",
+  "ended_at": "2026-10-29T11:23:20.296Z",
+  "origin": "http://127.0.0.1:4199",
+  "checks": [
+    {
+      "name": "homepage_and_mode_label",
+      "passed": true
+    },
+    {
+      "name": "health",
+      "passed": true
+    },
+    {
+      "name": "signed_session",
+      "passed": true
+    },
+    {
+      "name": "synthetic_accounts",
+      "passed": true
+    },
+    {
+      "name": "idempotent_replay",
+      "passed": true
+    },
+    {
+      "name": "csrf_rejected",
+      "passed": true
+    },
+    {
+      "name": "scenario_routing_only",
+      "passed": true
+    },
+    {
+      "name": "no_external_asset_dependency",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "provider_calls": 0,
+  "model_inference_verified": false,
+  "mainland_reachability_verified": false,
+  "note": "Run on actual mainland networks with proxy disabled; record operator and network separately. This script does not infer visitor location."
+}

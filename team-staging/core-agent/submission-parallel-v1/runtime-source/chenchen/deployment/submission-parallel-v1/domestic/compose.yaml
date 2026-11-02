@@ -1,0 +1,37 @@
+services:
+  app:
+    image: finance-lab-submission:${RELEASE_ID:-submission-parallel-v1-20261029}
+    build:
+      context: ../../../..
+      dockerfile: chenchen/deployment/submission-parallel-v1/domestic/Dockerfile
+    env_file: ../.env
+    ports:
+      - "127.0.0.1:4188:4188"
+    volumes:
+      - submission-data:/data
+    restart: unless-stopped
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:4188/health',{headers:{Host:new URL(process.env.PUBLIC_ORIGIN).host,'X-Submission-Proxy':process.env.PROXY_SECRET,'X-Forwarded-Proto':'https'}},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  edge:
+    image: caddy:2.10.2-alpine
+    network_mode: host
+    env_file: ../.env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+volumes:
+  submission-data:
+  caddy-data:
+  caddy-config:

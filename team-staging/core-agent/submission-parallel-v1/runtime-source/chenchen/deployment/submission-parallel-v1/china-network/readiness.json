@@ -1,0 +1,13 @@
+{
+  "route": "Cloudflare China Network -> domestic HTTPS origin",
+  "status": "PREPARATION_ONLY_NOT_PROVISIONED",
+  "domain_owned": false,
+  "icp_available": false,
+  "enterprise_contract": "UNCONFIRMED",
+  "china_network_subscription": "NOT_PROVISIONED",
+  "content_review": "NOT_SUBMITTED",
+  "domestic_origin": "NOT_PROVISIONED",
+  "sse_joint_acceptance": "NOT_RUN",
+  "workers_durable_objects_compatibility": "NOT_CONFIRMED_BY_VENDOR",
+  "production_dns_changes": false
+}
