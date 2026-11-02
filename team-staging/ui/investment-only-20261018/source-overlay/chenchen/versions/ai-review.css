@@ -1,0 +1,10 @@
+#ai-assistant { margin-top:24px; }
+#ai-assistant .ai-review-heading { display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+#ai-assistant textarea { display:block; width:100%; min-height:120px; margin:10px 0 14px; resize:vertical; }
+#ai-assistant label { display:block; }
+#ai-review-status { margin:14px 0; overflow-wrap:anywhere; }
+#ai-review-status[data-state="error"] { color:#efad83; }
+#ai-review-result { border-top:1px solid var(--line); margin-top:16px; padding-top:16px; }
+#ai-review-result p, #ai-review-result pre { white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; }
+#ai-review-result pre { max-height:320px; overflow:auto; font-size:12px; }
+#ai-assistant [hidden] { display:none !important; }

@@ -1,0 +1,29 @@
+[
+  {
+    "width": 1440,
+    "status": "passed",
+    "apiNetworkRequests": 0,
+    "cryptoParity": true,
+    "simulationParity": true,
+    "flows": 1,
+    "export": true
+  },
+  {
+    "width": 1024,
+    "status": "passed",
+    "apiNetworkRequests": 0,
+    "cryptoParity": true,
+    "simulationParity": true,
+    "flows": 1,
+    "export": true
+  },
+  {
+    "width": 375,
+    "status": "passed",
+    "apiNetworkRequests": 0,
+    "cryptoParity": true,
+    "simulationParity": true,
+    "flows": 1,
+    "export": true
+  }
+]
