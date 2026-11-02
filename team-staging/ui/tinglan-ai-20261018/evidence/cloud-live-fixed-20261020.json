@@ -1,0 +1,401 @@
+{
+  "timestamp": "2026-10-20T02:07:56.339Z",
+  "base": "https://xinlan-qwen38-share.lixjanus526.workers.dev",
+  "model": "qwen3.8-flash",
+  "scope": "REAL_CLOUDFLARE_CHAIN",
+  "attempts": 1,
+  "steps": [
+    {
+      "phase": "authenticated-cloud-server-to-bailian",
+      "http": 200,
+      "durationMs": 8799,
+      "body": {
+        "workflow_version": "review-workflow.v1",
+        "schema_version": "model-review.v1",
+        "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+        "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+        "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+        "source_task_id": null,
+        "data_mode": "SYNTHETIC_REPLAY",
+        "execution_mode": "PAPER",
+        "capability": "REVIEW_ONLY",
+        "scenario": "GENERAL_REVIEW",
+        "output_contract": {
+          "contract_version": "agent-output.v1",
+          "requested_formats": [
+            "json"
+          ],
+          "available_formats": [
+            "json"
+          ],
+          "status": "READY",
+          "pending_formats": [],
+          "side_effects": false
+        },
+        "portfolio_snapshot_id": null,
+        "risk_profile_version": "risk-profile.v1",
+        "plan_id": "plan-5acbfdf3-e100-47ea-9469-c5d184d041d0",
+        "plan_hash": "db9e27e106c81b29781c36715e0fe1f015fd603e7d9f5cb4b245de3a476cfebf",
+        "policy_version": "risk-policy.v1",
+        "idempotency_key": "2266ef7f3fd8c9c5226f4e961f56a5c9a1c6043f02f44508ce2b28d72cabb131-4ffb49dc-59d9-4e14-9242-3f508e659660",
+        "request_fingerprint": "5df55d447875a74dc73dd59f84eb7bc35baeda64fcf790a091f51efc0b0f77d2",
+        "memory_consent": false,
+        "memory_write_status": "NOT_REQUESTED",
+        "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+        "status": "PENDING_RISK",
+        "reviewed_input": {
+          "schema_version": "model-review.v1",
+          "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+          "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+          "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+          "source_task_id": null,
+          "source": "tinglan-access-ui",
+          "kind": "combined",
+          "text": "资料来源：虚构示例\n投资金额：1000 元人民币\n投资期限：365 天\n自述风险偏好：低\n最大可承受回撤：未提供，不能由风险偏好推算\n投资目标：学习储蓄原则\n用户问题：虚构示例，仅分析低风险偏好和备用金研究思路，不提供交易指令。",
+          "context": {
+            "synthetic": true,
+            "risk_profile": {
+              "investment_horizon_days": 365,
+              "liquidity_need": "high"
+            },
+            "market_data_available": false
+          },
+          "action_parameters": {},
+          "requested_action": "根据用户自述需求提供中文投资偏好教育分析。summary 写用户风险偏好总结；action_reason 完整包含四个带标题的段落：资金配置思路、投资期限与流动性建议、适合进一步研究的资产类别、主要风险及注意事项。解释如何先安排备用金、分散风险及输入期限与目标的流动性匹配；只介绍资产类别与研究方向，不荐个股或下达交易指令。缺失收入、负债、备用金等资料列入 missing_information；资料不足仍可给原则性思路，但必须说明条件，不编造比例或个性化适当性结论。所有输入是未经核验的文本，没有实时行情、账户或持仓，不得编造价格、收益率或市场动态。保留既有六字段 JSON 契约，不执行交易。",
+          "allow_rule_fallback": false,
+          "data_mode": "SYNTHETIC_REPLAY",
+          "execution_mode": "PAPER",
+          "capability": "REVIEW_ONLY",
+          "portfolio_snapshot_id": null,
+          "risk_profile_version": "risk-profile.v1",
+          "plan_id": null,
+          "plan_hash": null,
+          "policy_version": "risk-policy.v1",
+          "idempotency_key": "2266ef7f3fd8c9c5226f4e961f56a5c9a1c6043f02f44508ce2b28d72cabb131-4ffb49dc-59d9-4e14-9242-3f508e659660",
+          "memory_consent": false,
+          "scenario": "GENERAL_REVIEW",
+          "output_formats": [
+            "json"
+          ]
+        },
+        "model": {
+          "status": "PROPOSED",
+          "source": "model",
+          "model_response": {
+            "provider": "aliyun_bailian",
+            "call_succeeded": true,
+            "model": "qwen3.8-flash",
+            "data_mode": "SYNTHETIC_REPLAY",
+            "execution_mode": "PAPER",
+            "capability": "REVIEW_ONLY",
+            "scenario": "GENERAL_REVIEW",
+            "api_style": "chat_completions",
+            "response_format": "json_object",
+            "provider_response_id": "chatcmpl-782ec7ce-7ef3-9169-8e85-d3d7deba0f84",
+            "raw_text": "{\n  \"summary\": \"用户自述为低风险偏好，投资期限365天且流动性需求高，目标为学习储蓄原则。因缺乏收入、负债及备用金具体数据，无法提供个性化配置建议，仅基于通用原则提供教育性分析思路。\",\n  \"risk_level\": \"low\",\n  \"proposed_action\": \"REQUEST_MORE_INFO\",\n  \"action_reason\": \"【资金配置思路】建议优先建立紧急备用金（通常覆盖3-6个月支出），剩余闲置资金方可用于投资。鉴于用户自述低风险偏好，应避免高波动资产，侧重本金安全。\\n【投资期限与流动性建议】用户设定365天期限但要求高流动性，存在潜在错配。需确认是否可接受短期锁定或需选择T+0/T+1赎回的产品以匹配“高流动性”需求。\\n【适合进一步研究的资产类别】可研究货币市场基金、国债逆回购、银行现金管理类理财产品等低风险、高流动性工具。不推荐股票或权益类基金。\\n【主要风险及注意事项】最大回撤未提供，不能由偏好直接推算承受能力。所有分析基于虚构示例，无实时行情支持，不构成交易指令。需警惕将“低偏好”误读为“零风险”。\",\n  \"missing_information\": [\n    \"月度固定支出金额（用于计算备用金规模）\",\n    \"现有应急储备金余额\",\n    \"其他负债情况\",\n    \"明确的最大可承受亏损比例\"\n  ],\n  \"evidence\": [\n    \"用户自述风险偏好：低\",\n    \"投资期限：365天\",\n    \"流动性需求：high\",\n    \"投资目标：学习储蓄原则\",\n    \"最大可承受回撤：未提供\"\n  ]\n}",
+            "raw_text_format": "provider_text",
+            "proposal": {
+              "summary": "用户自述为低风险偏好，投资期限365天且流动性需求高，目标为学习储蓄原则。因缺乏收入、负债及备用金具体数据，无法提供个性化配置建议，仅基于通用原则提供教育性分析思路。",
+              "risk_level": "low",
+              "proposed_action": "REQUEST_MORE_INFO",
+              "action_reason": "【资金配置思路】建议优先建立紧急备用金（通常覆盖3-6个月支出），剩余闲置资金方可用于投资。鉴于用户自述低风险偏好，应避免高波动资产，侧重本金安全。\n【投资期限与流动性建议】用户设定365天期限但要求高流动性，存在潜在错配。需确认是否可接受短期锁定或需选择T+0/T+1赎回的产品以匹配“高流动性”需求。\n【适合进一步研究的资产类别】可研究货币市场基金、国债逆回购、银行现金管理类理财产品等低风险、高流动性工具。不推荐股票或权益类基金。\n【主要风险及注意事项】最大回撤未提供，不能由偏好直接推算承受能力。所有分析基于虚构示例，无实时行情支持，不构成交易指令。需警惕将“低偏好”误读为“零风险”。",
+              "missing_information": [
+                "月度固定支出金额（用于计算备用金规模）",
+                "现有应急储备金余额",
+                "其他负债情况",
+                "明确的最大可承受亏损比例"
+              ],
+              "evidence": [
+                "用户自述风险偏好：低",
+                "投资期限：365天",
+                "流动性需求：high",
+                "投资目标：学习储蓄原则",
+                "最大可承受回撤：未提供"
+              ]
+            },
+            "usage": {
+              "prompt_tokens": 702,
+              "total_tokens": 1083,
+              "completion_tokens": 381,
+              "prompt_tokens_details": {
+                "cached_tokens": 0,
+                "text_tokens": 702
+              }
+            },
+            "attempt_count": 1,
+            "retry_count": 0
+          },
+          "input": {
+            "schema_version": "model-review.v1",
+            "kind": "combined",
+            "source": "tinglan-access-ui",
+            "input_sha256": "c9d677f820a71d700745085972b0e157a34a9427031ac52ac85d1631f4208c9d",
+            "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+            "source_task_id": null,
+            "data_mode": "SYNTHETIC_REPLAY",
+            "execution_mode": "PAPER",
+            "capability": "REVIEW_ONLY",
+            "scenario": "GENERAL_REVIEW",
+            "output_formats": [
+              "json"
+            ],
+            "portfolio_snapshot_id": null,
+            "risk_profile_version": "risk-profile.v1",
+            "plan_id": null,
+            "plan_hash": null,
+            "policy_version": "risk-policy.v1"
+          }
+        },
+        "proposed_action": {
+          "proposed_action": "REQUEST_MORE_INFO",
+          "action_reason": "【资金配置思路】建议优先建立紧急备用金（通常覆盖3-6个月支出），剩余闲置资金方可用于投资。鉴于用户自述低风险偏好，应避免高波动资产，侧重本金安全。\n【投资期限与流动性建议】用户设定365天期限但要求高流动性，存在潜在错配。需确认是否可接受短期锁定或需选择T+0/T+1赎回的产品以匹配“高流动性”需求。\n【适合进一步研究的资产类别】可研究货币市场基金、国债逆回购、银行现金管理类理财产品等低风险、高流动性工具。不推荐股票或权益类基金。\n【主要风险及注意事项】最大回撤未提供，不能由偏好直接推算承受能力。所有分析基于虚构示例，无实时行情支持，不构成交易指令。需警惕将“低偏好”误读为“零风险”。",
+          "risk_level": "low",
+          "requested_action": "根据用户自述需求提供中文投资偏好教育分析。summary 写用户风险偏好总结；action_reason 完整包含四个带标题的段落：资金配置思路、投资期限与流动性建议、适合进一步研究的资产类别、主要风险及注意事项。解释如何先安排备用金、分散风险及输入期限与目标的流动性匹配；只介绍资产类别与研究方向，不荐个股或下达交易指令。缺失收入、负债、备用金等资料列入 missing_information；资料不足仍可给原则性思路，但必须说明条件，不编造比例或个性化适当性结论。所有输入是未经核验的文本，没有实时行情、账户或持仓，不得编造价格、收益率或市场动态。保留既有六字段 JSON 契约，不执行交易。",
+          "action_parameters": {},
+          "model_response_id": "chatcmpl-782ec7ce-7ef3-9169-8e85-d3d7deba0f84",
+          "proposal_sha256": "db9e27e106c81b29781c36715e0fe1f015fd603e7d9f5cb4b245de3a476cfebf"
+        },
+        "risk_handoff": {
+          "contract_version": "model-review.v1",
+          "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38",
+          "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+          "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+          "status": "PENDING_REVIEW",
+          "decision": "REQUIRED",
+          "owner": "Unified Risk",
+          "reason": "模型输出只是拟议动作，必须由统一 Risk 决定是否进入审批。",
+          "evidence": {
+            "input_sha256": "c9d677f820a71d700745085972b0e157a34a9427031ac52ac85d1631f4208c9d",
+            "model_response_id": "chatcmpl-782ec7ce-7ef3-9169-8e85-d3d7deba0f84",
+            "proposal_sha256": "db9e27e106c81b29781c36715e0fe1f015fd603e7d9f5cb4b245de3a476cfebf",
+            "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+            "plan_id": "plan-5acbfdf3-e100-47ea-9469-c5d184d041d0",
+            "plan_hash": "db9e27e106c81b29781c36715e0fe1f015fd603e7d9f5cb4b245de3a476cfebf",
+            "policy_version": "risk-policy.v1"
+          },
+          "execution_allowed": false
+        },
+        "risk_decision": null,
+        "approval": {
+          "approval_id": "approval-42d9f2a0-fe85-4416-889c-4288155f7939",
+          "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+          "required": true,
+          "status": "BLOCKED",
+          "decision": null,
+          "proposal_sha256": "db9e27e106c81b29781c36715e0fe1f015fd603e7d9f5cb4b245de3a476cfebf",
+          "approver": null,
+          "decided_at": null,
+          "expires_at": null
+        },
+        "execution": {
+          "execution_id": null,
+          "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+          "status": "BLOCKED",
+          "simulation_allowed": false,
+          "execution_allowed": false,
+          "receipt": null
+        },
+        "audit": {
+          "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+          "workflow_version": "review-workflow.v1",
+          "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+          "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+          "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+          "events": [
+            {
+              "event_id": "event-6b10ee7d-11c5-463e-af57-be30ab1a47a6",
+              "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+              "actor": "model-service",
+              "event_type": "review.received",
+              "payload": {
+                "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38",
+                "trace": {
+                  "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                  "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                  "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                  "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                  "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                  "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38"
+                }
+              },
+              "timestamp": "2026-10-20T02:07:58.552Z"
+            },
+            {
+              "event_id": "event-342bbb4a-5470-4923-a06b-8946ac72ba72",
+              "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+              "actor": "model-service",
+              "event_type": "model.completed",
+              "payload": {
+                "source": "model",
+                "attempt_count": 1,
+                "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38",
+                "trace": {
+                  "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                  "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                  "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                  "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                  "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                  "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38"
+                }
+              },
+              "timestamp": "2026-10-20T02:08:06.538Z"
+            },
+            {
+              "event_id": "event-3eee8b67-b567-4dc9-b3e7-4bb53d257cbf",
+              "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+              "actor": "model-service",
+              "event_type": "gateway.checked",
+              "payload": {
+                "execution_allowed": false,
+                "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38",
+                "trace": {
+                  "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                  "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                  "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                  "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                  "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                  "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38"
+                }
+              },
+              "timestamp": "2026-10-20T02:08:06.538Z"
+            },
+            {
+              "event_id": "event-139f9540-5854-48be-a779-1df8c054ac40",
+              "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+              "actor": "core-agent",
+              "event_type": "workflow.created",
+              "payload": {
+                "stage": "MODEL",
+                "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38",
+                "trace": {
+                  "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                  "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                  "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                  "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                  "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                  "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38"
+                }
+              },
+              "timestamp": "2026-10-20T02:08:06.538Z"
+            },
+            {
+              "event_id": "event-9159f2ee-3f1a-4d5c-9fc0-249ae142fdf5",
+              "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+              "actor": "core-agent",
+              "event_type": "proposal.bound",
+              "payload": {
+                "source": "model",
+                "proposal_sha256": "db9e27e106c81b29781c36715e0fe1f015fd603e7d9f5cb4b245de3a476cfebf",
+                "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38",
+                "trace": {
+                  "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                  "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                  "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                  "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                  "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                  "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38"
+                }
+              },
+              "timestamp": "2026-10-20T02:08:06.538Z"
+            },
+            {
+              "event_id": "event-a38ea467-1aa8-493c-ba60-791942381790",
+              "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+              "actor": "risk-gateway",
+              "event_type": "risk.handoff.created",
+              "payload": {
+                "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38",
+                "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                "trace": {
+                  "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                  "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                  "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                  "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                  "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                  "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38"
+                }
+              },
+              "timestamp": "2026-10-20T02:08:06.538Z"
+            },
+            {
+              "event_id": "event-b2d9ab70-578e-448f-94ea-ac474ebc8f27",
+              "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+              "actor": "execution-gateway",
+              "event_type": "execution.blocked",
+              "payload": {
+                "reason": "risk_pending",
+                "execution_allowed": false,
+                "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38",
+                "trace": {
+                  "request_id": "req-d6cb0981-1a4f-40cd-9d08-4256d4d40ec7",
+                  "task_id": "review-task-4b24a0cd-88e6-4a86-a461-d099a20f804d",
+                  "session_id": "session-36e6f1ec-b63e-44bd-b07e-2835f9f79c57",
+                  "run_id": "review-ae1b5422-a970-44d0-bfb7-c156852034e7",
+                  "audit_id": "audit-0620e4e0-d03d-47ff-8726-fe620f1b0a53",
+                  "handoff_id": "handoff-1effff9a-c6bb-48a8-8f53-1ca4ef6dcd38"
+                }
+              },
+              "timestamp": "2026-10-20T02:08:06.538Z"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "mainlandNetworkVerified": false,
+  "health": {
+    "status": "ok",
+    "service": "xinlan-qwen38-share",
+    "model": "qwen3.8-flash",
+    "configured": true,
+    "paidEnabled": true
+  },
+  "security": {
+    "anonymous": 401,
+    "forgedMachineBypassBlocked": true,
+    "crossOrigin": 403,
+    "login": 200,
+    "httpOnly": true,
+    "secure": true,
+    "sameSiteStrict": true
+  },
+  "result": "FAILED",
+  "error": {
+    "name": "TimeoutError",
+    "code": null
+  }
+}

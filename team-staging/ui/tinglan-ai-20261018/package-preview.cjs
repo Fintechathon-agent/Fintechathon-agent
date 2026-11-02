@@ -1,0 +1,20 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const target=path.resolve(process.argv[2]||'');
+if(!fs.existsSync(path.join(target,'investment-only/investment.html')))throw new Error('Expected an existing preview checkout');
+const root=path.join(target,'investment-only'),assets=path.join(root,'versions');
+for(const [source,dest] of [['client.mjs','tinglan-client.mjs'],['widget.mjs','tinglan-widget.mjs'],['transport.js','tinglan-transport.js'],['tinglan.css','tinglan.css']])fs.copyFileSync(path.join(__dirname,'frontend',source),path.join(assets,dest));
+fs.copyFileSync(path.join(__dirname,'frontend/tinglan-config.json'),path.join(root,'tinglan-config.json'));
+const page=path.join(root,'investment.html');let html=fs.readFileSync(page,'utf8');
+const section=/<section\b[^>]*id="ai-assistant"[\s\S]*?<\/section>/;
+if(!section.test(html))throw new Error('Assistant section not found');
+html=html.replace(section,fs.readFileSync(path.join(__dirname,'frontend/panel.html'),'utf8'));
+if(!html.includes('tinglan-transport.js'))html=html.replace('<head>','<head><script src="versions/tinglan-transport.js"></script>');
+if(!html.includes('tinglan-widget.mjs'))html=html.replace('</head>','<link rel="stylesheet" href="versions/tinglan.css"><script type="module" src="versions/tinglan-widget.mjs"></script></head>');
+fs.writeFileSync(page,html);
+const manifestPath=path.join(root,'release-manifest.json');const m=JSON.parse(fs.readFileSync(manifestPath));
+m.release='tinglan-secure-ai-candidate-2026-10-18';m.backend='OWNER_CONFIGURATION_REQUIRED';m.realModelCalls=false;
+const files=[];function walk(dir){for(const f of fs.readdirSync(dir,{withFileTypes:true})){const full=path.join(dir,f.name);if(f.isDirectory())walk(full);else if(full!==manifestPath)files.push({file:path.relative(root,full).replaceAll('\\','/'),sha256:crypto.createHash('sha256').update(fs.readFileSync(full)).digest('hex')});}}
+walk(root);m.files=files;fs.writeFileSync(manifestPath,JSON.stringify(m,null,2)+'\n');
+fs.mkdirSync(path.join(__dirname,'public'),{recursive:true});fs.cpSync(root,path.join(__dirname,'public/investment-only'),{recursive:true});
+console.log('Packaged assistant client and isolated Worker assets without credentials.');

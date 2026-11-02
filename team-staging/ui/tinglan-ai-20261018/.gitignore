@@ -1,0 +1,6 @@
+.env
+.env.*
+.dev.vars*
+wrangler.local.toml
+node_modules/
+.wrangler/

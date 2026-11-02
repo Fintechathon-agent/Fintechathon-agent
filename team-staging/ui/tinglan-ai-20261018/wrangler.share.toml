@@ -1,0 +1,41 @@
+name = "xinlan-qwen38-share"
+account_id = "323563bd429155d1e603e8493138ada3"
+main = "share-worker.mjs"
+compatibility_date = "2026-10-11"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+preview_urls = false
+
+[vars]
+MODEL_PROVIDER = "aliyun_bailian"
+MODEL_NAME = "qwen3.8-flash"
+MODEL_API_STYLE = "chat_completions"
+MODEL_RESPONSE_FORMAT = "json_object"
+MODEL_TIMEOUT_MS = "30000"
+MODEL_MAX_ATTEMPTS = "1"
+MODEL_DISABLE_RULE_FALLBACK = "true"
+MODEL_FALLBACK_TO_RULES = "false"
+BAILIAN_REGION = "cn-beijing"
+BAILIAN_WORKSPACE_ID = "ws-h55unwqubcoxw7tb"
+BAILIAN_MAX_OUTPUT_TOKENS = "1600"
+BAILIAN_ALLOW_PAID_CALLS = "false"
+BAILIAN_TEST_BUDGET_CNY = "0.20"
+TINGLAN_DAILY_REQUESTS = "20"
+MODEL_REQUESTS_PER_MINUTE = "6"
+RATE_LIMIT_PER_MINUTE = "30"
+REQUIRE_TRUSTED_ACTORS = "true"
+CORS_ORIGINS = ""
+
+[[durable_objects.bindings]]
+name = "REVIEW_SERVICE"
+class_name = "ReviewService"
+[[durable_objects.bindings]]
+name = "SHARE_AUTH"
+class_name = "ShareAuth"
+[[migrations]]
+tag = "share-v1"
+new_sqlite_classes = ["ReviewService", "ShareAuth"]
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true

@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-10-20T02:01:25.005Z",
+  "base": "https://xinlan-qwen38-share.lixjanus526.workers.dev",
+  "model": "qwen3.8-flash",
+  "scope": "NO_PROVIDER_PREFLIGHT",
+  "attempts": 0,
+  "steps": [],
+  "mainlandNetworkVerified": false,
+  "health": {
+    "status": "ok",
+    "service": "xinlan-qwen38-share",
+    "model": "qwen3.8-flash",
+    "configured": true,
+    "paidEnabled": false
+  },
+  "security": {
+    "anonymous": 401,
+    "forgedMachineBypassBlocked": true,
+    "crossOrigin": 403,
+    "login": 200,
+    "httpOnly": true,
+    "secure": true,
+    "sameSiteStrict": true
+  },
+  "browserLogin": true,
+  "pageErrors": [],
+  "logout": true,
+  "result": "CLOUD_PREFLIGHT_PASSED"
+}

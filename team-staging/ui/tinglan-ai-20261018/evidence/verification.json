@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-19",
+  "base": "922d8a34d54c862d0353b14bb3a01ceba67b2476",
+  "tests": {
+    "candidate": 11,
+    "regression": 249,
+    "failed": 0,
+    "provider": "MOCK"
+  },
+  "paidCalls": 0,
+  "deployment": "OWNER_REQUIRED",
+  "cloudflare": {
+    "healthStatus": 200,
+    "healthDurationMs": 1922,
+    "provider": "cloudflare_workers_ai",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "audit": "durable_object",
+    "earlierNodeDirectRequests": "FAILED",
+    "mainlandNetwork": "NOT_INDEPENDENTLY_VERIFIED"
+  },
+  "localConfig": {
+    "exists": true,
+    "gitIgnored": true,
+    "keyPresent": true,
+    "model": "qwen3.8-flash",
+    "fullBeijingEndpoint": true,
+    "secretPrinted": false
+  },
+  "preview": {
+    "commit": "1abdbba345306c7f5a072cd88a48456431a88b64",
+    "pagesAction": "success",
+    "http": 200,
+    "durationSeconds": 2.23612,
+    "configHttp": 200,
+    "mode": "OWNER_CONFIGURATION_REQUIRED",
+    "endpoint": null
+  },
+  "compile": {
+    "status": "BLOCKED_DEPENDENCY_DOWNLOAD",
+    "deploymentPerformed": false
+  }
+}

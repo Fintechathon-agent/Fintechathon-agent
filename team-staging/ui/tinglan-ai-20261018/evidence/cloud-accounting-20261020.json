@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-10-20T02:16:26.800Z",
+  "http": 200,
+  "data": {
+    "budget": {
+      "reserved_cents": 3,
+      "attempts": 3,
+      "minute": 29874375,
+      "minute_count": 1
+    },
+    "attempts": [
+      {
+        "status": "RESPONDED",
+        "model": "qwen3.8-flash",
+        "errorCode": null,
+        "usage": {
+          "prompt_tokens": 734,
+          "completion_tokens": 416,
+          "total_tokens": 1150
+        },
+        "elapsedMs": 9399,
+        "responseId": "chatcmpl-6daef9a1-9962-9bde-920e-c478c99f50d4",
+        "reservedCny": 0.01
+      },
+      {
+        "status": "RESPONDED",
+        "model": "qwen3.8-flash",
+        "errorCode": null,
+        "usage": {
+          "prompt_tokens": 702,
+          "completion_tokens": 381,
+          "total_tokens": 1083
+        },
+        "elapsedMs": 7986,
+        "responseId": "chatcmpl-782ec7ce-7ef3-9169-8e85-d3d7deba0f84",
+        "reservedCny": 0.01
+      },
+      {
+        "status": "FAILED",
+        "model": "qwen3.8-flash",
+        "errorCode": "MODEL_PROVIDER_UNAVAILABLE",
+        "usage": {
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "total_tokens": null
+        },
+        "elapsedMs": 11,
+        "responseId": null,
+        "reservedCny": 0.01
+      }
+    ]
+  }
+}

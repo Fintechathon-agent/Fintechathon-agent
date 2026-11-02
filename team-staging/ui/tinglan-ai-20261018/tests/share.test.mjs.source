@@ -1,0 +1,47 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { ShareAuth, issueSession, verifySession, sessionCookie, digest } from '../share-auth.mjs';
+import worker from '../share-worker.mjs';
+import { ReviewService } from '../worker-entry.mjs';
+const env = () => ({SHARE_ACCESS_CODE:'synthetic-code-for-tests-only-12345',SESSION_SIGNING_KEY:'synthetic-signing-key-for-tests-12345',CORE_AGENT_API_KEY:'synthetic-core-key',MODEL_PROVIDER:'aliyun_bailian',MODEL_NAME:'qwen3.8-flash'});
+const memory = () => {const entries=new Map();return {get:async key=>structuredClone(entries.get(key)),put:async(key,value)=>{for(const [k,v]of Object.entries(typeof key==='string'?{[key]:value}:key))entries.set(k,structuredClone(v));}};};
+test('Usage diagnostics require internal authority and omit stored prompts and session fields',async()=>{
+ const e=env(),storage=memory();storage.list=async()=>new Map([['bailian-attempt:test',{status:'RESPONDED',model:'qwen3.8-flash',usage:{total_tokens:10},prompt:'private-prompt-marker',session:'private-session-marker'}]]);
+ const service=new ReviewService({storage},e);
+ assert.equal((await service.handle(new Request('https://internal/_tinglan/usage'))).status,401);
+ const response=await service.handle(new Request('https://internal/_tinglan/usage',{headers:{'X-Core-Agent-Key':e.CORE_AGENT_API_KEY}}));
+ assert.equal(response.status,200);assert.equal(response.headers.get('Cache-Control'),'no-store');const text=await response.text();assert(!text.includes('private-'));assert(!text.includes(e.CORE_AGENT_API_KEY));
+ assert.equal((await worker.fetch(new Request('https://site.example/api/tinglan/status'),e)).status,401);
+});
+test('Share session verifies HMAC, expiry and code rotation without exposing the password',async()=>{
+ const e=env(),now=Date.now(),token=await issueSession(e,now);assert(!token.includes(e.SHARE_ACCESS_CODE));
+ const request=t=>new Request('https://site.example/api/review',{headers:{Cookie:'__Host-xinlan_session='+t}});
+ assert.equal(await verifySession(request(token),e,now),await digest(e.SHARE_ACCESS_CODE));
+ await assert.rejects(verifySession(request(token),e,now+9*3600000),/AUTHENTICATION_REQUIRED/);
+ await assert.rejects(verifySession(request(token.slice(0,-5)+'wrong'),e,now),/AUTHENTICATION_REQUIRED/);
+ await assert.rejects(verifySession(request(token),{...e,SHARE_ACCESS_CODE:'changed-code'},now),/AUTHENTICATION_REQUIRED/);
+ assert.match(sessionCookie(token),/HttpOnly; Secure; SameSite=Strict/);
+});
+test('Login persists attempt caps and fails closed on unavailable storage',async()=>{
+ const e=env(),storage=memory(),request=code=>new Request('https://internal/login',{method:'POST',body:JSON.stringify({code,ipHash:'a'.repeat(64)})});
+ const auth=new ShareAuth({storage},e);const response=await auth.fetch(request(e.SHARE_ACCESS_CODE));assert.equal(response.status,200);assert.match(response.headers.get('Set-Cookie'),/__Host-xinlan_session=/);
+ for(let i=0;i<4;i++)assert.equal((await auth.fetch(request('synthetic-wrong-code'))).status,401);
+ assert.equal((await new ShareAuth({storage},e).fetch(request(e.SHARE_ACCESS_CODE))).status,429);
+ const broken=new ShareAuth({storage:{get:async()=>{throw new Error('storage unavailable');}}},e);assert.equal((await broken.fetch(request(e.SHARE_ACCESS_CODE))).status,503);
+});
+test('Anonymous and forged machine credentials cannot start model calls or workflow writes',async()=>{
+ const e=env();for(const headers of [{},{'X-Core-Agent-Key':e.CORE_AGENT_API_KEY}]){
+  const response=await worker.fetch(new Request('https://site.example/api/review',{method:'POST',headers:{Origin:'https://site.example','Content-Type':'application/json',...headers},body:'{}'}),e);assert.equal(response.status,401);
+ }
+ assert.equal((await worker.fetch(new Request('https://site.example/api/review/approval',{method:'POST'}),e)).status,404);
+ assert.equal((await worker.fetch(new Request('https://site.example/api/session',{method:'POST',headers:{Origin:'https://evil.example'},body:'{}'}),e)).status,403);
+ assert.equal((await worker.fetch(new Request('https://site.example/api/session'),e)).status,401);
+});
+test('Same-origin login, logout and dynamic config retain session boundaries',async()=>{
+ const e=env(),auth=new ShareAuth({storage:memory()},e);e.SHARE_AUTH={idFromName:x=>x,get:()=>auth};
+ const response=await worker.fetch(new Request('https://site.example/api/session',{method:'POST',headers:{Origin:'https://site.example','Content-Type':'application/json'},body:JSON.stringify({code:e.SHARE_ACCESS_CODE})}),e);
+ assert.equal(response.status,200);const cookie=response.headers.get('Set-Cookie');assert(!cookie.includes(e.SHARE_ACCESS_CODE));
+ const session=await worker.fetch(new Request('https://site.example/api/session',{headers:{Cookie:cookie}}),e);assert.equal(session.status,200);
+ const config=await worker.fetch(new Request('https://site.example/investment-only/tinglan-config.json'),e);assert.equal((await config.json()).mode,'SESSION');
+ const logout=await worker.fetch(new Request('https://site.example/api/session',{method:'DELETE',headers:{Origin:'https://site.example'}}),e);assert.match(logout.headers.get('Set-Cookie'),/Max-Age=0/);
+});

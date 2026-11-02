@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-10-20T02:10:09.291Z",
+  "base": "https://xinlan-qwen38-share.lixjanus526.workers.dev",
+  "model": "qwen3.8-flash",
+  "scope": "REAL_CLOUDFLARE_CHAIN",
+  "attempts": 1,
+  "steps": [],
+  "mainlandNetworkVerified": false,
+  "health": {
+    "status": "ok",
+    "service": "xinlan-qwen38-share",
+    "model": "qwen3.8-flash",
+    "configured": true,
+    "paidEnabled": true
+  },
+  "stage": "browser-model-request",
+  "browserLogin": true,
+  "pageErrors": [],
+  "result": "FAILED",
+  "error": {
+    "name": "TimeoutError",
+    "code": null
+  }
+}

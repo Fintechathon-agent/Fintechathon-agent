@@ -1,0 +1,29 @@
+[
+  {
+    "width": 1440,
+    "status": "passed",
+    "mode": "MOCK_ONLY",
+    "realPaidCalls": 0,
+    "normalResponse": true,
+    "deterministicPlans": 3,
+    "failures": 7
+  },
+  {
+    "width": 1024,
+    "status": "passed",
+    "mode": "MOCK_ONLY",
+    "realPaidCalls": 0,
+    "normalResponse": true,
+    "deterministicPlans": 3,
+    "failures": 7
+  },
+  {
+    "width": 375,
+    "status": "passed",
+    "mode": "MOCK_ONLY",
+    "realPaidCalls": 0,
+    "normalResponse": true,
+    "deterministicPlans": 3,
+    "failures": 7
+  }
+]
