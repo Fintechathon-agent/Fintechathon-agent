@@ -1710,3 +1710,4 @@ pm test -- --test-reporter=tap 均 284/284，失败、跳过均为 0。
 ## Word 版式验收
 
 日报 DOCX 已嵌入架构与时序图，并完成 ZIP、OOXML、正文和图片结构检查。标准 render_docx.py 因环境缺少 LibreOffice soffice.exe 未生成逐页 PNG，版式验收未完成，未标记为通过。
+
