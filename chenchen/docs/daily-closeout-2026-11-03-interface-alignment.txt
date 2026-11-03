@@ -1,0 +1,1 @@
+4/4 core Schema SHA-256 definitions match the retained 2026-11-02 alignment evidence; no runtime Owner acceptance claimed.

@@ -1,0 +1,1 @@
+DOCX structural generation completed; canonical render_docx.py not run because bundled LibreOffice/pdf2image renderer is unavailable; page layout QA incomplete.
