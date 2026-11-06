@@ -1,0 +1,31 @@
+{
+  "scope": "docs only; no business or runtime Schema edits",
+  "docx": [
+    {
+      "name": "core-agent-daily-update-2026-11-06.docx",
+      "zip": "PASS",
+      "embedded_images": 2,
+      "trace_status_text": "PASS",
+      "page_layout": "NOT VERIFIED"
+    },
+    {
+      "name": "core-agent-integration-guide-2026-11-06.docx",
+      "zip": "PASS",
+      "embedded_images": 2,
+      "trace_status_text": "PASS",
+      "page_layout": "NOT VERIFIED"
+    }
+  ],
+  "render": "Attempted both final DOCX files; LibreOffice soffice.exe unavailable; page QA incomplete",
+  "runtime": "Bundled Python and Node; PYTHONPATH=C:/Users/33183/.codex/automations/core-agent-daily-update/python-deps",
+  "schema_and_trace": {
+    "passed": 32,
+    "failed": 0
+  },
+  "core_schema_alignment": {
+    "passed": 4,
+    "failed": 0
+  },
+  "allowed_paths": "PASS",
+  "bounded_credential_scan": "PASS"
+}
