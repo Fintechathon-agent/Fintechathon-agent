@@ -1,0 +1,3 @@
+git diff --check: exit 0
+git diff --cached --check: exit 0
+Only approved chenchen/docs files staged; no business or runtime Schema changes.
