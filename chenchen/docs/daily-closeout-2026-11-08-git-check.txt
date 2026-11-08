@@ -1,0 +1,7 @@
+git diff --check: exit 0
+git diff --cached --check: exit 0
+Allowed chenchen/docs paths: PASS
+Bounded credential scan: PASS
+Source diagrams visually inspected: PASS (retained November 7 baseline)
+DOCX final canonical render: FAILED missing LibreOffice soffice.exe
+Page layout acceptance: INCOMPLETE

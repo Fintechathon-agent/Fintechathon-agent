@@ -1,0 +1,62 @@
+{
+  "checked_at": "2026-11-08T14:53:47.246663+00:00",
+  "baseline": {
+    "exit": 0,
+    "stdout": "dae463655026fcbbe6b3163e7653b8f0a07b35b2",
+    "stderr": ""
+  },
+  "same_day_main_commits": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "named_local_main": {
+    "exit": 0,
+    "stdout": "23a978ea4b24809a201812853bfcf4a0549da023",
+    "stderr": ""
+  },
+  "origin_main": {
+    "exit": 0,
+    "stdout": "dae463655026fcbbe6b3163e7653b8f0a07b35b2",
+    "stderr": ""
+  },
+  "trusted_cloud_commit_is_main_ancestor": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "tests": {
+    "check_exit": 0,
+    "test_exit": 0,
+    "passed": 284,
+    "failed": 0,
+    "skipped": 0,
+    "trace_passed": 32,
+    "trace_failed": 0,
+    "positive_schema_cases": 7
+  },
+  "core_schema_alignment": {
+    "passed": 4,
+    "failed": 0
+  },
+  "business_changes_by_automation": false,
+  "external_model_risk_trade_calls": 0,
+  "formal_risk_joint_acceptance": false,
+  "docx_structure": "PASS ZIP/OOXML/text/two images/width each",
+  "page_layout_acceptance": "INCOMPLETE all final canonical renders failed: bundled environment missing LibreOffice soffice.exe; no page PNG; no layout acceptance claimed",
+  "environment": {
+    "python": "C:\\Users\\33183\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "CORE_AGENT_NODE": "C:\\Users\\33183\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "PYTHONPATH": "C:/Users/33183/.codex/automations/core-agent-daily-update/python-deps"
+  },
+  "commands": [
+    "npm run check",
+    "npm test -- --test-reporter=tap",
+    "python docs/daily-closeout-check-2026-11-08.py",
+    "python chenchen/docs/daily-interface-alignment-2026-11-08.py TEAM_ROOT PERSONAL_ROOT",
+    "git diff --check",
+    "git diff --cached --check"
+  ],
+  "render_attempted_final_docx": true,
+  "guide_required_fields_match_main_schema": true
+}
