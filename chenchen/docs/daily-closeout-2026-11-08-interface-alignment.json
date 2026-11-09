@@ -1,9 +1,9 @@
 {
-  "checked_at": "2026-11-08T14:52:41.611630+00:00",
+  "checked_at": "2026-11-09T14:56:47.665899+00:00",
   "command": "python chenchen/docs/daily-interface-alignment-2026-11-08.py TEAM_ROOT PERSONAL_ROOT",
   "baselines": {
-    "team": "dae463655026fcbbe6b3163e7653b8f0a07b35b2",
-    "personal": "02eae1c609297273069411b713cd7c1eab490fd1"
+    "team": "1480aca14a2f7844cfd2bdade94948936534acc7",
+    "personal": "3cfa0091e3f60561b3ecc905c99d45fe46c49428"
   },
   "passed": 4,
   "failed": 0,

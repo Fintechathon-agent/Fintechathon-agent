@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-08T14:52:40.629486+00:00",
+  "checked_at": "2026-11-09T14:59:08.123782+00:00",
   "scope": "New offline synthetic health success/reuse/failure plus October 17 retained synthetic model evidence. Full Draft 2020-12 structural validation with local references and separate semantic trace checks. No public request, model call, Risk dispatch, actual trade or independent Owner acceptance.",
   "validator": "jsonschema 4.26.0 Draft202012Validator with FormatChecker; local referencing registry only",
   "retained_source": "core-agent-public-evidence-2026-10-17.json",
