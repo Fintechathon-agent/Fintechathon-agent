@@ -1,0 +1,5 @@
+git diff --check: exit 0
+git diff --cached --check: exit 0
+Allowed paths: chenchen/docs only
+Bounded credential scan: PASS
+Original collaborator workspaces preserved.

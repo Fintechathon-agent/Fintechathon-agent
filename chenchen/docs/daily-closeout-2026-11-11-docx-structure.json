@@ -1,0 +1,18 @@
+[
+  {
+    "file": "core-agent-daily-update-2026-11-11.docx",
+    "zip_ok": true,
+    "paragraphs": 57,
+    "embedded_images": 2,
+    "trace_status_boundary_present": true,
+    "page_layout_accepted": false
+  },
+  {
+    "file": "core-agent-integration-guide-2026-11-11.docx",
+    "zip_ok": true,
+    "paragraphs": 96,
+    "embedded_images": 2,
+    "trace_status_boundary_present": true,
+    "page_layout_accepted": false
+  }
+]

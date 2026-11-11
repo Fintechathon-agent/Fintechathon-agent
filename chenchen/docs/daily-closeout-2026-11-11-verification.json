@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-11-11T14:01:52.359268+00:00",
+  "baseline": "9479d5d9eea07b56f5c6c343fff6661195da3bf4",
+  "python": "C:/Users/33183/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+  "node": "C:/Users/33183/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "PYTHONPATH": "C:/Users/33183/.codex/automations/core-agent-daily-update/python-deps",
+  "CORE_AGENT_NODE": "C:/Users/33183/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "check_exit": 0,
+  "tests_passed": 284,
+  "trace_passed": 32,
+  "positive_schema_cases": 7,
+  "schema_alignment_passed": 4,
+  "business_changes_today": false,
+  "public_model_risk_trade_calls": 0,
+  "layout_accepted": false,
+  "diagram_content_baseline": "2026-11-07"
+}
