@@ -1,0 +1,990 @@
+{
+  "contract_version": "risk-contract.v0.1-draft",
+  "schema_status": "DRAFT",
+  "risk_request_id": "risk-request-review",
+  "risk_check_id": "risk-check-review",
+  "checked_at": "2026-10-10T09:00:00+08:00",
+  "binding": {
+    "request_id": "req-demo-20261007-001",
+    "handoff_id": "handoff-task-4bba1586-f582-4899-bc8c-0e27f6ddff72",
+    "task_id": "task-4bba1586-f582-4899-bc8c-0e27f6ddff72",
+    "session_id": "session-f4229044-5c8d-4228-8fc9-8599688bef40",
+    "user_id": "demo-user-001",
+    "proposal_id": "proposal-a-74ef228729",
+    "proposal_hash": "b1c4acfbd501a4221e0e7e766b395102138a5ad99315c7cbcd06e33f243a7b74",
+    "plan_version": "demo-plan-a.v1",
+    "plan_hash": "a7f9498bcacab195f139874efee2e096a1acff7537d9ed5c40da63f9c3ffa65f",
+    "profile_version": "demo-profile.v2",
+    "constraints_version": "demo-constraints.v2",
+    "data_version": "demo-replay-20260923.v1",
+    "trading_rules_version": null,
+    "rules_version": "risk-rules.v0.1-draft"
+  },
+  "stage": "PLAN_REVIEW",
+  "decision": "REVIEW",
+  "check_complete": true,
+  "execution_allowed": false,
+  "execution_authorization": "NOT_GRANTED_BY_RISK_RESULT",
+  "checks": [
+    {
+      "rule_id": "R01",
+      "status": "PASS",
+      "reason_ids": [],
+      "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+      "measurements": []
+    },
+    {
+      "rule_id": "R02",
+      "status": "PASS",
+      "reason_ids": [],
+      "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+      "measurements": []
+    },
+    {
+      "rule_id": "R03",
+      "status": "PASS",
+      "reason_ids": [],
+      "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+      "measurements": [
+        {
+          "name": "cash_after",
+          "actual": 10000,
+          "unit": "CNY",
+          "basis": "CASH",
+          "denominator": null,
+          "operator": "LT",
+          "threshold": 5000
+        }
+      ]
+    },
+    {
+      "rule_id": "R04",
+      "status": "PASS",
+      "reason_ids": [],
+      "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+      "measurements": [
+        {
+          "name": "single_total",
+          "actual": 0.24292149292149293,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.35
+        },
+        {
+          "name": "top3_total",
+          "actual": 0.547940797940798,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.75
+        },
+        {
+          "name": "single_invested",
+          "actual": 0.3581593927893738,
+          "unit": "RATIO",
+          "basis": "INVESTED_ASSETS",
+          "denominator": 21080,
+          "operator": "GT",
+          "threshold": 0.5
+        },
+        {
+          "name": "top3_invested",
+          "actual": 0.8078747628083491,
+          "unit": "RATIO",
+          "basis": "INVESTED_ASSETS",
+          "denominator": 21080,
+          "operator": "GT",
+          "threshold": 0.9
+        }
+      ]
+    },
+    {
+      "rule_id": "R05",
+      "status": "PASS",
+      "reason_ids": [],
+      "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+      "measurements": [
+        {
+          "name": "Technology",
+          "actual": 0.3947876447876448,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.4
+        },
+        {
+          "name": "Technology",
+          "actual": 0.5820683111954459,
+          "unit": "RATIO",
+          "basis": "INVESTED_ASSETS",
+          "denominator": 21080,
+          "operator": "GT",
+          "threshold": 0.6
+        },
+        {
+          "name": "Consumer",
+          "actual": 0.15315315315315314,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.4
+        },
+        {
+          "name": "Consumer",
+          "actual": 0.22580645161290322,
+          "unit": "RATIO",
+          "basis": "INVESTED_ASSETS",
+          "denominator": 21080,
+          "operator": "GT",
+          "threshold": 0.6
+        },
+        {
+          "name": "Fixed Income",
+          "actual": 0.1303088803088803,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.4
+        },
+        {
+          "name": "Fixed Income",
+          "actual": 0.19212523719165087,
+          "unit": "RATIO",
+          "basis": "INVESTED_ASSETS",
+          "denominator": 21080,
+          "operator": "GT",
+          "threshold": 0.6
+        }
+      ]
+    },
+    {
+      "rule_id": "R06",
+      "status": "REVIEW",
+      "reason_ids": [
+        "reason-dd-001"
+      ],
+      "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+      "measurements": [
+        {
+          "name": "historical_drawdown_magnitude",
+          "actual": 0.02789133,
+          "unit": "RATIO",
+          "basis": "SAMPLE",
+          "denominator": null,
+          "operator": "GT",
+          "threshold": 0.02
+        }
+      ]
+    },
+    {
+      "rule_id": "R07",
+      "status": "PASS",
+      "reason_ids": [],
+      "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+      "measurements": [
+        {
+          "name": "EQUITY_ALPHA+ETF_GROWTH:correlation",
+          "actual": 0.988122,
+          "unit": "CORRELATION",
+          "basis": "SAMPLE",
+          "denominator": null,
+          "operator": "GTE",
+          "threshold": 0.8
+        },
+        {
+          "name": "EQUITY_ALPHA+ETF_GROWTH:weight",
+          "actual": 0.3947876447876448,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.4
+        },
+        {
+          "name": "EQUITY_ALPHA+ETF_CONSUMER:correlation",
+          "actual": 0.938165,
+          "unit": "CORRELATION",
+          "basis": "SAMPLE",
+          "denominator": null,
+          "operator": "GTE",
+          "threshold": 0.8
+        },
+        {
+          "name": "EQUITY_ALPHA+ETF_CONSUMER:weight",
+          "actual": 0.305019305019305,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.4
+        },
+        {
+          "name": "EQUITY_ALPHA+ETF_BOND:correlation",
+          "actual": -0.825061,
+          "unit": "CORRELATION",
+          "basis": "SAMPLE",
+          "denominator": null,
+          "operator": "GTE",
+          "threshold": 0.8
+        },
+        {
+          "name": "EQUITY_ALPHA+ETF_BOND:weight",
+          "actual": 0.28217503217503215,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.4
+        },
+        {
+          "name": "ETF_GROWTH+ETF_CONSUMER:correlation",
+          "actual": 0.97728,
+          "unit": "CORRELATION",
+          "basis": "SAMPLE",
+          "denominator": null,
+          "operator": "GTE",
+          "threshold": 0.8
+        },
+        {
+          "name": "ETF_GROWTH+ETF_CONSUMER:weight",
+          "actual": 0.3960746460746461,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.4
+        },
+        {
+          "name": "ETF_GROWTH+ETF_BOND:correlation",
+          "actual": -0.815422,
+          "unit": "CORRELATION",
+          "basis": "SAMPLE",
+          "denominator": null,
+          "operator": "GTE",
+          "threshold": 0.8
+        },
+        {
+          "name": "ETF_GROWTH+ETF_BOND:weight",
+          "actual": 0.3732303732303732,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.4
+        },
+        {
+          "name": "ETF_CONSUMER+ETF_BOND:correlation",
+          "actual": -0.819951,
+          "unit": "CORRELATION",
+          "basis": "SAMPLE",
+          "denominator": null,
+          "operator": "GTE",
+          "threshold": 0.8
+        },
+        {
+          "name": "ETF_CONSUMER+ETF_BOND:weight",
+          "actual": 0.28346203346203347,
+          "unit": "RATIO",
+          "basis": "TOTAL_ASSETS",
+          "denominator": 31080,
+          "operator": "GT",
+          "threshold": 0.4
+        }
+      ]
+    },
+    {
+      "rule_id": "R08",
+      "status": "NOT_APPLICABLE",
+      "reason_ids": [],
+      "scope_note": "该阶段不授予执行资格；执行前必须另查本规则。",
+      "measurements": []
+    },
+    {
+      "rule_id": "R09",
+      "status": "NOT_APPLICABLE",
+      "reason_ids": [],
+      "scope_note": "该阶段不授予执行资格；执行前必须另查本规则。",
+      "measurements": []
+    },
+    {
+      "rule_id": "R10",
+      "status": "NOT_APPLICABLE",
+      "reason_ids": [],
+      "scope_note": "该阶段不授予执行资格；执行前必须另查本规则。",
+      "measurements": []
+    }
+  ],
+  "reasons": [
+    {
+      "reason_id": "reason-dd-001",
+      "rule_id": "R06",
+      "code": "MAX_DRAWDOWN_EXCEEDED",
+      "decision": "REVIEW",
+      "message_zh": "历史回撤2.789133%超过用户演示容忍值2%；不代表未来损失上限。",
+      "measurements": [
+        {
+          "name": "historical_drawdown_magnitude",
+          "actual": 0.02789133,
+          "unit": "RATIO",
+          "basis": "SAMPLE",
+          "denominator": null,
+          "operator": "GT",
+          "threshold": 0.02
+        }
+      ],
+      "evidence_refs": [
+        "/upstream/artifacts/simulation/comparisons/1/metrics/max_drawdown",
+        "/profile/max_historical_drawdown"
+      ],
+      "acceptance_allowed": true,
+      "recovery": {
+        "action": "ACCEPT_RISK",
+        "owner": "USER",
+        "message_zh": "逐项接受此风险，再确认完整计划；本例仍未获得执行授权。"
+      }
+    }
+  ],
+  "allowed_functions": [
+    "VIEW_DIAGNOSIS",
+    "COMPARE",
+    "REQUEST_CONFIRMATION"
+  ],
+  "paused_functions": [
+    "PAPER_TRADE",
+    "REAL_TRADE"
+  ],
+  "approval": {
+    "status": "UNCONFIRMED",
+    "approval_id": null,
+    "confirmed_by": null,
+    "confirmed_at": null,
+    "expires_at": null,
+    "risk_check_id": null,
+    "binding": null,
+    "accepted_risks": []
+  },
+  "execution": {
+    "status": "NOT_STARTED",
+    "execution_id": null,
+    "idempotency_key": null,
+    "content_hash": null,
+    "previous_result_ref": null
+  },
+  "audit_event": {
+    "input_sha256": "1ef0b0251d679659d8963cac2fbeef30a82e177a0c5c6cf9caafdca4b9c5faad",
+    "input_snapshot_ref": "demo://risk-request-review",
+    "checks": [
+      {
+        "rule_id": "R01",
+        "status": "PASS",
+        "reason_ids": [],
+        "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+        "measurements": []
+      },
+      {
+        "rule_id": "R02",
+        "status": "PASS",
+        "reason_ids": [],
+        "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+        "measurements": []
+      },
+      {
+        "rule_id": "R03",
+        "status": "PASS",
+        "reason_ids": [],
+        "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+        "measurements": [
+          {
+            "name": "cash_after",
+            "actual": 10000,
+            "unit": "CNY",
+            "basis": "CASH",
+            "denominator": null,
+            "operator": "LT",
+            "threshold": 5000
+          }
+        ]
+      },
+      {
+        "rule_id": "R04",
+        "status": "PASS",
+        "reason_ids": [],
+        "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+        "measurements": [
+          {
+            "name": "single_total",
+            "actual": 0.24292149292149293,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.35
+          },
+          {
+            "name": "top3_total",
+            "actual": 0.547940797940798,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.75
+          },
+          {
+            "name": "single_invested",
+            "actual": 0.3581593927893738,
+            "unit": "RATIO",
+            "basis": "INVESTED_ASSETS",
+            "denominator": 21080,
+            "operator": "GT",
+            "threshold": 0.5
+          },
+          {
+            "name": "top3_invested",
+            "actual": 0.8078747628083491,
+            "unit": "RATIO",
+            "basis": "INVESTED_ASSETS",
+            "denominator": 21080,
+            "operator": "GT",
+            "threshold": 0.9
+          }
+        ]
+      },
+      {
+        "rule_id": "R05",
+        "status": "PASS",
+        "reason_ids": [],
+        "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+        "measurements": [
+          {
+            "name": "Technology",
+            "actual": 0.3947876447876448,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.4
+          },
+          {
+            "name": "Technology",
+            "actual": 0.5820683111954459,
+            "unit": "RATIO",
+            "basis": "INVESTED_ASSETS",
+            "denominator": 21080,
+            "operator": "GT",
+            "threshold": 0.6
+          },
+          {
+            "name": "Consumer",
+            "actual": 0.15315315315315314,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.4
+          },
+          {
+            "name": "Consumer",
+            "actual": 0.22580645161290322,
+            "unit": "RATIO",
+            "basis": "INVESTED_ASSETS",
+            "denominator": 21080,
+            "operator": "GT",
+            "threshold": 0.6
+          },
+          {
+            "name": "Fixed Income",
+            "actual": 0.1303088803088803,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.4
+          },
+          {
+            "name": "Fixed Income",
+            "actual": 0.19212523719165087,
+            "unit": "RATIO",
+            "basis": "INVESTED_ASSETS",
+            "denominator": 21080,
+            "operator": "GT",
+            "threshold": 0.6
+          }
+        ]
+      },
+      {
+        "rule_id": "R06",
+        "status": "REVIEW",
+        "reason_ids": [
+          "reason-dd-001"
+        ],
+        "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+        "measurements": [
+          {
+            "name": "historical_drawdown_magnitude",
+            "actual": 0.02789133,
+            "unit": "RATIO",
+            "basis": "SAMPLE",
+            "denominator": null,
+            "operator": "GT",
+            "threshold": 0.02
+          }
+        ]
+      },
+      {
+        "rule_id": "R07",
+        "status": "PASS",
+        "reason_ids": [],
+        "scope_note": "仅为人工编写的契约预期，非引擎运行结果。",
+        "measurements": [
+          {
+            "name": "EQUITY_ALPHA+ETF_GROWTH:correlation",
+            "actual": 0.988122,
+            "unit": "CORRELATION",
+            "basis": "SAMPLE",
+            "denominator": null,
+            "operator": "GTE",
+            "threshold": 0.8
+          },
+          {
+            "name": "EQUITY_ALPHA+ETF_GROWTH:weight",
+            "actual": 0.3947876447876448,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.4
+          },
+          {
+            "name": "EQUITY_ALPHA+ETF_CONSUMER:correlation",
+            "actual": 0.938165,
+            "unit": "CORRELATION",
+            "basis": "SAMPLE",
+            "denominator": null,
+            "operator": "GTE",
+            "threshold": 0.8
+          },
+          {
+            "name": "EQUITY_ALPHA+ETF_CONSUMER:weight",
+            "actual": 0.305019305019305,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.4
+          },
+          {
+            "name": "EQUITY_ALPHA+ETF_BOND:correlation",
+            "actual": -0.825061,
+            "unit": "CORRELATION",
+            "basis": "SAMPLE",
+            "denominator": null,
+            "operator": "GTE",
+            "threshold": 0.8
+          },
+          {
+            "name": "EQUITY_ALPHA+ETF_BOND:weight",
+            "actual": 0.28217503217503215,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.4
+          },
+          {
+            "name": "ETF_GROWTH+ETF_CONSUMER:correlation",
+            "actual": 0.97728,
+            "unit": "CORRELATION",
+            "basis": "SAMPLE",
+            "denominator": null,
+            "operator": "GTE",
+            "threshold": 0.8
+          },
+          {
+            "name": "ETF_GROWTH+ETF_CONSUMER:weight",
+            "actual": 0.3960746460746461,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.4
+          },
+          {
+            "name": "ETF_GROWTH+ETF_BOND:correlation",
+            "actual": -0.815422,
+            "unit": "CORRELATION",
+            "basis": "SAMPLE",
+            "denominator": null,
+            "operator": "GTE",
+            "threshold": 0.8
+          },
+          {
+            "name": "ETF_GROWTH+ETF_BOND:weight",
+            "actual": 0.3732303732303732,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.4
+          },
+          {
+            "name": "ETF_CONSUMER+ETF_BOND:correlation",
+            "actual": -0.819951,
+            "unit": "CORRELATION",
+            "basis": "SAMPLE",
+            "denominator": null,
+            "operator": "GTE",
+            "threshold": 0.8
+          },
+          {
+            "name": "ETF_CONSUMER+ETF_BOND:weight",
+            "actual": 0.28346203346203347,
+            "unit": "RATIO",
+            "basis": "TOTAL_ASSETS",
+            "denominator": 31080,
+            "operator": "GT",
+            "threshold": 0.4
+          }
+        ]
+      },
+      {
+        "rule_id": "R08",
+        "status": "NOT_APPLICABLE",
+        "reason_ids": [],
+        "scope_note": "该阶段不授予执行资格；执行前必须另查本规则。",
+        "measurements": []
+      },
+      {
+        "rule_id": "R09",
+        "status": "NOT_APPLICABLE",
+        "reason_ids": [],
+        "scope_note": "该阶段不授予执行资格；执行前必须另查本规则。",
+        "measurements": []
+      },
+      {
+        "rule_id": "R10",
+        "status": "NOT_APPLICABLE",
+        "reason_ids": [],
+        "scope_note": "该阶段不授予执行资格；执行前必须另查本规则。",
+        "measurements": []
+      }
+    ],
+    "reason_details": [
+      {
+        "reason_id": "reason-dd-001",
+        "rule_id": "R06",
+        "code": "MAX_DRAWDOWN_EXCEEDED",
+        "decision": "REVIEW",
+        "message_zh": "历史回撤2.789133%超过用户演示容忍值2%；不代表未来损失上限。",
+        "measurements": [
+          {
+            "name": "historical_drawdown_magnitude",
+            "actual": 0.02789133,
+            "unit": "RATIO",
+            "basis": "SAMPLE",
+            "denominator": null,
+            "operator": "GT",
+            "threshold": 0.02
+          }
+        ],
+        "evidence_refs": [
+          "/upstream/artifacts/simulation/comparisons/1/metrics/max_drawdown",
+          "/profile/max_historical_drawdown"
+        ],
+        "acceptance_allowed": true,
+        "recovery": {
+          "action": "ACCEPT_RISK",
+          "owner": "USER",
+          "message_zh": "逐项接受此风险，再确认完整计划；本例仍未获得执行授权。"
+        }
+      }
+    ],
+    "event_id": "event-review",
+    "correlation_id": "audit-demo-review",
+    "event_type": "RISK_CHECK_COMPLETED",
+    "occurred_at": "2026-10-10T09:00:00+08:00",
+    "actor": "DEMO_FIXTURE_AUTHOR",
+    "binding": {
+      "request_id": "req-demo-20261007-001",
+      "handoff_id": "handoff-task-4bba1586-f582-4899-bc8c-0e27f6ddff72",
+      "task_id": "task-4bba1586-f582-4899-bc8c-0e27f6ddff72",
+      "session_id": "session-f4229044-5c8d-4228-8fc9-8599688bef40",
+      "user_id": "demo-user-001",
+      "proposal_id": "proposal-a-74ef228729",
+      "proposal_hash": "b1c4acfbd501a4221e0e7e766b395102138a5ad99315c7cbcd06e33f243a7b74",
+      "plan_version": "demo-plan-a.v1",
+      "plan_hash": "a7f9498bcacab195f139874efee2e096a1acff7537d9ed5c40da63f9c3ffa65f",
+      "profile_version": "demo-profile.v2",
+      "constraints_version": "demo-constraints.v2",
+      "data_version": "demo-replay-20260923.v1",
+      "trading_rules_version": null,
+      "rules_version": "risk-rules.v0.1-draft"
+    },
+    "risk_check_id": "risk-check-review",
+    "stage": "PLAN_REVIEW",
+    "decision": "REVIEW",
+    "rule_ids": [
+      "R01",
+      "R02",
+      "R03",
+      "R04",
+      "R05",
+      "R06",
+      "R07",
+      "R08",
+      "R09",
+      "R10"
+    ],
+    "reason_ids": [
+      "reason-dd-001"
+    ],
+    "evidence_refs": [
+      "/upstream/artifacts/simulation/comparisons/1/metrics/max_drawdown",
+      "/profile/max_historical_drawdown"
+    ],
+    "data_mode": "SYNTHETIC_REPLAY",
+    "metrics_and_thresholds": [
+      {
+        "name": "cash_after",
+        "actual": 10000,
+        "unit": "CNY",
+        "basis": "CASH",
+        "denominator": null,
+        "operator": "LT",
+        "threshold": 5000
+      },
+      {
+        "name": "single_total",
+        "actual": 0.24292149292149293,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.35
+      },
+      {
+        "name": "top3_total",
+        "actual": 0.547940797940798,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.75
+      },
+      {
+        "name": "single_invested",
+        "actual": 0.3581593927893738,
+        "unit": "RATIO",
+        "basis": "INVESTED_ASSETS",
+        "denominator": 21080,
+        "operator": "GT",
+        "threshold": 0.5
+      },
+      {
+        "name": "top3_invested",
+        "actual": 0.8078747628083491,
+        "unit": "RATIO",
+        "basis": "INVESTED_ASSETS",
+        "denominator": 21080,
+        "operator": "GT",
+        "threshold": 0.9
+      },
+      {
+        "name": "Technology",
+        "actual": 0.3947876447876448,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.4
+      },
+      {
+        "name": "Technology",
+        "actual": 0.5820683111954459,
+        "unit": "RATIO",
+        "basis": "INVESTED_ASSETS",
+        "denominator": 21080,
+        "operator": "GT",
+        "threshold": 0.6
+      },
+      {
+        "name": "Consumer",
+        "actual": 0.15315315315315314,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.4
+      },
+      {
+        "name": "Consumer",
+        "actual": 0.22580645161290322,
+        "unit": "RATIO",
+        "basis": "INVESTED_ASSETS",
+        "denominator": 21080,
+        "operator": "GT",
+        "threshold": 0.6
+      },
+      {
+        "name": "Fixed Income",
+        "actual": 0.1303088803088803,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.4
+      },
+      {
+        "name": "Fixed Income",
+        "actual": 0.19212523719165087,
+        "unit": "RATIO",
+        "basis": "INVESTED_ASSETS",
+        "denominator": 21080,
+        "operator": "GT",
+        "threshold": 0.6
+      },
+      {
+        "name": "historical_drawdown_magnitude",
+        "actual": 0.02789133,
+        "unit": "RATIO",
+        "basis": "SAMPLE",
+        "denominator": null,
+        "operator": "GT",
+        "threshold": 0.02
+      },
+      {
+        "name": "EQUITY_ALPHA+ETF_GROWTH:correlation",
+        "actual": 0.988122,
+        "unit": "CORRELATION",
+        "basis": "SAMPLE",
+        "denominator": null,
+        "operator": "GTE",
+        "threshold": 0.8
+      },
+      {
+        "name": "EQUITY_ALPHA+ETF_GROWTH:weight",
+        "actual": 0.3947876447876448,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.4
+      },
+      {
+        "name": "EQUITY_ALPHA+ETF_CONSUMER:correlation",
+        "actual": 0.938165,
+        "unit": "CORRELATION",
+        "basis": "SAMPLE",
+        "denominator": null,
+        "operator": "GTE",
+        "threshold": 0.8
+      },
+      {
+        "name": "EQUITY_ALPHA+ETF_CONSUMER:weight",
+        "actual": 0.305019305019305,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.4
+      },
+      {
+        "name": "EQUITY_ALPHA+ETF_BOND:correlation",
+        "actual": -0.825061,
+        "unit": "CORRELATION",
+        "basis": "SAMPLE",
+        "denominator": null,
+        "operator": "GTE",
+        "threshold": 0.8
+      },
+      {
+        "name": "EQUITY_ALPHA+ETF_BOND:weight",
+        "actual": 0.28217503217503215,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.4
+      },
+      {
+        "name": "ETF_GROWTH+ETF_CONSUMER:correlation",
+        "actual": 0.97728,
+        "unit": "CORRELATION",
+        "basis": "SAMPLE",
+        "denominator": null,
+        "operator": "GTE",
+        "threshold": 0.8
+      },
+      {
+        "name": "ETF_GROWTH+ETF_CONSUMER:weight",
+        "actual": 0.3960746460746461,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.4
+      },
+      {
+        "name": "ETF_GROWTH+ETF_BOND:correlation",
+        "actual": -0.815422,
+        "unit": "CORRELATION",
+        "basis": "SAMPLE",
+        "denominator": null,
+        "operator": "GTE",
+        "threshold": 0.8
+      },
+      {
+        "name": "ETF_GROWTH+ETF_BOND:weight",
+        "actual": 0.3732303732303732,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.4
+      },
+      {
+        "name": "ETF_CONSUMER+ETF_BOND:correlation",
+        "actual": -0.819951,
+        "unit": "CORRELATION",
+        "basis": "SAMPLE",
+        "denominator": null,
+        "operator": "GTE",
+        "threshold": 0.8
+      },
+      {
+        "name": "ETF_CONSUMER+ETF_BOND:weight",
+        "actual": 0.28346203346203347,
+        "unit": "RATIO",
+        "basis": "TOTAL_ASSETS",
+        "denominator": 31080,
+        "operator": "GT",
+        "threshold": 0.4
+      }
+    ],
+    "improvement_focus": null,
+    "unknown_fields": [],
+    "approval": {
+      "status": "UNCONFIRMED",
+      "approval_id": null,
+      "confirmed_by": null,
+      "confirmed_at": null,
+      "expires_at": null,
+      "risk_check_id": null,
+      "binding": null,
+      "accepted_risks": []
+    },
+    "execution": {
+      "status": "NOT_STARTED",
+      "execution_id": null,
+      "idempotency_key": null,
+      "content_hash": null,
+      "previous_result_ref": null
+    },
+    "record_status": "DEMO_NOT_PERSISTED"
+  }
+}
