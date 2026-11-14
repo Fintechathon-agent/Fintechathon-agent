@@ -1,0 +1,11 @@
+{
+  "name": "long-text-life-risk-staging",
+  "version": "1.0.0",
+  "private": true,
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node server.cjs",
+    "test": "node --test test/*.test.cjs",
+    "check": "node --check parser.cjs && node --check service.cjs && node --check server.cjs && node --check public/app.js"
+  }
+}
