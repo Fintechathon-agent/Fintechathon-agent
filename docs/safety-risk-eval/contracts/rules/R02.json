@@ -1,0 +1,49 @@
+{
+  "rule_id": "R02",
+  "title_zh": "必需数据、证据、版本与测算有效性",
+  "version": "risk-rules.v0.1-draft",
+  "status": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW",
+  "stages": [
+    "PLAN_REVIEW",
+    "EXECUTION_PREFLIGHT"
+  ],
+  "check_key": "evidence_integrity",
+  "input_refs": [
+    "/upstream",
+    "/binding",
+    "/data_context"
+  ],
+  "conditions": [
+    {
+      "condition_id": "R02-policy",
+      "metric": "evidence_integrity",
+      "operator": "POLICY_CHECK",
+      "threshold": null,
+      "threshold_ref": null,
+      "unit": "POLICY",
+      "basis": "POLICY",
+      "group": "ANY"
+    }
+  ],
+  "reason_codes": [
+    "DATA_MISSING",
+    "EVIDENCE_MISMATCH",
+    "VERSION_MISMATCH",
+    "DATA_STALE",
+    "CALCULATION_FAILED",
+    "UNSUPPORTED_DATA_MODE"
+  ],
+  "failure_decisions": [
+    "ERROR",
+    "REVIEW"
+  ],
+  "acceptance_policy_zh": "已知资料待补进入不可勾选放行的复核；必要测算无法完成进入错误。",
+  "enforcement_owner": [
+    "RISK",
+    "ORCHESTRATOR",
+    "TOOLS"
+  ],
+  "recovery_zh": "补齐或修正来源、版本、数据与测算后重新检查。",
+  "source": "MODULE4_PROPOSAL",
+  "notes_zh": "配置仅供队内虚构演示；规则定义不是可执行规则引擎。"
+}

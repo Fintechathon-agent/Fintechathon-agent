@@ -3,6 +3,7 @@
 维护账号：realchenchenluo。阶段：本地验证通过、真实接入未开通。只放在临时共创区，尚未进入正式交付区。
 
 - [开通步骤](../../../chenchen/docs/bailian-setup-guide-2026-10-17.md)
+- [10 月 25 日 qwen3.8-flash 与预算守卫升级](../../../chenchen/docs/bailian-upgrade-2026-10-25.md)
 - [实现、配置和六类验收边界](../../../chenchen/docs/bailian-integration-2026-10-17.md)
 - [本地测试原始输出](../../../chenchen/docs/bailian-local-tests-2026-10-17.txt)
 - [尚未执行的真实验收记录模板](../../../chenchen/docs/bailian-live-acceptance-template.json)

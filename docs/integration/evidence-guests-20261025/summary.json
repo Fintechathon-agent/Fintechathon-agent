@@ -1,0 +1,59 @@
+{
+  "schema_version": "guest-account-acceptance.v1",
+  "tested_base_commit": "432f00387ee3e10c0113ba48a7992afc1a56f733",
+  "source_mode": "WORKING_TREE_SOURCE_HASHES",
+  "source_sha256": {
+    "qiqi/web/guest_gateway.py": "eeca9d10d20c337b49e1966cab1834adbcd948976d57ae075e0b5074bd5e0ae9",
+    "qiqi/web/guest_worker.py": "fb353c411eb9e6c9ce9cddfa35efd72562fd1566f59f5b5f84343ad0e45ae71c",
+    "qiqi/web/unified_account.py": "8841639a43a652d5d9df92922214cd1817bcc9e59b26e8b2e25423bef6e5d61e",
+    "qiqi/web/banking_service.py": "7b3532151f3c0c591a40298312add7eb7e730cb77bcc6afc17427dc423ef6e99",
+    "qiqi/tests/test_guest_accounts.py": "2d8ed0824cfe8397a1caad413edbf17c3c2cc9cff3d782c7c26df199120dac79",
+    "qiqi/web/static/guest-account.js": "948c9dfa59efba0d4112d10bf0734b303a5fe58b8fbade8227454177a8030ff0",
+    "qiqi/web/static/app.js": "f2fc320617bdf60c7f94b426e34f1ce0f559059793c18ed2e82a12c99836d521",
+    "qiqi/web/static/index.html": "789eb3ca7b53a5a589e4c1c03c1dbb4688592539fa1578dc0eeb5ef9ee334d7f"
+  },
+  "finance_regression": {
+    "passed": 262,
+    "failed": 0
+  },
+  "guest_special_subset": {
+    "passed": 11,
+    "failed": 0
+  },
+  "existing_three_service_http": {
+    "passed": 6,
+    "failed": 0,
+    "model": "TEST_DOUBLE_NOT_LIVE"
+  },
+  "budget": {
+    "user_authorized_daily_cny": 20,
+    "operator_imposed_run_total_cny": 20,
+    "includes_retries": true,
+    "automatic_recharge": false,
+    "cloud_configuration_changed": false
+  },
+  "real_model_calls_this_turn": 0,
+  "balance_verified": false,
+  "cloudflare_login_verified": false,
+  "main_chat_source_acquired": false,
+  "staging_deployed": false,
+  "browser": {
+    "os": "Windows",
+    "browser": "Chrome",
+    "environment": "LOOPBACK_DEMO",
+    "observed_cash_before": 25680.5,
+    "observed_cash_after": 24980.5,
+    "investment_cash_matches": true,
+    "minimum_cash_block_observed": true,
+    "restart_preserved_state": true
+  },
+  "unverified": [
+    "iOS",
+    "Android",
+    "macOS",
+    "Mainland direct network",
+    "public main chat integration",
+    "live model",
+    "team staging"
+  ]
+}

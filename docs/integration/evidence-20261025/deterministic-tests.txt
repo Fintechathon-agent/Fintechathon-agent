@@ -1,0 +1,15 @@
+test_competition_holdings_are_100000_with_60_20_20_weights (tests.test_preview_contract.PreviewContractTests.test_competition_holdings_are_100000_with_60_20_20_weights) ... ok
+test_demo_portfolio_keeps_cash_out_of_security_weights (tests.test_preview_contract.PreviewContractTests.test_demo_portfolio_keeps_cash_out_of_security_weights) ... ok
+test_missing_input_stops_before_analysis (tests.test_preview_contract.PreviewContractTests.test_missing_input_stops_before_analysis) ... ok
+test_unknown_or_invalid_cash_cannot_be_assumed_zero (tests.test_preview_contract.PreviewContractTests.test_unknown_or_invalid_cash_cannot_be_assumed_zero) ... ok
+test_valid_request_returns_read_only_handoff_with_traceable_artifacts (tests.test_preview_contract.PreviewContractTests.test_valid_request_returns_read_only_handoff_with_traceable_artifacts) ... ok
+test_csv_quotes_signs_refund_income_and_duplicate_reconcile (tests.test_bill_import.BillImportTests.test_csv_quotes_signs_refund_income_and_duplicate_reconcile) ... ok
+test_limits_and_bad_rows_fail_without_truncation (tests.test_bill_import.BillImportTests.test_limits_and_bad_rows_fail_without_truncation) ... ok
+test_bill_text_cannot_approve_or_change_sandbox_balance (tests.test_bill_import.BoundBillTaskTests.test_bill_text_cannot_approve_or_change_sandbox_balance) ... ok
+test_replacing_file_changes_answer_and_audit_binding (tests.test_bill_import.BoundBillTaskTests.test_replacing_file_changes_answer_and_audit_binding) ... ok
+test_unsafe_bill_question_never_looks_like_a_completed_import (tests.test_bill_import.BoundBillTaskTests.test_unsafe_bill_question_never_looks_like_a_completed_import) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.105s
+
+OK

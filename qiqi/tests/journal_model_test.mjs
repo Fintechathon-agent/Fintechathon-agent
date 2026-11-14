@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {emptyBook,mergeRecords,summarize,memories,cents,toCSV} from '../web/static/team-preview/versions/journal-model.mjs';
+const base={category:'其他',title:'餐饮支出',occurred_on:'2026-10-17',recorded_at:'2026-10-17T12:00:00+08:00',source:'user_report',confidence:'explicit_rule',notes:[],attention:'normal',currency:'CNY',direction:'out'};
+const row=(id,kind,amount_cents,status='recorded',extra={})=>({...base,id,kind,amount_cents,status,...extra});
+let book=emptyBook();
+book=mergeRecords(book,[row('a','income',1200000,'recorded',{title:'工资',direction:'in'}),row('b','expense',1800),row('c','subscription',20000,'recorded',{currency:'USD',title:'GPT'}),row('d','investment',360000,'plan',{title:'纳斯达克',attention:'high'}),row('e','expense',900000,'review')]);
+let s=summarize(book,'2026-10');
+assert.equal(s.totals.CNY.income,1200000);assert.equal(s.totals.CNY.expense,1800);assert.equal(s.totals.CNY.planned,360000);assert.equal(s.totals.CNY.investment,0);assert.equal(s.totals.USD.expense,20000);assert.equal(s.available,null);
+book.budgets['2026-10']={opening:0,essentials:700000,buffer:200000};s=summarize(book,'2026-10');assert.equal(s.available,-61800);assert(s.alerts.some(a=>a.tone==='risk'));
+const duplicate=mergeRecords(book,[row('f','expense',1800)]);assert.equal(duplicate.records.at(-1).status,'review');assert.equal(summarize(duplicate,'2026-10').totals.CNY.expense,1800);
+assert.equal(summarize(book,'2026-09').net,0);
+assert.equal(cents('0.29'),29);assert.equal(cents('12000.15'),1200015);assert.throws(()=>cents('-20'));assert.throws(()=>cents('1.123'));assert.throws(()=>cents('Infinity'));
+assert.equal(memories(book,'2026-10-17').length,1);assert.equal(memories(book,'2026-10-17')[0].weight,90);
+assert(memories(book,'2026-12-17')[0].weight<90);
+const csv=toCSV([row('g','expense',100,'recorded',{title:'=HYPERLINK("x")'})]);assert(csv.startsWith('\uFEFF'));assert(csv.includes("'=HYPERLINK"));assert(csv.includes('用户自述'));
+book.records=book.records.filter(r=>r.id!=='d');assert.equal(memories(book).length,0);
+console.log('PASS: currency separation, plans, budget shortfall, duplicate review, dates, decimal cents, attention decay, deletion and CSV injection.');

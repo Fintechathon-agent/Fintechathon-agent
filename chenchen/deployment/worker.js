@@ -6,6 +6,7 @@ import modelReviewModule from "../integrations/model-review.js";
 import legacyReviewAdapterModule from "../integrations/legacy-review-adapter.js";
 import riskHandoffModule from "../integrations/risk-handoff.js";
 import ownerBridgeModule from "../integrations/owner-bridge.js";
+import serviceSecurityModule from "../integrations/service-security.js";
 import reviewWorkflowModule from "../integrations/review-workflow.js";
 import fundingPlanModule from "../integrations/funding-plan.js";
 import coreErrorModule from "../contracts/core-agent-error.js";
@@ -22,6 +23,7 @@ const modelReview = modelReviewModule;
 const legacyReviewAdapter = legacyReviewAdapterModule;
 const riskHandoff = riskHandoffModule;
 const ownerBridge = ownerBridgeModule;
+const serviceSecurity = serviceSecurityModule;
 const { ReviewWorkflowStore, WorkflowError, matchesRequestFingerprint } = reviewWorkflowModule;
 const { FundingPlanStore } = fundingPlanModule;
 const coreError = coreErrorModule;
@@ -93,14 +95,6 @@ async function readJson(request) {
   }
 }
 
-function authFailure() {
-  const error = new Error("API authentication is required");
-  error.code = "AUTHENTICATION_REQUIRED";
-  error.statusCode = 401;
-  error.recovery = "Provide the configured X-Core-Agent-Key and retry.";
-  return error;
-}
-
 function rateLimitFailure() {
   const error = new Error("rate limit exceeded");
   error.code = "RATE_LIMITED";
@@ -130,52 +124,7 @@ function routeNotFoundFailure() {
 }
 
 function capabilityStatus(env) {
-  const config = modelReview.resolveModelConfig(env);
-  const provider = String(config.provider || "").toLowerCase();
-  const workersAi = config.style === "workers_ai";
-  const modelConfigured = workersAi
-    ? typeof env.AI?.run === "function"
-    : Boolean(config.apiKey && config.model && !config.configurationIssue);
-  const riskUrlConfigured = Boolean(String(env.RISK_SERVICE_URL || "").trim());
-  const riskSecretConfigured = Boolean(String(env.RISK_SERVICE_HMAC_SECRET || env.RISK_HMAC_SECRET || "").trim());
-  const approvalSecretConfigured = Boolean(String(env.APPROVAL_SERVICE_HMAC_SECRET || env.APPROVAL_HMAC_SECRET || "").trim());
-  return {
-    capability_version: "core-agent-capabilities.v1",
-    service: "core-agent",
-    contract_version: modelReview.REVIEW_VERSION,
-    model: {
-      provider,
-      name: config.model || null,
-      configured: modelConfigured,
-      inference_probe: "NOT_RUN",
-      response_id_sources: ["body.id", "body.response_id", "header.x-request-id", "header.x-correlation-id"],
-      paid_calls_this_check: 0
-    },
-    risk: {
-      handoff_contract: "risk-handoff.v1",
-      dispatch_url_configured: riskUrlConfigured,
-      dispatch_signature_configured: riskSecretConfigured,
-      dispatch_ready: riskUrlConfigured && riskSecretConfigured,
-      callback_signature_configured: riskSecretConfigured
-    },
-    approval: {
-      decision_endpoint: "/api/review/approval",
-      signature_configured: approvalSecretConfigured,
-      trusted_identity_ready: approvalSecretConfigured,
-      demo_actor_labels_allowed: !approvalSecretConfigured && String(env.REQUIRE_TRUSTED_ACTORS || "").toLowerCase() !== "true"
-    },
-    execution: {
-      mode: "PAPER",
-      allowed: false,
-      gateway_connected: false
-    },
-    acceptance: {
-      synthetic_local: true,
-      real_model: false,
-      formal_risk_callback: false,
-      joint_acceptance: false
-    }
-  };
+  return serviceSecurity.capabilityStatus(env);
 }
 
 function requestIdentity(request) {
@@ -195,12 +144,6 @@ function allowedByRateLimit(request, env) {
   if (count >= configuredLimit) return false;
   rateBuckets.set(key, count + 1);
   return true;
-}
-
-function requiresApiKey(request, env) {
-  const expected = String(env.CORE_AGENT_API_KEY || "").trim();
-  if (["bailian", "aliyun_bailian"].includes(String(env.MODEL_PROVIDER || "").trim().toLowerCase()) && !expected) return false;
-  return !expected || request.headers.get("X-Core-Agent-Key") === expected;
 }
 
 function workflowErrorPayload(error) {
@@ -480,7 +423,8 @@ export default {
     if (!isKnownPost && !isReviewRead && !isCapabilitiesRead) {
       return json(request, env, 404, errorPayload(routeNotFoundFailure()));
     }
-    if (!requiresApiKey(request, env)) return json(request, env, 401, errorPayload(authFailure()), { "WWW-Authenticate": "X-Core-Agent-Key" });
+    try { serviceSecurity.verifyCoreRequest(request.headers, env); }
+    catch (error) { return json(request, env, error.statusCode || 503, errorPayload(error), error.statusCode === 401 ? { "WWW-Authenticate": "X-Core-Agent-Key" } : {}); }
     if (!allowedByRateLimit(request, env)) return json(request, env, 429, errorPayload(rateLimitFailure()), { "Retry-After": "60" });
     if (isCapabilitiesRead) return json(request, env, 200, capabilityStatus(env));
     if (url.pathname === "/api/review" || url.pathname.startsWith("/api/review/") || url.pathname.startsWith("/api/funding-demo/")) {

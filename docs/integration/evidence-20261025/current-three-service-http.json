@@ -1,0 +1,475 @@
+{
+  "schema_version": "competition-current-http.v1",
+  "generated_at": "2026-10-25T06:48:14.819Z",
+  "mode": "LOCAL_THREE_SERVICE_HTTP",
+  "source_manifest": {
+    "snapshot_mode": "CURRENT_TRACKED_WORKTREE",
+    "core_commit": "91411251fe538edd4bc47df0f2ad2aeb37ab4e9c",
+    "core_tree": "27268a7d8bdcd7585dc7650609a439b22af8f8ce",
+    "source_sha256": {
+      "chenchen/contracts/README.md": "547142916106fddeb194b19249dce66d7b437ae8bba68b4cccdcaaef113b79d2",
+      "chenchen/contracts/agent-output.v1.schema.json": "2472f4e428768c1423597834149fc1b12fb6749e9f341b58491bd269d5a48c82",
+      "chenchen/contracts/core-agent-error.js": "45e90ee4377d118825bc5a89444dc186281423b1650f47ee1225c87a1bd9f6d6",
+      "chenchen/contracts/core-agent-error.v1.schema.json": "2da099863c10feea80dd7de488aa7a048f1fc9a02cbb47f1c2584e9806e25401",
+      "chenchen/contracts/examples/approval.request.json": "dc7078547e454843ae1b7c0a7529ad3070bc46965f2ba1cd413ec99a31c6f87e",
+      "chenchen/contracts/examples/core-agent-error.response.json": "c9ea1a9424e60eaa7710a50c0adfa3a1cd53ee98096a83089bdc700485bd315d",
+      "chenchen/contracts/examples/funding-plan.request.json": "cf50371f1c75c162d2adb7c8613ff01448ff5068ccf5da37595a41f15fe6807f",
+      "chenchen/contracts/examples/health-check.request.json": "d1637f5968de8975c4f6b4510e45964bbfebd1bbdcd76de3e4bfd7f3b1357bfe",
+      "chenchen/contracts/examples/health-check.response.json": "7f24e9a24ae571010aaa139eabfeebc9b62f0d20756e1d72378203648d735a11",
+      "chenchen/contracts/examples/model-review.request.json": "93686d876ce263f024bf8db5746b7dd196267f16916768433b0dbb50ef6efad3",
+      "chenchen/contracts/examples/model-review.response.json": "c7a2c09a193464144197e132ba5134ed3254dba2bd241348cf93c02c4e28d701",
+      "chenchen/contracts/examples/risk-callback.request.json": "18dcf223efc51768167c44181a110cefc09d47c875c16df8afc7a65f2c528f30",
+      "chenchen/contracts/examples/risk-decision.request.json": "ed3098bf31565390eb5cb05916e327e15718c72a837f6bd814bd821508e6db03",
+      "chenchen/contracts/examples/scenario-review.request.json": "3a49be465b3d72bd25a54344ae8d3a0f5b964c071a04de5fa0b6e71a0b64403e",
+      "chenchen/contracts/examples/simulation.request.json": "c661cbc7042458528556e056ecab398a6c5878ccb788710c1b470088308f4db8",
+      "chenchen/contracts/funding-plan-demo.v1.schema.json": "28f9aed6afa5e172de5f091d2c42c982b378582286f6d255317de085e898ace6",
+      "chenchen/contracts/investment-agent.v1.schema.json": "b4cf5eff4a65efdfc9a2cad6a42a2180c887e99d0eb1d570f068d2d965ed2383",
+      "chenchen/contracts/investment-contract.js": "60040b65019527ac43d51a7c80bc754eaf6dc1fb81a869439a066b811170b821",
+      "chenchen/contracts/model-review.v1.schema.json": "4d5d111c74d199104fbcf2f8409d3464b31c6b4d2a8f4f9f36e5755cdf73ad69",
+      "chenchen/contracts/owner-bridge.v1.schema.json": "2e593f083630b436f73c794736008fa495621c35d4e0511225eaab8c15726cae",
+      "chenchen/contracts/risk-handoff.v1.schema.json": "4905c1e9453ad8db946bddd7c8d64d5f99b8d2649be0351facbc262b990c0c3a",
+      "chenchen/core/harness.js": "bdcd59114431b9078f6306a61a374636dd43435aaa36537e33c6943838913da1",
+      "chenchen/core/memory.js": "d178d914ce9ff5db0916d8931c574f632e2ea2900dd178768ed6077041554eac",
+      "chenchen/data/demo-portfolio.json": "a0961f6560de6e90e801e2c7a74845838060fd2574f5f905849f19489933d4a3",
+      "chenchen/data/market-brief-2026-10-08.json": "4c252072e47aa14d296e36075d8ba93c67b7173cbe84a5df7afd0211d118c585",
+      "chenchen/data/market-brief-2026-10-09.json": "e48cd734578f22833bd9c3d88bfef2ff8dafadcc9d3e628026464f2e371e3a5c",
+      "chenchen/data/risk-workbench-demo.json": "2d8eb5ed9a187cd217fb15567c9afbd977642802621e91d9e4ac99a459566916",
+      "chenchen/deployment/package.json": "4ae935ef906a8954168983d48aaca9acbb0d53232a095d20a32e0baf373b1dcd",
+      "chenchen/deployment/review-docs.js": "c3048758438fc67a937ec2f8a4883d5f7d42f6b975f3f0e2913201578e5f0f9e",
+      "chenchen/deployment/risk-cloud-store.js": "3642b18482f48778311838a6fabab459f49affba7650749e28a6aff372aae4f7",
+      "chenchen/deployment/risk-worker.js": "c8430a658df460bc87037dc1a348dab2cb5f83c43f1702004c1bda4ab7639d9b",
+      "chenchen/deployment/worker.js": "46ef67d51ddff80e507df9a6771766ad4d751c8a00163af31710e12250f0b5ac",
+      "chenchen/integrations/bailian-budget.js": "aa2cf98797d9a743e6de4d8528f192e885773514cf17fcef15360b7bc2045c4f",
+      "chenchen/integrations/bailian-provider.js": "8b20297601d3f844c946cbea246d37ded7904d47c97d53a836026c63afa08bf8",
+      "chenchen/integrations/funding-plan.js": "16919750ad014e31113e3b02ba3d4c3efd7540857ea268f668bca29b84722477",
+      "chenchen/integrations/legacy-review-adapter.js": "8c41d044cf61578967e499db5d1d0577df9419820404c9c5121656b2600b2195",
+      "chenchen/integrations/model-review.js": "9d0f39d91fcc4d4066906568f9d65665a6f51128bc5ec76d4b454c0af405ecce",
+      "chenchen/integrations/owner-bridge.js": "6bd8a2a96e097d2f2b3896976eccc8e345823f065e3d7e26a25e307099ac6bd3",
+      "chenchen/integrations/review-evidence.js": "48b7474c8769629f00b2d6d025b5044e6221b0f3165b1f030ea4e5f2404dfd80",
+      "chenchen/integrations/review-reservation.js": "82ff05fc0444fcfbd5bf57e82de492374c96d877937e40950983742a17ec7081",
+      "chenchen/integrations/review-transition.js": "86c9400e91a89955c01957b810cef174820866025eadbbf79b59c8f0e0d2db73",
+      "chenchen/integrations/review-workflow.js": "7cb41b1195dc4a3e65cbfa2ac9760d86baf46f785034164afd1e72e591037b5e",
+      "chenchen/integrations/risk-handoff.js": "13e1be66a8cba5cdbc8fda7d412bcdc33c272a65b6e2126f781fd965013544f8",
+      "chenchen/integrations/risk-workbench-adapter.js": "9177b40ffd59ebb25a1bbfd557bde985ce025a2f933e1ec8d422c8b8ff870976",
+      "chenchen/integrations/service-security.js": "3957494486eded859aacf9af4e244467a62f8485bb0edcdb2b44b53c78886d6d",
+      "chenchen/tools/financial-tools.js": "ee8f1f3c6acb1bd784bc2ef38bd3d76fe710e9411ac5e52b6b96fe3591587a13",
+      "chenchen/tools/market-brief.js": "85d2532616861a7702606a00f03d3604bd5782e9ae0ef4c729e97fd1be4f7970"
+    },
+    "candidate_overlays": [
+      {
+        "path": "chenchen/integrations/review-workflow.js",
+        "base_sha256": "7cb41b1195dc4a3e65cbfa2ac9760d86baf46f785034164afd1e72e591037b5e",
+        "candidate_sha256": "7cb41b1195dc4a3e65cbfa2ac9760d86baf46f785034164afd1e72e591037b5e",
+        "changed": false
+      }
+    ],
+    "risk_sources": {
+      "daily-engine.cjs": "f588c9d2299fce5a94248744a359eb0ceccfc9c958d6f66688f5849d235ab556",
+      "interface-adapters/money.cjs": "7548c9a1f65e59fe43663cfda68c34c91e5358ad3324dd578cd0575467271dd1",
+      "interface-adapters/conversation-input.cjs": "24fc91ff4b2bb01817d3cccd1e9d8b3e209f0b9ae42f2d69265f04c41666991d",
+      "interface-adapters/conversation-risk.cjs": "2a5764ea190e1b7c6ec843df533af05051d3127a0fb0f8fe26ab0eb9a0f84777",
+      "interface-adapters/conversation-store.cjs": "5d3c32dc7e1c4a0e974a891788a568137f1a25fea4f603d124a090d865b3427e",
+      "interface-adapters/conversation-review.cjs": "c621f9cef50d3776f5eabd96727d9124d44af72ede7af8486fef959c773e6239",
+      "interface-adapters/core-client.cjs": "61171c2d99bc293d9b20707ea8dd2174262f53ded2316ea54d396b3382827381",
+      "interface-adapters/risk-callback.cjs": "eac98b03e6f593290a9aeb79fb22cc892fd6c9d4d5523def7e715ac7fb8b56b5",
+      "interface-adapters/risk-callback-sender.cjs": "f76c1dd0a848671c631631ef785920c61e1e6548047e35ff02b71f71efaa208c"
+    }
+  },
+  "finance_source_sha256": {
+    "qiqi/web/app.py": "888067ea08f5d7d1c7cf3d941c25eb96751c175ee565a452dae3f33220c45acd",
+    "qiqi/web/core_agent.py": "360272629f17a97ffc6b17f4d5c1e0ef81795a58ec3f88a07aaa6f52f227664e",
+    "qiqi/web/risk_conversation.py": "37ae2b287ec48f9dd915be6392bf1c14f6ff674a1ae2fdbc4a3c920711933712"
+  },
+  "path": [
+    "Finance Python HTTP",
+    "Risk Node HTTP",
+    "Core Worker Handler HTTP",
+    "Risk HMAC callback"
+  ],
+  "model": "TEST_DOUBLE_NOT_LIVE",
+  "core_storage": "IN_MEMORY_TEST_ADAPTER",
+  "real_model_calls": 0,
+  "synthetic_model_calls": 2,
+  "passed": 6,
+  "failed": 0,
+  "checks": [
+    "authenticated_capabilities_without_inference",
+    "forged_identity_rejected_before_model",
+    "python_risk_core_signed_block_same_task",
+    "risk_replay_does_not_recall_model",
+    "changed_payload_same_id_rejected",
+    "finance_core_request_id_preserved"
+  ],
+  "steps": [
+    {
+      "path": "/api/core-agent/status",
+      "status": 200,
+      "task_id": null,
+      "error_code": null
+    },
+    {
+      "path": "/api/review",
+      "status": 422,
+      "task_id": null,
+      "error_code": "INVALID_CONVERSATION_INPUT"
+    },
+    {
+      "path": "/api/review",
+      "status": 200,
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "error_code": null
+    },
+    {
+      "path": "/api/review",
+      "status": 200,
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "error_code": null
+    },
+    {
+      "path": "/api/review",
+      "status": 409,
+      "task_id": null,
+      "error_code": "IDEMPOTENCY_CONTENT_CONFLICT"
+    },
+    {
+      "path": "/api/core-agent/review",
+      "status": 200,
+      "task_id": "review-task-31b14d55-3fe1-437d-9a4c-bce7e663f225",
+      "error_code": null
+    },
+    {
+      "path": "/api/core-agent/review",
+      "status": 200,
+      "task_id": "review-task-31b14d55-3fe1-437d-9a4c-bce7e663f225",
+      "error_code": null
+    }
+  ],
+  "task": {
+    "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+    "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+    "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+    "risk_decision": "BLOCK",
+    "metrics": {
+      "amount_unit": "MINOR",
+      "currency": "CNY",
+      "free_before_minor": 200000,
+      "projected_free_after_minor": -600000,
+      "shortfall_minor": 600000,
+      "metric_status": {
+        "standard_dti": "NOT_EVALUATED",
+        "salary_based_ratio": "NOT_EVALUATED",
+        "food_tobacco_alcohol_share": "NOT_EVALUATED"
+      },
+      "available_for_new_action_minor": 200000,
+      "existing_shortfall_minor": 0,
+      "protected_before_minor": 1000000,
+      "holds_before_minor": 0,
+      "free_after_hold_minor": -600000,
+      "projected_cash_after_minor": 1200000,
+      "projected_holds_after_minor": 800000,
+      "projected_available_after_minor": 400000,
+      "projected_protected_after_minor": 1000000,
+      "projected_independent_floor_minor": 0,
+      "new_shortfall_minor": 600000,
+      "incremental_shortfall_minor": 600000,
+      "after_action_shortfall_minor": 600000,
+      "action_total_minor": 800000,
+      "cashflow": [
+        {
+          "at": "2026-10-25T06:48:14.628Z",
+          "event_id": "OPENING",
+          "kind": "OPENING",
+          "balance_minor": 1200000
+        },
+        {
+          "event_id": "PROPOSED_ACTION",
+          "kind": "ACTION",
+          "amount_minor": -800000,
+          "at": "2026-10-25T06:48:14.628Z",
+          "day": "2026-10-25",
+          "uncertain": false,
+          "balance_minor": 400000
+        },
+        {
+          "event_id": "conversation-protected-purpose",
+          "kind": "PAYMENT",
+          "amount_minor": -1000000,
+          "release_minor": 0,
+          "at": "2099-11-01",
+          "day": "2099-11-01",
+          "uncertain": true,
+          "balance_minor": -600000
+        }
+      ],
+      "baseline_date_gap_minor": 0,
+      "after_action_date_gap_minor": 600000,
+      "gap_date": "2099-11-01",
+      "free_before_yuan": "2000.00",
+      "available_for_new_action_yuan": "2000.00",
+      "protected_before_yuan": "10000.00",
+      "holds_before_yuan": "0.00",
+      "projected_independent_floor_yuan": "0.00",
+      "projected_free_after_yuan": "-6000.00",
+      "shortfall_yuan": "6000.00",
+      "action_total_yuan": "8000.00",
+      "after_action_date_gap_yuan": "6000.00",
+      "budget_over_yuan": null,
+      "emergency_allocation_after_yuan": null,
+      "suggested_max_principal_minor": 200000,
+      "suggested_max_principal_yuan": "2000.00"
+    },
+    "execution_receipt": null
+  },
+  "callback": {
+    "status": "RECORDED",
+    "requires_reconciliation": false,
+    "execution_allowed": false
+  },
+  "audit_events": [
+    {
+      "event_id": "event-35983846-538c-4e32-914a-d5cd1df5e76b",
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "actor": "model-service",
+      "event_type": "review.received",
+      "payload": {
+        "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+        "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+        "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+        "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+        "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+        "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304",
+        "trace": {
+          "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+          "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+          "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+          "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+          "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+          "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304"
+        }
+      },
+      "timestamp": "2026-10-25T06:48:14.653Z"
+    },
+    {
+      "event_id": "event-8af0bc7b-efc0-42fa-8362-63fed53afe44",
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "actor": "model-service",
+      "event_type": "model.completed",
+      "payload": {
+        "source": "model",
+        "attempt_count": 1,
+        "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+        "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+        "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+        "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+        "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+        "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304",
+        "trace": {
+          "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+          "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+          "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+          "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+          "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+          "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304"
+        }
+      },
+      "timestamp": "2026-10-25T06:48:14.653Z"
+    },
+    {
+      "event_id": "event-f29f0a8d-c1df-4e2a-8628-e876c1e8424c",
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "actor": "model-service",
+      "event_type": "gateway.checked",
+      "payload": {
+        "execution_allowed": false,
+        "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+        "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+        "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+        "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+        "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+        "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304",
+        "trace": {
+          "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+          "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+          "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+          "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+          "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+          "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304"
+        }
+      },
+      "timestamp": "2026-10-25T06:48:14.654Z"
+    },
+    {
+      "event_id": "event-2b9f6276-7670-4124-85c5-c227139c9577",
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "actor": "core-agent",
+      "event_type": "workflow.created",
+      "payload": {
+        "stage": "MODEL",
+        "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+        "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+        "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+        "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+        "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+        "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304",
+        "trace": {
+          "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+          "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+          "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+          "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+          "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+          "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304"
+        }
+      },
+      "timestamp": "2026-10-25T06:48:14.654Z"
+    },
+    {
+      "event_id": "event-cd4501c8-3cf0-41fc-803b-271f8c5c7f49",
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "actor": "core-agent",
+      "event_type": "proposal.bound",
+      "payload": {
+        "source": "model",
+        "proposal_sha256": "6a0bd77eaad152b4c7d9add61a98c7bdc81cd4248d66a1e552a8cd593d0e97a1",
+        "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+        "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+        "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+        "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+        "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+        "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304",
+        "trace": {
+          "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+          "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+          "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+          "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+          "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+          "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304"
+        }
+      },
+      "timestamp": "2026-10-25T06:48:14.654Z"
+    },
+    {
+      "event_id": "event-0a0ff405-e1c4-489e-8fb5-98fca3c31769",
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "actor": "risk-gateway",
+      "event_type": "risk.handoff.created",
+      "payload": {
+        "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304",
+        "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+        "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+        "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+        "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+        "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+        "trace": {
+          "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+          "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+          "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+          "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+          "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+          "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304"
+        }
+      },
+      "timestamp": "2026-10-25T06:48:14.654Z"
+    },
+    {
+      "event_id": "event-473b3405-96d0-4cf8-b7fc-4c61e740eea3",
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "actor": "execution-gateway",
+      "event_type": "execution.blocked",
+      "payload": {
+        "reason": "risk_pending",
+        "execution_allowed": false,
+        "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+        "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+        "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+        "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+        "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+        "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304",
+        "trace": {
+          "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+          "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+          "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+          "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+          "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+          "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304"
+        }
+      },
+      "timestamp": "2026-10-25T06:48:14.654Z"
+    },
+    {
+      "event_id": "event-72bcc88e-2974-4836-a6cc-f9b7c9dedc6c",
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "actor": "risk",
+      "event_type": "risk.rejected",
+      "payload": {
+        "reason": "风险检查阻止此方案；检查=conversation-risk-635ac80d-d4c0-4b91-ac89-b971a27876a0；原因=PROTECTED_PURPOSE_CONFLICT,PAYMENT_DATE_GAP",
+        "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+        "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+        "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+        "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+        "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+        "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304",
+        "trace": {
+          "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+          "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+          "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+          "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+          "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+          "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304"
+        }
+      },
+      "timestamp": "2026-10-25T06:48:14.688Z"
+    },
+    {
+      "event_id": "event-d5f03843-8f40-45e4-8659-2495db3c6f31",
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "actor": "execution-gateway",
+      "event_type": "execution.blocked",
+      "payload": {
+        "reason": "risk_rejected",
+        "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+        "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+        "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+        "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+        "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+        "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304",
+        "trace": {
+          "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+          "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+          "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+          "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+          "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+          "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304"
+        }
+      },
+      "timestamp": "2026-10-25T06:48:14.688Z"
+    },
+    {
+      "event_id": "event-93a6be3a-2a0b-43b3-8252-40b84f5898e1",
+      "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+      "actor": "risk-gateway",
+      "event_type": "risk.callback.recorded",
+      "payload": {
+        "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304",
+        "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+        "proposal_sha256": "6a0bd77eaad152b4c7d9add61a98c7bdc81cd4248d66a1e552a8cd593d0e97a1",
+        "decision": "REJECT",
+        "risk_decision_id": "risk-decision-9a519227-e1ca-4806-ad1e-e7156326a2d0",
+        "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+        "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+        "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+        "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+        "trace": {
+          "request_id": "req-0cf8c226-34ae-4dbb-99dc-6d4bb1610b12",
+          "task_id": "review-task-9d0f24f9-3fa7-43fc-8e40-80ce179faa49",
+          "session_id": "session-595363f3-79eb-485e-9d09-61be1abc0fa6",
+          "run_id": "review-cb5adad1-66c7-4dc1-a381-5b4f6571569c",
+          "audit_id": "audit-9ee2c196-8382-4848-994d-0aaf48e777f4",
+          "handoff_id": "handoff-515860b5-657c-416b-b9e7-991c1a8b7304"
+        }
+      },
+      "timestamp": "2026-10-25T06:48:14.688Z"
+    }
+  ],
+  "production_connected": false,
+  "joint_acceptance": false
+}

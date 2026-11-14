@@ -1,0 +1,55 @@
+{
+  "rule_id": "R05",
+  "title_zh": "行业集中度与未知行业",
+  "version": "risk-rules.v0.1-draft",
+  "status": "MODULE4_PROPOSAL_PENDING_TEAM_REVIEW",
+  "stages": [
+    "PLAN_REVIEW",
+    "EXECUTION_PREFLIGHT"
+  ],
+  "check_key": "sector_concentration",
+  "input_refs": [
+    "/data_context/classification",
+    "/upstream/artifacts/candidates"
+  ],
+  "conditions": [
+    {
+      "condition_id": "R05-total",
+      "metric": "sector_weight",
+      "operator": "GT",
+      "threshold": 0.4,
+      "threshold_ref": null,
+      "unit": "RATIO",
+      "basis": "TOTAL_ASSETS",
+      "group": "ANY"
+    },
+    {
+      "condition_id": "R05-invested",
+      "metric": "sector_weight",
+      "operator": "GT",
+      "threshold": 0.6,
+      "threshold_ref": null,
+      "unit": "RATIO",
+      "basis": "INVESTED_ASSETS",
+      "group": "ANY"
+    }
+  ],
+  "reason_codes": [
+    "SECTOR_LIMIT_EXCEEDED",
+    "SECTOR_INFORMATION_INCOMPLETE",
+    "GRADUAL_IMPROVEMENT_ACCEPTANCE"
+  ],
+  "failure_decisions": [
+    "BLOCK",
+    "REVIEW"
+  ],
+  "acceptance_policy_zh": "行业未知可接受；已知超限仅可使用合格的逐步改善例外。",
+  "enforcement_owner": [
+    "RISK",
+    "ORCHESTRATOR",
+    "TOOLS"
+  ],
+  "recovery_zh": "降低已知行业占比、补齐分类或明确接受允许的剩余风险。",
+  "source": "MODULE4_PROPOSAL",
+  "notes_zh": "ETF采用预置行业权重，未知单列；不能以未知数据证明改善。改善例外条件同R04。"
+}

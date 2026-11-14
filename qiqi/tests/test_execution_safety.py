@@ -456,6 +456,25 @@ class HttpSafetyTests(IsolatedAppTest):
         self.assertEqual(overview["balance"], demo_balance() - 1200)
         self.assertEqual(overview["pending"], [])
 
+    def test_live_mode_rejects_client_identity_flags_before_any_sandbox_execution(self):
+        pending_id = self.queue("给张伟转账700元备注房租")
+        wealth_id = self.wealth_request()
+        before = deepcopy(self.state._dump())
+        self.app.mode = "live"
+        for route, body in (
+            ("/api/scenarios/confirm", {"id": pending_id, "verification": MFA, "mode": "demo"}),
+            ("/api/decide", {"id": wealth_id, "approved": True, "verification": MFA, "mode": "demo"}),
+        ):
+            with self.subTest(route=route), self.assertRaises(HTTPError) as error:
+                self.request(route, body)
+            self.assertEqual(error.exception.code, 403)
+            result = json.load(error.exception)
+            self.assertEqual(result["error_code"], "TRUSTED_APPROVAL_REQUIRED")
+            self.assertFalse(result["executed"])
+        self.assertEqual(self.state._dump(), before)
+        self.assertEqual(self.app.trades(), [])
+        self.assertEqual(self.request("/api/scenarios/boot")["balance"], before["balance"])
+
     def test_http_executor_failure_does_not_claim_success(self):
         action_id = self.wealth_request()
         with patch.object(self.app.orch.paper_trader, "execute", return_value=PaperTradingResult(False, message="unavailable")):
